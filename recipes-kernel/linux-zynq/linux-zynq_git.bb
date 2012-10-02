@@ -39,11 +39,11 @@ SRC_URI = "git://git.xilinx.com/linux-xlnx.git;protocol=git;nocheckout=1 \
 
 KERNEL_DEVICETREE = "${WORKDIR}/devicetree.dts"
 
-LINUX_VERSION ?= "3.3"
+LINUX_VERSION ?= "3.5"
 LINUX_VERSION_EXTENSION ?= "-xilinx"
 
 # tag: v3.4 76e10d158efb6d4516018846f60c2ab5501900bc
-SRCREV="1e92da8e3a66b051766b1be57be67e2bff11e19d"
+SRCREV="790589101cb174690d3500ea874d4662d96823a0"
 
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
