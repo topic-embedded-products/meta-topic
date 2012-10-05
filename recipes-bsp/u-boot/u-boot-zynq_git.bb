@@ -7,6 +7,8 @@ require recipes-bsp/u-boot/u-boot.inc
 # UBOOT_ENTRYPOINT = "0x80008000"
 # UBOOT_LOADADDRESS = "0x80008000"
 
+UBOOT_MACHINE = "zynq_zc70x_config"
+
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1707d6db1d42237583f50183a5651ecb"
 
@@ -14,9 +16,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1707d6db1d42237583f50183a5651ecb"
 
 # We use the revision in order to avoid having to fetch it from the
 # repo during parse
-SRCREV = "b8416f141c46a44a41071125bcf990a044eb0660"
+SRCREV = "7639205355d437d0650953021b99c0e515355c62"
 
 PV = "xilinx-zc702"
+PR = "r1"
 
 SRC_URI = "git://git.xilinx.com/u-boot-xarm.git;protocol=git"
 
