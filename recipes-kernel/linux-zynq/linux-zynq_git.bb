@@ -37,6 +37,7 @@ SRC_URI = "git://git.xilinx.com/linux-xlnx.git;protocol=git;nocheckout=1 \
            file://defconfig \
           "
 
+KERNEL_IMAGETYPE = "uImage"
 KERNEL_DEVICETREE = "${WORKDIR}/devicetree.dts"
 
 LINUX_VERSION ?= "3.5"
