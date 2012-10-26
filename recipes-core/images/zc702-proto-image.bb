@@ -7,6 +7,7 @@ IMAGE_FEATURES += "splash ssh-server-openssh tools-sdk \
 IMAGE_INSTALL = "\
     packagegroup-core-boot \
     packagegroup-core-basic \
+    kernel-modules \
     "
 
 inherit core-image
