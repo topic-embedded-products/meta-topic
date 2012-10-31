@@ -30,6 +30,9 @@
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
 
+# Using LZO compression in the kernel requires "lzop"
+DEPENDS += "lzop-native"
+
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-zynq-git:"
 
 SRC_URI = "git://git.xilinx.com/linux-xlnx.git;protocol=git;nocheckout=1 \
