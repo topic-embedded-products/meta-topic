@@ -9,10 +9,10 @@
 
 	memory {
 		device_type = "memory";
-		reg = <0x00000000 0x40000000>; 
+		reg = <0x00000000 0x40000000>;
 	};
 	chosen {
-		bootargs = "console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootwait earlyprintk"; 
+		bootargs = "console=ttyPS0,115200 ubi.mtd=qspi-rootfs root=ubi0:qspi-rootfs rw rootfstype=ubifs rootwait";
 		linux,stdout-path = "/amba@0/uart@E0001000";
 	};
 
@@ -56,7 +56,7 @@
 		timer@0xf8001000 {
 			compatible = "xlnx,ps7-ttc-1.00.a";
 			reg = <0xf8001000 0x1000>;
-			interrupts = <0 10 4>,<0 11 4>,<0 12 4>; 
+			interrupts = <0 10 4>,<0 11 4>,<0 12 4>;
 			interrupt-parent = <&gic>;
 			clock-frequency-timer0 = <111111111>;
 			clock-frequency-timer1 = <111111111>;
@@ -87,6 +87,46 @@
 			reg = <0xf8f00620 0x20>;
 			clock-frequency = <333333333>;
 			reset = <1>;
+		};
+
+		qspi0: spi@e000d000 {
+			compatible = "xlnx,ps7-qspi-1.00.a";
+			reg = <0xE000D000 0x1000>;
+			interrupts = <0 19 4>;
+			interrupt-parent = <&gic>;
+			speed-hz = <200000000>;
+			bus-num = <1>;
+			num-chip-select = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			is-dual = <0>;
+			flash@0 {
+			compatible = "n25q128";
+			reg = <0x0>;
+			spi-max-frequency = <50000000>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+			partition@qspi-bootloader {
+				label = "qspi-bootloader";
+				reg = <0x0 0x60000>;
+				};
+			partition@qspi-u-boot-env {
+				label = "qspi-u-boot-env";
+				reg = <0x60000 0x10000>;
+				};
+			partition@qspi-device-tree {
+				label = "qspi-device-tree";
+				reg = <0x70000 0x10000>;
+				};
+			partition@qspi-linux {
+				label = "qspi-linux";
+				reg = <0x80000 0x400000>;
+				};
+			partition@qspi-rootfs {
+				label = "qspi-rootfs";
+				reg = <0x480000 0xb80000>;
+				};
+			};
 		};
 
 		eth@e000b000 {
@@ -120,7 +160,7 @@
 			bus-id = <0>;
 			input-clk = <111111111>;
 			i2c-clk = <100000>;
-			
+
 			#address-cells = <1>;
 			#size-cells = <0>;
 		};
@@ -148,54 +188,6 @@
 			reg = <0xe000a000 0x1000>;
 			interrupts = <0 20 4>;
 			interrupt-parent = <&gic>;
-		};
-
-		qspi0: spi@e000d000 {
-			compatible = "xlnx,ps7-qspi-1.00.a";
-			reg = <0xE000D000 0x1000>;
-			interrupts = <0 19 4>;
-			interrupt-parent = <&gic>;
-			speed-hz = <200000000>;
-			bus-num = <1>;
-			num-chip-select = <1>;
-			#address-cells = <1>;
-			#size-cells = <0>;
-			is-dual = <0>;
-			flash@0 {
-			compatible = "n25q128";
-			reg = <0x0>;
-			spi-max-frequency = <50000000>;
-			#address-cells = <1>;
-			#size-cells = <1>;
-			partition@qspi-fsbl {
-				label = "qspi-fsbl";
-				reg = <0x0 0x80000>;
-				};
-			partition@qspi-u-boot {
-				label = "qspi-u-boot";
-				reg = <0x80000 0x80000>;
-				};
-			partition@qspi-linux {
-				label = "qspi-linux";
-				reg = <0x100000 0x500000>;
-				};
-			partition@qspi-device-tree {
-				label = "qspi-device-tree";
-				reg = <0x600000 0x20000>;
-				};
-			partition@qspi-user {
-				label = "qspi-user";
-				reg = <0x620000 0xE0000>;
-				};
-			partition@qspi-scratch {
-				label = "qspi-scratch";
-				reg = <0x700000 0x100000>;
-				};
-			partition@qspi-rootfs {
-				label = "qspi-rootfs";
-				reg = <0x800000 0x800000>;
-				};
-			};
 		};
 
 		devcfg@f8007000 {

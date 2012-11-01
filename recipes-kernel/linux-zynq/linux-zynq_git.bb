@@ -36,6 +36,7 @@ DEPENDS += "lzop-native"
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-zynq-git:"
 
 SRC_URI = "git://git.xilinx.com/linux-xlnx.git;protocol=git;nocheckout=1 \
+           file://spi-xilinx-qps-use-initcall.patch \
            file://devicetree.dts \
            file://defconfig \
           "
@@ -53,3 +54,5 @@ PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
 COMPATIBLE_MACHINE = "(zynq-zc702)"
+
+PR_append=".8"

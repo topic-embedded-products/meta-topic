@@ -2,7 +2,7 @@ Index: git/include/configs/zynq_common.h
 ===================================================================
 --- git.orig/include/configs/zynq_common.h
 +++ git/include/configs/zynq_common.h
-@@ -32,55 +32,51 @@
+@@ -32,55 +32,47 @@
   */
  #define CONFIG_OF_LIBFDT
  
@@ -25,21 +25,19 @@ Index: git/include/configs/zynq_common.h
  	"fdt_high=0x20000000\0"	\
  	"initrd_high=0x20000000\0"	\
  	"norboot=echo Copying Linux from NOR flash to RAM...;" \
- 		"cp 0xE2100000 ${kernel_addr} ${kernel_size};" \
- 		"cp 0xE2600000 0x2A00000 0x20000;" \
+-		"cp 0xE2100000 ${kernel_addr} ${kernel_size};" \
+-		"cp 0xE2600000 0x2A00000 0x20000;" \
 -		"echo Copying ramdisk...;" \
 -		"cp 0xE3000000 0x2000000 ${ramdisk_size};" \
 -		"bootm ${kernel_addr} 0x2000000 0x2A00000\0" \
-+		"bootm ${kernel_addr} - 0x2A00000\0" \
++		"bootm 0xE2100000 - 0xE2600000\0" \
  	"qspiboot=echo Copying Linux from QSPI flash to RAM...;" \
 -		"cp 0xFC100000 ${kernel_addr} ${kernel_size};" \
 -		"cp 0xFC600000 0x2A00000 0x20000;" \
 -		"echo Copying ramdisk...;" \
 -		"cp 0xFC800000 0x2000000 ${ramdisk_size};" \
 -		"bootm ${kernel_addr} 0x2000000 0x2A00000\0" \
-+		"cp 0xFC080000 ${kernel_addr} 0x400000;" \
-+		"cp 0xFC070000 0x2A00000 0x10000;" \
-+		"bootm ${kernel_addr} - 0x2A00000\0" \
++		"bootm 0xFC080000 - 0xFC070000\0" \
  	"sdboot=echo Copying Linux from SD to RAM...;" \
  		"mmcinfo;" \
  		"fatload mmc 0 ${kernel_addr} ${kernel_image};" \
