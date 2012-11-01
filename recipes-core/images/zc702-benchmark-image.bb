@@ -1,5 +1,7 @@
 DESCRIPTION = "A console-only image with a few benchmark tools."
 
+DEPENDS += "sd-bootscript"
+
 IMAGE_FEATURES += "splash"
 
 IMAGE_INSTALL = "\
