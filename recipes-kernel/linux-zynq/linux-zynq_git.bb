@@ -1,7 +1,7 @@
 # linux-yocto-custom.bb:
 #
 #   Provides an example/minimal kernel recipe that uses the linux-yocto
-#   and oe-core kernel classes to apply a subset of yocto kernel 
+#   and oe-core kernel classes to apply a subset of yocto kernel
 #   management to git managed kernel repositories.
 #
 # Notes:
@@ -10,9 +10,9 @@
 #               configuration fragment(s). Either of these can be added
 #               via bbappend.
 #   patches: patches can be merged into to the source git tree itself, added
-#            using standard bbappend syntax or controlled via .scc feature 
+#            using standard bbappend syntax or controlled via .scc feature
 #            descriptions (also via bbappends)
-#   
+#
 #   example configuration addition:
 #            SRC_URI += "file://smp.cfg"
 #   example patch addition (for kernel v3.4 only):
@@ -25,7 +25,7 @@
 #   Building the sample kernel tree (kernel.org) without providing any
 #   configuration will result in build or boot errors. This is not a bug
 #   it is a required element for creating a valid kernel.
-#    
+#
 
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
@@ -55,4 +55,4 @@ PV = "${LINUX_VERSION}+git${SRCPV}"
 
 COMPATIBLE_MACHINE = "(zynq-zc702)"
 
-PR_append=".8"
+PR_append=".11"
