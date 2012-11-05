@@ -1,0 +1,4 @@
+#!/bin/sh
+# Kernel with devtmpfs, no need to mount /dev
+echo "/sbin/mdev" > /proc/sys/kernel/hotplug
+mdev -s
