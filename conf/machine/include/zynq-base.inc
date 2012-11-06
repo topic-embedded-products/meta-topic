@@ -3,7 +3,7 @@
 include conf/machine/include/zynq-default-providers.inc
 
 # Add u-boot image to rootfs
-EXTRA_IMAGEDEPENDS = "u-boot-zynq"
+EXTRA_IMAGEDEPENDS = "virtual/bootloader"
 
 # Specify kernel image type
 KERNEL_IMAGETYPE = "uImage"
