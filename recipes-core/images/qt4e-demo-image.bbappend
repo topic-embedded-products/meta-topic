@@ -1,2 +1,2 @@
 
-IMAGE_INSTALL += "netperf"
+IMAGE_INSTALL += "netperf kernel-modules"
