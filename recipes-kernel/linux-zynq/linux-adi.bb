@@ -40,7 +40,6 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/linux-adi-git:"
 SRC_URI = "git://github.com/analogdevicesinc/linux.git;branch=${KBRANCH};protocol=git"
 
 SRC_URI += "\
-	file://adv7511-kconfig.patch \
 	file://defconfig \
 	file://devicetree.dts \
 	"
@@ -52,9 +51,9 @@ LINUX_VERSION ?= "3.6"
 LINUX_VERSION_EXTENSION ?= "-adi"
 
 # tag: v3.4 76e10d158efb6d4516018846f60c2ab5501900bc
-SRCREV="0f8dd21d5a75da378066468228eba03333f2b4cf"
+SRCREV="269d2c613f52891864776d73399cb5583f894b15"
 
-PR = "r0.3"
+PR = "r0.4"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
 COMPATIBLE_MACHINE = "(zynq-zc702)"
