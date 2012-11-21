@@ -1,10 +1,30 @@
-BSP for Xilinx Zynq dev boards. See: 
+BSP for Xilinx Zynq dev boards. For instructions on building, see: 
 
 https://github.com/balister/meta-zynq/wiki/Getting-started
 
-to get started.
 
-Questions to philip@opensdr.com. No promise I can answer them all. If this
-becomes popular, I'll create a mailing list for it. I try and follow the
-Xilinx forums, but I find forums painful to use.
+This is a fork of Ballister's OE environment for Zynq boards. This repo
+mainly serves to share ideas and code for the Zynq series. In this version
+I have so far made the following additions:
+
+- Faster booting by tweaking boot params.
+
+- Build BOOT.bin using Xilinx tools (which you'll need to install for this)
+  from within OE. u-boot will be built by OE, you'll need to create a FSBL
+  and optionally a logic bit file and point OE variables to their location.
+
+- Allow mixed booting, e.g. bootloader from QSPI, kernel and rootfs on SD.
+  This is implemented by checking for an "autorun" script on the SD card.
+  There's a recipe in the build that boots like described. You can have the
+  script do anything that the u-boot shell supports.
+
+- Offer kernels from Xilinx and ADI (for their framebuffer).
+
+- Boot and run completely from QSPI flash, mounting a UBIFS root filesystem
+  allowing read/write access.
+
+If you have questions or comments, I usually read the Xilinx Linux forum and
+the ADI linux driver forum:
+http://forums.xilinx.com/t5/Embedded-Linux/bd-p/ELINUX
+http://ez.analog.com/community/linux-device-drivers/linux-software-drivers
 
