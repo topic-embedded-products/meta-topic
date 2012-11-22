@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# We could check /sys/devices/amba.0/f8007000.devcfg/prog_done
+# to see if it's already programmed
+
+BITFILE=/etc/fpga.bin
+
+case "$1" in
+  start)
+    if [ ! -e /dev/xdevcfg ]; then
+      mknod /dev/xdevcfg c 259 0
+    fi
+    if [ ! -e "${BITFILE}" ]; then
+      echo "FPGA bitfile ${BITFILE} does not exist"
+      exit 1
+    fi
+    cat "${BITFILE}" > /dev/xdevcfg
+    result=`cat /sys/devices/amba.0/f8007000.devcfg/prog_done`
+    if [ $result -ne 1 ]; then
+      echo "ERROR configuring FPGA, logic is not configured!"
+      exit 1
+    fi
+    ;;
+esac
