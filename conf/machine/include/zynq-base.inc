@@ -3,7 +3,7 @@
 include conf/machine/include/zynq-default-providers.inc
 
 # Add u-boot image to rootfs
-EXTRA_IMAGEDEPENDS = "virtual/bootloader"
+EXTRA_IMAGEDEPENDS = "virtual/bootloader sd-bootscript"
 
 # Specify kernel image type
 KERNEL_IMAGETYPE = "uImage"
@@ -24,5 +24,5 @@ SERIAL_CONSOLE = "115200 ttyPS0"
 ZYNQ_FSBL ?= "${HOME}/workspace/zynq_fsbl_0/Release/zynq_fsbl_0.elf"
 # By default, no bitfile.
 ZYNQ_BITFILE ?= ""
-# Assumt "bootgen" is in the PATH (it usually isn't)
+# Assume "bootgen" is in the PATH (it usually isn't)
 ZYNQ_BOOTGEN ?= "bootgen"

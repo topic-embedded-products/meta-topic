@@ -1,2 +1,6 @@
 
-IMAGE_INSTALL += "netperf kernel-modules"
+IMAGE_INSTALL += "\
+	kernel-modules \
+	fpga-image \
+	adi-hdmi-load \
+	"

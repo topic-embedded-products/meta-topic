@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58"
 
 PV = "0"
-PR = "r0"
+PR = "r1"
 
 PACKAGES = "${PN}"
 
@@ -14,10 +14,10 @@ SRC_URI = "file://fpga-bit-to-bin.py file://init"
 
 inherit update-rc.d
 
-# Set to start at 21, which is before networking and similar
-# so you could have network or filesystem in logic.
+# Set to start at 03, which is before modutils
+# so you can autoload modules which use FPGA logic.
 INITSCRIPT_NAME = "${PN}"
-INITSCRIPT_PARAMS = "start 21 S ."
+INITSCRIPT_PARAMS = "start 03 S ."
 
 do_compile() {
 	python fpga-bit-to-bin.py --flip ${ZYNQ_ROOTFS_BITFILE} ${S}/fpga.bin
