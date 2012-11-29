@@ -40,6 +40,8 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/linux-adi-git:"
 SRC_URI = "git://github.com/analogdevicesinc/linux.git;branch=${KBRANCH};protocol=git"
 
 SRC_URI += "\
+	file://spi-xilinx-qps-use-initcall.patch \
+	file://0001-Move-virtual-mappings-into-vmalloc-space.patch \
 	file://defconfig \
 	file://devicetree.dts \
 	"
@@ -52,7 +54,7 @@ LINUX_VERSION_EXTENSION ?= "-adi"
 
 SRCREV="ce2f3b7c7d7f530df74e300094c6c7fdeac06239"
 
-PR = "r0.9"
+PR = "r0.11"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
 COMPATIBLE_MACHINE = "(zynq-zc702)"

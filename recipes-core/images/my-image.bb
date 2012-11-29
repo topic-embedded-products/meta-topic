@@ -2,10 +2,14 @@ DESCRIPTION = "An image"
 DEPENDS += "sd-bootscript"
 # IMAGE_FEATURES += "splash"
 
+IMAGE_FSTYPES = "tar.gz ubi"
+
 inherit image
 
 MY_THINGS = "\
 	kernel-modules \
+	fpga-image \
+	adi-hdmi-load \
 	mtd-utils \
 	nbench-byte \
 	"
