@@ -57,4 +57,4 @@ SRCREV="ce2f3b7c7d7f530df74e300094c6c7fdeac06239"
 PR = "r0.11"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-COMPATIBLE_MACHINE = "(zynq-zc702)"
+COMPATIBLE_MACHINE = "(zynq-zc702|zedboard)"

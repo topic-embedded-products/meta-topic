@@ -2,7 +2,7 @@ Index: git/include/configs/zynq_common.h
 ===================================================================
 --- git.orig/include/configs/zynq_common.h
 +++ git/include/configs/zynq_common.h
-@@ -32,55 +32,47 @@
+@@ -32,55 +32,48 @@
   */
  #define CONFIG_OF_LIBFDT
  
@@ -12,6 +12,7 @@ Index: git/include/configs/zynq_common.h
 +
  /* Default environment */
  #define CONFIG_EXTRA_ENV_SETTINGS	\
++	"bootscript=zynq-zc702-autorun.scr\0"	\
  	"ethaddr=00:0a:35:00:01:22\0"	\
  	"kernel_image=uImage\0"	\
 -	"ramdisk_image=uramdisk.image.gz\0"	\
@@ -60,7 +61,7 @@ Index: git/include/configs/zynq_common.h
 -/* default boot is according to the bootmode switch settings */
 -#define CONFIG_BOOTCOMMAND "run modeboot"
 +/* default boot is according to the bootmode switch settings, unless you insert a SD card with an autorun script */
-+#define CONFIG_BOOTCOMMAND "if mmcinfo; then if fatload mmc 0 0x1900000 zynq-zc702-autorun.scr; then source 0x1900000; fi; fi; run modeboot"
++#define CONFIG_BOOTCOMMAND "if mmcinfo; then if fatload mmc 0 0x1900000 ${bootscript}; then source 0x1900000; fi; fi; run modeboot"
  
  #define CONFIG_BAUDRATE		115200
  #define CONFIG_SYS_BAUDRATE_TABLE { 9600, 38400, 115200 }

@@ -2,6 +2,9 @@
 
 include conf/machine/include/zynq-default-providers.inc
 
+# Define a machine class for common zynq platforms
+MACHINE_CLASS = "zynq"
+
 # Add u-boot image to rootfs
 EXTRA_IMAGEDEPENDS = "virtual/bootloader sd-bootscript"
 

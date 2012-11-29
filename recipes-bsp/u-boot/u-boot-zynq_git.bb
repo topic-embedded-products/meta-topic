@@ -18,6 +18,7 @@ SRC_URI = "git://git.xilinx.com/u-boot-xarm.git;protocol=git \
            file://0001-Change-boot-options-so-linux-can-boot-without-a-ramd.patch \
            file://zynq-boot-xip.patch \
            file://autorun-bootscript.patch \
+           file://zed-bootscript.patch \
           "
 
 S = "${WORKDIR}/git"
