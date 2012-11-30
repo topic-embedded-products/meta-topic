@@ -17,6 +17,7 @@ MY_THINGS = "\
 IMAGE_INSTALL = "\
 	packagegroup-core-boot \
 	packagegroup-core-ssh-dropbear \
+	${ROOTFS_PKGMANAGE} \
 	${MY_THINGS} \
 	"
 

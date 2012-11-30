@@ -1,5 +1,5 @@
 # Increment PR number
-PRINC = "1"
+PRINC = "2"
 
 SRC_URI += "\
 	file://inetd file://inetd.conf \

@@ -35,35 +35,9 @@ case "$ACTION" in
 		# first allow fstab to determine the mountpoint
 		if ! mount /dev/$MDEV > /dev/null 2>&1
 		then
-			# no fstab entry, use automatic mountpoint
-			if [ "${DEVBASE}" == "mmcblk0" ]
-			then
-				DEVICETYPE="mmc1"
-			else
-				REMOVABLE=`cat /sys/block/$DEVBASE/removable`
-				if [ "${REMOVABLE}" -eq "0" ]; then
-					# mount the first non-removable internal device on /media/hdd
-					DEVICETYPE="hdd"
-				else
-					DEVICETYPE="usb"
-				fi
-			fi
-			if grep -q " /media/$DEVICETYPE " /proc/mounts || grep -q -w "\s/media/$DEVICETYPE\s" /etc/fstab
-			then
-			        # $DEVICETYPE already mounted, or in fstab
-				MOUNTPOINT="/media/$MDEV"
-			else
-				# Use mkdir as 'atomic' action, failure means someone beat us to the punch
-				if mkdir "/media/$DEVICETYPE"
-				then
-					# /media/$DEVICETYPE is available
-					MOUNTPOINT="/media/$DEVICETYPE"
-				else
-					mkdir "/media/$MDEV"
-					MOUNTPOINT="/media/$MDEV"
-				fi
-			fi
-			mount -t auto /dev/$MDEV $MOUNTPOINT
+			MOUNTPOINT="/media/$MDEV"
+			mkdir "$MOUNTPOINT"
+			mount -t auto /dev/$MDEV "$MOUNTPOINT"
 		fi
 		;;
 	remove)
@@ -71,7 +45,7 @@ case "$ACTION" in
 		if [ ! -z "$MOUNTPOINT" ]
 		then
 			umount "$MOUNTPOINT"
-			rmdir "$MOUNTPOINT" 
+			rmdir "$MOUNTPOINT"
 		else
 			umount /dev/$MDEV
 		fi

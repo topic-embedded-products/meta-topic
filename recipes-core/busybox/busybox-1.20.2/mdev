@@ -1,4 +1,6 @@
 #!/bin/sh
-# Kernel with devtmpfs, no need to mount /dev
+# Create a /media tmpfs for storing mount points (in RAM)
+mount -t tmpfs -o size=64k tmpfs /media
+# Start the hotplug
 echo "/sbin/mdev" > /proc/sys/kernel/hotplug
 mdev -s
