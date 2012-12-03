@@ -111,14 +111,16 @@
 		qspi0: spi@e000d000 {
 			compatible = "xlnx,ps7-qspi-1.00.a";
 			reg = <0xE000D000 0x1000>;
-			interrupts = <0 19 0>;
+			interrupts = <0 19 4>;
 			interrupt-parent = <&gic>;
 			speed-hz = <200000000>;
 			bus-num = <1>;
 			num-chip-select = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
 			is-dual = <0>;
 			flash@0 {
-				compatible = "n25q128";
+				compatible = "s25fl256s1";
 				reg = <0x0>;
 				spi-max-frequency = <50000000>;
 				#address-cells = <1>;
@@ -141,7 +143,7 @@
 				};
 				partition@qspi-rootfs {
 					label = "qspi-rootfs";
-					reg = <0x480000 0xb80000>;
+					reg = <0x480000 0x0b80000>;
 				};
 			};
 		};

@@ -1,0 +1,15 @@
+Index: git/drivers/mtd/devices/m25p80.c
+===================================================================
+--- git.orig/drivers/mtd/devices/m25p80.c
++++ git/drivers/mtd/devices/m25p80.c
+@@ -954,8 +954,8 @@ static int __devinit m25p_probe(struct s
+ 	else {
+ 		/* enable 4-byte addressing if the device exceeds 16MiB */
+ 		if (flash->mtd.size > 0x1000000) {
+-			flash->addr_width = 4;
+-			set_4byte(flash, info->jedec_id, 1);
++			flash->addr_width = 3; /* 4-bit address does not work on zynq/zedboard */
++			set_4byte(flash, info->jedec_id, 0); /* so we need this hack */
+ 		} else
+ 			flash->addr_width = 3;
+ 	}
