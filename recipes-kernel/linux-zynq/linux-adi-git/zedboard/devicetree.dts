@@ -43,10 +43,16 @@
 			reg = <0xf8001000 0x1000>;
 			interrupts = <0 10 0>,<0 11 0>,<0 12 0>;
 			interrupt-parent = <&gic>;
-/*			clock-frequency = <111111111>;*/
 			clock-frequency-timer0 = <111111111>;
 			clock-frequency-timer1 = <111111111>;
 			clock-frequency-timer2 = <111111111>;
+		};
+
+		timer@f8f00600 {
+			compatible = "arm,cortex-a9-twd-timer";
+			reg = <0xf8f00600 0x20>;
+			interrupts = <1 13 0x301>;
+			interrupt-parent = <&gic>;
 		};
 
 		swdt@f8005000 {
@@ -94,7 +100,8 @@
 		sdhci@e0100000 {
 			compatible = "xlnx,ps7-sdhci-1.00.a";
 			reg = <0xe0100000 0x1000>;
-			interrupts = <0 24 0>;
+			xlnx,has-cd = <0x1>;
+			interrupts = <0 24 4>;
 			interrupt-parent = <&gic>;
 			clock-frequency = <50000000>;
 		};
