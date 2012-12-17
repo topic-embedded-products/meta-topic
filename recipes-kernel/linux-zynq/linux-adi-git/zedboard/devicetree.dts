@@ -219,5 +219,40 @@
 			cpu-dai = <&axi_spdif_tx_0>;
 			pcm = <&xilinx_pcm_audio>;
 		};
+		leds {
+			compatible = "gpio-leds";
+			mmc_led {
+				label = "mmc_led";
+				gpios = <0x8000000 0x7000000 0x0>;
+				linux,default-trigger = "mmc0";
+			};
+		};
+		gpio_keys {
+			compatible = "gpio-keys";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			autorepeat;
+			btn8 {
+				label = "PB1";
+				linux,code = <28>; /* Enter */
+				gpios = <&gpio 50 0>;
+			};
+			btn9 {
+				label = "PB2";
+				linux,code = <1>; /* ESC */
+				gpios = <&gpio 51 0>;
+			};
+		};
+		zed_oled {
+			compatible = "dglnt,pmodoled-gpio";
+			vbat-gpio = <0x8000000 0x37000000 0x0>;
+			vdd-gpio = <0x8000000 0x38000000 0x0>;
+			res-gpio = <0x8000000 0x39000000 0x0>;
+			dc-gpio = <0x8000000 0x3a000000 0x0>;
+			spi-bus-num = <0x2000000>;
+			spi-speed-hz = <0x93d00>;
+			spi-sclk-gpio = <0x8000000 0x3b000000 0x0>;
+			spi-sdin-gpio = <0x8000000 0x3c000000 0x0>;
+		};
 	};
 };
