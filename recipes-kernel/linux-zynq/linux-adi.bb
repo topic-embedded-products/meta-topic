@@ -16,6 +16,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/linux-adi-git:"
 
 SRC_URI = "\
 	git://github.com/analogdevicesinc/linux.git;branch=${KBRANCH};protocol=git \
+	file://linux.git-53c84983549230495156d7da666cd1acdb9c9015.patch \
 	file://spi-xilinx-qps-use-initcall.patch \
 	file://0001-Move-virtual-mappings-into-vmalloc-space.patch \
 	file://xilinx_devcfg_add_hotplug.patch \
