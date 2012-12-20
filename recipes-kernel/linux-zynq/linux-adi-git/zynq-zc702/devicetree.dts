@@ -86,6 +86,20 @@
 			#gpio-cells = <2>;
 		};
 
+		leds {
+			compatible = "gpio-leds";
+			ds23 {
+				label = "ds23";
+				gpios = <&gpio 10 0>;
+				linux,default-trigger = "heartbeat";
+			};
+			/* Note that ds12 is not muxed in MIO by default */
+			ds12 {
+				label = "ds12";
+				gpios = <&gpio 8 0>;
+			};
+		};
+
 /*
 		i2c0: i2c@e0004000 {
 			compatible = "xlnx,ps7-i2c-1.00.a";
