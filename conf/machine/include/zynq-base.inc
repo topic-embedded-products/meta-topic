@@ -11,6 +11,9 @@ EXTRA_IMAGEDEPENDS = "virtual/bootloader sd-bootscript"
 # Specify kernel image type
 KERNEL_IMAGETYPE = "uImage"
 
+# If we have an rtc, we'll tell it
+MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
+
 # Specify machine features
 MACHINE_FEATURES = "apm vfat ethernet"
 
@@ -18,7 +21,7 @@ MACHINE_FEATURES = "apm vfat ethernet"
 MACHINE_EXTRA_RRECOMMENDS = "kernel-modules"
 
 # Specify rootfs image filesystem types
-IMAGE_FSTYPES += "tar.gz"
+IMAGE_FSTYPES = "tar.gz ubi"
 
 # Specify serial console settings
 SERIAL_CONSOLE = "115200 ttyPS0"
