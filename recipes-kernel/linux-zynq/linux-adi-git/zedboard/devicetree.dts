@@ -221,10 +221,10 @@
 		};
 		leds {
 			compatible = "gpio-leds";
-			mmc_led {
-				label = "mmc_led";
-				gpios = <0x8000000 0x7000000 0x0>;
-				linux,default-trigger = "mmc0";
+			ld9 {
+				label = "ld9";
+				gpios = <&gpio 7 0>;
+				linux,default-trigger = "heartbeat";
 			};
 		};
 		gpio_keys {
