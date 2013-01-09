@@ -12,14 +12,14 @@ require recipes-kernel/linux/linux-dtb.inc
 # Using LZO compression in the kernel requires "lzop"
 DEPENDS += "lzop-native"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/linux-adi-git:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/linux-milo:"
+
+# If you have a local repository, you can set this variable to point to
+# another kernel repo. Or to another kernel entirely.
+KERNEL_GIT_REPO ?= "git://github.com/milosoftware/linux.git;protocol=git"
 
 SRC_URI = "\
-	git://github.com/analogdevicesinc/linux.git;branch=${KBRANCH};protocol=git \
-	file://linux.git-53c84983549230495156d7da666cd1acdb9c9015.patch \
-	file://spi-xilinx-qps-use-initcall.patch \
-	file://0001-Move-virtual-mappings-into-vmalloc-space.patch \
-	file://xilinx_devcfg_add_hotplug.patch \
+	${KERNEL_GIT_REPO};branch=${KBRANCH} \
 	file://zedboard-qspi-flash-hack.patch \
 	file://defconfig \
 	file://devicetree.dts \
@@ -28,12 +28,12 @@ SRC_URI = "\
 KERNEL_IMAGETYPE = "uImage"
 KERNEL_DEVICETREE = "${WORKDIR}/devicetree.dts"
 
-LINUX_VERSION ?= "3.5"
-LINUX_VERSION_EXTENSION ?= "-adi"
+LINUX_VERSION ?= "3.6"
+LINUX_VERSION_EXTENSION ?= "-milo"
 
-SRCREV="a97300abf508f4b5622a1d8b53fb454c57ea94e9"
+SRCREV="80b982ff00c5f3f67152f33b354800785597dc35"
 
-PR = "r0.15"
+PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
 COMPATIBLE_MACHINE = "(zynq-zc702|zedboard)"
