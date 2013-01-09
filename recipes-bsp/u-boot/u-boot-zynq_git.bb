@@ -42,4 +42,4 @@ do_bootbin() {
 	${ZYNQ_BOOTGEN} -image bootimage.bif -o i ${DEPLOY_DIR_IMAGE}/BOOT.bin
 }
 
-addtask bootbin before do_build after do_deploy
+addtask bootbin before do_package after do_deploy
