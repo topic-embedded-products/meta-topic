@@ -93,10 +93,26 @@
 				gpios = <&gpio 10 0>;
 				linux,default-trigger = "heartbeat";
 			};
-			/* Note that ds12 is not muxed in MIO by default */
+			/* Note that ds12 is not muxed in MIO by default
 			ds12 {
 				label = "ds12";
 				gpios = <&gpio 8 0>;
+			}; */
+		};
+		gpio_keys {
+			compatible = "gpio-keys";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			autorepeat;
+			sw13 {
+				label = "SW13";
+				linux,code = <49>; /* "N" */
+				gpios = <&gpio 14 0>;
+			};
+			sw14 {
+				label = "SW14";
+				linux,code = <31>; /* "S" */
+				gpios = <&gpio 12 0>;
 			};
 		};
 
