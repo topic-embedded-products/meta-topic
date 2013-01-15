@@ -245,14 +245,15 @@
 		};
 		zed_oled {
 			compatible = "dglnt,pmodoled-gpio";
-			vbat-gpio = <0x8000000 0x37000000 0x0>;
-			vdd-gpio = <0x8000000 0x38000000 0x0>;
-			res-gpio = <0x8000000 0x39000000 0x0>;
-			dc-gpio = <0x8000000 0x3a000000 0x0>;
-			spi-bus-num = <0x2000000>;
-			spi-speed-hz = <0x93d00>;
-			spi-sclk-gpio = <0x8000000 0x3b000000 0x0>;
-			spi-sdin-gpio = <0x8000000 0x3c000000 0x0>;
+			/* GPIO Pins */
+			vbat-gpio = <&gpio 55 0>;
+			vdd-gpio = <&gpio 56 0>;
+			res-gpio = <&gpio 57 0>;
+			dc-gpio = <&gpio 58 0>;
+			/* SPI-GPIOs */
+			spi-bus-num = <2>;
+			spi-sclk-gpio = <&gpio 59 0>;
+			spi-sdin-gpio = <&gpio 60 0>;
 		};
 	};
 };
