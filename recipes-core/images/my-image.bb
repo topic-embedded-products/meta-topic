@@ -8,6 +8,7 @@ inherit image
 
 MY_THINGS = "\
 	kernel-modules \
+	modutils-loadscript \
 	fpga-image \
 	adi-hdmi-load \
 	mtd-utils \
