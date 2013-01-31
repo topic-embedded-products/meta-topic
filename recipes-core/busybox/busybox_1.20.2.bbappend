@@ -1,5 +1,5 @@
 # Increment PR number
-PRINC = "3"
+PRINC = "4"
 
 SRC_URI += "\
 	file://inetd file://inetd.conf \
@@ -12,6 +12,7 @@ do_install_append() {
 	fi
 	install -d ${D}${sysconfdir}/mdev
 	install -m 0755 ${WORKDIR}/mdev-mount.sh ${D}${sysconfdir}/mdev
+	install -m 0755 ${WORKDIR}/find-touchscreen.sh ${D}${sysconfdir}/mdev
 }
 
 # Fix mdev startup, should start at the same level as udev does
