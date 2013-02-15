@@ -1,6 +1,7 @@
 DESCRIPTION = "An image"
 DEPENDS += "sd-bootscript"
-# IMAGE_FEATURES += "splash"
+
+IMAGE_FEATURES += "package-management ssh-server-dropbear"
 
 IMAGE_FSTYPES = "tar.gz ubi"
 
@@ -12,7 +13,7 @@ MY_THINGS = "\
 	fpga-image \
 	adi-hdmi-load \
 	mtd-utils \
-	nbench-byte \
+	mtd-utils-ubifs \
 	"
 
 IMAGE_INSTALL = "\
@@ -38,4 +39,4 @@ myimage_rootfs_postprocess() {
 
         cd $curdir
 }
-ROOTFS_POSTPROCESS_COMMAND += "myimage_rootfs_postprocess"
+ROOTFS_POSTPROCESS_COMMAND += "myimage_rootfs_postprocess ; "
