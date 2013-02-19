@@ -182,6 +182,33 @@
 			bus-num = <1>;
 			num-chip-select = <1>;
 			is-dual = <0>;
+			flash@0 {
+				compatible = "s25fl256s1";
+				reg = <0x0>;
+				spi-max-frequency = <50000000>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+				partition@qspi-bootloader {
+					label = "qspi-bootloader";
+					reg = <0x0 0x60000>;
+				};
+				partition@qspi-u-boot-env {
+					label = "qspi-u-boot-env";
+					reg = <0x60000 0x10000>;
+				};
+				partition@qspi-device-tree {
+					label = "qspi-device-tree";
+					reg = <0x70000 0x10000>;
+				};
+				partition@qspi-linux {
+					label = "qspi-linux";
+					reg = <0x80000 0x400000>;
+				};
+				partition@qspi-rootfs {
+					label = "qspi-rootfs";
+					reg = <0x480000 0x0b80000>;
+				};
+			};
 		};
 
 		devcfg@f8007000 {
