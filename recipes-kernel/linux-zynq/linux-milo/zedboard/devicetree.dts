@@ -12,8 +12,7 @@
 		reg = <0x000000000 0x20000000>;
 	};
 	chosen {
-//		bootargs = "console=ttyPS0,115200 root=/dev/ram rw initrd=0x1100000,33M ip=:::::eth0:dhcp earlyprintk";
-		bootargs = "console=ttyPS0,115200 root=/dev/mmcblk0p2 rw earlyprintk rootfstype=ext4 rootwait devtmpfs.mount=0";
+		bootargs = "console=ttyPS0,115200 ubi.mtd=qspi-rootfs root=ubi0:qspi-rootfs rw rootfstype=ubifs rootwait quiet";
 		linux,stdout-path = "/amba@0/uart@E0001000";
 	};
 
@@ -319,6 +318,38 @@
 				gpios = <&gpio 7 0>;
 				linux,default-trigger = "heartbeat";
 			};
+		};
+
+/* Commented out because activating this crashes the kernel real badly!
+		gpio_keys {
+			compatible = "gpio-keys";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			autorepeat;
+			btn8 {
+				label = "PB1";
+				linux,code = <28>; // Enter
+				gpios = <&gpio 50 0>;
+			};
+			btn9 {
+				label = "PB2";
+				linux,code = <1>; // ESC
+				gpios = <&gpio 51 0>;
+			};
+		};
+*/
+
+		zed_oled {
+			compatible = "dglnt,pmodoled-gpio";
+			/* GPIO Pins */
+			vbat-gpio = <&gpio 55 0>;
+			vdd-gpio = <&gpio 56 0>;
+			res-gpio = <&gpio 57 0>;
+			dc-gpio = <&gpio 58 0>;
+			/* SPI-GPIOs */
+			spi-bus-num = <2>;
+			spi-sclk-gpio = <&gpio 59 0>;
+			spi-sdin-gpio = <&gpio 60 0>;
 		};
 	};
 };
