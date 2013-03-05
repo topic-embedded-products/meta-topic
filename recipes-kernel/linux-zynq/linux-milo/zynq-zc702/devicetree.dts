@@ -342,5 +342,29 @@
 			cpu-dai = <&axi_spdif_tx_0>;
 			pcm = <&xilinx_pcm_audio>;
 		};
+		leds {
+			compatible = "gpio-leds";
+			ds23 {
+				label = "ds23";
+				gpios = <&gpio 10 0>;
+				linux,default-trigger = "heartbeat";
+			};
+		};
+		gpio_keys {
+			compatible = "gpio-keys";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			autorepeat;
+			sw13 {
+				label = "SW13";
+				linux,code = <49>; /* "N" */
+				gpios = <&gpio 14 0>;
+			};
+			sw14 {
+				label = "SW14";
+				linux,code = <31>; /* "S" */
+				gpios = <&gpio 12 0>;
+			};
+		};
 	};
 };
