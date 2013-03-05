@@ -9,16 +9,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1707d6db1d42237583f50183a5651ecb"
 
 # We use the revision in order to avoid having to fetch it from the
 # repo during parse
-SRCREV = "7639205355d437d0650953021b99c0e515355c62"
+SRCREV = "5d46363c0dace3b6dcf45f4af67d2f41a01ef358"
 
 PV = "xilinx-zynq"
-PR = "r2.7"
+PR = "r3"
 
 SRC_URI = "git://git.xilinx.com/u-boot-xlnx.git;protocol=git \
-           file://0001-Change-boot-options-so-linux-can-boot-without-a-ramd.patch \
-           file://zynq-boot-xip.patch \
-           file://autorun-bootscript.patch \
-           file://zed-bootscript.patch \
+           file://0001-Use-bootscript-to-boot-use-fast-XIP-load-address-no-.patch \
           "
 
 S = "${WORKDIR}/git"

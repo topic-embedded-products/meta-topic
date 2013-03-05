@@ -1,0 +1,123 @@
+From 76910c31c13d3910db7d76d1f6c7d04720c4b062 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 5 Mar 2013 11:17:47 +0100
+Subject: [PATCH] Use bootscript to boot, use fast XIP load address, no
+ ramdisk
+
+Check for autorun bootscript and run it from SD.
+Load kernel at correct offset so it can execute in place (save a memcpy)
+Boot without ramdisk because we expect real filesystems (ubi or ext4)
+---
+ include/configs/zynq_common.h |   75 ++++++++++++++++++++++++-----------------
+ 1 files changed, 44 insertions(+), 31 deletions(-)
+
+diff --git a/include/configs/zynq_common.h b/include/configs/zynq_common.h
+index 89df277..e60b80f 100644
+--- a/include/configs/zynq_common.h
++++ b/include/configs/zynq_common.h
+@@ -31,7 +31,7 @@
+ #define CONFIG_SYS_SDRAM_SIZE	PHYS_SDRAM_1_SIZE
+
+ /* Total Size of Environment Sector */
+-#define CONFIG_ENV_SIZE		(128 << 10)
++#define CONFIG_ENV_SIZE		0x10000
+
+ /* allow to overwrite serial and ethaddr */
+ #define CONFIG_ENV_OVERWRITE
+@@ -183,7 +183,7 @@
+ # endif
+
+ # define CONFIG_ENV_SECT_SIZE		CONFIG_ENV_SIZE
+-# define CONFIG_ENV_OFFSET		0xE0000
++# define CONFIG_ENV_OFFSET		0x60000
+ # define CONFIG_CMD_SAVEENV	/* Command to save ENV to Flash */
+ #endif
+
+@@ -200,51 +200,55 @@
+  */
+ #define CONFIG_OF_LIBFDT
+
++#ifndef CONFIG_EXTRA_ENV_BOOTSCRIPT
++# define CONFIG_EXTRA_ENV_BOOTSCRIPT "autorun.scr"
++#endif
++
++#ifdef CONFIG_NAND_ZYNQ
++# define CONFIG_EXTRA_ENV_NANDBOOT "nandboot=echo Copying Linux from NAND flash to RAM... && " \
++		"nand read ${kernel_addr} 0x100000 ${kernel_size} && " \
++		"nand read 0x2A00000 0x600000 ${devicetree_size} && " \
++		"bootm ${kernel_addr} - 0x2A00000\0"
++#else
++# define CONFIG_EXTRA_ENV_NANDBOOT ""
++#endif
++
+ /* Default environment */
+ #define CONFIG_EXTRA_ENV_SETTINGS	\
+ 	"ethaddr=00:0a:35:00:01:22\0"	\
+ 	"kernel_image=uImage\0"	\
+ 	"ramdisk_image=uramdisk.image.gz\0"	\
+ 	"devicetree_image=devicetree.dtb\0"	\
+-	"kernel_size=0x500000\0"	\
+-	"devicetree_size=0x20000\0"	\
+-	"ramdisk_size=0x5E0000\0"	\
++	"bootscript=" CONFIG_EXTRA_ENV_BOOTSCRIPT "\0" \
++	"kernel_size=0x380000\0"	\
++	"kernel_addr=0x79C0\0"	\
++	"devicetree_size=0x10000\0"	\
+ 	"fdt_high=0x20000000\0"	\
+ 	"initrd_high=0x20000000\0"	\
+-	"norboot=echo Copying Linux from NOR flash to RAM...;" \
+-		"cp 0xE2100000 0x3000000 ${kernel_size} && " \
+-		"cp 0xE2600000 0x2A00000 ${devicetree_size} && " \
+-		"echo Copying ramdisk... && " \
+-		"cp 0xE2620000 0x2000000 ${ramdisk_size} && " \
+-		"bootm 0x3000000 0x2000000 0x2A00000\0" \
+-	"qspiboot=echo Copying Linux from QSPI flash to RAM... && " \
++	"norboot=echo Boot from NOR flash...;" \
++		"bootm 0xE2100000 - 0xE2600000\0" \
++	"qspiboot=echo Booting from QSPI flash... && " \
+ 		"sf probe 0 0 0 && " \
+-		"sf read 0x3000000 0x100000 ${kernel_size} && " \
+-		"sf read 0x2A00000 0x600000 ${devicetree_size} && " \
+-		"echo Copying ramdisk... && " \
+-		"sf read 0x2000000 0x620000 ${ramdisk_size} && " \
+-		"bootm 0x3000000 0x2000000 0x2A00000\0" \
+-	"sdboot=echo Copying Linux from SD to RAM... && " \
++		"sf read ${kernel_addr} 0x80000 ${kernel_size} && " \
++		"sf read 0x2A00000 0x70000 ${devicetree_size} && " \
++		"bootm ${kernel_addr} - 0x2A00000\0" \
++	"sdboot=echo Copying Linux from SD to RAM... ; " \
+ 		"mmcinfo && " \
+-		"fatload mmc 0 0x3000000 ${kernel_image} && " \
++		"fatload mmc 0 ${kernel_addr} ${kernel_image} && " \
+ 		"fatload mmc 0 0x2A00000 ${devicetree_image} && " \
+-		"fatload mmc 0 0x2000000 ${ramdisk_image} && " \
+-		"bootm 0x3000000 0x2000000 0x2A00000\0" \
+-	"nandboot=echo Copying Linux from NAND flash to RAM... && " \
+-		"nand read 0x3000000 0x100000 ${kernel_size} && " \
+-		"nand read 0x2A00000 0x600000 ${devicetree_size} && " \
+-		"echo Copying ramdisk... && " \
+-		"nand read 0x2000000 0x620000 ${ramdisk_size} && " \
+-		"bootm 0x3000000 0x2000000 0x2A00000\0" \
++		"bootm ${kernel_addr} - 0x2A00000\0" \
++	CONFIG_EXTRA_ENV_NANDBOOT \
+ 	"jtagboot=echo TFTPing Linux to RAM... && " \
+-		"tftp 0x3000000 ${kernel_image} && " \
++		"tftp ${kernel_addr} ${kernel_image} && " \
+ 		"tftp 0x2A00000 ${devicetree_image} && " \
+ 		"tftp 0x2000000 ${ramdisk_image} && " \
+-		"bootm 0x3000000 0x2000000 0x2A00000\0"
++		"bootm ${kernel_addr} 0x2000000 0x2A00000\0" \
++	"\0"
+
+ /* default boot is according to the bootmode switch settings */
+-#define CONFIG_BOOTCOMMAND	"run $modeboot"
+-#define CONFIG_BOOTDELAY	3 /* -1 to Disable autoboot */
++#define CONFIG_BOOTCOMMAND	"if mmcinfo; then if fatload mmc 0 0x1900000 ${bootscript}; then source 0x1900000; fi; fi; run $modeboot"
++#define CONFIG_ZERO_BOOTDELAY_CHECK
++#define CONFIG_BOOTDELAY	0
+
+ #define CONFIG_SYS_PROMPT	"zynq-uboot> "
+
+--
+1.7.5.4
+
