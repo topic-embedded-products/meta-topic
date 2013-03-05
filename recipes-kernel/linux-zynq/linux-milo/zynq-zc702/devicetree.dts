@@ -235,6 +235,8 @@
 			speed-hz = <200000000>;
 			bus-num = <1>;
 			num-chip-select = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
 			is-dual = <0>;
 			flash@0 {
 				compatible = "n25q128";
