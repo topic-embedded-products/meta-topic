@@ -2,7 +2,7 @@ DESCRIPTION = "HDMI framebuffer module loader to load in correct order"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58"
 
-PV = "1"
+PV = "2"
 PR = "r0"
 
 PACKAGES = "${PN}"
