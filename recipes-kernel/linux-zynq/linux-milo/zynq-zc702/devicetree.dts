@@ -335,7 +335,13 @@
 
 		xilinx_pcm_audio: xilinx_pcm_audio {
 			compatible = "xilinx-pcm-audio";
-			dma-request = <&axi_dma_0 0>;
+			#size-cells = <0>;
+			#address-cells = <1>;
+
+			stream@0 {
+				reg = <0>;
+				dma-request = <&axi_dma_0 0>;
+			};
 		};
 
 		adv7511_hdmi_snd: adv7511_hdmi_snd {
@@ -367,6 +373,18 @@
 				linux,code = <31>; /* "S" */
 				gpios = <&gpio 12 0>;
 			};
+/* Commented out: causes crash even though GPIO is correct.
+			sw5 {
+				label = "SW5";
+				linux,code = <106>; // Right
+				gpios = <&gpio 54 0>;
+			};
+			sw7 {
+				label = "SW7";
+				linux,code = <105>; // Left
+				gpios = <&gpio 55 0>;
+			};
+*/
 		};
 	};
 };
