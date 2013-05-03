@@ -1,6 +1,10 @@
 DESCRIPTION = "An image"
 DEPENDS += "sd-bootscript"
 
+DISTRO_EXTRA_DEPENDS ?= ""
+MACHINE_EXTRA_DEPENDS ?= ""
+DEPENDS += "${DISTRO_EXTRA_DEPENDS} ${MACHINE_EXTRA_DEPENDS}"
+
 IMAGE_FEATURES += "package-management ssh-server-dropbear"
 
 IMAGE_FSTYPES = "tar.gz ubi"
@@ -16,9 +20,13 @@ MY_THINGS = "\
 	mtd-utils-ubifs \
 	"
 
+# Skip packagegroup-base to reduce the number of packages built. Thus, we need
+# to include the MACHINE_EXTRA_ stuff ourselves.
 IMAGE_INSTALL = "\
 	packagegroup-core-boot \
 	packagegroup-core-ssh-dropbear \
+	${MACHINE_EXTRA_RDEPENDS} ${MACHINE_EXTRA_RRECOMMENDS} \
+	${DISTRO_EXTRA_RDEPENDS} ${DISTRO_EXTRA_RRECOMMENDS} \
 	${ROOTFS_PKGMANAGE} \
 	${MY_THINGS} \
 	"
