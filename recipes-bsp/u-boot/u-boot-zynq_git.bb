@@ -14,7 +14,7 @@ SRCREV = "5d46363c0dace3b6dcf45f4af67d2f41a01ef358"
 PV = "xilinx-zynq"
 PR = "r3"
 
-SRC_URI = "git://git.xilinx.com/u-boot-xlnx.git;protocol=git \
+SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git;protocol=git \
            file://0001-Use-bootscript-to-boot-use-fast-XIP-load-address-no-.patch \
           "
 
