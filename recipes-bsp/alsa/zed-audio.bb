@@ -25,6 +25,8 @@ INITSCRIPT_PARAMS = "start 50 S ."
 
 FILES_${PN} += "/lib/firmware/adau1761.bin /etc/init.d/zed-audio-config.sh"
 
+RDEPENDS_${PN} += "alsa-utils-alsactl"
+
 # Provide fake firmware to prevent blocking during bootup
 do_compile() {
 	touch ${S}/adau1761.bin
