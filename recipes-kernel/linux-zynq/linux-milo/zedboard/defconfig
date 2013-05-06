@@ -1933,7 +1933,70 @@ CONFIG_RPMSG=m
 # CONFIG_EXTCON is not set
 CONFIG_MEMORY=y
 CONFIG_ZYNQ_SMC=y
-# CONFIG_IIO is not set
+CONFIG_IIO=y
+CONFIG_IIO_BUFFER=y
+CONFIG_IIO_KFIFO_BUF=y
+CONFIG_IIO_TRIGGERED_BUFFER=y
+CONFIG_IIO_TRIGGER=y
+CONFIG_IIO_CONSUMERS_PER_TRIGGER=2
+
+#
+# Analog to digital converters
+#
+# CONFIG_AD7266 is not set
+# CONFIG_CF_AXI_ADC is not set
+# CONFIG_CF_AXI_FFT is not set
+# CONFIG_AXI_JESD204B is not set
+CONFIG_XILINX_XADC=y
+
+#
+# Amplifiers
+#
+# CONFIG_AD8366 is not set
+
+#
+# Light sensors
+#
+# CONFIG_ADJD_S311 is not set
+# CONFIG_VCNL4000 is not set
+
+#
+# Frequency Synthesizers DDS/PLL
+#
+
+#
+# Clock Generator/Distribution
+#
+# CONFIG_AD9523 is not set
+# CONFIG_AD9548 is not set
+# CONFIG_AD9517 is not set
+
+#
+# Direct Digital Synthesis
+#
+# CONFIG_CF_AXI_DDS is not set
+
+#
+# Phase-Locked Loop (PLL) frequency synthesizers
+#
+# CONFIG_ADF4350 is not set
+
+#
+# Digital to analog converters
+#
+# CONFIG_AD5064 is not set
+# CONFIG_AD5360 is not set
+# CONFIG_AD5380 is not set
+# CONFIG_AD5421 is not set
+# CONFIG_AD5624R_SPI is not set
+# CONFIG_AD5446 is not set
+# CONFIG_AD5504 is not set
+# CONFIG_AD5764 is not set
+# CONFIG_AD5791 is not set
+# CONFIG_AD5686 is not set
+# CONFIG_AD7303 is not set
+# CONFIG_MAX517 is not set
+# CONFIG_MCP4725 is not set
 # CONFIG_PWM is not set
 CONFIG_PMODS=y
 # CONFIG_PMODS_DEBUG is not set
