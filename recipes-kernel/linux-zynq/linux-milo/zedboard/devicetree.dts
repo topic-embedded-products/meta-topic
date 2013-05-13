@@ -387,7 +387,6 @@
 			};
 		};
 
-/* Commented out because activating this crashes the kernel real badly!
 		gpio_keys {
 			compatible = "gpio-keys";
 			#address-cells = <1>;
@@ -403,8 +402,32 @@
 				linux,code = <1>; // ESC
 				gpios = <&gpio 51 0>;
 			};
+			btnc {
+				label = "BTNC";
+				linux,code = <76>; // Numeric 5
+				gpios = <&gpio 54 0>;
+			};
+			btnd {
+				label = "BTND";
+				linux,code = <80>; // DOWN 2
+				gpios = <&gpio 61 0>;
+			};
+			btnl {
+				label = "BTNL";
+				linux,code = <75>; // LEFT 4
+				gpios = <&gpio 62 0>;
+			};
+			btnr {
+				label = "BTNR";
+				linux,code = <77>; // RT ARROW 6
+				gpios = <&gpio 63 0>;
+			};
+			btnu {
+				label = "BTNU";
+				linux,code = <72>; // UP 8
+				gpios = <&gpio 64 0>;
+			};
 		};
-*/
 
 		zed_oled {
 			compatible = "dglnt,pmodoled-gpio";

@@ -426,7 +426,6 @@
 				linux,code = <31>; /* "S" */
 				gpios = <&gpio 12 0>;
 			};
-/* Commented out: causes crash even when GPIO is connected through logic
 			sw5 {
 				label = "SW5";
 				linux,code = <106>; // Right
@@ -437,7 +436,6 @@
 				linux,code = <105>; // Left
 				gpios = <&gpio 55 0>;
 			};
-*/
 		};
 	};
 };

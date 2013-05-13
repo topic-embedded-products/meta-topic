@@ -31,7 +31,7 @@ KERNEL_DEVICETREE = "${WORKDIR}/devicetree.dts"
 LINUX_VERSION ?= "3.6"
 LINUX_VERSION_EXTENSION ?= "-milo"
 
-SRCREV="ba8ffcfe2a16f44816b607bfc6a8fc8d082d151d"
+SRCREV="559bff0b5af2df83b232c8d2ccdfce82bd164933"
 
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
