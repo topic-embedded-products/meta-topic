@@ -2,6 +2,10 @@ BSP for Xilinx Zynq dev boards. For instructions on building, see:
 
 https://github.com/balister/meta-zynq/wiki/Getting-started
 
+In order to properly use the zynq for anything useful, you will need to
+build a bit image and FSBL using the Xilinx tools. README-LOGIC contains
+some tips on that (mainly for myself because I keep forgetting these
+tricks).
 
 This is a fork of Ballister's OE environment for Zynq boards. This repo
 mainly serves to share ideas and code for the Zynq series. In this version
