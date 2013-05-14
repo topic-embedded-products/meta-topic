@@ -9,7 +9,7 @@ IMAGE_FEATURES += "package-management ssh-server-dropbear"
 
 IMAGE_FSTYPES = "tar.gz ubi"
 
-inherit image
+inherit core-image
 
 MY_THINGS = "\
 	kernel-modules \
