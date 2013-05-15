@@ -17,7 +17,7 @@ MY_THINGS = "\
 	fpga-image \
 	adi-hdmi-load \
 	mtd-utils \
-	mtd-utils-ubifs \
+	${@base_contains("IMAGE_FSTYPES", "ubi", "mtd-utils-ubifs" , "", d)} \
 	"
 
 # Skip packagegroup-base to reduce the number of packages built. Thus, we need
