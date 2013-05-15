@@ -34,17 +34,19 @@ IMAGE_INSTALL = "\
 # Postprocessing to reduce the amount of work to be done
 # by configuration scripts
 myimage_rootfs_postprocess() {
-	curdir=$PWD
-	cd ${IMAGE_ROOTFS}
-	rm -rf boot
-	rm -rf media/* mnt
-	ln -f -s media mnt
-	rm -rf tmp
-	ln -s var/volatile/tmp tmp
-	rm -f etc/resolv.conf
-	ln -f -s ../var/run/resolv.conf etc/resolv.conf
-	rm -rf dev/*
-
-        cd $curdir
+	# Run populate-volatile.sh at rootfs time to set up basic files
+	# and directories to support read-only rootfs.
+	if [ -x ${IMAGE_ROOTFS}/etc/init.d/populate-volatile.sh ]; then
+		echo "Running populate-volatile.sh"
+		${IMAGE_ROOTFS}/etc/init.d/populate-volatile.sh
+	fi
+	rm -rf ${IMAGE_ROOTFS}/boot
+	rm -rf ${IMAGE_ROOTFS}/media/* ${IMAGE_ROOTFS}/mnt
+	ln -f -s media ${IMAGE_ROOTFS}/mnt
+	rm -rf ${IMAGE_ROOTFS}/tmp
+	ln -s var/volatile/tmp ${IMAGE_ROOTFS}/tmp
+	rm -f ${IMAGE_ROOTFS}/etc/resolv.conf
+	ln -s ../var/run/resolv.conf ${IMAGE_ROOTFS}/etc/resolv.conf
+	rm -rf ${IMAGE_ROOTFS}/dev/*
 }
 ROOTFS_POSTPROCESS_COMMAND += "myimage_rootfs_postprocess ; "
