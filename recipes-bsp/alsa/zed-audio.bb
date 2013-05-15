@@ -1,8 +1,10 @@
-DESCRIPTION = "Zedboard  module loader for ADAU1761"
+SUMMARY = "Zedboard  module loader for ADAU1761"
+DESCRIPTION = "Loads drivers for the on-board audio codec, configures it for generic \
+capture and playback, and sets it as the default output for ALSA applications."
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58"
 
-PV = "1"
+PV = "2"
 PR = "r0"
 
 PACKAGES = "${PN}"
@@ -12,6 +14,7 @@ S="${WORKDIR}"
 SRC_URI = "\
 	file://modules.conf \
 	file://zed-audio-config.sh \
+	file://asound.conf \
 	http://ez.analog.com/servlet/JiveServlet/download/80077-14002/zed_audio.state.zip \
 	"
 # Checksums for zed_audio.state.zip
@@ -23,7 +26,10 @@ inherit update-rc.d
 INITSCRIPT_NAME = "zed-audio-config.sh"
 INITSCRIPT_PARAMS = "start 50 S ."
 
-FILES_${PN} += "/lib/firmware/adau1761.bin /etc/init.d/zed-audio-config.sh"
+FILES_${PN} += "\
+	/lib/firmware/adau1761.bin \
+	${sysconfdir}/init.d/zed-audio-config.sh \
+	"
 
 RDEPENDS_${PN} += "alsa-utils-alsactl"
 
@@ -33,13 +39,12 @@ do_compile() {
 }
 
 do_install() {
-	install -d ${D}/etc
-	install -d ${D}/etc/modules-load.d
-	install -d ${D}/etc/init.d
-	install -d ${D}/lib/firmware
-	install -m 644 ${S}/modules.conf ${D}/etc/modules-load.d/zed-adau1761.conf
-	install -m 644 ${S}/zed_audio.state ${D}/etc/
-	install -m 644 ${S}/adau1761.bin ${D}/lib/firmware/
-	install -m 755 ${S}/zed-audio-config.sh ${D}/etc/init.d/
+	install -d ${D}${sysconfdir}/modules-load.d
+	install -d ${D}${sysconfdir}/init.d
+	install -d ${D}${base_libdir}/firmware
+	install -m 644 ${S}/modules.conf ${D}${sysconfdir}/modules-load.d/zed-adau1761.conf
+	install -m 644 ${S}/zed_audio.state ${D}${sysconfdir}/
+	install -m 644 ${S}/asound.conf ${D}${sysconfdir}/
+	install -m 644 ${S}/adau1761.bin ${D}${base_libdir}/firmware/
+	install -m 755 ${S}/zed-audio-config.sh ${D}${sysconfdir}/init.d/
 }
-
