@@ -1,2 +1,7 @@
 #!/bin/sh
-dd if=/dev/urandom of=/dev/zed_oled bs=512 count=1 2> /dev/null
+if [ -e /usr/share/oled.bin ]
+then
+	cat /usr/share/oled.bin > /dev/zed_oled
+else
+	dd if=/dev/urandom of=/dev/zed_oled bs=512 count=1 2> /dev/null
+fi
