@@ -14,12 +14,14 @@ result = []
 
 for band in range(4):
 	for x in range(128):
+		y = 24 - (band * 8)
 		v = 0
-		mask = 1
-		for y in range(8):
-			if g[x + ((y + (band * 8)) * 128)] >= 128:
+		mask = 0x80
+		while mask:
+			if g[127 - x + (y * 128)] >= 128:
 				v |= mask
-			mask = mask << 1
+			mask = mask >> 1
+			y += 1
 		result.append(chr(v))
 
 sys.stdout.write(''.join(result))
