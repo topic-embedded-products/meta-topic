@@ -3,6 +3,7 @@ DESCRIPTION = "Loads drivers for the on-board audio codec, configures it for gen
 capture and playback, and sets it as the default output for ALSA applications."
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58"
+INHIBIT_DEFAULT_DEPS = "1"
 
 PV = "2"
 PR = "r0"
