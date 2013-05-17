@@ -27,8 +27,18 @@ IMAGE_FSTYPES = "tar.gz ubi"
 SERIAL_CONSOLE = "115200 ttyPS0"
 
 # XILINX tool locations (for in your site.conf) and input files
+# Override them in local.conf to suit your system
+
+# Use the "32" or "64" toolchain
+XILINX_TOOL_ARCH ?= "64"
+# The base install directory for XPS and other tools
+XILINX_TOOL_PATH ?= "/opt/Xilinx/14.4"
+# Your LM_LICENSE_FILE is usually removed by Bitbake
+XILINX_LM_LICENSE_FILE ?= "${XILINX_TOOL_PATH}/ISE_DS/ISE/coregen/core_licenses/Xilinx.lic"
+# The bootgen program is usually here
+ZYNQ_BOOTGEN ?= "${XILINX_TOOL_PATH}/ISE_DS/ISE/bin/lin64/bootgen"
+# The FSBL can be built from the FPGA design, but that's a work in progress for now.
 ZYNQ_FSBL ?= "${HOME}/workspace/zynq_fsbl_0/Release/zynq_fsbl_0.elf"
-# By default, no bitfile.
+# The logic is usually placed in the rootfs, but if you insist you can put a
+# binary bitfile into the BOOT.bin and waste time and space.
 ZYNQ_BITFILE ?= ""
-# Assume "bootgen" is in the PATH (it usually isn't)
-ZYNQ_BOOTGEN ?= "bootgen"

@@ -1,9 +1,6 @@
 #!/bin/sh
 
-# We could check /sys/devices/amba.0/f8007000.devcfg/prog_done
-# to see if it's already programmed
-
-BITFILE=/etc/fpga.bin
+BITFILE=/usr/share/fpga.bin
 
 case "$1" in
   start)
