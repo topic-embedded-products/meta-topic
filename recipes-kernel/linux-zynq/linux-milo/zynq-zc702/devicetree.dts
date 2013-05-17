@@ -150,24 +150,16 @@
 			#gpio-cells = <2>;
 		};
 
-/*
 		i2c0: i2c@e0004000 {
 			compatible = "xlnx,ps7-i2c-1.00.a";
 			reg = <0xe0004000 0x1000>;
-			interrupts = <0 25 0>;
+			interrupts = <0 25 4>;
 			interrupt-parent = <&gic>;
 			bus-id = <0>;
 			input-clk = <111111111>;
 			i2c-clk = <100000>;
-*/
-
-		i2c0: i2c@0 {
-			compatible = "i2c-gpio";
-			gpios = <&gpio 51 0 &gpio 50 0>;
-			i2c-gpio,delay-us = <2>;
 			#address-cells = <1>;
 			#size-cells = <0>;
-
 			mux@74 {
 				compatible = "pca9548";
 				reg = <0x74>;
