@@ -15,9 +15,5 @@ do_install_append() {
 	install -m 0755 ${WORKDIR}/find-touchscreen.sh ${D}${sysconfdir}/mdev
 }
 
-# Fix mdev startup, should start at the same level as udev does
-# especially since modutils runs at 04
-INITSCRIPT_PARAMS_${PN}-mdev = "start 03 S ."
-
 # use our own defconfig
 FILESEXTRAPATHS_prepend := "${THISDIR}/${P}:"
