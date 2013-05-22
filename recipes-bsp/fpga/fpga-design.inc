@@ -14,7 +14,7 @@ BOARD_DESIGN_URI_zedboard = "git://github.com/milosoftware/zynq-zedboard-logic.g
 SRCREV_board-zedboard = "63e317164357bf87bba7dd0adc429d4c91a78cff"
 
 BOARD_DESIGN_URI_zynq-zc702 = "git://github.com/milosoftware/zynq-zc702-logic.git"
-SRCREV_board-zynq-zc702 = "bfd37feb034919cc11b3879745f2770810a4e796"
+SRCREV_board-zynq-zc702 = "a458185d1dd27b399603ac7db73931fb59d72b5e"
 
 SRC_URI = "\
 	${BOARD_DESIGN_URI};name=board-${MACHINE} \
