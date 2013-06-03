@@ -314,9 +314,15 @@
 
 		devcfg@f8007000 {
 			compatible = "xlnx,ps7-dev-cfg-1.00.a";
-			reg = <0xf8007000 0x1000>;
+			reg = <0xf8007000 0x100>;
 			interrupts = <0 8 0>;
 			interrupt-parent = <&gic>;
+		};
+
+		ps7_xadc@f8007100 {
+			compatible = "xlnx,ps7-xadc-1.00.a";
+			interrupts = <0x0 0x7 0x4>;
+			reg = <0xf8007100 0x20>;
 		};
 
 		axi_dma_0: axidma@40400000 {
@@ -395,6 +401,7 @@
 			cpu-dai = <&axi_spdif_tx_0>;
 			pcm = <&xilinx_pcm_audio>;
 		};
+
 		leds {
 			compatible = "gpio-leds";
 			ds23 {
