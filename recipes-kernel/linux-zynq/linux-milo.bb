@@ -22,16 +22,17 @@ SRC_URI = "\
 	${KERNEL_GIT_REPO};branch=${KBRANCH} \
 	file://zedboard-qspi-flash-hack.patch \
 	file://defconfig \
-	file://devicetree.dts \
 	"
 
 KERNEL_IMAGETYPE = "uImage"
 KERNEL_DEVICETREE = "${WORKDIR}/devicetree.dts"
+KERNEL_DEVICETREE_zynq-zc702 = "arch/arm/boot/dts/${MACHINE}-adv7511.dts"
+KERNEL_DEVICETREE_zedboard = "arch/arm/boot/dts/zynq-zed-adv7511.dts"
 
 LINUX_VERSION ?= "3.6"
 LINUX_VERSION_EXTENSION ?= "-milo"
 
-SRCREV="559bff0b5af2df83b232c8d2ccdfce82bd164933"
+SRCREV = "f1f2962b264a40cec795af70db1e723fb1391d0c"
 
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
