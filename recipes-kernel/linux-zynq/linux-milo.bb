@@ -32,7 +32,7 @@ KERNEL_DEVICETREE_zedboard = "arch/arm/boot/dts/zynq-zed-adv7511.dts"
 LINUX_VERSION ?= "3.6"
 LINUX_VERSION_EXTENSION ?= "-milo"
 
-SRCREV = "f1f2962b264a40cec795af70db1e723fb1391d0c"
+SRCREV = "4e35508ba33189ff6e732c6ec8e6dda892f8acab"
 
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
