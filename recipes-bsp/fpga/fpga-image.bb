@@ -6,12 +6,10 @@ DEPENDS = "python-native"
 
 require fpga-design.inc
 
-PV = "3.${SRCPV}"
+PV = "4.${SRCPV}"
 PR = "r0"
 
 PACKAGES = "${PN}"
-
-S="${WORKDIR}/git"
 
 SRC_URI += "\
 	file://fpga-bit-to-bin.py \

@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1707d6db1d42237583f50183a5651ecb"
 SRCREV = "5d46363c0dace3b6dcf45f4af67d2f41a01ef358"
 
 PV = "xilinx-zynq"
-PR = "r3"
+PR = "r4"
 
 SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git;protocol=git \
            file://0001-Use-bootscript-to-boot-use-fast-XIP-load-address-no-.patch \
@@ -23,18 +23,11 @@ S = "${WORKDIR}/git"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 # Fetch the FSBL binary from the design for now, as building it is a royal pita.
-BOARD_DESIGN_URI ?= ""
-BOARD_SRCREV ?= ""
-BOARD_DESIGN_URI_zedboard = "https://raw.github.com/milosoftware/zynq-zedboard-logic"
-BOARD_SRCREV_zedboard = "7b6556b8fc1d35efd52ff01b281970be8158bfa0"
-BOARD_DESIGN_URI_zynq-zc702 = "https://raw.github.com/milosoftware/zynq-zc702-logic.git"
-BOARD_SRCREV_zynq-zc702 = "b2858b015fd15a211fb1b23981717ac20396a3a7"
-SRC_URI += "${BOARD_DESIGN_URI}/${BOARD_SRCREV}/bin/fsbl.elf.bz2;name=fsbl-${MACHINE}"
+BOARD_DESIGN_URI = "file://${HOME}/zynq/fsbl_bin/${MACHINE}"
+SRC_URI += "${BOARD_DESIGN_URI}/fsbl.elf.bz2;name=fsbl-${MACHINE}"
 ZYNQ_FSBL = "${WORKDIR}/fsbl.elf"
-SRC_URI[fsbl-zynq-zc702.md5sum] = "b30394d80d1b7355035c2aaf69133cbf"
-SRC_URI[fsbl-zynq-zc702.sha256sum] = "49af21ecc98519ebc152d61cd45c648903c4feb9c2933965078de9fd6bb52e35"
-SRC_URI[fsbl-zedboard.md5sum] = "ec6c42b342fd06352bf099aa083ecf81"
-SRC_URI[fsbl-zedboard.sha256sum] = "cea3eef0fae699559a4aea2f913a667d5c0d3c0586187a29060c4dde1337b5d2"
+# SRC_URI[fsbl-zynq-zc702.md5sum] = "b30394d80d1b7355035c2aaf69133cbf"
+SRC_URI[fsbl-zedboard.md5sum] = "defd368ccf504c5d252f358516840b40"
 
 # Generate BOOT.bin from u-boot, FSBL and optionally a bitfile. This requires the
 # "bootgen" tool from Xilinx, as well as a first-stage-bootloader which can be
