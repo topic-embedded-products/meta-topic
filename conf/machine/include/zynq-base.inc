@@ -18,7 +18,7 @@ MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
 MACHINE_FEATURES = "apm vfat ethernet"
 
 # Ship kernel modules
-MACHINE_EXTRA_RRECOMMENDS = "kernel-modules"
+MACHINE_EXTRA_RRECOMMENDS = "kernel-modules fpga-image"
 
 # Specify rootfs image filesystem types
 IMAGE_FSTYPES = "tar.gz ubi"
@@ -37,8 +37,6 @@ XILINX_TOOL_PATH ?= "/opt/Xilinx/14.4"
 XILINX_LM_LICENSE_FILE ?= "${XILINX_TOOL_PATH}/ISE_DS/ISE/coregen/core_licenses/Xilinx.lic"
 # The bootgen program is usually here
 ZYNQ_BOOTGEN ?= "${XILINX_TOOL_PATH}/ISE_DS/ISE/bin/lin64/bootgen"
-# The FSBL can be built from the FPGA design, but that's a work in progress for now.
-ZYNQ_FSBL ?= "${HOME}/workspace/zynq_fsbl_0/Release/zynq_fsbl_0.elf"
 # The logic is usually placed in the rootfs, but if you insist you can put a
 # binary bitfile into the BOOT.bin and waste time and space.
 ZYNQ_BITFILE ?= ""
