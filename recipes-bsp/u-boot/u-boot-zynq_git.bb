@@ -35,15 +35,22 @@ SRC_URI[fsbl-zedboard.md5sum] = "defd368ccf504c5d252f358516840b40"
 # variables in your local.conf or site.conf to match your project. Or set
 # ZYNQ_BOOTGEN="echo" if you don't want to generate BOOT.bin now.
 do_bootbin() {
-	cd ${DEPLOYDIR}
-	rm -f ${DEPLOY_DIR_IMAGE}/BOOT.bin
+	rm -f ${S}/BOOT.bin
 	echo "the_ROM_image:" > bootimage.bif
 	echo "{" >> bootimage.bif
 	echo " [bootloader]${ZYNQ_FSBL}" >> bootimage.bif
 	echo " ${ZYNQ_BITFILE}" >> bootimage.bif
-	echo " [load = 0x04000000, startup = 0x04000000]${UBOOT_IMAGE}" >> bootimage.bif
+	echo " [load = 0x04000000, startup = 0x04000000]${S}/${UBOOT_BINARY}" >> bootimage.bif
 	echo "}" >> bootimage.bif
-	${ZYNQ_BOOTGEN} -image bootimage.bif -o i ${DEPLOY_DIR_IMAGE}/BOOT.bin
+	${ZYNQ_BOOTGEN} -image bootimage.bif -o i ${S}/BOOT.bin
 }
 
-addtask bootbin before do_package after do_deploy
+do_install_append() {
+	install ${S}/BOOT.bin ${D}/boot/BOOT.bin
+}
+
+do_deploy_append() {
+	install ${S}/BOOT.bin ${DEPLOYDIR}/BOOT.bin
+}
+
+addtask bootbin before do_deploy after do_compile
