@@ -16,4 +16,4 @@ do_install_append() {
 }
 
 # use our own defconfig
-FILESEXTRAPATHS_prepend := "${THISDIR}/${P}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
