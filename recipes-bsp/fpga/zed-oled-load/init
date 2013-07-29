@@ -1,7 +1,17 @@
 #!/bin/sh
-if [ -e /usr/share/oled.bin ]
-then
-	cat /usr/share/oled.bin > /dev/zed_oled
-else
-	dd if=/dev/urandom of=/dev/zed_oled bs=512 count=1 2> /dev/null
-fi
+case "$1" in
+	start)
+		if [ -e /usr/share/oled.bin ]
+		then
+			cat /usr/share/oled.bin > /dev/zed_oled
+		else
+			dd if=/dev/urandom of=/dev/zed_oled bs=512 count=1 2> /dev/null
+		fi
+		;;
+	stop)
+		modprobe -r pmodoled_gpio
+		;;
+	*)
+		echo "use: $0 (start|stop)"
+		exit 1
+esac

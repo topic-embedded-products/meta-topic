@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3
 INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS = "python-native"
 
-PV = "3"
+PV = "5"
 PR = "r0"
 
 PACKAGES = "${PN}"
@@ -20,7 +20,7 @@ SRC_URI = "\
 	"
 
 INITSCRIPT_NAME = "zed-oled.sh"
-INITSCRIPT_PARAMS = "start 9 S ."
+INITSCRIPT_PARAMS = "start 9 S . stop 80 0 1 6 ."
 
 inherit update-rc.d
 
