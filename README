@@ -2,6 +2,33 @@ BSP for Xilinx Zynq dev boards. For instructions on building, see:
 
 https://github.com/balister/meta-zynq/wiki/Getting-started
 
+For the lazy, here's a quick script:
+
+mkdir my-zynq
+cd my-zynq
+git clone git://git.openembedded.org/openembedded-core oe-core
+git clone git://git.openembedded.org/bitbake bitbake
+git clone git://github.com/milosoftware/meta-zynq.git
+source oe-core/oe-init-build-env build bitbake
+# Edit conf/bblayers.conf and add meta-zynq to it, e.g.
+# BBLAYERS ?= " \
+#  /home/mike/my-zynq/oe-core/meta \
+#  /home/mike/my-zynq/meta-zynq \
+#  "
+vi conf/bblayers.conf
+# Edit local.conf to match your setup. In particular, set
+# BB_NUMBER_THREADS and PARALLEL_MAKE to match you CPU count
+# set the following variables (to match yor setup):
+# MACHINE="zedboard"
+# XILINX_TOOL_PATH = "/opt/Xilinx/14.4"
+# XILINX_LM_LICENSE_FILE = "2100@192.168.0.101"
+# DISTRO="tiny"
+# INHERIT += "rm_work"
+vi conf/local.conf
+# Then build your first image and relax a bit:
+nice bitbake my-image
+
+
 In order to properly use the zynq for anything useful, you will need to
 build a bit image and FSBL using the Xilinx tools. README-LOGIC contains
 some tips on that (mainly for myself because I keep forgetting these
