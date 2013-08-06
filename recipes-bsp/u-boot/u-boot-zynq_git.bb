@@ -42,6 +42,7 @@ do_bootbin() {
 	echo " ${ZYNQ_BITFILE}" >> bootimage.bif
 	echo " [load = 0x04000000, startup = 0x04000000]${S}/${UBOOT_BINARY}" >> bootimage.bif
 	echo "}" >> bootimage.bif
+	echo "executing: {$ZYNQ_BOOTGEN} -image bootimage.bif -o i ${S}/BOOT.bin"
 	${ZYNQ_BOOTGEN} -image bootimage.bif -o i ${S}/BOOT.bin
 }
 
@@ -53,4 +54,4 @@ do_deploy_append() {
 	install ${S}/BOOT.bin ${DEPLOYDIR}/BOOT.bin
 }
 
-addtask bootbin before do_deploy after do_compile
+addtask bootbin before do_deploy do_install after do_compile
