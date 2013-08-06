@@ -30,10 +30,10 @@ KERNEL_DEVICETREE_zedboard = "arch/arm/boot/dts/zynq-zed-adv7511.dts"
 # See http://permalink.gmane.org/gmane.linux.kernel.commits.head/371588
 KERNEL_EXTRA_ARGS += "LOADADDR=0x00008000"
 
-LINUX_VERSION ?= "3.9"
+LINUX_VERSION ?= "3.10"
 LINUX_VERSION_EXTENSION ?= "-milo"
 
-SRCREV = "0dc28f7072d8b2520fc53933527a8e809d6eec56"
+SRCREV = "34a8eb1f16269cdea67065e7d82a8562739d9b40"
 
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
