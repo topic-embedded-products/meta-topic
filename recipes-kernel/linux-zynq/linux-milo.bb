@@ -29,6 +29,9 @@ KERNEL_DEVICETREE_zynq-zc702 = "arch/arm/boot/dts/${MACHINE}-adv7511.dts"
 KERNEL_DEVICETREE_zedboard = "arch/arm/boot/dts/zynq-zed-adv7511.dts"
 # See http://permalink.gmane.org/gmane.linux.kernel.commits.head/371588
 KERNEL_EXTRA_ARGS += "LOADADDR=0x00008000"
+KERNEL_IMAGEDEST = "/tmp/boot"
+
+FILES_kernel-image = "${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}*"
 
 LINUX_VERSION ?= "3.10"
 LINUX_VERSION_EXTENSION ?= "-milo"
@@ -39,3 +42,20 @@ PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
 COMPATIBLE_MACHINE = "(zynq-zc702|zedboard)"
+
+pkg_postinst_kernel-image () {
+	if [ "x$D" == "x" ]; then
+		if [ -f ${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ] ; then
+			if grep -q "ubi0:qspi-rootfs" /proc/mounts
+			then
+				flashcp -v ${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} /dev/mtd3
+			else
+				if [ -f /media/mmcblk0p1/${KERNEL_IMAGETYPE} ]; then
+					cp ${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} /media/mmcblk0p1/${KERNEL_IMAGETYPE}
+				fi
+			fi
+			rm -f ${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
+		fi
+	fi
+	true
+}
