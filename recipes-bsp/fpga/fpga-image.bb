@@ -3,11 +3,31 @@ DESCRIPTION = "FPGA bit image loader from userspace and tools"
 INHIBIT_DEFAULT_DEPS = "1"
 # But we do need Python on the build machine
 DEPENDS = "python-native"
+LICENSE = "GPLv2"
+LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58"
+# Package is machine specific
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-require fpga-design.inc
+# Workaround: XPS fails to build when there's a "+" in the path.
+SRCPV = "${@bb.fetch2.get_srcrev(d).replace('+','-')}"
 
-PV = "4.${SRCPV}"
+BOARD_DESIGN_URI ?= "git://github.com/analogdevicesinc/fpgahdl_xilinx.git"
+SRCREV = "0a90b0d42efa2c571e1dd3a038a00f974d6b3e5f"
+
+BOARD_DESIGN_PATH ?= ""
+BOARD_DESIGN_PATH_zedboard = "cf_adv7511_zed"
+BOARD_DESIGN_PATH_zynq-zc702 = "cf_adv7511_zc702"
+BOARD_DESIGN_PATH_zynq-zc706 = "cf_adv7511_zc706"
+
+SRC_URI = "${BOARD_DESIGN_URI}"
+
+S = "${WORKDIR}/git/${BOARD_DESIGN_PATH}"
+
+inherit gitpkgv
+
+PV = "5.${SRCPV}"
 PR = "r0"
+PKGV = "5.${GITPKGV}"
 
 PACKAGES = "${PN}"
 
