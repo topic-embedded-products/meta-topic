@@ -33,6 +33,8 @@ SERIAL_CONSOLE = "115200 ttyPS0"
 XILINX_TOOL_ARCH ?= "64"
 # The base install directory for XPS and other tools
 XILINX_TOOL_PATH ?= "/opt/Xilinx/14.4"
+# The base install directory for Vivado
+XILINX_VIVADO_PATH ?= "/opt/Xilinx/Vivado/2013.2"
 # Your LM_LICENSE_FILE is usually removed by Bitbake
 XILINX_LM_LICENSE_FILE ?= "${XILINX_TOOL_PATH}/ISE_DS/ISE/coregen/core_licenses/Xilinx.lic"
 # The bootgen program is usually here

@@ -45,12 +45,41 @@ INITSCRIPT_PARAMS = "start 03 S ."
 
 do_compile() {
 	export LM_LICENSE_FILE="${XILINX_LM_LICENSE_FILE}"
-	source ${XILINX_TOOL_PATH}/ISE_DS/settings${XILINX_TOOL_ARCH}.sh
-	xps -nw system.xmp << EOF
+	for iseprojf in *.xmp
+	do
+		if [ -f "${iseprojf}" ]
+		then
+			iseproj=`basename ${iseprojf} .xmp`
+			source ${XILINX_TOOL_PATH}/ISE_DS/settings${XILINX_TOOL_ARCH}.sh
+			xps -nw ${iseprojf} << EOF
 run bits
 run exporttosdk
 EOF
-	python ${WORKDIR}/fpga-bit-to-bin.py --flip ${S}/implementation/system.bit ${WORKDIR}/fpga.bin
+			python ${WORKDIR}/fpga-bit-to-bin.py --flip ${S}/implementation/${iseproj}.bit ${WORKDIR}/fpga.bin
+		fi
+	done
+	for vivadoprojf in *.xpr
+	do
+		if [ -f "${vivadoprojf}" ]
+		then
+		vivadoproj=`basename "${vivadoprojf}" .xpr`
+			source ${XILINX_VIVADO_PATH}/settings${XILINX_TOOL_ARCH}.sh
+			${XILINX_VIVADO_PATH}/bin/vivado -mode tcl << EOF
+open_project {${vivadoprojf}}
+reset_run impl_1
+reset_run synth_1
+launch_runs synth_1
+wait_on_run synth_1
+launch_runs impl_1
+wait_on_run impl_1
+launch_runs impl_1 -to_step write_bitstream
+wait_on_run impl_1
+close_project
+exit
+EOF
+			python ${WORKDIR}/fpga-bit-to-bin.py --flip ${S}/${vivadoproj}.runs/impl_1/${vivadoproj}*.bit ${WORKDIR}/fpga.bin
+		fi
+	done
 }
 
 FILES_${PN} = "${sysconfdir} ${datadir}"
@@ -62,9 +91,3 @@ do_install() {
 	install -m 644 ${WORKDIR}/fpga.bin ${D}${datadir}/fpga.bin
 }
 
-# Store the SDK files into the sysroot for other packages
-SYSROOT_PREPROCESS_FUNCS += "fpga_sysroot_preprocess"
-fpga_sysroot_preprocess() {
-	install -d ${SYSROOT_DESTDIR}${datadir}/xilinx_sdk
-	cp -r ${S}/SDK/SDK_Export/hw/* ${SYSROOT_DESTDIR}${datadir}/xilinx_sdk/
-}
