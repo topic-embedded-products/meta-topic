@@ -43,6 +43,8 @@ inherit update-rc.d
 INITSCRIPT_NAME = "${PN}.sh"
 INITSCRIPT_PARAMS = "start 03 S ."
 
+VIVADO_EXTRA_COMMANDS ?= ""
+
 do_compile() {
 	export LM_LICENSE_FILE="${XILINX_LM_LICENSE_FILE}"
 	for iseprojf in *.xmp
@@ -66,6 +68,8 @@ EOF
 			source ${XILINX_VIVADO_PATH}/settings${XILINX_TOOL_ARCH}.sh
 			${XILINX_VIVADO_PATH}/bin/vivado -mode tcl << EOF
 open_project {${vivadoprojf}}
+reset_target {all} [get_ips]
+generate_target {all} [get_ips]
 reset_run impl_1
 reset_run synth_1
 launch_runs synth_1
