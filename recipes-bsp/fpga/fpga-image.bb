@@ -23,11 +23,8 @@ SRC_URI = "${BOARD_DESIGN_URI}"
 
 S = "${WORKDIR}/git/${BOARD_DESIGN_PATH}"
 
-inherit gitpkgv
-
 PV = "5.${SRCPV}"
 PR = "r0"
-PKGV = "5.${GITPKGV}"
 
 PACKAGES = "${PN}"
 
