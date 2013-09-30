@@ -44,26 +44,32 @@ VIVADO_EXTRA_COMMANDS ?= ""
 
 do_compile() {
 	export LM_LICENSE_FILE="${XILINX_LM_LICENSE_FILE}"
-	for iseprojf in *.xmp
-	do
-		if [ -f "${iseprojf}" ]
-		then
-			iseproj=`basename ${iseprojf} .xmp`
-			source ${XILINX_TOOL_PATH}/ISE_DS/settings${XILINX_TOOL_ARCH}.sh
-			xps -nw ${iseprojf} << EOF
+	if [ -f generate_bitstreams.sh ]
+	then
+		echo "Executing generate_bitstreams.sh"
+		source ${XILINX_VIVADO_PATH}/settings${XILINX_TOOL_ARCH}.sh
+		./generate_bitstreams.sh
+	else
+		for iseprojf in *.xmp
+		do
+			if [ -f "${iseprojf}" ]
+			then
+				iseproj=`basename ${iseprojf} .xmp`
+				source ${XILINX_TOOL_PATH}/ISE_DS/settings${XILINX_TOOL_ARCH}.sh
+				xps -nw ${iseprojf} << EOF
 run bits
 run exporttosdk
 EOF
-			python ${WORKDIR}/fpga-bit-to-bin.py --flip ${S}/implementation/${iseproj}.bit ${WORKDIR}/fpga.bin
-		fi
-	done
-	for vivadoprojf in *.xpr
-	do
-		if [ -f "${vivadoprojf}" ]
-		then
-		vivadoproj=`basename "${vivadoprojf}" .xpr`
-			source ${XILINX_VIVADO_PATH}/settings${XILINX_TOOL_ARCH}.sh
-			${XILINX_VIVADO_PATH}/bin/vivado -mode tcl << EOF
+				python ${WORKDIR}/fpga-bit-to-bin.py --flip ${S}/implementation/${iseproj}.bit ${WORKDIR}/fpga.bin
+			fi
+		done
+		for vivadoprojf in *.xpr
+		do
+			if [ -f "${vivadoprojf}" ]
+			then
+			vivadoproj=`basename "${vivadoprojf}" .xpr`
+				source ${XILINX_VIVADO_PATH}/settings${XILINX_TOOL_ARCH}.sh
+				${XILINX_VIVADO_PATH}/bin/vivado -mode tcl << EOF
 open_project {${vivadoprojf}}
 reset_target {all} [get_ips]
 generate_target {all} [get_ips]
@@ -78,9 +84,10 @@ wait_on_run impl_1
 close_project
 exit
 EOF
-			python ${WORKDIR}/fpga-bit-to-bin.py --flip ${S}/${vivadoproj}.runs/impl_1/${vivadoproj}*.bit ${WORKDIR}/fpga.bin
-		fi
-	done
+				python ${WORKDIR}/fpga-bit-to-bin.py --flip ${S}/${vivadoproj}.runs/impl_1/${vivadoproj}*.bit ${WORKDIR}/fpga.bin
+			fi
+		done
+	fi
 }
 
 FILES_${PN} = "${sysconfdir} ${datadir}"
