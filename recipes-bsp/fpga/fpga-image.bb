@@ -49,6 +49,7 @@ do_compile() {
 		echo "Executing generate_bitstreams.sh"
 		source ${XILINX_VIVADO_PATH}/settings${XILINX_TOOL_ARCH}.sh
 		./generate_bitstreams.sh
+		test -f ${WORKDIR}/fpga.bin
 	else
 		for iseprojf in *.xmp
 		do
