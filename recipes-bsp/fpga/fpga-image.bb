@@ -98,5 +98,9 @@ do_install() {
 	install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/${PN}.sh
 	install -d ${D}${datadir}
 	install -m 644 ${WORKDIR}/fpga.bin ${D}${datadir}/fpga.bin
+	if [ -d ${WORKDIR}/bitstreams ]
+	then
+		install -d ${D}${datadir}/bitstreams
+		cp -r ${WORKDIR}/bitstreams/* ${D}${datadir}/bitstreams/
+	fi
 }
-
