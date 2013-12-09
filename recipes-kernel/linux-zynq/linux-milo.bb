@@ -33,10 +33,15 @@ KERNEL_IMAGEDEST = "tmp/boot"
 
 FILES_kernel-image = "${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}*"
 
-LINUX_VERSION ?= "3.12"
+LINUX_VERSION ?= "3.10"
 LINUX_VERSION_EXTENSION ?= "-milo"
 
-SRCREV = "4424de9244e2fa2f4873a96c8cf633d53d56ce74"
+SRCREV = "dbebd8b890aaf18cd53433eb84ef917b0d70b275"
+
+# Zedboard has a defconfig for 3.12, the zc702 not (yet) so use the 3.12
+# kernel only for the zedboard for now.
+LINUX_VERSION_zedboard = "3.12"
+SRCREV_zedboard = "4424de9244e2fa2f4873a96c8cf633d53d56ce74"
 
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
