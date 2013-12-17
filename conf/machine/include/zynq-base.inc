@@ -17,9 +17,6 @@ MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
 # Specify machine features
 MACHINE_FEATURES = "apm vfat ethernet"
 
-# Ship kernel modules
-MACHINE_EXTRA_RRECOMMENDS = "kernel-modules fpga-image"
-
 # Specify rootfs image filesystem types
 IMAGE_FSTYPES = "tar.gz ubi"
 

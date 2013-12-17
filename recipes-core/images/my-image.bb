@@ -14,7 +14,7 @@ inherit core-image
 MY_THINGS = "\
 	kernel-modules \
 	modutils-loadscript \
-	fpga-image \
+	fpga-image-adi \
 	adi-hdmi-load \
 	mtd-utils \
 	${@base_contains("IMAGE_FSTYPES", "ubi", "mtd-utils-ubifs" , "", d)} \
