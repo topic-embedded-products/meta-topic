@@ -29,7 +29,7 @@ do_compile() {
 		echo "Executing generate_bitstreams.sh"
 		source ${XILINX_VIVADO_PATH}/settings${XILINX_TOOL_ARCH}.sh
 		./generate_bitstreams.sh
-		test -f ${WORKDIR}/fpga.bin
+		test -f fpga.bit
 	else
 		for iseprojf in *.xmp
 		do
@@ -41,7 +41,8 @@ do_compile() {
 run bits
 run exporttosdk
 EOF
-				fpga-bit-to-bin.py --flip ${S}/implementation/${iseproj}.bit ${WORKDIR}/fpga.bin
+				test -f ${S}/implementation/${iseproj}.bit
+				cp ${S}/implementation/${iseproj}.bit fpga.bit
 			fi
 		done
 		for vivadoprojf in *.xpr
@@ -65,8 +66,27 @@ wait_on_run impl_1
 close_project
 exit
 EOF
-				fpga-bit-to-bin.py --flip ${S}/${vivadoproj}.runs/impl_1/${vivadoproj}*.bit ${WORKDIR}/fpga.bin
+				test -f ${S}/${vivadoproj}.runs/impl_1/${vivadoproj}*.bit
+				cp ${S}/${vivadoproj}.runs/impl_1/${vivadoproj}*.bit fpga.bit
 			fi
+		done
+	fi
+}
+
+# Postcondition for do_compile must be that there's a fpga.bit
+# bitstream to be loaded at board startup, and optionally there can be
+# partial bitstreams in a bitstreams directory.
+do_convert_bitstreams() {
+	fpga-bit-to-bin.py --flip fpga.bit ${WORKDIR}/fpga.bin
+	if [ -d bitstreams ]
+	then
+		for path in bitstreams/*
+		do
+			mkdir -p "${WORKDIR}/${path}"
+			for p in ${path}/*partial.bit
+			do
+				fpga-bit-to-bin.py --flip "${p}" "${WORKDIR}/${p}.bin"
+			done
 		done
 	fi
 }
@@ -81,3 +101,5 @@ do_install() {
 		cp -r ${WORKDIR}/bitstreams/* ${D}${datadir}/bitstreams/
 	fi
 }
+
+addtask convert_bitstreams after do_compile before do_install
