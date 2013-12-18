@@ -11,10 +11,10 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 # Workaround: XPS fails to build when there's a "+" in the path.
 SRCPV = "${@bb.fetch2.get_srcrev(d).replace('+','-')}"
 
-BOARD_DESIGN_URI ?= "git://github.com/analogdevicesinc/fpgahdl_xilinx.git"
-SRCREV = "0a90b0d42efa2c571e1dd3a038a00f974d6b3e5f"
-
+# Required parameters
+BOARD_DESIGN_URI ?= ""
 BOARD_DESIGN_PATH ?= ""
+
 SRC_URI = "${BOARD_DESIGN_URI}"
 S = "${WORKDIR}/git/${BOARD_DESIGN_PATH}"
 
