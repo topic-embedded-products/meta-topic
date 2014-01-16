@@ -16,7 +16,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/linux-milo:"
 
 # If you have a local repository, you can set this variable to point to
 # another kernel repo. Or to another kernel entirely.
-KERNEL_GIT_REPO ?= "git://redmine.topic.nl/linux-topic-zynq"
+KERNEL_GIT_REPO ?= "git://github.com/topic-embedded-products/linux"
 
 SRC_URI = "\
 	${KERNEL_GIT_REPO};branch=${KBRANCH} \
