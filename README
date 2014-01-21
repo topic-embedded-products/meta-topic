@@ -8,7 +8,7 @@ mkdir my-zynq
 cd my-zynq
 git clone git://git.openembedded.org/openembedded-core oe-core
 git clone git://git.openembedded.org/bitbake bitbake
-git clone git://github.com/milosoftware/meta-zynq.git
+git clone git://github.com/topic-embedded-software/meta-topic.git meta-zynq
 source oe-core/oe-init-build-env build bitbake
 # Edit conf/bblayers.conf and add meta-zynq to it, e.g.
 # BBLAYERS ?= " \
@@ -20,7 +20,7 @@ vi conf/bblayers.conf
 # BB_NUMBER_THREADS and PARALLEL_MAKE to match you CPU count
 # set the following variables (to match yor setup):
 # MACHINE="zedboard"
-# XILINX_TOOL_PATH = "/opt/Xilinx/14.4"
+# XILINX_TOOL_PATH = "/opt/Xilinx/14.6"
 # XILINX_LM_LICENSE_FILE = "2100@192.168.0.101"
 # DISTRO="tiny"
 # INHERIT += "rm_work"
@@ -44,6 +44,8 @@ I have so far made the following additions:
   from within OE. u-boot will be built by OE, you'll need to create a FSBL
   and optionally a logic bit file and point OE variables to their location.
 
+- Build FPGA image using ISE, Vivado or custom scripts.
+
 - Allow mixed booting, e.g. bootloader from QSPI, kernel and rootfs on SD.
   This is implemented by checking for an "autorun" script on the SD card.
   There's a recipe in the build that boots like described. You can have the
@@ -54,8 +56,10 @@ I have so far made the following additions:
 - Boot and run completely from QSPI flash, mounting a UBIFS root filesystem
   allowing read/write access.
 
+Future versions of this repository will add full support for Dyplo, see
+http://www.topic.nl/dyplo/
+
 If you have questions or comments, I usually read the Xilinx Linux forum and
 the ADI linux driver forum:
 http://forums.xilinx.com/t5/Embedded-Linux/bd-p/ELINUX
 http://ez.analog.com/community/linux-device-drivers/linux-software-drivers
-
