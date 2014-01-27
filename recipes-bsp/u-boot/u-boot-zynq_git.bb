@@ -3,19 +3,16 @@ require recipes-bsp/u-boot/u-boot.inc
 FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-zynq-git:"
 
 LICENSE = "GPLv2+"
-LIC_FILES_CHKSUM = "file://COPYING;md5=1707d6db1d42237583f50183a5651ecb"
+LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce1dc69f702a6c"
 
-#FILESDIR = "${@os.path.dirname(d.getVar('FILE',1))}/u-boot-git/${MACHINE}"
-
-# We use the revision in order to avoid having to fetch it from the
-# repo during parse
-SRCREV = "5d46363c0dace3b6dcf45f4af67d2f41a01ef358"
+SRCREV = "c55c35bb239a40d5d5d7678fc38b92c77cf882f8"
 
 PV = "xilinx-zynq"
-PR = "r5"
+PR = "r6"
 
-SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git;protocol=git \
+SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git \
            file://0001-Use-bootscript-to-boot-use-fast-XIP-load-address-no-.patch \
+           file://0002-Revert-arm-zynq-Enable-the-Neon-instructions.patch \
           "
 
 S = "${WORKDIR}/git"
