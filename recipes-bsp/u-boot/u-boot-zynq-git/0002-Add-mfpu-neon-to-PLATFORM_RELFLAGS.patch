@@ -1,0 +1,28 @@
+From 577d2ed6c0b5c54e76b2bc757d50783ff975a3c7 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 27 Jan 2014 14:03:03 +0100
+Subject: [PATCH 2/2] Add -mfpu=neon to PLATFORM_RELFLAGS
+
+Fixes the following compiler error when using a GNU toolchain:
+lowlevel_init.S:19: Error: selected processor does not support ARM mode `fmrx r1,FPEXC'
+lowlevel_init.S:21: Error: selected processor does not support ARM mode `fmxr FPEXC,r1'
+
+See also
+http://forums.xilinx.com/t5/Embedded-Linux/Current-U-boot-master-u-boot-xlnx-fails-to-build-on-GNU/td-p/407205
+---
+ arch/arm/cpu/armv7/zynq/config.mk |    2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm/cpu/armv7/zynq/config.mk b/arch/arm/cpu/armv7/zynq/config.mk
+index 9f90a2e..9640433 100644
+--- a/arch/arm/cpu/armv7/zynq/config.mk
++++ b/arch/arm/cpu/armv7/zynq/config.mk
+@@ -6,3 +6,5 @@
+ PLATFORM_RELFLAGS += -fno-strict-aliasing
+ # Xilinx, added to prevent unaligned accesses which started happening # with GCC 4.5.2 tools
+ PLATFORM_RELFLAGS += -mno-unaligned-access
++# Allow NEON instructions (needed for lowlevel_init.S with GNU toolchain)
++PLATFORM_RELFLAGS += -mfpu=neon
+-- 
+1.7.9.5
+

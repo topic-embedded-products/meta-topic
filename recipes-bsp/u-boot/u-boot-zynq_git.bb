@@ -12,7 +12,7 @@ PR = "r6"
 
 SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git \
            file://0001-Use-bootscript-to-boot-use-fast-XIP-load-address-no-.patch \
-           file://0002-Revert-arm-zynq-Enable-the-Neon-instructions.patch \
+           file://0002-Add-mfpu-neon-to-PLATFORM_RELFLAGS.patch \
           "
 
 S = "${WORKDIR}/git"
