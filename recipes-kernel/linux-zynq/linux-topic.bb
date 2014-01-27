@@ -31,6 +31,7 @@ KERNEL_IMAGETYPE = "uImage"
 KERNEL_DEVICETREE = "${WORKDIR}/devicetree.dts"
 KERNEL_DEVICETREE_zynq-zc702 = "arch/arm/boot/dts/${MACHINE}-adv7511.dts"
 KERNEL_DEVICETREE_zedboard = "arch/arm/boot/dts/zynq-zed-adv7511.dts"
+KERNEL_DEVICETREE_zynq-miami = "arch/arm/boot/dts/zynq-zed-adv7511.dts"
 # See http://permalink.gmane.org/gmane.linux.kernel.commits.head/371588
 KERNEL_EXTRA_ARGS += "LOADADDR=0x00008000"
 KERNEL_IMAGEDEST = "tmp/boot"
@@ -45,7 +46,7 @@ SRCREV = "b0f1cdb587674084e412847d0fbe452e38040c3d"
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-COMPATIBLE_MACHINE = "(zynq-zc702|zedboard)"
+COMPATIBLE_MACHINE = "(zynq-zc702|zedboard|zynq-miami)"
 
 pkg_postinst_kernel-image () {
 	if [ "x$D" == "x" ]; then
