@@ -1,9 +1,9 @@
 DESCRIPTION = "HDMI framebuffer module loader to load in correct order"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaabaa882bbe"
-INHIBIT_DEFAULT_DEPS = "1"
+inherit allarch
 
-PV = "5"
+PV = "6"
 PR = "r0"
 
 PACKAGES = "${PN}"
