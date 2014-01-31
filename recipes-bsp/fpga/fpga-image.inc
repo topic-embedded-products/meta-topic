@@ -11,6 +11,10 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 # Workaround: XPS fails to build when there's a "+" in the path.
 SRCPV = "${@bb.fetch2.get_srcrev(d).replace('+','-')}"
 
+# Tool paths and versions may differ, the output should be the same, so
+# do not take these into account.
+do_compile[vardepsexclude] += "XILINX_TOOL_PATH XILINX_LM_LICENSE_FILE XILINX_TOOL_ARCH XILINX_VIVADO_PATH"
+
 # Required parameters
 BOARD_DESIGN_URI ?= ""
 BOARD_DESIGN_PATH ?= ""
