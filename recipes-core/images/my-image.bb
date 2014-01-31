@@ -11,11 +11,15 @@ IMAGE_FSTYPES = "tar.gz ubi"
 
 inherit core-image
 
+MY_LOGIC = "\
+	fpga-image-adi \
+	adi-hdmi-load \
+	"
+
 MY_THINGS = "\
 	kernel-modules \
 	modutils-loadscript \
-	fpga-image-adi \
-	adi-hdmi-load \
+	${MY_LOGIC} \
 	mtd-utils \
 	${@base_contains("IMAGE_FSTYPES", "ubi", "mtd-utils-ubifs" , "", d)} \
 	"
