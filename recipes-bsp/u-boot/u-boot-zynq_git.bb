@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce
 SRCREV = "c55c35bb239a40d5d5d7678fc38b92c77cf882f8"
 
 PV = "xilinx-zynq"
-PR = "r6"
+PR = "r7"
 
 SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git \
            file://0001-Use-bootscript-to-boot-use-fast-XIP-load-address-no-.patch \

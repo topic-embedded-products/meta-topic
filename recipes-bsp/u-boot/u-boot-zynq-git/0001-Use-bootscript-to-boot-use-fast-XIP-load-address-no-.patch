@@ -1,18 +1,21 @@
-From dc51b54bec7d44eeae5c6815cbcd0f4df65c18ef Mon Sep 17 00:00:00 2001
+From 2819c4cbba27dd6eb528c22bb015c60f3ed39b9f Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 27 Jan 2014 08:17:34 +0100
-Subject: [PATCH] Use bootscript to boot, use fast XIP load address, no
+Subject: [PATCH 2/2] Use bootscript to boot, use fast XIP load address, no
  ramdisk
 
 Check for autorun bootscript and run it from SD.
 Load kernel at correct offset so it can execute in place (save a memcpy).
 Boot without ramdisk because we expect real filesystems (ubi or ext4).
+Set SPI speed to 50MHz (most chips can even do 100 with fast_read).
+Omit environments that can't be used (e.g. NOR, NAND, RSA) when their
+configs aren't defined.
 ---
- include/configs/zynq_common.h |   53 +++++++++++++++++++----------------------
- 1 file changed, 24 insertions(+), 29 deletions(-)
+ include/configs/zynq_common.h |  115 ++++++++++++++++++++++-------------------
+ 1 file changed, 62 insertions(+), 53 deletions(-)
 
 diff --git a/include/configs/zynq_common.h b/include/configs/zynq_common.h
-index 2acf3ee..0f326bb 100644
+index 2acf3ee..cd5348f 100644
 --- a/include/configs/zynq_common.h
 +++ b/include/configs/zynq_common.h
 @@ -29,7 +29,7 @@
@@ -24,7 +27,74 @@ index 2acf3ee..0f326bb 100644
  
  /* allow to overwrite serial and ethaddr */
  #define CONFIG_ENV_OVERWRITE
-@@ -196,7 +196,7 @@
+@@ -48,6 +48,31 @@
+ #if defined(CONFIG_CMD_ZYNQ_RSA)
+ #define CONFIG_SHA256
+ #define CONFIG_CMD_ZYNQ_AES
++# define CONFIG_EXTRA_ENV_RSA_BOOT \
++	"boot_image=BOOT.bin\0"	\
++	"rsa_norboot=echo Copying Image from NOR flash to RAM... && " \
++		"cp.b 0xE2100000 0x100000 ${boot_size} && " \
++		"zynqrsa 0x100000 && " \
++		"bootm 0x3000000 0x2000000 0x2A00000\0" \
++	"rsa_nandboot=echo Copying Image from NAND flash to RAM... && " \
++		"nand read 0x100000 0x0 ${boot_size} && " \
++		"zynqrsa 0x100000 && " \
++		"bootm 0x3000000 0x2000000 0x2A00000\0" \
++	"rsa_qspiboot=echo Copying Image from QSPI flash to RAM... && " \
++		"sf probe 0 0 0 && " \
++		"sf read 0x100000 0x0 ${boot_size} && " \
++		"zynqrsa 0x100000 && " \
++		"bootm 0x3000000 0x2000000 0x2A00000\0" \
++	"rsa_sdboot=echo Copying Image from SD to RAM... && " \
++		"fatload mmc 0 0x100000 ${boot_image} && " \
++		"zynqrsa 0x100000 && " \
++		"bootm 0x3000000 0x2000000 0x2A00000\0" \
++	"rsa_jtagboot=echo TFTPing Image to RAM... && " \
++		"tftp 0x100000 ${boot_image} && " \
++		"zynqrsa 0x100000 && " \
++		"bootm 0x3000000 0x2000000 0x2A00000\0"
++#else
++# define CONFIG_EXTRA_ENV_RSA_BOOT ""
+ #endif
+ 
+ /* DCC driver */
+@@ -115,6 +140,11 @@
+ /* use buffered writes (20x faster) */
+ # define CONFIG_SYS_FLASH_USE_BUFFER_WRITE
+ # define CONFIG_ZYNQ_M29EW_WB_HACK
++# define CONFIG_EXTRA_ENV_NOR_BOOT \
++	"norboot=echo Boot from NOR flash...;" \
++		"bootm 0xE2100000 - 0xE2600000\0"
++#else
++# define CONFIG_EXTRA_ENV_NOR_BOOT ""
+ #endif
+ 
+ /* SPI */
+@@ -127,7 +157,7 @@
+ 
+ /* QSPI */
+ #ifdef CONFIG_ZYNQ_QSPI
+-# define CONFIG_SF_DEFAULT_SPEED	30000000
++# define CONFIG_SF_DEFAULT_SPEED	50000000
+ # define CONFIG_SPI_FLASH
+ # define CONFIG_SPI_FLASH_BAR
+ # define CONFIG_SPI_FLASH_SPANSION
+@@ -158,6 +188,13 @@
+ # define CONFIG_SYS_NAND_SELF_INIT
+ # define CONFIG_SYS_NAND_ONFI_DETECTION
+ # define CONFIG_MTD_DEVICE
++# define CONFIG_EXTRA_ENV_NAND_BOOT \
++	"nandboot=echo Copying Linux from NAND flash to RAM... && " \
++		"nand read ${kernel_addr} 0x100000 ${kernel_size} && " \
++		"nand read 0x2A00000 0x600000 ${devicetree_size} && " \
++		"bootm ${kernel_addr} - 0x2A00000\0"
++#else
++# define CONFIG_EXTRA_ENV_NAND_BOOT ""
+ #endif
+ 
+ /* I2C */
+@@ -196,7 +233,7 @@
  
  # define CONFIG_ENV_SECT_SIZE		CONFIG_ENV_SIZE
  # ifndef CONFIG_ENV_OFFSET
@@ -33,7 +103,7 @@ index 2acf3ee..0f326bb 100644
  # endif
  # define CONFIG_CMD_SAVEENV	/* Command to save ENV to Flash */
  #endif
-@@ -207,6 +207,10 @@
+@@ -207,6 +244,10 @@
  # define CONFIG_PANIC_HANG
  #endif
  
@@ -44,10 +114,11 @@ index 2acf3ee..0f326bb 100644
  /* Default environment */
  #define CONFIG_EXTRA_ENV_SETTINGS	\
  	"ethaddr=00:0a:35:00:01:22\0"	\
-@@ -215,11 +219,12 @@
+@@ -214,12 +255,12 @@
+ 	"ramdisk_image=uramdisk.image.gz\0"	\
  	"devicetree_image=devicetree.dtb\0"	\
  	"bitstream_image=system.bit.bin\0"	\
- 	"boot_image=BOOT.bin\0"	\
+-	"boot_image=BOOT.bin\0"	\
 +	"bootscript=" CONFIG_EXTRA_ENV_BOOTSCRIPT "\0" \
  	"loadbit_addr=0x100000\0"	\
  	"loadbootenv_addr=0x2000000\0" \
@@ -60,7 +131,7 @@ index 2acf3ee..0f326bb 100644
  	"boot_size=0xF00000\0"	\
  	"fdt_high=0x20000000\0"	\
  	"initrd_high=0x20000000\0"	\
-@@ -231,19 +236,11 @@
+@@ -231,19 +272,11 @@
  		"mmcinfo && " \
  		"fatload mmc 0 ${loadbit_addr} ${bitstream_image} && " \
  		"fpga load 0 ${loadbit_addr} ${filesize}\0" \
@@ -71,21 +142,20 @@ index 2acf3ee..0f326bb 100644
 -		"cp.b 0xE2620000 0x2000000 ${ramdisk_size} && " \
 -		"bootm 0x3000000 0x2000000 0x2A00000\0" \
 -	"qspiboot=echo Copying Linux from QSPI flash to RAM... && " \
--		"sf probe 0 0 0 && " \
++	"qspiboot=echo Booting from QSPI flash... && " \
+ 		"sf probe 0 0 0 && " \
 -		"sf read 0x3000000 0x100000 ${kernel_size} && " \
 -		"sf read 0x2A00000 0x600000 ${devicetree_size} && " \
 -		"echo Copying ramdisk... && " \
 -		"sf read 0x2000000 0x620000 ${ramdisk_size} && " \
 -		"bootm 0x3000000 0x2000000 0x2A00000\0" \
-+	"norboot=echo Boot from NOR flash...;" \
-+		"bootm 0xE2100000 - 0xE2600000\0" \
-+	"qspiboot=echo Booting from QSPI flash... && " \
 +		"sf read 0x2A00000 0x70000 ${devicetree_size} && " \
 +		"sf read ${kernel_addr} 0x80000 ${kernel_size} && " \
++		"bootm ${kernel_addr} - 0x2A00000\0" \
  	"uenvboot=" \
  		"if run loadbootenv; then " \
  			"echo Loaded environment from ${bootenv}; " \
-@@ -256,22 +253,19 @@
+@@ -256,51 +289,27 @@
  	"sdboot=if mmcinfo; then " \
  			"run uenvboot; " \
  			"echo Copying Linux from SD to RAM... && " \
@@ -96,25 +166,45 @@ index 2acf3ee..0f326bb 100644
 -			"bootm 0x3000000 0x2000000 0x2A00000; " \
 +			"bootm ${kernel_addr} - 0x2A00000\0" \
  		"fi\0" \
- 	"nandboot=echo Copying Linux from NAND flash to RAM... && " \
+-	"nandboot=echo Copying Linux from NAND flash to RAM... && " \
 -		"nand read 0x3000000 0x100000 ${kernel_size} && " \
-+		"nand read ${kernel_addr} 0x100000 ${kernel_size} && " \
- 		"nand read 0x2A00000 0x600000 ${devicetree_size} && " \
+-		"nand read 0x2A00000 0x600000 ${devicetree_size} && " \
 -		"echo Copying ramdisk... && " \
 -		"nand read 0x2000000 0x620000 ${ramdisk_size} && " \
 -		"bootm 0x3000000 0x2000000 0x2A00000\0" \
-+		"bootm ${kernel_addr} - 0x2A00000\0" \
  	"jtagboot=echo TFTPing Linux to RAM... && " \
 -		"tftp 0x3000000 ${kernel_image} && " \
 +		"tftp ${kernel_addr} ${kernel_image} && " \
  		"tftp 0x2A00000 ${devicetree_image} && " \
  		"tftp 0x2000000 ${ramdisk_image} && " \
 -		"bootm 0x3000000 0x2000000 0x2A00000\0" \
+-	"rsa_norboot=echo Copying Image from NOR flash to RAM... && " \
+-		"cp.b 0xE2100000 0x100000 ${boot_size} && " \
+-		"zynqrsa 0x100000 && " \
+-		"bootm 0x3000000 0x2000000 0x2A00000\0" \
+-	"rsa_nandboot=echo Copying Image from NAND flash to RAM... && " \
+-		"nand read 0x100000 0x0 ${boot_size} && " \
+-		"zynqrsa 0x100000 && " \
+-		"bootm 0x3000000 0x2000000 0x2A00000\0" \
+-	"rsa_qspiboot=echo Copying Image from QSPI flash to RAM... && " \
+-		"sf probe 0 0 0 && " \
+-		"sf read 0x100000 0x0 ${boot_size} && " \
+-		"zynqrsa 0x100000 && " \
+-		"bootm 0x3000000 0x2000000 0x2A00000\0" \
+-	"rsa_sdboot=echo Copying Image from SD to RAM... && " \
+-		"fatload mmc 0 0x100000 ${boot_image} && " \
+-		"zynqrsa 0x100000 && " \
+-		"bootm 0x3000000 0x2000000 0x2A00000\0" \
+-	"rsa_jtagboot=echo TFTPing Image to RAM... && " \
+-		"tftp 0x100000 ${boot_image} && " \
+-		"zynqrsa 0x100000 && " \
+-		"bootm 0x3000000 0x2000000 0x2A00000\0"
 +		"bootm ${kernel_addr} 0x2000000 0x2A00000\0" \
- 	"rsa_norboot=echo Copying Image from NOR flash to RAM... && " \
- 		"cp.b 0xE2100000 0x100000 ${boot_size} && " \
- 		"zynqrsa 0x100000 && " \
-@@ -298,9 +292,10 @@
++	CONFIG_EXTRA_ENV_NOR_BOOT \
++	CONFIG_EXTRA_ENV_NAND_BOOT \
++	CONFIG_EXTRA_ENV_RSA_BOOT
+ 
+ /* default boot is according to the bootmode switch settings */
  #if defined(CONFIG_CMD_ZYNQ_RSA)
  #define CONFIG_BOOTCOMMAND		"run rsa_$modeboot"
  #else
