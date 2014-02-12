@@ -5,6 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 S = "${WORKDIR}/git"
 
 KBRANCH = "xcomm_zynq_new_pcore_regmap"
+KBRANCH_zynq-miami = "miami"
 
 # Remove old names
 RREPLACES_${PN} = "linux-milo"
@@ -31,7 +32,7 @@ KERNEL_IMAGETYPE = "uImage"
 KERNEL_DEVICETREE = "${WORKDIR}/devicetree.dts"
 KERNEL_DEVICETREE_zynq-zc702 = "arch/arm/boot/dts/${MACHINE}-adv7511.dts"
 KERNEL_DEVICETREE_zedboard = "arch/arm/boot/dts/zynq-zed-adv7511.dts"
-KERNEL_DEVICETREE_zynq-miami = "arch/arm/boot/dts/zynq-zed-adv7511.dts"
+KERNEL_DEVICETREE_zynq-miami = "arch/arm/boot/dts/zynq-miami-florida.dts"
 # See http://permalink.gmane.org/gmane.linux.kernel.commits.head/371588
 KERNEL_EXTRA_ARGS += "LOADADDR=0x00008000"
 KERNEL_IMAGEDEST = "tmp/boot"
@@ -42,6 +43,7 @@ LINUX_VERSION ?= "3.12"
 LINUX_VERSION_EXTENSION ?= "-topic"
 
 SRCREV = "b0f1cdb587674084e412847d0fbe452e38040c3d"
+SRCREV_zynq-miami = "f53cde472b210c063b2584bacd5f9a5e0e2031b7"
 
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
