@@ -1,0 +1,34 @@
+From e0ac35a633dac123eafc6d76ad4d7671db63a09d Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Wed, 19 Feb 2014 15:18:47 +0100
+Subject: [PATCH 2/3] Disable CONFIG_SPL_OS_BOOT
+
+---
+ include/configs/zynq-common.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
+index 3eabb90..5547476 100644
+--- a/include/configs/zynq-common.h
++++ b/include/configs/zynq-common.h
+@@ -401,7 +401,7 @@
+ /* Address in RAM where the parameters must be copied by SPL. */
+ #define CONFIG_SYS_SPL_ARGS_ADDR	0x10000000
+ 
+-#define CONFIG_SPL_FAT_LOAD_ARGS_NAME		"system.dtb"
++#define CONFIG_SPL_FAT_LOAD_ARGS_NAME		"devicetree.dtb"
+ #define CONFIG_SPL_FAT_LOAD_KERNEL_NAME		"uImage"
+ 
+ /* Not using MMC raw mode - just for compilation purpose */
+@@ -428,7 +428,7 @@
+ #endif
+ 
+ /* for booting directly linux */
+-#define CONFIG_SPL_OS_BOOT
++#undef CONFIG_SPL_OS_BOOT
+ 
+ /* SP location before relocation, must use scratch RAM */
+ #define CONFIG_SPL_TEXT_BASE	0x0
+-- 
+1.7.9.5
+

@@ -13,3 +13,18 @@ BOARD_DESIGN_PATH_zynq-zc702 = "cf_adv7511_zc702"
 BOARD_DESIGN_PATH_zynq-zc706 = "cf_adv7511_zc706"
 
 PV = "1.${SRCPV}"
+
+# Support for u-boot-spl
+PROVIDES = "virtual/xilinx-sdk"
+# Store the SDK files into the sysroot for other packages
+SYSROOT_PREPROCESS_FUNCS += "fpga_sysroot_preprocess"
+fpga_sysroot_preprocess() {
+	if [ -d ${S}/SDK/SDK_Export ]
+	then
+		install -d ${SYSROOT_DESTDIR}${datadir}/xilinx_sdk
+		cp -r ${S}/SDK/SDK_Export/hw/* ${SYSROOT_DESTDIR}${datadir}/xilinx_sdk/
+	else
+		echo "No SDK exported, cannot create u-boot SPL from this!"
+	fi
+}
+

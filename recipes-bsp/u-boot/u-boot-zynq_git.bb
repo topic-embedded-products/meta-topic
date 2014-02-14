@@ -1,23 +1,4 @@
-require recipes-bsp/u-boot/u-boot.inc
-
-FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-zynq-git:"
-
-LICENSE = "GPLv2+"
-LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce1dc69f702a6c"
-
-SRCREV = "c55c35bb239a40d5d5d7678fc38b92c77cf882f8"
-
-PV = "xilinx-zynq"
-PR = "r7"
-
-SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git \
-           file://0001-Use-bootscript-to-boot-use-fast-XIP-load-address-no-.patch \
-           file://0002-Add-mfpu-neon-to-PLATFORM_RELFLAGS.patch \
-          "
-
-S = "${WORKDIR}/git"
-
-PACKAGE_ARCH = "${MACHINE_ARCH}"
+require u-boot-zynq.inc
 
 # Fetch the FSBL binary from the design for now, as building it is a royal pita.
 BOARD_DESIGN_URI = "file:/"
