@@ -30,6 +30,8 @@ vi conf/local.conf
 # Then build your first image and relax a bit:
 nice bitbake my-image
 
+Note that "my-image" was designed to be used with DISTRO=tiny. It
+expects to run with busybox-mdev instead of udev.
 
 In order to properly use the zynq for anything useful, you will need to
 build a bit image and FSBL using the Xilinx tools. README-LOGIC contains
