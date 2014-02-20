@@ -22,6 +22,7 @@ MY_THINGS = "\
 	${MY_LOGIC} \
 	mtd-utils \
 	${@base_contains("IMAGE_FSTYPES", "ubi", "mtd-utils-ubifs" , "", d)} \
+	alsa-utils-aplay alsa-utils-speakertest alsa-utils-amixer alsa-utils-alsactl \
 	"
 
 # Skip packagegroup-base to reduce the number of packages built. Thus, we need
