@@ -3,7 +3,10 @@
 
 require u-boot-zynq.inc
 
-SRC_URI += "file://0003-Disable-FPGA-support.patch"
+SRC_URI += "\
+	file://0003-Disable-FPGA-support.patch \
+	file://0001-Set-SPL-offset-in-qspi-flash.patch \
+	"
 
 DEPENDS += "virtual/xilinx-sdk"
 

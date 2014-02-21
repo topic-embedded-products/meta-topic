@@ -1,0 +1,133 @@
+From faeb3eeb2f4ca6ea8d24554fdc064f585ca9d5c3 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 21 Feb 2014 09:20:51 +0100
+Subject: [PATCH] Add zynq-miami board
+
+---
+ arch/arm/cpu/armv7/zynq/spl.c   |   22 +++++++++++++++++++---
+ board/xilinx/dts/zynq-miami.dts |   14 ++++++++++++++
+ boards.cfg                      |    1 +
+ include/configs/zynq_miami.h    |   37 +++++++++++++++++++++++++++++++++++++
+ 4 files changed, 71 insertions(+), 3 deletions(-)
+ create mode 100644 board/xilinx/dts/zynq-miami.dts
+ create mode 100644 include/configs/zynq_miami.h
+
+diff --git a/arch/arm/cpu/armv7/zynq/spl.c b/arch/arm/cpu/armv7/zynq/spl.c
+index f6686b4..1edf18f 100644
+--- a/arch/arm/cpu/armv7/zynq/spl.c
++++ b/arch/arm/cpu/armv7/zynq/spl.c
+@@ -41,8 +41,9 @@ void spl_board_init(void)
+ u32 spl_boot_device(void)
+ {
+ 	u32 mode;
++	u8 zynq_mode = (zynq_slcr_get_boot_mode()) & ZYNQ_BM_MASK;
+ 
+-	switch ((zynq_slcr_get_boot_mode()) & ZYNQ_BM_MASK) {
++	switch (zynq_mode) {
+ #ifdef CONFIG_SPL_SPI_SUPPORT
+ 	case ZYNQ_BM_QSPI:
+ 		puts("qspi boot\n");
+@@ -65,8 +66,23 @@ u32 spl_boot_device(void)
+ 		mode = BOOT_DEVICE_RAM;
+ 		break;
+ 	default:
+-		puts("Unsupported boot mode selected\n");
+-		hang();
++		puts("Unknown boot mode: 0x");
++		if (zynq_mode > 9)
++			putc((zynq_mode - 10) + 'A');
++		else
++			putc(zynq_mode + '0');
++#ifdef CONFIG_SPL_MMC_SUPPORT
++		puts(". Assuming SD boot\n");
++		mode = BOOT_DEVICE_MMC1;
++#else
++# ifdef CONFIG_SPL_SPI_SUPPORT
++		puts(". Assuming QSPI boot\n");
++		mode = BOOT_DEVICE_SPI;
++# else
++		putc('\n');
++		mode = BOOT_DEVICE_NONE;
++# endif
++#endif		
+ 	}
+ 
+ 	return mode;
+diff --git a/board/xilinx/dts/zynq-miami.dts b/board/xilinx/dts/zynq-miami.dts
+new file mode 100644
+index 0000000..ccab2a9
+--- /dev/null
++++ b/board/xilinx/dts/zynq-miami.dts
+@@ -0,0 +1,14 @@
++/*
++ * Topic Miami board DTS
++ *
++ * Copyright (C) 2014 Topic Embedded Products
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++/dts-v1/;
++#include "zynq-7000.dtsi"
++
++/ {
++	model = "Zynq Miami Board";
++	compatible = "xlnx,zynq-miami", "xlnx,zynq-7000";
++};
+diff --git a/boards.cfg b/boards.cfg
+index bab89f2..bf87f96 100644
+--- a/boards.cfg
++++ b/boards.cfg
+@@ -362,6 +362,7 @@ Active  arm	    armv7	   zynq	       xilinx	       zynq	   	   zynq_microzed			-
+ Active  arm	    armv7	   zynq	       xilinx	       zynq	   	   zynq_zc770_XM010			zynq_zc770:ZC770_XM010                                                                                                            Michal Simek <monstr@monstr.eu>:Jagannadha Sutradharudu Teki <jaganna@xilinx.com>
+ Active  arm	    armv7	   zynq	       xilinx	       zynq	   	   zynq_zc770_XM012			zynq_zc770:ZC770_XM012                                                                                                            Michal Simek <monstr@monstr.eu>:Jagannadha Sutradharudu Teki <jaganna@xilinx.com>
+ Active  arm	    armv7	   zynq	       xilinx	       zynq	   	   zynq_zc770_XM013			zynq_zc770:ZC770_XM013                                                                                                            Michal Simek <monstr@monstr.eu>:Jagannadha Sutradharudu Teki <jaganna@xilinx.com>
++Active  arm	    armv7	   zynq	       xilinx	       zynq	   	   zynq_miami				-                                                                                                                                 Mike Looijmans <mike.looijmans@topic.nl>
+ Active  arm         armv7          zynq        xilinx          zynq                zynq_zc770_XM011                     zynq_zc770:ZC770_XM011                                                                                                            Michal Simek <michal.simek@xilinx.com>
+ Active  arm         armv7          zynq        xilinx          zynq                zynq_afx_nor                         zynq_afx:AFX_NOR                                                                                                                  Michal Simek <michal.simek@xilinx.com>
+ Active  arm         armv7          zynq        xilinx          zynq                zynq_afx_qspi                        zynq_afx:AFX_QSPI                                                                                                                 Michal Simek <michal.simek@xilinx.com>
+diff --git a/include/configs/zynq_miami.h b/include/configs/zynq_miami.h
+new file mode 100644
+index 0000000..6812111
+--- /dev/null
++++ b/include/configs/zynq_miami.h
+@@ -0,0 +1,37 @@
++/*
++ * (C) Copyright 2014 Topic Embedded Products
++ *
++ * Configuration for Zynq Evaluation and Development Board - Miami
++ * See zynq-common.h for Zynq common configs
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++#ifndef __CONFIG_ZYNQ_MIAMI_H
++#define __CONFIG_ZYNQ_MIAMI_H
++
++#define CONFIG_SYS_SDRAM_SIZE		(512 * 1024 * 1024)
++
++#define CONFIG_ZYNQ_SERIAL_UART1
++/* Ethernet needs external clock, not really supported here yet but
++ * it won't compile without it. */
++#define CONFIG_ZYNQ_GEM0
++#define CONFIG_ZYNQ_GEM_PHY_ADDR0 0
++#undef CONFIG_ZYNQ_GEM1
++#undef CONFIG_SYS_ENET
++
++#define CONFIG_SYS_NO_FLASH
++
++#define CONFIG_ZYNQ_SDHCI0
++#define CONFIG_ZYNQ_QSPI
++
++#define CONFIG_ZYNQ_BOOT_FREEBSD
++#define CONFIG_DEFAULT_DEVICE_TREE	zynq-miami
++
++#include <configs/zynq-common.h>
++
++/* Extras */
++#define CONFIG_CMD_MEMTEST
++#define CONFIG_CMD_EXT4
++
++#endif /* __CONFIG_ZYNQ_MIAMI_H */
+-- 
+1.7.9.5
+
