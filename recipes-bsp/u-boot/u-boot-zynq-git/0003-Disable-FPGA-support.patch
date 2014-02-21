@@ -1,7 +1,7 @@
-From fefbb73db62256ebfcd4e6fb235f16b240e61830 Mon Sep 17 00:00:00 2001
+From fc59986866edd1cb03897bbc9d8146592fc42053 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 19 Feb 2014 15:38:48 +0100
-Subject: [PATCH 3/3] Disable FPGA support
+Subject: [PATCH 3/7] Disable FPGA support
 
 Boot faster when logic is loaded from the rootfs
 ---

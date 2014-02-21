@@ -41,19 +41,21 @@ FILES_kernel-image = "${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}*"
 LINUX_VERSION ?= "3.12"
 LINUX_VERSION_EXTENSION ?= "-topic"
 
-SRCREV = "4557b7c2d23f0c7131312ba38ad30edf6bef8861"
+SRCREV = "1e7e55404e429046bfe9c8d84c6eff5f7e13740f"
 
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-COMPATIBLE_MACHINE = "(zynq-zc702|zedboard|zynq-miami)"
+COMPATIBLE_MACHINE = "zynq-zc702|zedboard|zynq-miami"
+
+KERNEL_FLASH_DEVICE = "/dev/mtd4"
 
 pkg_postinst_kernel-image () {
 	if [ "x$D" == "x" ]; then
 		if [ -f /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ] ; then
 			if grep -q "ubi0:qspi-rootfs" /proc/mounts
 			then
-				flashcp -v /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} /dev/mtd3
+				flashcp -v /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${KERNEL_FLASH_DEVICE}
 			else
 				if [ -f /media/mmcblk0p1/${KERNEL_IMAGETYPE} ]; then
 					cp /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} /media/mmcblk0p1/${KERNEL_IMAGETYPE}

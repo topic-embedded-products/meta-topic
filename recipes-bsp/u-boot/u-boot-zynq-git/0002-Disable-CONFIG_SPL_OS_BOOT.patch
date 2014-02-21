@@ -1,7 +1,7 @@
-From e0ac35a633dac123eafc6d76ad4d7671db63a09d Mon Sep 17 00:00:00 2001
+From 24c207ba59c011068a3cdafd189cd07d95cef906 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 19 Feb 2014 15:18:47 +0100
-Subject: [PATCH 2/3] Disable CONFIG_SPL_OS_BOOT
+Subject: [PATCH 2/7] Disable CONFIG_SPL_OS_BOOT
 
 ---
  include/configs/zynq-common.h |    4 ++--

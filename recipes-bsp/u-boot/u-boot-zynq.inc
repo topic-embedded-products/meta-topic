@@ -12,8 +12,11 @@ PR = "r7"
 
 SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git;branch=master-next \
 	file://0001-Use-bootscript-to-boot-use-fast-XIP-load-address-no-.patch \
-	file://0001-spl_mmc.c-Display-correct-message-when-bitstream-fai.patch \
 	file://0002-Disable-CONFIG_SPL_OS_BOOT.patch \
+	file://0004-spl_mmc.c-Display-correct-message-when-bitstream-fai.patch \
+	file://0005-arch-zynq-hardware.h-Fix-bootmode-mask.patch \
+	file://0006-Set-SPL-offset-in-qspi-flash.patch \
+	file://0007-Add-zynq-miami-board-support.patch \
 	"
 
 S = "${WORKDIR}/git"

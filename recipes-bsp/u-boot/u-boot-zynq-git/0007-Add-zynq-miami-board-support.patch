@@ -1,0 +1,150 @@
+From 7f6cdf49ebe2f9c6a77ec694ec33d26ca2fe1ef5 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 24 Feb 2014 10:56:17 +0100
+Subject: [PATCH 7/7] Add zynq-miami board support
+
+---
+ board/xilinx/dts/zynq-miami.dts |   14 ++++++
+ boards.cfg                      |    1 +
+ include/configs/zynq_miami.h    |   96 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 111 insertions(+)
+ create mode 100644 board/xilinx/dts/zynq-miami.dts
+ create mode 100644 include/configs/zynq_miami.h
+
+diff --git a/board/xilinx/dts/zynq-miami.dts b/board/xilinx/dts/zynq-miami.dts
+new file mode 100644
+index 0000000..ccab2a9
+--- /dev/null
++++ b/board/xilinx/dts/zynq-miami.dts
+@@ -0,0 +1,14 @@
++/*
++ * Topic Miami board DTS
++ *
++ * Copyright (C) 2014 Topic Embedded Products
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++/dts-v1/;
++#include "zynq-7000.dtsi"
++
++/ {
++	model = "Zynq Miami Board";
++	compatible = "xlnx,zynq-miami", "xlnx,zynq-7000";
++};
+diff --git a/boards.cfg b/boards.cfg
+index bab89f2..bf87f96 100644
+--- a/boards.cfg
++++ b/boards.cfg
+@@ -362,6 +362,7 @@ Active  arm	    armv7	   zynq	       xilinx	       zynq	   	   zynq_microzed			-
+ Active  arm	    armv7	   zynq	       xilinx	       zynq	   	   zynq_zc770_XM010			zynq_zc770:ZC770_XM010                                                                                                            Michal Simek <monstr@monstr.eu>:Jagannadha Sutradharudu Teki <jaganna@xilinx.com>
+ Active  arm	    armv7	   zynq	       xilinx	       zynq	   	   zynq_zc770_XM012			zynq_zc770:ZC770_XM012                                                                                                            Michal Simek <monstr@monstr.eu>:Jagannadha Sutradharudu Teki <jaganna@xilinx.com>
+ Active  arm	    armv7	   zynq	       xilinx	       zynq	   	   zynq_zc770_XM013			zynq_zc770:ZC770_XM013                                                                                                            Michal Simek <monstr@monstr.eu>:Jagannadha Sutradharudu Teki <jaganna@xilinx.com>
++Active  arm	    armv7	   zynq	       xilinx	       zynq	   	   zynq_miami				-                                                                                                                                 Mike Looijmans <mike.looijmans@topic.nl>
+ Active  arm         armv7          zynq        xilinx          zynq                zynq_zc770_XM011                     zynq_zc770:ZC770_XM011                                                                                                            Michal Simek <michal.simek@xilinx.com>
+ Active  arm         armv7          zynq        xilinx          zynq                zynq_afx_nor                         zynq_afx:AFX_NOR                                                                                                                  Michal Simek <michal.simek@xilinx.com>
+ Active  arm         armv7          zynq        xilinx          zynq                zynq_afx_qspi                        zynq_afx:AFX_QSPI                                                                                                                 Michal Simek <michal.simek@xilinx.com>
+diff --git a/include/configs/zynq_miami.h b/include/configs/zynq_miami.h
+new file mode 100644
+index 0000000..d4113aa
+--- /dev/null
++++ b/include/configs/zynq_miami.h
+@@ -0,0 +1,96 @@
++/*
++ * (C) Copyright 2014 Topic Embedded Products
++ *
++ * Configuration for Zynq Evaluation and Development Board - Miami
++ * See zynq-common.h for Zynq common configs
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++#ifndef __CONFIG_ZYNQ_MIAMI_H
++#define __CONFIG_ZYNQ_MIAMI_H
++
++#define CONFIG_SYS_SDRAM_SIZE		(512 * 1024 * 1024)
++
++#define CONFIG_ZYNQ_SERIAL_UART1
++/* Ethernet needs external clock, not really supported here yet but
++ * it won't compile without it. */
++#define CONFIG_ZYNQ_GEM0
++#define CONFIG_ZYNQ_GEM_PHY_ADDR0 0
++#undef CONFIG_ZYNQ_GEM1
++#undef CONFIG_SYS_ENET
++
++#define CONFIG_SYS_NO_FLASH
++
++#define CONFIG_ZYNQ_SDHCI0
++#define CONFIG_ZYNQ_QSPI
++
++#define CONFIG_ZYNQ_BOOT_FREEBSD
++#define CONFIG_DEFAULT_DEVICE_TREE	zynq-miami
++
++
++#include <configs/zynq-common.h>
++
++#ifndef CONFIG_EXTRA_ENV_RSA_BOOT
++# define CONFIG_EXTRA_ENV_RSA_BOOT
++#endif
++
++/* Different SPI flash partitions because of the 256k erase size */
++#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x40000
++#define CONFIG_SPL_MAX_FOOTPRINT	0x30000
++#define CONFIG_EXTRA_ENV_SETTINGS	\
++	"ethaddr=00:0a:35:00:01:22\0"	\
++	"kernel_image=uImage\0"	\
++	"ramdisk_image=uramdisk.image.gz\0"	\
++	"devicetree_image=devicetree.dtb\0"	\
++	"bitstream_image=system.bit.bin\0"	\
++	"bootscript=" CONFIG_EXTRA_ENV_BOOTSCRIPT "\0" \
++	"loadbit_addr=0x100000\0"	\
++	"loadbootenv_addr=0x2000000\0" \
++	"kernel_size=0x380000\0"	\
++	"kernel_addr=0x79C0\0"	\
++	"devicetree_size=0x10000\0"	\
++	"boot_size=0xF00000\0"	\
++	"fdt_high=0x20000000\0"	\
++	"initrd_high=0x20000000\0"	\
++	"bootenv=uEnv.txt\0" \
++	"loadbootenv=fatload mmc 0 ${loadbootenv_addr} ${bootenv}\0" \
++	"importbootenv=echo Importing environment from SD ...; " \
++		"env import -t ${loadbootenv_addr} $filesize\0" \
++	"mmc_loadbit_fat=echo Loading bitstream from SD/MMC/eMMC to RAM.. && " \
++		"mmcinfo && " \
++		"fatload mmc 0 ${loadbit_addr} ${bitstream_image} && " \
++		"fpga load 0 ${loadbit_addr} ${filesize}\0" \
++	"qspiboot=echo Booting from QSPI flash... && " \
++		"sf probe 0 0 0 && " \
++		"sf read 0x2A00000 0x140000 ${devicetree_size} && " \
++		"sf read ${kernel_addr} 0x180000 ${kernel_size} && " \
++		"bootm ${kernel_addr} - 0x2A00000\0" \
++	"uenvboot=" \
++		"if run loadbootenv; then " \
++			"echo Loaded environment from ${bootenv}; " \
++			"run importbootenv; " \
++		"fi; " \
++		"if test -n $uenvcmd; then " \
++			"echo Running uenvcmd ...; " \
++			"run uenvcmd; " \
++		"fi\0" \
++	"sdboot=if mmcinfo; then " \
++			"run uenvboot; " \
++			"echo Copying Linux from SD to RAM... && " \
++			"fatload mmc 0 ${kernel_addr} ${kernel_image} && " \
++			"fatload mmc 0 0x2A00000 ${devicetree_image} && " \
++			"bootm ${kernel_addr} - 0x2A00000\0" \
++		"fi\0" \
++	"jtagboot=echo TFTPing Linux to RAM... && " \
++		"tftp ${kernel_addr} ${kernel_image} && " \
++		"tftp 0x2A00000 ${devicetree_image} && " \
++		"tftp 0x2000000 ${ramdisk_image} && " \
++		"bootm ${kernel_addr} 0x2000000 0x2A00000\0" \
++	CONFIG_EXTRA_ENV_RSA_BOOT
++
++/* Extras */
++#define CONFIG_CMD_MEMTEST
++#define CONFIG_CMD_EXT4
++
++#endif /* __CONFIG_ZYNQ_MIAMI_H */
+-- 
+1.7.9.5
+
