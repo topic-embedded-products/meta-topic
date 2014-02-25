@@ -1,0 +1,29 @@
+From ed854f6f646b26a76d9739a84b9cb1949dee024e Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Wed, 26 Feb 2014 14:53:52 +0100
+Subject: [PATCH] zynq_miami: Support MICREL PHY
+
+Using Micrel PHY on ethernet, replace it.
+---
+ include/configs/zynq_miami.h |    5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/include/configs/zynq_miami.h b/include/configs/zynq_miami.h
+index 88798df..374376d 100644
+--- a/include/configs/zynq_miami.h
++++ b/include/configs/zynq_miami.h
+@@ -33,6 +33,11 @@
+ 
+ #include "zynq-common.h"
+ 
++/* Ethernet PHY is different */
++#undef CONFIG_PHY_MARVELL
++#define CONFIG_PHY_MICREL
++#define CONFIG_PHY_MICREL_KSZ9031
++
+ /* Extras */
+ #define CONFIG_CMD_MEMTEST
+ 
+-- 
+1.7.9.5
+

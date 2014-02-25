@@ -18,6 +18,8 @@ SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git;branch=master-next \
 	file://0006-Set-SPL-offset-in-qspi-flash.patch \
 	file://0007-Add-zynq-miami-board-support.patch \
 	file://0001-Configure-clock-as-32MHz-on-zynq-miami.patch \
+	file://0001-Allow-overriding-flash-offsets.patch \
+	file://0001-zynq_miami-Support-MICREL-PHY.patch \
 	"
 
 S = "${WORKDIR}/git"
