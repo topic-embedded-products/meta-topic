@@ -1,4 +1,4 @@
-From 24c207ba59c011068a3cdafd189cd07d95cef906 Mon Sep 17 00:00:00 2001
+From bcf8e3c013b96dfaebcd36228f4d17b45ebc201b Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 19 Feb 2014 15:18:47 +0100
 Subject: [PATCH 2/7] Disable CONFIG_SPL_OS_BOOT
@@ -8,10 +8,10 @@ Subject: [PATCH 2/7] Disable CONFIG_SPL_OS_BOOT
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index 3eabb90..5547476 100644
+index d90ae8c..1a07b42 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
-@@ -401,7 +401,7 @@
+@@ -424,7 +424,7 @@
  /* Address in RAM where the parameters must be copied by SPL. */
  #define CONFIG_SYS_SPL_ARGS_ADDR	0x10000000
  
@@ -20,7 +20,7 @@ index 3eabb90..5547476 100644
  #define CONFIG_SPL_FAT_LOAD_KERNEL_NAME		"uImage"
  
  /* Not using MMC raw mode - just for compilation purpose */
-@@ -428,7 +428,7 @@
+@@ -451,7 +451,7 @@
  #endif
  
  /* for booting directly linux */

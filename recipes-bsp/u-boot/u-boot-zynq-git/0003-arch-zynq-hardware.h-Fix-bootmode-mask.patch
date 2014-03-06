@@ -1,7 +1,7 @@
-From c1af14126dd05300fddc6c26d6d59673606c9d69 Mon Sep 17 00:00:00 2001
+From 59d6e6e725e71685af31173eac5403dd1a77440c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 21 Feb 2014 12:42:26 +0100
-Subject: [PATCH 5/7] arch-zynq/hardware.h: Fix bootmode mask
+Subject: [PATCH 3/7] arch-zynq/hardware.h: Fix bootmode mask
 
 Bootmode mask was defined as 0x0F, but documentation mentions 0x07.
 Experiments show that bit "3" is the JTAG chain configuration.
@@ -14,11 +14,11 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm/include/asm/arch-zynq/hardware.h b/arch/arm/include/asm/arch-zynq/hardware.h
-index f126179..4925fac 100644
+index 2dc9ce5..76577cd 100644
 --- a/arch/arm/include/asm/arch-zynq/hardware.h
 +++ b/arch/arm/include/asm/arch-zynq/hardware.h
-@@ -28,7 +28,7 @@
- #define ZYNQ_EFUSE_BASEADDR		0xF800D000
+@@ -30,7 +30,7 @@
+ #define ZYNQ_USB_BASEADDR1		0xE0003000
  
  /* Bootmode setting values */
 -#define ZYNQ_BM_MASK		0x0F

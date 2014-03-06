@@ -1,4 +1,4 @@
-From 8dd7955b403cd03bc385b7dac3e9a8c9ff526eaf Mon Sep 17 00:00:00 2001
+From 4b50931ab5b202f8ecab8d17240976719fbcd659 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 27 Jan 2014 08:17:34 +0100
 Subject: [PATCH 1/7] Use bootscript to boot, use fast XIP load address, no
@@ -10,16 +10,12 @@ Boot without ramdisk because we expect real filesystems (ubi or ext4).
 Set SPI speed to 50MHz (most chips can even do 100 with fast_read).
 Omit environments that can't be used (e.g. NOR, NAND, RSA) when their
 configs aren't defined.
-
-Conflicts:
-
-	include/configs/zynq-common.h
 ---
- include/configs/zynq-common.h |  126 ++++++++++++++++++++++-------------------
- 1 file changed, 67 insertions(+), 59 deletions(-)
+ include/configs/zynq-common.h |  146 ++++++++++++++++++++++-------------------
+ 1 file changed, 78 insertions(+), 68 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index 9ec68c8..3eabb90 100644
+index 3bc882d..d90ae8c 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
 @@ -34,6 +34,34 @@
@@ -69,7 +65,29 @@ index 9ec68c8..3eabb90 100644
  #endif
  
  /* MMC */
-@@ -92,7 +125,7 @@
+@@ -88,7 +121,6 @@
+ # define CONFIG_SUPPORT_VFAT
+ # define CONFIG_CMD_EXT2
+ # define CONFIG_DOS_PARTITION
+-# define CONFIG_FAT_WRITE
+ #endif
+ 
+ #ifdef CONFIG_ZYNQ_USB
+@@ -101,11 +133,21 @@
+ #define CONFIG_USB_ULPI
+ #define CONFIG_EHCI_IS_TDI
+ #define CONFIG_USB_MAX_CONTROLLER_COUNT	2
++# define CONFIG_EXTRA_ENV_USB_BOOT \
++	"usbboot=if usb start; then " \
++			"run uenvboot; " \
++			"echo Copying Linux from USB to RAM... && " \
++			"fatload usb 0 ${kernel_addr} ${kernel_image} && " \
++			"fatload usb 0 0x2A00000 ${devicetree_image} && " \
++			"bootm ${kernel_addr} - 0x2A00000\0" \
++		"fi\0"
++#else
++# define CONFIG_EXTRA_ENV_USB_BOOT ""
+ #endif
  
  /* QSPI */
  #ifdef CONFIG_ZYNQ_QSPI
@@ -78,7 +96,7 @@ index 9ec68c8..3eabb90 100644
  # define CONFIG_SPI_FLASH
  # define CONFIG_SPI_FLASH_BAR
  # define CONFIG_SPI_FLASH_SPANSION
-@@ -111,6 +144,13 @@
+@@ -124,6 +166,13 @@
  # define CONFIG_SYS_NAND_SELF_INIT
  # define CONFIG_SYS_NAND_ONFI_DETECTION
  # define CONFIG_MTD_DEVICE
@@ -92,7 +110,7 @@ index 9ec68c8..3eabb90 100644
  #endif
  
  #define CONFIG_SYS_I2C_ZYNQ
-@@ -133,7 +173,7 @@
+@@ -146,7 +195,7 @@
  #endif
  
  /* Total Size of Environment Sector */
@@ -101,7 +119,7 @@ index 9ec68c8..3eabb90 100644
  
  /* Allow to overwrite serial and ethaddr */
  #define CONFIG_ENV_OVERWRITE
-@@ -155,11 +195,15 @@
+@@ -168,11 +217,15 @@
  
  # define CONFIG_ENV_SECT_SIZE		CONFIG_ENV_SIZE
  # ifndef CONFIG_ENV_OFFSET
@@ -118,7 +136,7 @@ index 9ec68c8..3eabb90 100644
  /* Default environment */
  #define CONFIG_EXTRA_ENV_SETTINGS	\
  	"ethaddr=00:0a:35:00:01:22\0"	\
-@@ -167,12 +211,12 @@
+@@ -180,12 +233,12 @@
  	"ramdisk_image=uramdisk.image.gz\0"	\
  	"devicetree_image=devicetree.dtb\0"	\
  	"bitstream_image=system.bit.bin\0"	\
@@ -135,7 +153,7 @@ index 9ec68c8..3eabb90 100644
  	"boot_size=0xF00000\0"	\
  	"fdt_high=0x20000000\0"	\
  	"initrd_high=0x20000000\0"	\
-@@ -184,19 +228,11 @@
+@@ -197,19 +250,11 @@
  		"mmcinfo && " \
  		"fatload mmc 0 ${loadbit_addr} ${bitstream_image} && " \
  		"fpga load 0 ${loadbit_addr} ${filesize}\0" \
@@ -159,7 +177,7 @@ index 9ec68c8..3eabb90 100644
  	"uenvboot=" \
  		"if run loadbootenv; then " \
  			"echo Loaded environment from ${bootenv}; " \
-@@ -209,55 +245,27 @@
+@@ -222,63 +267,28 @@
  	"sdboot=if mmcinfo; then " \
  			"run uenvboot; " \
  			"echo Copying Linux from SD to RAM... && " \
@@ -167,6 +185,14 @@ index 9ec68c8..3eabb90 100644
 +			"fatload mmc 0 ${kernel_addr} ${kernel_image} && " \
  			"fatload mmc 0 0x2A00000 ${devicetree_image} && " \
 -			"fatload mmc 0 0x2000000 ${ramdisk_image} && " \
+-			"bootm 0x3000000 0x2000000 0x2A00000; " \
+-		"fi\0" \
+-	"usbboot=if usb start; then " \
+-			"run uenvboot; " \
+-			"echo Copying Linux from USB to RAM... && " \
+-			"fatload usb 0 0x3000000 ${kernel_image} && " \
+-			"fatload usb 0 0x2A00000 ${devicetree_image} && " \
+-			"fatload usb 0 0x2000000 ${ramdisk_image} && " \
 -			"bootm 0x3000000 0x2000000 0x2A00000; " \
 +			"bootm ${kernel_addr} - 0x2A00000\0" \
  		"fi\0" \
@@ -212,6 +238,7 @@ index 9ec68c8..3eabb90 100644
 +		"bootm ${kernel_addr} 0x2000000 0x2A00000\0" \
 +	CONFIG_EXTRA_ENV_NOR_BOOT \
 +	CONFIG_EXTRA_ENV_NAND_BOOT \
++	CONFIG_EXTRA_ENV_USB_BOOT \
 +	CONFIG_EXTRA_ENV_RSA_BOOT
  
  /* default boot is according to the bootmode switch settings */

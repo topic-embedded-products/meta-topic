@@ -1,13 +1,16 @@
-From 7f6cdf49ebe2f9c6a77ec694ec33d26ca2fe1ef5 Mon Sep 17 00:00:00 2001
+From b5c0a2159921f6570510a18714ea19fa6b66226c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 24 Feb 2014 10:56:17 +0100
-Subject: [PATCH 7/7] Add zynq-miami board support
+Subject: [PATCH 5/7] Add zynq-miami board support
 
+Configure clock as 32MHz
+Support MICREL PHY
+Add USB boot support
 ---
  board/xilinx/dts/zynq-miami.dts |   14 ++++++
  boards.cfg                      |    1 +
- include/configs/zynq_miami.h    |   96 +++++++++++++++++++++++++++++++++++++++
- 3 files changed, 111 insertions(+)
+ include/configs/zynq_miami.h    |  102 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 117 insertions(+)
  create mode 100644 board/xilinx/dts/zynq-miami.dts
  create mode 100644 include/configs/zynq_miami.h
 
@@ -45,10 +48,10 @@ index bab89f2..bf87f96 100644
  Active  arm         armv7          zynq        xilinx          zynq                zynq_afx_qspi                        zynq_afx:AFX_QSPI                                                                                                                 Michal Simek <michal.simek@xilinx.com>
 diff --git a/include/configs/zynq_miami.h b/include/configs/zynq_miami.h
 new file mode 100644
-index 0000000..d4113aa
+index 0000000..2818dd3
 --- /dev/null
 +++ b/include/configs/zynq_miami.h
-@@ -0,0 +1,96 @@
+@@ -0,0 +1,102 @@
 +/*
 + * (C) Copyright 2014 Topic Embedded Products
 + *
@@ -62,7 +65,7 @@ index 0000000..d4113aa
 +#define __CONFIG_ZYNQ_MIAMI_H
 +
 +#define CONFIG_SYS_SDRAM_SIZE		(512 * 1024 * 1024)
-+
++#define CONFIG_ZYNQ_PS_CLK_FREQ		32000000UL
 +#define CONFIG_ZYNQ_SERIAL_UART1
 +/* Ethernet needs external clock, not really supported here yet but
 + * it won't compile without it. */
@@ -75,6 +78,7 @@ index 0000000..d4113aa
 +
 +#define CONFIG_ZYNQ_SDHCI0
 +#define CONFIG_ZYNQ_QSPI
++#define CONFIG_ZYNQ_USB
 +
 +#define CONFIG_ZYNQ_BOOT_FREEBSD
 +#define CONFIG_DEFAULT_DEVICE_TREE	zynq-miami
@@ -139,6 +143,11 @@ index 0000000..d4113aa
 +		"tftp 0x2000000 ${ramdisk_image} && " \
 +		"bootm ${kernel_addr} 0x2000000 0x2A00000\0" \
 +	CONFIG_EXTRA_ENV_RSA_BOOT
++
++/* Ethernet PHY is different */
++#undef CONFIG_PHY_MARVELL
++#define CONFIG_PHY_MICREL
++#define CONFIG_PHY_MICREL_KSZ9031
 +
 +/* Extras */
 +#define CONFIG_CMD_MEMTEST
