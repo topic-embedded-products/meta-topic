@@ -3,14 +3,13 @@
 
 include conf/machine/include/zynq-base.inc
 include conf/machine/include/tune-cortexa9.inc
+SOC_FAMILY = "zynq-miami"
+require conf/machine/include/soc-family.inc
 
 PREFERRED_PROVIDER_virtual/xilinx-sdk ?= "fpga-image-miami"
 
 UBOOT_MACHINE = "zynq_miami_config"
-#UBOOT_ENTRYPOINT = "0x40000000"
-#UBOOT_LOADADDRESS = "0x40000000"
 
-# UBI parameters copied from zc702 board, have to be verified
 # ubiattach /dev/ubi_ctrl -m 5
 # From dmesg:
 # UBI: attached mtd5 (name "qspi-rootfs", size 58 MiB) to ubi0                    
@@ -24,3 +23,4 @@ UBINIZE_ARGS = "-m 1 -p 256KiB"
 UBI_VOLNAME = "qspi-rootfs"
 
 MACHINE_FEATURES += "bluetooth"
+
