@@ -44,7 +44,7 @@ SRCREV = "73ce82c3ecc02a165d2727e5f6d30a3b38d6104d"
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-COMPATIBLE_MACHINE = "zynq-zc702|zedboard|zynq-miami"
+COMPATIBLE_MACHINE = "zynq-zc702|zynq-zc706|zedboard|zynq-miami"
 
 KERNEL_FLASH_DEVICE = "/dev/mtd4"
 
