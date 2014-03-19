@@ -1,4 +1,4 @@
-BSP for Xilinx Zynq dev boards. For instructions on building, see: 
+BSP for Xilinx Zynq dev boards. For instructions on building, see:
 
 https://github.com/balister/meta-zynq/wiki/Getting-started
 
@@ -42,13 +42,14 @@ This is a fork of Ballister's OE environment for Zynq boards. This repo
 mainly serves to share ideas and code for the Zynq series. In this version
 I have so far made the following additions:
 
+- Support for the upcoming Miami SOM and boards like Florida.
+
 - Faster booting by tweaking boot params.
 
-- Build BOOT.bin using Xilinx tools (which you'll need to install for this)
-  from within OE. u-boot will be built by OE, you'll need to create a FSBL
-  and optionally a logic bit file and point OE variables to their location.
-
 - Build FPGA image using ISE, Vivado or custom scripts.
+
+- Builds bootloader directly from a FPGA design (u-boot SPL). Copies the
+  required SDK files from the Xilinx tools.
 
 - Allow mixed booting, e.g. bootloader from QSPI, kernel and rootfs on SD.
   This is implemented by checking for an "autorun" script on the SD card.
@@ -60,8 +61,8 @@ I have so far made the following additions:
 - Boot and run completely from QSPI flash, mounting a UBIFS root filesystem
   allowing read/write access.
 
-Future versions of this repository will add full support for Dyplo, see
-http://www.topic.nl/dyplo/
+This repository also contains support for Dyplo, see
+http://www.topicembeddedproducts.com/products/dyplo/
 
 If you have questions or comments, I usually read the Xilinx Linux forum and
 the ADI linux driver forum:
