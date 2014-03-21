@@ -1,0 +1,44 @@
+From 8166d4918474a28b15dc097cf9ec2b039b973bd6 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 21 Mar 2014 08:15:48 +0100
+Subject: [PATCH 9/9] Load FPGA from "big" u-boot instead of SPL
+
+---
+ include/configs/zynq-common.h |    7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
+index 540a491..36d618f 100644
+--- a/include/configs/zynq-common.h
++++ b/include/configs/zynq-common.h
+@@ -221,7 +221,9 @@
+ #  define CONFIG_ENV_IS_NOWHERE
+ # endif
+ 
+-# define CONFIG_ENV_SECT_SIZE		CONFIG_ENV_SIZE
++# ifndef CONFIG_ENV_SECT_SIZE
++#  define CONFIG_ENV_SECT_SIZE		CONFIG_ENV_SIZE
++# endif
+ # ifndef CONFIG_ENV_OFFSET
+ #  define CONFIG_ENV_OFFSET		0x60000
+ # endif
+@@ -238,7 +240,7 @@
+ 	"kernel_image=uImage\0"	\
+ 	"ramdisk_image=uramdisk.image.gz\0"	\
+ 	"devicetree_image=devicetree.dtb\0"	\
+-	"bitstream_image=system.bit.bin\0"	\
++	"bitstream_image=fpga.bin\0"	\
+ 	"bootscript=" CONFIG_EXTRA_ENV_BOOTSCRIPT "\0" \
+ 	"loadbit_addr=0x100000\0"	\
+ 	"loadbootenv_addr=0x2000000\0" \
+@@ -410,7 +412,6 @@
+ #endif
+ 
+ /* FPGA support */
+-#define CONFIG_SPL_FPGA_SUPPORT
+ #define CONFIG_SPL_FPGA_LOAD_ADDR      0x1000000
+ /* #define CONFIG_SPL_FPGA_BIT */
+ #ifdef CONFIG_SPL_FPGA_BIT
+-- 
+1.7.9.5
+

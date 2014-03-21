@@ -5,7 +5,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-zynq-git:"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce1dc69f702a6c"
 
-SRCREV = "54fee227ef141214141a226efd17ae0516deaf32"
+SRCREV = "59981d20462859d6ed7f2e84c9cca8157325afd2"
 
 PV = "xilinx-zynq"
 PR = "r7"
@@ -18,6 +18,8 @@ SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git;branch=master-next \
 	file://0005-Add-zynq-miami-board-support.patch \
 	file://0006-Allow-overriding-flash-offsets.patch \
 	file://0007-Correct-sector-size-to-256k-for-Spansion-S25FL512S_2.patch \
+	file://0008-zynq-board.c-Fix-building-SPL-without-FPGA-support.patch \
+	file://0009-Load-FPGA-from-big-u-boot-instead-of-SPL.patch \
 	"
 
 S = "${WORKDIR}/git"

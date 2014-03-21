@@ -1,7 +1,7 @@
-From 73338181bc8796826ba085a626fb677cf3e225ac Mon Sep 17 00:00:00 2001
+From aa95aa257be43599b57b8a26666c6f259361b475 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 6 Mar 2014 13:41:40 +0100
-Subject: [PATCH 7/7] Correct sector size to 256k for Spansion S25FL512S_256K
+Subject: [PATCH 7/9] Correct sector size to 256k for Spansion S25FL512S_256K
  and S25FL256S_256K
 
 The information in sf_params.c is incorrect for the Spansion flash chips,
@@ -16,7 +16,7 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/mtd/spi/sf_params.c b/drivers/mtd/spi/sf_params.c
-index daf8fe7..5f63023 100644
+index a638daf..ffd0b91 100644
 --- a/drivers/mtd/spi/sf_params.c
 +++ b/drivers/mtd/spi/sf_params.c
 @@ -55,9 +55,9 @@ const struct spi_flash_params spi_flash_params_table[] = {
@@ -29,8 +29,8 @@ index daf8fe7..5f63023 100644
 -	{"S25FL512S_256K", 0x010220, 0x4d00,    64 * 1024,  1024, RD_FULL,		     WR_QPP},
 +	{"S25FL512S_256K", 0x010220, 0x4d00,   256 * 1024,   256, RD_FULL,		     WR_QPP},
  	{"S25FL512S_64K",  0x010220, 0x4d01,    64 * 1024,  1024, RD_FULL,		     WR_QPP},
+ 	{"S25FL512S_512K", 0x010220, 0x4f00,   256 * 1024,   256, RD_FULL,		     WR_QPP},
  #endif
- #ifdef CONFIG_SPI_FLASH_STMICRO		/* STMICRO */
 -- 
 1.7.9.5
 

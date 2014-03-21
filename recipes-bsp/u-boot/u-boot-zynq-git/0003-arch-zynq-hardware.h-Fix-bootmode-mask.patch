@@ -1,7 +1,7 @@
-From 59d6e6e725e71685af31173eac5403dd1a77440c Mon Sep 17 00:00:00 2001
+From 1c645c7513f8b3e9727b76a4f0cbd55176d77eae Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 21 Feb 2014 12:42:26 +0100
-Subject: [PATCH 3/7] arch-zynq/hardware.h: Fix bootmode mask
+Subject: [PATCH 3/9] arch-zynq/hardware.h: Fix bootmode mask
 
 Bootmode mask was defined as 0x0F, but documentation mentions 0x07.
 Experiments show that bit "3" is the JTAG chain configuration.

@@ -1,7 +1,7 @@
-From 4b50931ab5b202f8ecab8d17240976719fbcd659 Mon Sep 17 00:00:00 2001
+From a69389807dd3f9aa94303936d34921413acd25ad Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 27 Jan 2014 08:17:34 +0100
-Subject: [PATCH 1/7] Use bootscript to boot, use fast XIP load address, no
+Subject: [PATCH 1/9] Use bootscript to boot, use fast XIP load address, no
  ramdisk
 
 Check for autorun bootscript and run it from SD.
@@ -11,11 +11,11 @@ Set SPI speed to 50MHz (most chips can even do 100 with fast_read).
 Omit environments that can't be used (e.g. NOR, NAND, RSA) when their
 configs aren't defined.
 ---
- include/configs/zynq-common.h |  146 ++++++++++++++++++++++-------------------
- 1 file changed, 78 insertions(+), 68 deletions(-)
+ include/configs/zynq-common.h |  150 ++++++++++++++++++++++-------------------
+ 1 file changed, 80 insertions(+), 70 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index 3bc882d..d90ae8c 100644
+index c0d24a3..aeeb8c8 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
 @@ -34,6 +34,34 @@
@@ -65,28 +65,31 @@ index 3bc882d..d90ae8c 100644
  #endif
  
  /* MMC */
-@@ -88,7 +121,6 @@
- # define CONFIG_SUPPORT_VFAT
- # define CONFIG_CMD_EXT2
- # define CONFIG_DOS_PARTITION
--# define CONFIG_FAT_WRITE
- #endif
- 
- #ifdef CONFIG_ZYNQ_USB
-@@ -101,11 +133,21 @@
+@@ -95,21 +128,30 @@
  #define CONFIG_USB_ULPI
  #define CONFIG_EHCI_IS_TDI
  #define CONFIG_USB_MAX_CONTROLLER_COUNT	2
 +# define CONFIG_EXTRA_ENV_USB_BOOT \
 +	"usbboot=if usb start; then " \
 +			"run uenvboot; " \
-+			"echo Copying Linux from USB to RAM... && " \
-+			"fatload usb 0 ${kernel_addr} ${kernel_image} && " \
++			"echo Copying from USB to RAM... && " \
++			"fatload usb 0 0x3000000 ${kernel_image} && " \
 +			"fatload usb 0 0x2A00000 ${devicetree_image} && " \
-+			"bootm ${kernel_addr} - 0x2A00000\0" \
++			"fatload usb 0 0x2000000 ${ramdisk_image} && " \
++			"bootm 0x3000000 0x2000000 0x2A00000; " \
 +		"fi\0"
 +#else
 +# define CONFIG_EXTRA_ENV_USB_BOOT ""
+ #endif
+ 
+ #if defined (CONFIG_ZYNQ_SDHCI) || defined(CONFIG_ZYNQ_USB)
+ #define CONFIG_SUPPORT_VFAT
+ #define CONFIG_CMD_FAT
+ #define CONFIG_CMD_EXT2
+-#define CONFIG_FAT_WRITE
+ #define CONFIG_DOS_PARTITION
+ #define CONFIG_CMD_EXT4
+-#define CONFIG_CMD_EXT4_WRITE
  #endif
  
  /* QSPI */
@@ -96,7 +99,7 @@ index 3bc882d..d90ae8c 100644
  # define CONFIG_SPI_FLASH
  # define CONFIG_SPI_FLASH_BAR
  # define CONFIG_SPI_FLASH_SPANSION
-@@ -124,6 +166,13 @@
+@@ -128,6 +170,13 @@
  # define CONFIG_SYS_NAND_SELF_INIT
  # define CONFIG_SYS_NAND_ONFI_DETECTION
  # define CONFIG_MTD_DEVICE
@@ -110,7 +113,7 @@ index 3bc882d..d90ae8c 100644
  #endif
  
  #define CONFIG_SYS_I2C_ZYNQ
-@@ -146,7 +195,7 @@
+@@ -152,7 +201,7 @@
  #endif
  
  /* Total Size of Environment Sector */
@@ -119,7 +122,7 @@ index 3bc882d..d90ae8c 100644
  
  /* Allow to overwrite serial and ethaddr */
  #define CONFIG_ENV_OVERWRITE
-@@ -168,11 +217,15 @@
+@@ -174,11 +223,15 @@
  
  # define CONFIG_ENV_SECT_SIZE		CONFIG_ENV_SIZE
  # ifndef CONFIG_ENV_OFFSET
@@ -136,7 +139,7 @@ index 3bc882d..d90ae8c 100644
  /* Default environment */
  #define CONFIG_EXTRA_ENV_SETTINGS	\
  	"ethaddr=00:0a:35:00:01:22\0"	\
-@@ -180,12 +233,12 @@
+@@ -186,12 +239,12 @@
  	"ramdisk_image=uramdisk.image.gz\0"	\
  	"devicetree_image=devicetree.dtb\0"	\
  	"bitstream_image=system.bit.bin\0"	\
@@ -153,7 +156,7 @@ index 3bc882d..d90ae8c 100644
  	"boot_size=0xF00000\0"	\
  	"fdt_high=0x20000000\0"	\
  	"initrd_high=0x20000000\0"	\
-@@ -197,19 +250,11 @@
+@@ -203,19 +256,11 @@
  		"mmcinfo && " \
  		"fatload mmc 0 ${loadbit_addr} ${bitstream_image} && " \
  		"fpga load 0 ${loadbit_addr} ${filesize}\0" \
@@ -177,7 +180,7 @@ index 3bc882d..d90ae8c 100644
  	"uenvboot=" \
  		"if run loadbootenv; then " \
  			"echo Loaded environment from ${bootenv}; " \
-@@ -222,63 +267,28 @@
+@@ -228,63 +273,28 @@
  	"sdboot=if mmcinfo; then " \
  			"run uenvboot; " \
  			"echo Copying Linux from SD to RAM... && " \
@@ -186,7 +189,8 @@ index 3bc882d..d90ae8c 100644
  			"fatload mmc 0 0x2A00000 ${devicetree_image} && " \
 -			"fatload mmc 0 0x2000000 ${ramdisk_image} && " \
 -			"bootm 0x3000000 0x2000000 0x2A00000; " \
--		"fi\0" \
++			"bootm ${kernel_addr} - 0x2A00000\0" \
+ 		"fi\0" \
 -	"usbboot=if usb start; then " \
 -			"run uenvboot; " \
 -			"echo Copying Linux from USB to RAM... && " \
@@ -194,8 +198,7 @@ index 3bc882d..d90ae8c 100644
 -			"fatload usb 0 0x2A00000 ${devicetree_image} && " \
 -			"fatload usb 0 0x2000000 ${ramdisk_image} && " \
 -			"bootm 0x3000000 0x2000000 0x2A00000; " \
-+			"bootm ${kernel_addr} - 0x2A00000\0" \
- 		"fi\0" \
+-		"fi\0" \
 -	"nandboot=echo Copying Linux from NAND flash to RAM... && " \
 -		"nand read 0x3000000 0x100000 ${kernel_size} && " \
 -		"nand read 0x2A00000 0x600000 ${devicetree_size} && " \
@@ -254,6 +257,15 @@ index 3bc882d..d90ae8c 100644
  #define CONFIG_SYS_LOAD_ADDR		0 /* default? */
  
  /* Miscellaneous configurable options */
+@@ -315,7 +325,7 @@
+ #define CONFIG_SYS_SDRAM_BASE		0
+ 
+ #define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_SDRAM_BASE
+-#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_SDRAM_BASE + 0x1000)
++#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_SDRAM_BASE + 0x8000000)
+ 
+ #define CONFIG_SYS_MALLOC_LEN		0x400000
+ 
 -- 
 1.7.9.5
 

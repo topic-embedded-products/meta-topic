@@ -1,7 +1,7 @@
-From 03bd00a8f250e8f1660503c987dce52b1af32ee1 Mon Sep 17 00:00:00 2001
+From d1afa852a2b173e6b87750faaa9034f5de4283cc Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 26 Feb 2014 12:03:36 +0100
-Subject: [PATCH 6/7] Allow overriding flash offsets.
+Subject: [PATCH 6/9] Allow overriding flash offsets.
 
 Modify zynq-xommon.h to allow a board include to specify which
 addresses to use in flash (because of sector alignment).
@@ -10,84 +10,25 @@ Name bitstream "fpga.bin". Remove unused environment vars.
 
 Adapt zynq_miami.h accordingly, so the ENV need not be repeated.
 ---
- include/configs/zynq-common.h |   35 ++++++++++++++-----
+ include/configs/zynq-common.h |   10 +++++-
  include/configs/zynq_miami.h  |   76 ++++++-----------------------------------
- 2 files changed, 37 insertions(+), 74 deletions(-)
+ 2 files changed, 19 insertions(+), 67 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index a064f5a..037116c 100644
+index a4251aa..540a491 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
-@@ -119,7 +119,7 @@
- # define CONFIG_CMD_MMC
- # define CONFIG_CMD_FAT
- # define CONFIG_SUPPORT_VFAT
--# define CONFIG_CMD_EXT2
-+# define CONFIG_CMD_EXT4
- # define CONFIG_DOS_PARTITION
- #endif
- 
-@@ -214,8 +214,9 @@
- # elif defined(CONFIG_SYS_NO_FLASH)
- #  define CONFIG_ENV_IS_NOWHERE
- # endif
--
--# define CONFIG_ENV_SECT_SIZE		CONFIG_ENV_SIZE
-+# ifndef CONFIG_ENV_SECT_SIZE
-+#  define CONFIG_ENV_SECT_SIZE		CONFIG_ENV_SIZE
-+# endif
- # ifndef CONFIG_ENV_OFFSET
- #  define CONFIG_ENV_OFFSET		0x60000
- # endif
-@@ -225,6 +226,16 @@
- #ifndef CONFIG_EXTRA_ENV_BOOTSCRIPT
- # define CONFIG_EXTRA_ENV_BOOTSCRIPT "autorun.scr"
- #endif
-+#ifndef CONFIG_SYS_SPI_DEVTREE_OFFS
-+# define CONFIG_SYS_SPI_DEVTREE_OFFS 0x70000
-+#endif
-+#ifndef CONFIG_SYS_SPI_UIMAGE_OFFS
-+# define CONFIG_SYS_SPI_UIMAGE_OFFS	0x80000
-+#endif
-+
-+/* C stuff to convert macro contents to quoted string */
-+#define QUOTE(name) #name
-+#define STR(macro) QUOTE(macro)
- 
- /* Default environment */
- #define CONFIG_EXTRA_ENV_SETTINGS	\
-@@ -232,7 +243,7 @@
- 	"kernel_image=uImage\0"	\
- 	"ramdisk_image=uramdisk.image.gz\0"	\
- 	"devicetree_image=devicetree.dtb\0"	\
--	"bitstream_image=system.bit.bin\0"	\
-+	"bitstream_image=fpga.bin\0"	\
- 	"bootscript=" CONFIG_EXTRA_ENV_BOOTSCRIPT "\0" \
- 	"loadbit_addr=0x100000\0"	\
- 	"loadbootenv_addr=0x2000000\0" \
-@@ -252,8 +263,8 @@
- 		"fpga load 0 ${loadbit_addr} ${filesize}\0" \
- 	"qspiboot=echo Booting from QSPI flash... && " \
- 		"sf probe 0 0 0 && " \
--		"sf read 0x2A00000 0x70000 ${devicetree_size} && " \
--		"sf read ${kernel_addr} 0x80000 ${kernel_size} && " \
-+		"sf read 0x2A00000 " STR(CONFIG_SYS_SPI_DEVTREE_OFFS) " ${devicetree_size} && " \
-+		"sf read ${kernel_addr} " STR(CONFIG_SYS_SPI_UIMAGE_OFFS) " ${kernel_size} && " \
- 		"bootm ${kernel_addr} - 0x2A00000\0" \
- 	"uenvboot=" \
- 		"if run loadbootenv; then " \
-@@ -438,7 +449,9 @@
+@@ -447,7 +447,9 @@
  #define CONFIG_SPL_SPI_LOAD
  #define CONFIG_SPL_SPI_FLASH_SUPPORT
  #define CONFIG_SPL_SPI_BUS	0
--#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x10000
 +#ifndef CONFIG_SYS_SPI_U_BOOT_OFFS
-+# define CONFIG_SYS_SPI_U_BOOT_OFFS	0x10000
+ #define CONFIG_SYS_SPI_U_BOOT_OFFS	0x10000
 +#endif
  #define CONFIG_SPL_SPI_CS	0
  #endif
  
-@@ -457,7 +470,13 @@
+@@ -466,7 +468,13 @@
  #define CONFIG_SPL_TEXT_BASE	0x0
  
  /* 3 * 64kB blocks of OCM - one is on the top because of bootrom */

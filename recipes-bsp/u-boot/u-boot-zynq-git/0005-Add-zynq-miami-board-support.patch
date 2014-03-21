@@ -1,7 +1,7 @@
-From b5c0a2159921f6570510a18714ea19fa6b66226c Mon Sep 17 00:00:00 2001
+From 254db939ff26ab3d038d2b5c9b7b840d5c3b4890 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 24 Feb 2014 10:56:17 +0100
-Subject: [PATCH 5/7] Add zynq-miami board support
+Subject: [PATCH 5/9] Add zynq-miami board support
 
 Configure clock as 32MHz
 Support MICREL PHY
@@ -35,7 +35,7 @@ index 0000000..ccab2a9
 +	compatible = "xlnx,zynq-miami", "xlnx,zynq-7000";
 +};
 diff --git a/boards.cfg b/boards.cfg
-index bab89f2..bf87f96 100644
+index 711f58b..6bfe324 100644
 --- a/boards.cfg
 +++ b/boards.cfg
 @@ -362,6 +362,7 @@ Active  arm	    armv7	   zynq	       xilinx	       zynq	   	   zynq_microzed			-
