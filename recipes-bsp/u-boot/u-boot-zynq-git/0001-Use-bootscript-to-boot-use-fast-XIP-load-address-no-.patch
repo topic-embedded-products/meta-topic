@@ -1,7 +1,7 @@
-From a69389807dd3f9aa94303936d34921413acd25ad Mon Sep 17 00:00:00 2001
+From 72c17056dbd73ba9b568aace38927f26e2891587 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 27 Jan 2014 08:17:34 +0100
-Subject: [PATCH 1/9] Use bootscript to boot, use fast XIP load address, no
+Subject: [PATCH 1/7] Use bootscript to boot, use fast XIP load address, no
  ramdisk
 
 Check for autorun bootscript and run it from SD.
@@ -15,7 +15,7 @@ configs aren't defined.
  1 file changed, 80 insertions(+), 70 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index c0d24a3..aeeb8c8 100644
+index 08984a7..b1a5aa2 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
 @@ -34,6 +34,34 @@

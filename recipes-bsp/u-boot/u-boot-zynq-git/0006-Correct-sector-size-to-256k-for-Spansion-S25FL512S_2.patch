@@ -1,7 +1,7 @@
-From aa95aa257be43599b57b8a26666c6f259361b475 Mon Sep 17 00:00:00 2001
+From 40979aa0cb7f4106cc44b44d3ec8b0198617a468 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 6 Mar 2014 13:41:40 +0100
-Subject: [PATCH 7/9] Correct sector size to 256k for Spansion S25FL512S_256K
+Subject: [PATCH 6/7] Correct sector size to 256k for Spansion S25FL512S_256K
  and S25FL256S_256K
 
 The information in sf_params.c is incorrect for the Spansion flash chips,
