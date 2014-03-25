@@ -1,7 +1,7 @@
-From 414e1c76360f2911b1675a68671b8e044a4dacd1 Mon Sep 17 00:00:00 2001
+From b7f5ad47e0625f96e46ad1f493ae9db51487a0b8 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 24 Feb 2014 10:56:17 +0100
-Subject: [PATCH 4/7] Add zynq-miami board support
+Subject: [PATCH 4/6] Add zynq-miami board support
 
 Configure clock as 32MHz
 Support MICREL PHY
