@@ -3,10 +3,6 @@
 
 require u-boot-zynq.inc
 
-#SRC_URI += "\
-#	file://0003-Disable-FPGA-support.patch \
-#	"
-
 DEPENDS += "virtual/xilinx-sdk"
 
 # Fetch the ps7_init files from the FPGA image into the bootloader. The
