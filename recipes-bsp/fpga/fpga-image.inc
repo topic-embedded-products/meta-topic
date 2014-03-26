@@ -86,11 +86,14 @@ do_convert_bitstreams() {
 	then
 		for path in bitstreams/*
 		do
-			mkdir -p "${WORKDIR}/${path}"
-			for p in ${path}/*partial.bit
-			do
-				fpga-bit-to-bin.py --flip "${p}" "${WORKDIR}/${p}.bin"
-			done
+			if [ -d "${path}" ]
+			then
+				mkdir -p "${WORKDIR}/${path}"
+				for p in ${path}/*partial.bit
+				do
+					fpga-bit-to-bin.py --flip "${p}" "${WORKDIR}/${p}.bin"
+				done
+			fi
 		done
 	fi
 }
