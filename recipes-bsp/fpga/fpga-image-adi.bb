@@ -24,7 +24,7 @@ fpga_sysroot_preprocess() {
 		install -d ${SYSROOT_DESTDIR}${datadir}/xilinx_sdk
 		cp -r ${S}/SDK/SDK_Export/hw/* ${SYSROOT_DESTDIR}${datadir}/xilinx_sdk/
 	else
-		echo "No SDK exported, cannot create u-boot SPL from this!"
+		bbwarn "No SDK exported, cannot create u-boot SPL from this!"
 	fi
 }
 
