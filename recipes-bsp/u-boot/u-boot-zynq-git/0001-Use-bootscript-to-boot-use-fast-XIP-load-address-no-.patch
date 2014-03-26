@@ -1,8 +1,7 @@
-From 186f9dc60c66b2311c030c92ed6b322fec1f0e0f Mon Sep 17 00:00:00 2001
+From 0e7fafc5d70de403bfd28937b7902b5d03a9e552 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 27 Jan 2014 08:17:34 +0100
-Subject: [PATCH 1/6] Use bootscript to boot, use fast XIP load address, no
- ramdisk
+Subject: [PATCH] Use bootscript to boot, no ramdisk, smaller enviroment
 
 Check for autorun bootscript and run it from SD.
 Load kernel at correct offset so it can execute in place (save a memcpy).
@@ -15,7 +14,7 @@ configs aren't defined.
  1 file changed, 80 insertions(+), 70 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index 08984a7..b1a5aa2 100644
+index 08984a7..096f008 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
 @@ -34,6 +34,34 @@
@@ -151,7 +150,7 @@ index 08984a7..b1a5aa2 100644
 -	"devicetree_size=0x20000\0"	\
 -	"ramdisk_size=0x5E0000\0"	\
 +	"kernel_size=0x380000\0"	\
-+	"kernel_addr=0x79C0\0"	\
++	"kernel_addr=0x3000000\0"	\
 +	"devicetree_size=0x10000\0"	\
  	"boot_size=0xF00000\0"	\
  	"fdt_high=0x20000000\0"	\
