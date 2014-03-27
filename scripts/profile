@@ -1,0 +1,3 @@
+export BB_ENV_EXTRAWHITE=MACHINE
+TOPDIR=`dirname "${PWD}"`
+export PATH=${TOPDIR}/oe-core/scripts:${TOPDIR}/bitbake/bin:$PATH
