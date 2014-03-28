@@ -28,10 +28,8 @@ SRC_URI = "\
 	"
 
 KERNEL_IMAGETYPE = "uImage"
-KERNEL_DEVICETREE = "${WORKDIR}/devicetree.dts"
-KERNEL_DEVICETREE_zynq-zc702 = "arch/arm/boot/dts/${MACHINE}-adv7511.dts"
-KERNEL_DEVICETREE_zedboard = "arch/arm/boot/dts/zynq-zed-adv7511.dts"
-KERNEL_DEVICETREE_zynq-miami = "arch/arm/boot/dts/zynq-miami-florida.dts"
+KERNEL_DEVICETREE = "arch/arm/boot/dts/${MACHINE}-dyplo.dts"
+KERNEL_DEVICETREE_zynq-miami = "arch/arm/boot/dts/zynq-miami-dyplo.dts"
 # See http://permalink.gmane.org/gmane.linux.kernel.commits.head/371588
 KERNEL_EXTRA_ARGS += "LOADADDR=0x00008000"
 KERNEL_IMAGEDEST = "tmp/boot"
@@ -41,7 +39,7 @@ FILES_kernel-image = "${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}*"
 LINUX_VERSION ?= "3.13"
 LINUX_VERSION_EXTENSION ?= "-topic"
 
-SRCREV = "8604d73990abb304e6a780dadd98bcb620f85137"
+SRCREV = "73ce82c3ecc02a165d2727e5f6d30a3b38d6104d"
 
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
