@@ -42,7 +42,7 @@ do
 done
 if [ -z "${DTB}" ]
 then
-	DTB="uImage-*-adv7511.dtb"
+	DTB="uImage-${MACHINE}-dyplo.dtb"
 fi
 set -e
 echo "Writing boot..."
