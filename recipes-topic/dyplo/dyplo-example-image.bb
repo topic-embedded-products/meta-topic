@@ -7,7 +7,6 @@ MY_THINGS = "\
 	mtd-utils \
 	${@base_contains("IMAGE_FSTYPES", "ubi", "mtd-utils-ubifs" , "", d)} \
 	distro-feed-configs \
-	topic-ssh-key \
 	kernel-module-dyplo \
 	dyplo-utils \
 	fpga-image-example \
