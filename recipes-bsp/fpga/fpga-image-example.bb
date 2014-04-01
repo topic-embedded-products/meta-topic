@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 BOARD_DESIGN_URI = "git://github.com/topic-embedded-products/fpga-image-example.git"
-SRCREV = "5a8bbc966bb28a04b0d20fc17f76780f64a0a831"
+SRCREV = "03f8ad2a71524e1851cfaac87c78c077906530e6"
 
 inherit gitpkgv
 PV = "1.${SRCPV}"
