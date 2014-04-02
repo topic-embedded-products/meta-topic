@@ -1,7 +1,7 @@
-From fc828336b035fb2fde19e3a904a8a9fdddb7404d Mon Sep 17 00:00:00 2001
+From d8a0a3342940e3be45580a1696f256188753631d Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 20 Feb 2014 18:13:49 +0100
-Subject: [PATCH 3/6] Set SPL offset in qspi flash
+Subject: [PATCH 3/7] Set SPL offset in qspi flash
 
 To allow existing images to boot, set the offset to 64k, so the second
 sector contains u-boot.img. Otherwise there isn't enough room because
@@ -11,7 +11,7 @@ the environment is stored at 0x60000.
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index 0324a9d..4052caf 100644
+index 7590e8b..1477d36 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
 @@ -447,7 +447,7 @@

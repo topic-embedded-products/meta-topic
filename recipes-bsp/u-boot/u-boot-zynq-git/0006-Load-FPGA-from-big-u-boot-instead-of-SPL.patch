@@ -1,17 +1,17 @@
-From 4997455aab3fa4ca5a260975607ea28caa655efa Mon Sep 17 00:00:00 2001
+From a1f626de8fc0aef26cf3fa625d7ae94b06e608d6 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 21 Mar 2014 08:15:48 +0100
-Subject: [PATCH 6/6] Load FPGA from "big" u-boot instead of SPL
+Subject: [PATCH 6/7] Load FPGA from "big" u-boot instead of SPL
 
 ---
  include/configs/zynq-common.h |    7 ++++---
  1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index b6680aa..8526bc2 100644
+index ec10f41..5c19830 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
-@@ -221,7 +221,9 @@
+@@ -225,7 +225,9 @@
  #  define CONFIG_ENV_IS_NOWHERE
  # endif
  
@@ -22,7 +22,7 @@ index b6680aa..8526bc2 100644
  # ifndef CONFIG_ENV_OFFSET
  #  define CONFIG_ENV_OFFSET		0x60000
  # endif
-@@ -238,7 +240,7 @@
+@@ -248,7 +250,7 @@
  	"kernel_image=uImage\0"	\
  	"ramdisk_image=uramdisk.image.gz\0"	\
  	"devicetree_image=devicetree.dtb\0"	\
@@ -31,7 +31,7 @@ index b6680aa..8526bc2 100644
  	"bootscript=" CONFIG_EXTRA_ENV_BOOTSCRIPT "\0" \
  	"loadbit_addr=0x100000\0"	\
  	"loadbootenv_addr=0x2000000\0" \
-@@ -410,7 +412,6 @@
+@@ -420,7 +422,6 @@
  #endif
  
  /* FPGA support */

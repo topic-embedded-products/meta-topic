@@ -1,7 +1,7 @@
-From d299b3c67ffb848f83e1c32036c20cd5e0a01608 Mon Sep 17 00:00:00 2001
+From e451b6a8baec970183ffa6b1cc12d36e3d25fcd5 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 26 Feb 2014 12:03:36 +0100
-Subject: [PATCH 5/6] Allow overriding flash offsets.
+Subject: [PATCH 5/7] Allow overriding flash offsets.
 
 Modify zynq-xommon.h to allow a board include to specify which
 addresses to use in flash (because of sector alignment).
@@ -10,15 +10,50 @@ Name bitstream "fpga.bin". Remove unused environment vars.
 
 Adapt zynq_miami.h accordingly, so the ENV need not be repeated.
 ---
- include/configs/zynq-common.h |   10 +++++-
+ include/configs/zynq-common.h |   24 +++++++++++--
  include/configs/zynq_miami.h  |   76 ++++++-----------------------------------
- 2 files changed, 19 insertions(+), 67 deletions(-)
+ 2 files changed, 31 insertions(+), 69 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index 4052caf..b6680aa 100644
+index 1477d36..ec10f41 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
-@@ -447,7 +447,9 @@
+@@ -10,6 +10,10 @@
+ #ifndef __CONFIG_ZYNQ_COMMON_H
+ #define __CONFIG_ZYNQ_COMMON_H
+ 
++/* C stuff to convert macro contents to quoted string */
++#define QUOTE(name) #name
++#define STR(macro) QUOTE(macro)
++
+ /* High Level configuration Options */
+ #define CONFIG_ARMV7
+ #define CONFIG_ZYNQ
+@@ -231,6 +235,12 @@
+ #ifndef CONFIG_EXTRA_ENV_BOOTSCRIPT
+ # define CONFIG_EXTRA_ENV_BOOTSCRIPT "autorun.scr"
+ #endif
++#ifndef CONFIG_SYS_SPI_DEVTREE_OFFS
++# define CONFIG_SYS_SPI_DEVTREE_OFFS 0x70000
++#endif
++#ifndef CONFIG_SYS_SPI_UIMAGE_OFFS
++# define CONFIG_SYS_SPI_UIMAGE_OFFS	0x80000
++#endif
+ 
+ /* Default environment */
+ #define CONFIG_EXTRA_ENV_SETTINGS	\
+@@ -258,8 +268,8 @@
+ 		"fpga load 0 ${loadbit_addr} ${filesize}\0" \
+ 	"qspiboot=echo Booting from QSPI flash... && " \
+ 		"sf probe 0 0 0 && " \
+-		"sf read 0x2A00000 0x70000 ${devicetree_size} && " \
+-		"sf read ${kernel_addr} 0x80000 ${kernel_size} && " \
++		"sf read 0x2A00000 " STR(CONFIG_SYS_SPI_DEVTREE_OFFS) " ${devicetree_size} && " \
++		"sf read ${kernel_addr} " STR(CONFIG_SYS_SPI_UIMAGE_OFFS) " ${kernel_size} && " \
+ 		"bootm ${kernel_addr} - 0x2A00000\0" \
+ 	"uenvboot=" \
+ 		"if run loadbootenv; then " \
+@@ -447,7 +457,9 @@
  #define CONFIG_SPL_SPI_LOAD
  #define CONFIG_SPL_SPI_FLASH_SUPPORT
  #define CONFIG_SPL_SPI_BUS	0
@@ -28,7 +63,7 @@ index 4052caf..b6680aa 100644
  #define CONFIG_SPL_SPI_CS	0
  #endif
  
-@@ -466,7 +468,13 @@
+@@ -466,7 +478,13 @@
  #define CONFIG_SPL_TEXT_BASE	0x0
  
  /* 3 * 64kB blocks of OCM - one is on the top because of bootrom */

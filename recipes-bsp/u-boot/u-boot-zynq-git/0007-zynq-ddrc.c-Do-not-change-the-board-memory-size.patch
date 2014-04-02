@@ -1,0 +1,34 @@
+From 6cce7c7845b97d72b6847b2313a1b64ffefb7d53 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 1 Apr 2014 16:10:18 +0200
+Subject: [PATCH 7/7] zynq/ddrc.c: Do not change the board memory size
+
+While bringing up a board that uses only a single memory chip, and
+hence only 16-bit DDR width, the memory size was somehow cut in half.
+The cause turned out to be a line in ddrc.c that just divides the memory
+size by two for no apparent reason when the bus width is 16.
+
+The memory size is simply obtained from a constant in the configuration
+header, so do not modify it. Tested this on my board and now the memory
+size is correct.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ arch/arm/cpu/armv7/zynq/ddrc.c |    3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/arch/arm/cpu/armv7/zynq/ddrc.c b/arch/arm/cpu/armv7/zynq/ddrc.c
+index ba6a6ae..62ca354 100644
+--- a/arch/arm/cpu/armv7/zynq/ddrc.c
++++ b/arch/arm/cpu/armv7/zynq/ddrc.c
+@@ -44,7 +44,4 @@ void zynq_ddrc_init(void)
+ 	} else {
+ 		puts("Memory: ECC disabled\n");
+ 	}
+-
+-	if (width == ZYNQ_DDRC_CTRLREG_BUSWIDTH_16BIT)
+-		gd->ram_size /= 2;
+ }
+-- 
+1.7.9.5
+
