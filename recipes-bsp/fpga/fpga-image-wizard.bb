@@ -27,7 +27,7 @@ do_compile() {
 	cp ${PATH_TO_BITSTREAMS}/static.bit ${S}/fpga.bit
 	ln -s -f ${PATH_TO_BITSTREAMS} ${S}/bitstreams
 
-	if [ -f ${PATH_TO_DYPLO_LICENSE_FILE} ]; then
+	if [ "${PATH_TO_DYPLO_LICENSE_FILE}" != "" ] && [ -f "${PATH_TO_DYPLO_LICENSE_FILE}" ]; then
 		cp -f ${PATH_TO_DYPLO_LICENSE_FILE} ${S}/dyplo_license_file.lic
 	fi
 }
