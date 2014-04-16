@@ -14,6 +14,7 @@ SRCPV = "${@bb.fetch2.get_srcrev(d).replace('+','-')}"
 # Tool paths and versions may differ, the output should be the same, so
 # do not take these into account.
 do_compile[vardepsexclude] += "XILINX_TOOL_PATH XILINX_LM_LICENSE_FILE XILINX_TOOL_ARCH XILINX_VIVADO_PATH"
+do_convert_bitstreams[vardepsexclude] += "WORKDIR"
 
 # Required parameters
 BOARD_DESIGN_URI ?= ""
@@ -23,8 +24,6 @@ SRC_URI = "${BOARD_DESIGN_URI}"
 S = "${WORKDIR}/git/${BOARD_DESIGN_PATH}"
 
 PACKAGES = "${PN}"
-
-VIVADO_EXTRA_COMMANDS ?= ""
 
 do_compile() {
 	export LM_LICENSE_FILE="${XILINX_LM_LICENSE_FILE}"
