@@ -1,5 +1,7 @@
 require u-boot-zynq.inc
 
+COMPATIBLE_MACHINE = "zedboard|zynq-zc70[26]|zynq-miami"
+
 # Fetch the FSBL binary from the design for now, as building it is a royal pita.
 BOARD_DESIGN_URI = "file:/"
 SRC_URI += "${BOARD_DESIGN_URI}/fsbl.elf.bz2;name=fsbl-${MACHINE}"

@@ -34,20 +34,12 @@ then
 fi
 cd oe-core
 source ./oe-init-build-env ../${BUILDDIR} ../bitbake
+
 echo "-------------------------------------------------------------"
-echo "You'll need to install the following packages, if you haven't"
-echo "already done so. On ubuntu, use:"
-echo "sudo apt-get install \\"
-echo "   sed wget cvs subversion git-core \\"
-echo "   coreutils unzip texi2html texinfo docbook-utils \\"
-echo "   gawk python-pysqlite2 diffstat help2man make gcc \\"
-echo "   build-essential g++ desktop-file-utils chrpath"
+echo "You might need to install extra packages, if you haven't"
+echo "already done so. Please see the manual."
 echo "-------------------------------------------------------------"
 echo "Initialization complete!"
 echo ""
 echo "First, EDIT build/conf/local.conf to match your system."
-echo "To build an image for the zedboard, run the following:"
-echo ""
-echo "cd ${BUILDDIR}"
-echo ". profile"
-echo "bitbake my-image"
+echo "See the manual on how to build an image."
