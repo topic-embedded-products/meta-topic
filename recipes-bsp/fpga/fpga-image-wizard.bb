@@ -26,7 +26,19 @@ S = "${WORKDIR}/src"
 do_compile() {
 	cp ${PATH_TO_BITSTREAMS}/static.bit ${S}/fpga.bit
 	ln -s -f ${PATH_TO_BITSTREAMS} ${S}/bitstreams
+
+	if [ -f ${PATH_TO_DYPLO_LICENSE_FILE} ]; then
+		cp -f ${PATH_TO_DYPLO_LICENSE_FILE} ${S}/dyplo_license_file.lic
+	fi
 }
+
+# Copy the dyplo_license_file if exists.
+do_install_append() {
+	if [ -f ${S}/dyplo_license_file.lic ]; then
+		cp -f ${S}/dyplo_license_file.lic ${D}${datadir}/dyplo_license_file.lic
+	fi
+}
+
 
 # Store the SDK files into the sysroot for other packages.
 SYSROOT_PREPROCESS_FUNCS += "fpga_sysroot_preprocess"
