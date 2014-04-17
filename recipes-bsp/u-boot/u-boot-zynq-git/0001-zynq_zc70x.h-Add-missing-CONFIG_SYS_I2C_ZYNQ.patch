@@ -1,0 +1,27 @@
+From f12103ba1be4a035a0b55efec974ecb60ee4b1c6 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 17 Apr 2014 14:07:14 +0200
+Subject: [PATCH] zynq_zc70x.h: Add missing CONFIG_SYS_I2C_ZYNQ
+
+Fix compilation error:
+common/cmd_eeprom.c:164: undefined reference to `i2c_read'
+common/cmd_eeprom.c:342: undefined reference to `i2c_write'
+---
+ include/configs/zynq_zc70x.h |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/configs/zynq_zc70x.h b/include/configs/zynq_zc70x.h
+index cdcba34..afdb4f5 100644
+--- a/include/configs/zynq_zc70x.h
++++ b/include/configs/zynq_zc70x.h
+@@ -18,6 +18,7 @@
+ 
+ #define CONFIG_SYS_NO_FLASH
+ 
++#define CONFIG_SYS_I2C_ZYNQ
+ #define CONFIG_ZYNQ_SDHCI0
+ #define CONFIG_ZYNQ_USB
+ #define CONFIG_ZYNQ_QSPI
+-- 
+1.7.9.5
+
