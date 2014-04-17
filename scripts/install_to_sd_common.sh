@@ -75,6 +75,7 @@ then
 fi
 if [ $DO_UNMOUNT -ne 0 ]
 then
+	sleep 1
 	echo -n "Unmounting"
 	for p in /media/boot /media/rootfs /media/data
 	do
