@@ -1,0 +1,35 @@
+From 0a212cfc2dd4e4d1595de2ca2dde3f642e5707e7 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 18 Apr 2014 11:15:34 +0200
+Subject: [PATCH] configs/zynq-common: Don't add parameters to "sf probe"
+ command
+
+When booting from QSPI flash, the system "hangs" for a few seconds
+between reading the devicetree and reading the kernel.
+
+This only happens for "run qspiboot", it did not happen when entering
+the read commands manually. I suspect it is triggered by reading the
+environment from flash somehow.
+
+"sf probe 0 0 0" triggers this, "sf probe" does not. So do not pass
+any parameters to sf probe.
+---
+ include/configs/zynq-common.h |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
+index 2c7f257..f2c1ddb 100644
+--- a/include/configs/zynq-common.h
++++ b/include/configs/zynq-common.h
+@@ -268,7 +268,7 @@
+ 		"fatload mmc 0 ${loadbit_addr} ${bitstream_image} && " \
+ 		"fpga load 0 ${loadbit_addr} ${filesize}\0" \
+ 	"qspiboot=echo Booting from QSPI flash... && " \
+-		"sf probe 0 0 0 && " \
++		"sf probe && " \
+ 		"sf read 0x2A00000 " STR(CONFIG_SYS_SPI_DEVTREE_OFFS) " ${devicetree_size} && " \
+ 		"sf read ${kernel_addr} " STR(CONFIG_SYS_SPI_UIMAGE_OFFS) " ${kernel_size} && " \
+ 		"bootm ${kernel_addr} - 0x2A00000\0" \
+-- 
+1.7.9.5
+
