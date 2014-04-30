@@ -4,13 +4,9 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 S = "${WORKDIR}/git"
 
-KBRANCH = "xcomm_zynq_new_pcore_regmap"
-SRCREV = "7ad9c8fc726f0ed22507c4cba2ab777045ac6280"
-LINUX_VERSION = "3.13"
-
-KBRANCH_topic-miami = "topic-miami"
-SRCREV_topic-miami = "15bd79865c2990b81dcdf94682d79c0345e32167"
-LINUX_VERSION_topic-miami = "3.14"
+KBRANCH = "topic-miami"
+SRCREV = "15bd79865c2990b81dcdf94682d79c0345e32167"
+LINUX_VERSION = "3.14"
 
 # Remove old names
 RREPLACES_${PN} = "linux-milo"
@@ -43,6 +39,7 @@ KERNEL_IMAGEDEST = "tmp/boot"
 FILES_kernel-image = "${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}*"
 
 LINUX_VERSION_EXTENSION ?= "-topic"
+
 
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
