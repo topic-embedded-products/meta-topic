@@ -12,7 +12,7 @@ IMAGE_FSTYPES = "tar.gz ubi"
 inherit core-image
 
 MY_LOGIC = "\
-	fpga-image-adi \
+	fpga-image-adi-vivado \
 	adi-hdmi-load \
 	"
 

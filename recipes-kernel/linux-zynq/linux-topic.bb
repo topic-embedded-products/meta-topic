@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 S = "${WORKDIR}/git"
 
-KBRANCH = "xcomm_zynq_new_pcore_regmap"
+KBRANCH = "xcomm_zynq_new_pcore_regmap-next"
 
 # Remove old names
 RREPLACES_${PN} = "linux-milo"
@@ -39,7 +39,7 @@ FILES_kernel-image = "${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}*"
 LINUX_VERSION ?= "3.13"
 LINUX_VERSION_EXTENSION ?= "-topic"
 
-SRCREV = "78cda1239e38040eb3ad916f60e7bc20541332ee"
+SRCREV = "c38f2bd640df3eb3dbbfdcc43f40ab112faa64a4"
 
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
