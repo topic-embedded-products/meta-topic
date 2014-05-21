@@ -19,7 +19,10 @@ MY_LOGIC_append_zedboard = "\
 	zed-audio \
 	zed-oled-load \
 	"
-
+MY_LOGIC_zynq-miami = "\
+	fpga-image-miami \
+	adi-hdmi-load \
+	"
 
 MY_THINGS = "\
 	kernel-modules \
