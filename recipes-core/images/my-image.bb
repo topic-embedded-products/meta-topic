@@ -15,6 +15,11 @@ MY_LOGIC = "\
 	fpga-image-adi-vivado \
 	adi-hdmi-load \
 	"
+MY_LOGIC_append_zedboard = "\
+	zed-audio \
+	zed-oled-load \
+	"
+
 
 MY_THINGS = "\
 	kernel-modules \
