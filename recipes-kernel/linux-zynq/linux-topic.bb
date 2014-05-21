@@ -36,10 +36,10 @@ KERNEL_IMAGEDEST = "tmp/boot"
 
 FILES_kernel-image = "${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}*"
 
-LINUX_VERSION ?= "3.13"
+LINUX_VERSION ?= "3.14"
 LINUX_VERSION_EXTENSION ?= "-topic"
 
-SRCREV = "c38f2bd640df3eb3dbbfdcc43f40ab112faa64a4"
+SRCREV = "fef3e65ca2852eb4d3b02a0ddc941ce6e3fdab22"
 
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
