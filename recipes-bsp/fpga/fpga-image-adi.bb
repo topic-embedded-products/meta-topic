@@ -1,5 +1,7 @@
 DESCRIPTION = "FPGA bitstream reference design from ADI."
 
+XILINX_VIVADO_VERSION = "2013.4"
+
 require fpga-image.inc
 
 LICENSE = "GPLv2"
@@ -11,6 +13,8 @@ BOARD_DESIGN_PATH = ""
 BOARD_DESIGN_PATH_zedboard = "cf_adv7511_zed"
 BOARD_DESIGN_PATH_zynq-zc702 = "cf_adv7511_zc702"
 BOARD_DESIGN_PATH_zynq-zc706 = "cf_adv7511_zc706"
+
+COMPATIBLE_MACHINE = "zedboard|zynq-zc70[26]"
 
 PV = "1.${SRCPV}"
 
