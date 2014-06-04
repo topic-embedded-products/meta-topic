@@ -5,6 +5,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 S = "${WORKDIR}/git"
 
 KBRANCH = "xcomm_zynq_new_pcore_regmap"
+SRCREV = "7ad9c8fc726f0ed22507c4cba2ab777045ac6280"
+LINUX_VERSION = "3.13"
+
+KBRANCH_zynq-miami = "xcomm_zynq_new_pcore_regmap-next"
+SRCREV_zynq-miami = "cee8e6371bbbd7eeb2faa01286a04fd6baa6ece5"
+LINUX_VERSION_zynq-miami = "3.14"
 
 # Remove old names
 RREPLACES_${PN} = "linux-milo"
@@ -36,10 +42,7 @@ KERNEL_IMAGEDEST = "tmp/boot"
 
 FILES_kernel-image = "${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}*"
 
-LINUX_VERSION ?= "3.13"
 LINUX_VERSION_EXTENSION ?= "-topic"
-
-SRCREV = "7ad9c8fc726f0ed22507c4cba2ab777045ac6280"
 
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"

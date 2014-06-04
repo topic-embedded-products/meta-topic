@@ -8,7 +8,7 @@ require conf/machine/include/soc-family.inc
 
 PREFERRED_PROVIDER_virtual/xilinx-sdk = "miami-xilinx-sdk"
 
-module_autoload_spi-zynq = "spi-zynq"
+module_autoload_spi-cadence = "spi-cadence"
 
 UBOOT_MACHINE = "zynq_miami_config"
 
