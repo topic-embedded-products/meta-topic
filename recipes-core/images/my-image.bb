@@ -24,6 +24,11 @@ MY_LOGIC_zynq-miami = "\
 	adi-hdmi-load \
 	"
 
+# TODO: No publicly available FPGA reference image yet.
+MY_LOGIC_topic-miami = "\
+	kernel-module-ltc2990 \
+	"
+
 MY_THINGS = "\
 	kernel-modules \
 	modutils-loadscript \
@@ -31,6 +36,7 @@ MY_THINGS = "\
 	mtd-utils \
 	${@base_contains("IMAGE_FSTYPES", "ubi", "mtd-utils-ubifs" , "", d)} \
 	alsa-utils-aplay alsa-utils-speakertest alsa-utils-amixer alsa-utils-alsactl \
+	i2c-tools \
 	"
 
 # Skip packagegroup-base to reduce the number of packages built. Thus, we need
