@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=9eef91148a9b14ec7f9df333daebc746"
 DEPENDS = "libdyplo"
 include dyplo-stable-revisions.inc
 
-inherit autotools gitpkgv
+inherit autotools pkgconfig gitpkgv
 
 PV = "0+${SRCPV}"
 PKGV = "0+${GITPKGV}"
