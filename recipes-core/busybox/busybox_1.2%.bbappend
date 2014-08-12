@@ -1,6 +1,3 @@
-# Increment PR number
-PRINC = "5"
-
 SRC_URI += "\
 	file://inetd file://inetd.conf \
 	file://mdev file://mdev.conf file://mdev-mount.sh \
