@@ -9,7 +9,7 @@ SRCREV = "7ad9c8fc726f0ed22507c4cba2ab777045ac6280"
 LINUX_VERSION = "3.13"
 
 KBRANCH_topic-miami = "topic-miami"
-SRCREV_topic-miami = "4fa76ccf909783b3e9501c99ea1608ccfa74c9b3"
+SRCREV_topic-miami = "15bd79865c2990b81dcdf94682d79c0345e32167"
 LINUX_VERSION_topic-miami = "3.14"
 
 # Remove old names
