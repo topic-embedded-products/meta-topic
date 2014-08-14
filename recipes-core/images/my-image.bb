@@ -19,14 +19,11 @@ MY_LOGIC_append_zedboard = "\
 	zed-audio \
 	zed-oled-load \
 	"
-MY_LOGIC_zynq-miami = "\
-	fpga-image-miami \
-	adi-hdmi-load \
-	"
 
 # TODO: No publicly available FPGA reference image yet.
 MY_LOGIC_topic-miami = "\
 	kernel-module-ltc2990 \
+	kernel-module-rsi \
 	"
 
 MY_THINGS = "\

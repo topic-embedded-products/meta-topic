@@ -8,10 +8,6 @@ KBRANCH = "xcomm_zynq_new_pcore_regmap"
 SRCREV = "7ad9c8fc726f0ed22507c4cba2ab777045ac6280"
 LINUX_VERSION = "3.13"
 
-KBRANCH_zynq-miami = "topic-miami"
-SRCREV_zynq-miami = "4fa76ccf909783b3e9501c99ea1608ccfa74c9b3"
-LINUX_VERSION_zynq-miami = "3.14"
-
 KBRANCH_topic-miami = "topic-miami"
 SRCREV_topic-miami = "4fa76ccf909783b3e9501c99ea1608ccfa74c9b3"
 LINUX_VERSION_topic-miami = "3.14"
@@ -39,7 +35,6 @@ SRC_URI = "\
 
 KERNEL_IMAGETYPE = "uImage"
 KERNEL_DEVICETREE = "arch/arm/boot/dts/${MACHINE}-dyplo.dts"
-KERNEL_DEVICETREE_zynq-miami = "arch/arm/boot/dts/zynq-miami-dyplo.dts"
 KERNEL_DEVICETREE_topic-miami = "arch/arm/boot/dts/topic-miami-dyplo.dts"
 # See http://permalink.gmane.org/gmane.linux.kernel.commits.head/371588
 KERNEL_EXTRA_ARGS += "LOADADDR=0x00008000"
@@ -52,7 +47,7 @@ LINUX_VERSION_EXTENSION ?= "-topic"
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-COMPATIBLE_MACHINE = "zynq-zc702|zynq-zc706|zedboard|zynq-miami|topic-miami"
+COMPATIBLE_MACHINE = "zynq-zc702|zynq-zc706|zedboard|topic-miami"
 
 KERNEL_FLASH_DEVICE = "/dev/mtd4"
 
