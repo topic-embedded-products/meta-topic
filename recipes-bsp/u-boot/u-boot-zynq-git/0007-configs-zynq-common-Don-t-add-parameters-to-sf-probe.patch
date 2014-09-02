@@ -1,7 +1,7 @@
-From 0a212cfc2dd4e4d1595de2ca2dde3f642e5707e7 Mon Sep 17 00:00:00 2001
+From 1f2972d0971d7d06ab5b39901f3c114c3cd65eea Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 18 Apr 2014 11:15:34 +0200
-Subject: [PATCH] configs/zynq-common: Don't add parameters to "sf probe"
+Subject: [PATCH 7/9] configs/zynq-common: Don't add parameters to "sf probe"
  command
 
 When booting from QSPI flash, the system "hangs" for a few seconds
@@ -18,7 +18,7 @@ any parameters to sf probe.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index 2c7f257..f2c1ddb 100644
+index 9551e18..c38aaaa 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
 @@ -268,7 +268,7 @@
