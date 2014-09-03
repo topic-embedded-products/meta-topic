@@ -4,11 +4,8 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-zynq-git:"
 
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce1dc69f702a6c"
-
 SRCREV = "f30aefb347f08a7a34d1c02be98af12794b67fd6"
-
-PV = "xilinx-zynq"
-PR = "r8"
+PV = "z2014.7+git${SRCPV}"
 
 SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git;branch=master-next \
 	file://0001-Use-bootscript-to-boot-no-ramdisk-smaller-enviroment.patch \
