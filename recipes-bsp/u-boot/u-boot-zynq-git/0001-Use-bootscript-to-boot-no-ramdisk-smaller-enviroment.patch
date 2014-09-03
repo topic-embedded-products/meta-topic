@@ -1,7 +1,7 @@
 From dbc8e7294aa98390c18745451fad519212d87885 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 27 Jan 2014 08:17:34 +0100
-Subject: [PATCH 1/9] Use bootscript to boot, no ramdisk, smaller enviroment
+Subject: [PATCH 1/8] Use bootscript to boot, no ramdisk, smaller enviroment
 
 Check for autorun bootscript and run it from SD.
 Load kernel at correct offset so it can execute in place (save a memcpy).

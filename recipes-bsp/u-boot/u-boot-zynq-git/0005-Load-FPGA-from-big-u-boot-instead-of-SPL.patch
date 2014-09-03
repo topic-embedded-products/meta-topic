@@ -1,7 +1,7 @@
 From 1243167640b9f193442a84e62148776dc579cfe2 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 21 Mar 2014 08:15:48 +0100
-Subject: [PATCH 5/9] Load FPGA from "big" u-boot instead of SPL
+Subject: [PATCH 5/8] Load FPGA from "big" u-boot instead of SPL
 
 ---
  include/configs/zynq-common.h |    7 ++++---

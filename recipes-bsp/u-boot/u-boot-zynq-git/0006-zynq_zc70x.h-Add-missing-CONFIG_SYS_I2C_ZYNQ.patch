@@ -1,7 +1,7 @@
 From c2831bb90b3e8a8b25173ff1a47ea39f0d1aac65 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 17 Apr 2014 14:07:14 +0200
-Subject: [PATCH 6/9] zynq_zc70x.h: Add missing CONFIG_SYS_I2C_ZYNQ
+Subject: [PATCH 6/8] zynq_zc70x.h: Add missing CONFIG_SYS_I2C_ZYNQ
 
 Fix compilation error:
 common/cmd_eeprom.c:164: undefined reference to `i2c_read'
