@@ -11,7 +11,7 @@ PREFERRED_PROVIDER_virtual/xilinx-sdk = "miami-xilinx-sdk"
 UBOOT_MACHINE = "topic_miami_config"
 
 KERNEL_MODULE_AUTOLOAD ?= ""
-KERNEL_MODULE_AUTOLOAD += "spi-cadence xilinx-emacps"
+KERNEL_MODULE_AUTOLOAD += "spi-cadence xilinx_emacps"
 
 # ubiattach /dev/ubi_ctrl -m 5
 # From dmesg:
