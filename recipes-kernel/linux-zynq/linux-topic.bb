@@ -5,8 +5,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 S = "${WORKDIR}/git"
 
 KBRANCH = "topic-miami"
-SRCREV = "75e12cdd8e53528890888b9900ff1fb2d4340444"
-LINUX_VERSION = "3.14"
+SRCREV = "e553a0bccca9444284850cb9733dc55caaca6632"
+LINUX_VERSION = "3.15"
 
 # Remove old names
 RREPLACES_${PN} = "linux-milo"
