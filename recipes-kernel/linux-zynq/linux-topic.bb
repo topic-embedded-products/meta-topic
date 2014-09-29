@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 S = "${WORKDIR}/git"
 
 KBRANCH = "topic-miami"
-SRCREV = "e553a0bccca9444284850cb9733dc55caaca6632"
+SRCREV = "80e9761d260f1f7db8e6b64f1723f60826b5baed"
 LINUX_VERSION = "3.15"
 
 # Remove old names
