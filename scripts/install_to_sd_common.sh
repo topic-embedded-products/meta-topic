@@ -26,9 +26,14 @@ then
 	echo "format it with partition_sd_card.sh?"
 	exit 1
 fi
-if [ ! -f tmp-eglibc/deploy/images/${MACHINE}/${IMAGE}-${MACHINE}.tar.gz ]
+if [ -z "${IMAGE_ROOT}" ]
 then
-	echo "Image '${IMAGE}' does not exist, cannot flash it."
+	IMAGE_ROOT=tmp-glibc/deploy/images/${MACHINE}
+fi
+if [ ! -f ${IMAGE_ROOT}/${IMAGE}-${MACHINE}.tar.gz ]
+then
+	echo "Image '${IMAGE}' does not exist, cannot flash it:"
+	echo ${IMAGE_ROOT}/${IMAGE}-${MACHINE}.tar.gz
 	exit 1
 fi
 DO_UNMOUNT=1
@@ -47,17 +52,17 @@ fi
 set -e
 echo "Writing boot..."
 rm -f /media/boot/*.ubi
-cp tmp-eglibc/deploy/images/${MACHINE}/BOOT.bin /media/boot/BOOT.BIN
-if [ -e tmp-eglibc/deploy/images/${MACHINE}/u-boot.img ]
+cp ${IMAGE_ROOT}/BOOT.bin /media/boot/BOOT.BIN
+if [ -e ${IMAGE_ROOT}/u-boot.img ]
 then
-	cp tmp-eglibc/deploy/images/${MACHINE}/u-boot.img /media/boot/
+	cp ${IMAGE_ROOT}/u-boot.img /media/boot/
 fi
-cp tmp-eglibc/deploy/images/${MACHINE}/*.scr /media/boot/
-cp tmp-eglibc/deploy/images/${MACHINE}/uImage /media/boot/
-cp tmp-eglibc/deploy/images/${MACHINE}/${DTB} /media/boot/devicetree.dtb
-if [ -f tmp-eglibc/deploy/images/${MACHINE}/${IMAGE}-${MACHINE}.ubi ]
+cp ${IMAGE_ROOT}/*.scr /media/boot/
+cp ${IMAGE_ROOT}/uImage /media/boot/
+cp ${IMAGE_ROOT}/${DTB} /media/boot/devicetree.dtb
+if [ -f ${IMAGE_ROOT}/${IMAGE}-${MACHINE}.ubi ]
 then
-	cp tmp-eglibc/deploy/images/${MACHINE}/${IMAGE}-${MACHINE}.ubi /media/boot/
+	cp ${IMAGE_ROOT}/${IMAGE}-${MACHINE}.ubi /media/boot/
 fi
 echo "Writing rootfs..."
 if [ ! -f dropbear_rsa_host_key -a -f /media/rootfs/etc/dropbear/dropbear_rsa_host_key ]
@@ -66,8 +71,7 @@ then
 	chmod 666 dropbear_rsa_host_key
 fi
 rm -rf /media/rootfs/*
-tar xzf tmp-eglibc/deploy/images/${MACHINE}/${IMAGE}-${MACHINE}.tar.gz -C /media/rootfs
-cp /media/rootfs/usr/share/fpga.bin /media/boot/
+tar xzf ${IMAGE_ROOT}/${IMAGE}-${MACHINE}.tar.gz -C /media/rootfs
 if [ -f dropbear_rsa_host_key ]
 then
 	install -d /media/rootfs/etc/dropbear
