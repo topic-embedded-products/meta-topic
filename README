@@ -14,52 +14,39 @@ git clone http://github.com/topic-embedded-products/meta-topic.git meta-topic
 
 meta-topic/scripts/init-oe.sh
 
-# Edit local.conf to match your setup. In particular, set
-# BB_NUMBER_THREADS and PARALLEL_MAKE to match you CPU count
-# set the following variables (to match yor setup):
-# MACHINE="zedboard"
-# XILINX_TOOL_PATH = "/opt/Xilinx/"
-# XILINX_LM_LICENSE_FILE = "2100@192.168.0.101"
-# DISTRO="tiny"
-# INHERIT += "rm_work"
+cd build
+
+# Edit local.conf to match your setup. In particular, check the paths to
+# the Xilinx tools.
 vi conf/local.conf
 
+# The default machine is "topic-miami-7015", change it in the "profile"
+# script or just export the MACHINE environment before builing.
+
 # Then build your first image and relax a bit:
+. ./profile
 nice bitbake my-image
 
 Note that "my-image" was designed to be used with DISTRO=tiny. It
 expects to run with busybox-mdev instead of udev.
+
+For the Miami boards, there is a miami-vice-image that can be run on the
+miami board using only the "Miami Vice" debugging add-on. This image can
+be loaded into RAM using JTAG and run from there.
 
 In order to properly use the zynq for anything useful, you will need to
 build a bit image and FSBL using the Xilinx tools. README-LOGIC contains
 some tips on that (mainly for myself because I keep forgetting these
 tricks).
 
-This is a fork of Ballister's OE environment for Zynq boards. This repo
-mainly serves to share ideas and code for the Zynq series. In this version
-I have so far made the following additions:
-
-- Support for the upcoming Miami SOM and boards like Florida.
-
-- Faster booting by tweaking boot params.
-
-- Build FPGA image using ISE, Vivado or custom scripts.
-
-- Builds bootloader directly from a FPGA design (u-boot SPL). Copies the
-  required SDK files from the Xilinx tools.
-
-- Allow mixed booting, e.g. bootloader from QSPI, kernel and rootfs on SD.
-  This is implemented by checking for an "autorun" script on the SD card.
-  There's a recipe in the build that boots like described. You can have the
-  script do anything that the u-boot shell supports.
-
-- Offer kernels from Xilinx and ADI (for their framebuffer).
-
-- Boot and run completely from QSPI flash, mounting a UBIFS root filesystem
-  allowing read/write access.
+This started as a fork of Ballister's OE environment for Zynq boards.
 
 This repository also contains support for Dyplo, see
 http://www.topicembeddedproducts.com/products/dyplo/
+
+In future, this OpenEmbedded overlay is to be split up into several
+components, as to separate the board support package for Topic Miami
+boards, the Dyplo framework and the tiny distro.
 
 If you have questions or comments, I usually read the Xilinx Linux forum and
 the ADI linux driver forum:
