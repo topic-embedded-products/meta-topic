@@ -9,6 +9,11 @@ MY_LOGIC = ""
 # No packaging
 ROOTFS_PKGMANAGE = ""
 
+# External module for power monitor
+MY_LOGIC_topic-miami = "\
+	kernel-module-ltc2990 \
+	"
+
 MY_THINGS = "\
 	modutils-loadscript \
 	${MY_LOGIC} \
