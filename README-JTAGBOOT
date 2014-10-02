@@ -1,0 +1,50 @@
+Booting the Miami board using JTAG only.
+
+(This is not complete yet, but contains many useful tips)
+
+This applies to the Miami board with only the "Vice" debug board and the
+Florida carrier boards. The system can boot and run Linux using only the
+JTAG and a serial connection to a development PC.
+This routine may work on many other boards too.
+
+You will need:
+- One or two USB cables.
+- The "xmd" program from the Xilinx Vivado or XPS software suites.
+- On Ubuntu, you may need the "libusb-driver" for the JTAG hardware.
+- The results of an OpenEmbedded image build (miami-vice-image)
+- The ps7_init.tcl script (created by Vivado or XPS)
+
+Instructions:
+-------------
+
+To create the ps7_init.tcl script, open the Vivado project and configure
+the PS7 for the Miami board. You won't need to generate a bitstream, so
+you don't have to route anything in logic or otherwise.
+Generate the design, and via File - Export - Hardware to SDK you can
+write out the ps7_init files. The ps7_init.tcl is the one you need later.
+(TODO: Link to reference design or board definition file or ...)
+
+Set the jumpers on the Miami to boot from JTAG.
+(TODO: Add the jumper settings here)
+Connect the USB cable to the JTAG module on the board.
+Connect another USB cable to the UART (if you have only one, you can do
+this later on). Run a terminal program using 112500 baud, 8-bit,
+no parity, no flow control.
+
+Run the xmd program (you may need to "preload" the libusb-driver).
+Enter the following commands (hint: place them in a script file and run
+it using the "-tcl" commandline option):
+
+connect arm hw
+rst
+source ps7_init.tcl
+ps7_init
+ps7_post_config
+dow -data u-boot.bin 0x4000000
+dow -data devicetree.dtb 0x2A00000
+dow -data uImage 0x3000000
+con 0x4000000
+
+For the first attempt, omit the devicetree and kernel, and see if u-boot
+starts up.
+You can find the binaries in the OE build directory (see README).

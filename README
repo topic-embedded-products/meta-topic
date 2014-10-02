@@ -32,7 +32,8 @@ expects to run with busybox-mdev instead of udev.
 
 For the Miami boards, there is a miami-vice-image that can be run on the
 miami board using only the "Miami Vice" debugging add-on. This image can
-be loaded into RAM using JTAG and run from there.
+be loaded into RAM using JTAG and run from there, see README-JTAGBOOT
+for more information on how to do that.
 
 In order to properly use the zynq for anything useful, you will need to
 build a bit image and FSBL using the Xilinx tools. README-LOGIC contains
