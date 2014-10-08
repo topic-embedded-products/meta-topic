@@ -5,12 +5,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 S = "${WORKDIR}/git"
 
 KBRANCH = "topic-miami"
-SRCREV = "80e9761d260f1f7db8e6b64f1723f60826b5baed"
+SRCREV = "6fb853c7eaec3b9390643bf20441a3ac066962d7"
 LINUX_VERSION = "3.15"
-
-# Remove old names
-RREPLACES_${PN} = "linux-milo"
-RCONFLICTS_${PN} = "linux-milo"
 
 inherit kernel
 require recipes-kernel/linux/linux-dtb.inc
