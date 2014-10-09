@@ -1,12 +1,14 @@
-BSP for Xilinx Zynq dev boards. For instructions on building, see:
+BSP for Topic development boards, like the Miami and its Florida carrier
+boards.
 
-https://github.com/balister/meta-zynq/wiki/Getting-started
+This is an overlay intended for OpenEmbedded and/or Yocto.
 
-For the lazy, here's a quick script:
+--- OpenEmbedded ---
+
+Here's a quick script for OE:
 
 mkdir my-zynq
 cd my-zynq
-
 git clone git://git.openembedded.org/openembedded-core oe-core
 git clone git://github.com/openembedded/meta-oe.git meta-oe
 git clone git://git.openembedded.org/bitbake bitbake
@@ -35,8 +37,39 @@ miami board using only the "Miami Vice" debugging add-on. This image can
 be loaded into RAM using JTAG and run from there, see README-JTAGBOOT
 for more information on how to do that.
 
+
+--- Yocto ---
+
+For Yocto, clone this repository to a local directory, and add it to the
+conf/bblayers.conf file. Change your MACHINE to "topic-miami-7015" or
+"topic-miami-7030", and bitbake core-image-minimal. See also the Yocto
+Quick start for more information:
+http://www.yoctoproject.org/docs/1.6.1/yocto-project-qs/yocto-project-qs.html
+
+A few recipes still require the "gitpkgv" class from meta-openembedded.
+Include it by cloning git://github.com/openembedded/meta-oe.git and add
+the path to its "meta-oe" subdirectory to the conf/bblayers.conf list.
+Getting rid of this meta-oe dependency is still on my TODO list.
+
+
+--- BOOT ---
+
+The simplest way to boot the resulting image is to place it on an SD
+card. The scripts/partition-sd-card.sh script formats an SD card so it
+can be used directly. This needs to be done only once for a card.
+The install-to-sd scripts copy the required files to the card. You'll
+have to run these scripts as root, as they require low-level access to
+the SD card.
+
+To boot a Miami-Florida board, insert the SD card into the slot, set the
+jumpers on the miami to boot from SD (01010110) and switch on the power
+supply.
+
+
+--- Additional information ---
+
 In order to properly use the zynq for anything useful, you will need to
-build a bit image and FSBL using the Xilinx tools. README-LOGIC contains
+build a bitstream image using the Xilinx tools. README-LOGIC contains
 some tips on that (mainly for myself because I keep forgetting these
 tricks).
 
@@ -49,7 +82,10 @@ In future, this OpenEmbedded overlay is to be split up into several
 components, as to separate the board support package for Topic Miami
 boards, the Dyplo framework and the tiny distro.
 
-If you have questions or comments, I usually read the Xilinx Linux forum and
-the ADI linux driver forum:
+
+--- Contact ---
+
+If you have questions or comments, I usually read the Xilinx Linux forum
+and the ADI linux driver forum:
 http://forums.xilinx.com/t5/Embedded-Linux/bd-p/ELINUX
 http://ez.analog.com/community/linux-device-drivers/linux-software-drivers
