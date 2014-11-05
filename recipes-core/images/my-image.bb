@@ -22,10 +22,6 @@ MY_LOGIC_append_zedboard = "\
 
 # TODO: No publicly available FPGA reference image yet.
 MY_LOGIC_topic-miami = "\
-	kernel-module-ltc2990 \
-	firmware-rsi-91x \
-	kernel-module-rsi-sdio \
-	kernel-module-rsi-91x \
 	"
 
 MY_THINGS = "\

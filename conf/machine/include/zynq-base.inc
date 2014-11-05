@@ -23,6 +23,10 @@ IMAGE_FSTYPES = "tar.gz ubi"
 # Specify serial console settings
 SERIAL_CONSOLE = "115200 ttyPS0"
 
+# Default FGPA architecture is the machine
+FPGA_FAMILY ??= "${MACHINE}"
+FPGA_FAMILY_ARCH ??= "${MACHINE_ARCH}"
+
 # XILINX tool locations (for in your site.conf) and input files
 # Override them in local.conf to suit your system
 

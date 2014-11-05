@@ -6,8 +6,8 @@ INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS = "fpga-bit-to-bin-native"
 # Recommend bitstream to be loaded at boot
 RRECOMMENDS_${PN} = "fpga-image-load"
-# Package is machine specific
-PACKAGE_ARCH = "${MACHINE_ARCH}"
+# Package is FPGA logic specific, usually not related to the machine.
+PACKAGE_ARCH = "${FPGA_FAMILY_ARCH}"
 # Workaround: XPS fails to build when there's a "+" in the path.
 SRCPV = "${@bb.fetch2.get_srcrev(d).replace('+','-')}"
 
@@ -36,7 +36,7 @@ ALTERNATIVE_TARGET[bitstreams] = "${datadir}/bitstreams"
 
 do_compile() {
 	export LM_LICENSE_FILE="${XILINX_LM_LICENSE_FILE}"
-	export MACHINE="${MACHINE}"
+	export FPGA_FAMILY="${FPGA_FAMILY}"
 	if [ -f generate_bitstreams.sh ]
 	then
 		if [ -f fpga.bit ]

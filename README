@@ -22,8 +22,8 @@ cd build
 # the Xilinx tools.
 vi conf/local.conf
 
-# The default machine is "topic-miami-7015", change it in the "profile"
-# script or just export the MACHINE environment before builing.
+# The default machine is "topic-miami-florida-med-7015", change it in the
+# "profile" script or just export the MACHINE environment before building.
 
 # Then build your first image and relax a bit:
 . ./profile
@@ -85,7 +85,5 @@ boards, the Dyplo framework and the tiny distro.
 
 --- Contact ---
 
-If you have questions or comments, I usually read the Xilinx Linux forum
-and the ADI linux driver forum:
-http://forums.xilinx.com/t5/Embedded-Linux/bd-p/ELINUX
-http://ez.analog.com/community/linux-device-drivers/linux-software-drivers
+For questions or comments, contact Topic Embedded Products via the website:
+http://www.topicembeddedproducts.com/
