@@ -25,10 +25,24 @@ S = "${WORKDIR}/git/${BOARD_DESIGN_PATH}"
 
 PACKAGES = "${PN}"
 
+# Multiple bitstream providers may exist for a single machine, so use
+# update-alternatives to keep them apart
+inherit update-alternatives
+ALTERNATIVE_${PN} = "fpga.bin bitstreams"
+ALTERNATIVE_LINK_NAME[fpga.bin] = "${datadir}/fpga.bin"
+ALTERNATIVE_TARGET[fpga.bin] = "${datadir}/fpga.bin"
+ALTERNATIVE_LINK_NAME[bitstreams] = "${datadir}/bitstreams"
+ALTERNATIVE_TARGET[bitstreams] = "${datadir}/bitstreams"
+
 do_compile() {
 	export LM_LICENSE_FILE="${XILINX_LM_LICENSE_FILE}"
+	export MACHINE="${MACHINE}"
 	if [ -f generate_bitstreams.sh ]
 	then
+		if [ -f fpga.bit ]
+		then
+			rm fpga.bit
+		fi
 		echo "Executing generate_bitstreams.sh"
 		source ${XILINX_VIVADO_PATH}/settings${XILINX_TOOL_ARCH}.sh
 		source ./generate_bitstreams.sh
@@ -101,11 +115,16 @@ FILES_${PN} = "${datadir}"
 do_install() {
 	install -d ${D}${datadir}
 	install -m 644 ${WORKDIR}/fpga.bin ${D}${datadir}/fpga.bin
+	install -d ${D}${datadir}/bitstreams
 	if [ -d ${WORKDIR}/bitstreams ]
 	then
-		install -d ${D}${datadir}/bitstreams
 		cp -r ${WORKDIR}/bitstreams/* ${D}${datadir}/bitstreams/
 	fi
 }
 
 addtask convert_bitstreams after do_compile before do_install
+
+# Prevent bitstreams ending up in sysroot.
+sysroot_stage_dirs_append() {
+	rm -rf $to${datadir}/fpga.bin $to${datadir}/bitstreams
+}
