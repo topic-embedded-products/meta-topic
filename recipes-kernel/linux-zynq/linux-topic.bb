@@ -1,11 +1,11 @@
-DESCRIPTION = "Xilinx Zynq kernel with ADI extensions"
+DESCRIPTION = "Xilinx Zynq kernel with ADI and Topic extensions"
 SECTION = "kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 S = "${WORKDIR}/git"
 
 KBRANCH = "topic-miami"
-SRCREV = "0f1965c3ebc8a72f8896d9a4680e9e074d96c8dc"
+SRCREV = "de0f944248d58493c63875d390995da06b4c6048"
 LINUX_VERSION = "3.15"
 
 inherit kernel
