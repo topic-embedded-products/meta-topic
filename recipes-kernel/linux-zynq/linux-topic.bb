@@ -5,8 +5,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 S = "${WORKDIR}/git"
 
 KBRANCH = "topic-miami"
-SRCREV = "de0f944248d58493c63875d390995da06b4c6048"
-LINUX_VERSION = "3.15"
+SRCREV = "9edcedfb6be4ffb64167f0ccc260a319906a19f3"
+LINUX_VERSION = "3.17"
 
 inherit kernel
 require recipes-kernel/linux/linux-dtb.inc
