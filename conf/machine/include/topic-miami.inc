@@ -34,7 +34,7 @@ UBOOT_MACHINE = "topic_miami_config"
 KERNEL_MODULE_AUTOLOAD ?= ""
 KERNEL_MODULE_AUTOLOAD += "xilinx_emacps rsi_sdio g_ether"
 
-MACHINE_EXTRA_RRECOMMENDS = "\
+MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-ltc2990 \
 	"
 # ubiattach /dev/ubi_ctrl -m 5

@@ -1,8 +1,10 @@
 # Florida board common components
 require conf/machine/include/topic-miami.inc
 
-# Extra drivers to load as modules
-MACHINE_EXTRA_RRECOMMENDS += "\
+MACHINE_FPGA_BITSTREAM ?= "fpga-image-miami-florida-gen-reference"
+
+# Extra packages to install for the board
+BOARD_FPGA_PACKAGES ?= "\
 	adi-hdmi-load \
 	kernel-module-adi-axi-hdmi \
 	kernel-module-adv7511 \

@@ -27,6 +27,15 @@ SERIAL_CONSOLE = "115200 ttyPS0"
 FPGA_FAMILY ??= "${MACHINE}"
 FPGA_FAMILY_ARCH ??= "${MACHINE_ARCH}"
 
+# Default is not to have a bitstream, but machines will recommend their own,
+# or images may choose to use another application-specific bitstream provider.
+MACHINE_FPGA_BITSTREAM ??= ""
+# The board adds extra packages, usually kernel modules, that depend on the
+# FPGA to function properly. Changing the bitstream usually alters this list
+# too.
+BOARD_FPGA_PACKAGES ??= ""
+MACHINE_EXTRA_RRECOMMENDS = "${MACHINE_FPGA_BITSTREAM} ${BOARD_FPGA_PACKAGES}"
+
 # XILINX tool locations (for in your site.conf) and input files
 # Override them in local.conf to suit your system
 

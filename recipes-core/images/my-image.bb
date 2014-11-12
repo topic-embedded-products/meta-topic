@@ -11,23 +11,9 @@ IMAGE_FSTYPES = "tar.gz ubi"
 
 inherit core-image
 
-MY_LOGIC = "\
-	fpga-image-adi-vivado \
-	adi-hdmi-load \
-	"
-MY_LOGIC_append_zedboard = "\
-	zed-audio \
-	zed-oled-load \
-	"
-
-# TODO: No publicly available FPGA reference image yet.
-MY_LOGIC_topic-miami = "\
-	"
-
 MY_THINGS = "\
 	kernel-modules \
 	modutils-loadscript \
-	${MY_LOGIC} \
 	mtd-utils \
 	${@base_contains("IMAGE_FSTYPES", "ubi", "mtd-utils-ubifs" , "", d)} \
 	alsa-utils-aplay alsa-utils-speakertest alsa-utils-amixer alsa-utils-alsactl \
