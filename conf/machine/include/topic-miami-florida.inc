@@ -31,3 +31,5 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-xilinx-dma \
 	kernel-module-xilinx-emacps \
 	"
+
+MACHINE_FEATURES += "usbhost screen touchscreen wifi alsa ethernet"

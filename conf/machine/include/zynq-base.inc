@@ -15,10 +15,10 @@ KERNEL_IMAGETYPE = "uImage"
 MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
 
 # Specify machine features
-MACHINE_FEATURES = "apm vfat ethernet"
+MACHINE_FEATURES = "vfat"
 
 # Specify rootfs image filesystem types
-IMAGE_FSTYPES = "tar.gz ubi"
+IMAGE_FSTYPES = "tar.gz"
 
 # Specify serial console settings
 SERIAL_CONSOLE = "115200 ttyPS0"
