@@ -22,7 +22,7 @@ cd build
 # the Xilinx tools.
 vi conf/local.conf
 
-# The default machine is "topic-miami-florida-med-7015", change it in the
+# The default machine is "topic-miami-florida-med-xc7z015", change it in the
 # "profile" script or just export the MACHINE environment before building.
 
 # Then build your first image and relax a bit:
@@ -41,7 +41,7 @@ for more information on how to do that.
 --- Yocto ---
 
 For Yocto, clone this repository to a local directory, and add it to the
-conf/bblayers.conf file. Change your MACHINE to "topic-miami-7015" or
+conf/bblayers.conf file. Change your MACHINE to "topic-miami-florida-med-xc7z015" or
 "topic-miami-7030", and bitbake core-image-minimal. See also the Yocto
 Quick start for more information:
 http://www.yoctoproject.org/docs/1.6.1/yocto-project-qs/yocto-project-qs.html
