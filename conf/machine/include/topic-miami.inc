@@ -36,6 +36,7 @@ KERNEL_MODULE_AUTOLOAD += "xilinx_emacps rsi_sdio g_ether"
 
 MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-ltc2990 \
+	topic-miami-monitor-lib \
 	"
 # ubiattach /dev/ubi_ctrl -m 5
 # From dmesg:
