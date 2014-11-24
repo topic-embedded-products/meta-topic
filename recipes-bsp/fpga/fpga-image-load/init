@@ -12,7 +12,7 @@ case "$1" in
       exit 1
     fi
     cat "${BITFILE}" > /dev/xdevcfg
-    result=`cat /sys/devices/amba.[0123]/f8007000.devcfg/prog_done`
+    result=`cat /sys/class/xdevcfg/xdevcfg/device/prog_done`
     if [ $result -ne 1 ]; then
       echo "ERROR configuring FPGA, logic is not configured!"
       exit 1
