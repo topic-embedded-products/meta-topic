@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=9eef91148a9b14ec7f9df333daebc746"
 GITHUB_TOPIC_URI ?= "git://github.com/topic-embedded-products"
 SRC_URI = "${GITHUB_TOPIC_URI}/${PN}"
 
-SRCREV = "aa48578ddbcc98cf125900a6be80ddce583dcd0d"
+SRCREV = "9d1f63a746f4c00b04b183b6fd7abedc2cbb1648"
 
 inherit gitpkgv
 
