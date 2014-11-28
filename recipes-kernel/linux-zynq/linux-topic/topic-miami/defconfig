@@ -884,6 +884,8 @@ CONFIG_MTD_CFI_UTIL=y
 # Self-contained MTD device drivers
 #
 # CONFIG_MTD_DATAFLASH is not set
+CONFIG_MTD_M25P80=y
+# CONFIG_CONFIG_MTD_SPI_NOR_USE_4K_SECTORS is not set
 # CONFIG_MTD_SST25L is not set
 # CONFIG_MTD_SLRAM is not set
 # CONFIG_MTD_PHRAM is not set
@@ -902,7 +904,8 @@ CONFIG_MTD_CFI_UTIL=y
 #
 # CONFIG_MTD_LPDDR is not set
 # CONFIG_MTD_LPDDR2_NVM is not set
-# CONFIG_MTD_SPI_NOR is not set
+CONFIG_MTD_SPI_NOR=y
+# CONFIG_MTD_SPI_NOR_USE_4K_SECTORS is not set
 CONFIG_MTD_UBI=y
 CONFIG_MTD_UBI_WL_THRESHOLD=4096
 CONFIG_MTD_UBI_BEB_LIMIT=20
@@ -2793,6 +2796,7 @@ CONFIG_XILINX_XADC=y
 # Digital to analog converters
 #
 # CONFIG_AD5064 is not set
+# CONFIG_AD5270 is not set
 # CONFIG_AD5360 is not set
 # CONFIG_AD5380 is not set
 # CONFIG_AD5421 is not set
@@ -2818,6 +2822,7 @@ CONFIG_XILINX_XADC=y
 # Clock Generator/Distribution
 #
 # CONFIG_AD9523 is not set
+# CONFIG_AD9528 is not set
 # CONFIG_AD9548 is not set
 # CONFIG_AD9517 is not set
 
