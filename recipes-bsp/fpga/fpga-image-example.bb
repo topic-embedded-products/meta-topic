@@ -3,8 +3,11 @@ require recipes-bsp/fpga/fpga-image.inc
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-BOARD_DESIGN_URI = "git://github.com/topic-embedded-products/fpga-image-example.git"
-SRCREV = "56af172328102040ab5cdf725cc830ea36136354"
+# BOARD_DESIGN_URI = "git://github.com/topic-embedded-products/{PN}.git"
+# SRCREV = "56af172328102040ab5cdf725cc830ea36136354"
+
+BOARD_DESIGN_URI = "git:///home/niek/workspace/${PN}"
+SRCREV = "${AUTOREV}"
 
 inherit gitpkgv
 PV = "1.${SRCPV}"
@@ -25,14 +28,14 @@ do_compile_prepend() {
 	fi
 
 	if [ -z ${DYPLO_LICENSE_TYPE} ]; then
-		bberror "Environment variable 'DYPLO_LICENSE_TYPE' not set, please set this variable (with the license purchased (trial, student or full)) in your local.conf file" 
+		bberror "Environment variable 'DYPLO_LICENSE_TYPE' not set, please set this variable (with the license purchased (demo, trial, student, full or kit)) in your local.conf file" 
 		exit 1
 	elif [ "${DYPLO_LICENSE_TYPE}" == "" ]; then
-		bberror "Environment variable 'DYPLO_LICENSE_TYPE' not set, please set this variable (with the license purchased (trial, student or full)) in your local.conf file"
+		bberror "Environment variable 'DYPLO_LICENSE_TYPE' not set, please set this variable (with the license purchased (demo, trial, student, full or kit)) in your local.conf file"
 		exit 1
 	else
-		if [ ! "${DYPLO_LICENSE_TYPE}" == "trial" ] && [ ! "${DYPLO_LICENSE_TYPE}" == "student" ] && [ ! "${DYPLO_LICENSE_TYPE}" == "full" ]; then
-			bberror "The license in environment variable 'DYPLO_LICENSE_TYPE' is not valid, please set this variable (with the license purchased (trial, student or full)) in your local.conf file"
+		if [ ! "${DYPLO_LICENSE_TYPE}" == "demo" ] && [ ! "${DYPLO_LICENSE_TYPE}" == "trial" ] && [ ! "${DYPLO_LICENSE_TYPE}" == "student" ] && [ ! "${DYPLO_LICENSE_TYPE}" == "full" ] && [ ! "${DYPLO_LICENSE_TYPE}" == "kit"]; then
+			bberror "The license in environment variable 'DYPLO_LICENSE_TYPE' is not valid, please set this variable (with the license purchased (demo, trial, student, full or kit)) in your local.conf file"
 			exit 1		
 		fi
 	fi
