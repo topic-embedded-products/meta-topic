@@ -3,11 +3,8 @@ require recipes-bsp/fpga/fpga-image.inc
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-# BOARD_DESIGN_URI = "git://github.com/topic-embedded-products/{PN}.git"
-# SRCREV = "56af172328102040ab5cdf725cc830ea36136354"
-
-BOARD_DESIGN_URI = "git:///home/niek/workspace/${PN}"
-SRCREV = "${AUTOREV}"
+BOARD_DESIGN_URI = "git://github.com/topic-embedded-products/{PN}.git"
+SRCREV = "4c704190c08362c4b5296e0e8b48d5cde5603e7f"
 
 inherit gitpkgv
 PV = "1.${SRCPV}"
