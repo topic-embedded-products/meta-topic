@@ -169,7 +169,7 @@ index a58defc..faf8115 100644
 -	"kernel_size=0x500000\0"	\
 -	"devicetree_size=0x20000\0"	\
 -	"ramdisk_size=0x5E0000\0"	\
-+	"kernel_size=0x380000\0"	\
++	"kernel_size=0x400000\0"	\
 +	"kernel_addr=0x3000000\0"	\
 +	"devicetree_size=0x10000\0"	\
  	"boot_size=0xF00000\0"	\
