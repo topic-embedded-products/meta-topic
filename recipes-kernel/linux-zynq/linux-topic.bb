@@ -40,7 +40,7 @@ LINUX_VERSION_EXTENSION ?= "-topic"
 PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-COMPATIBLE_MACHINE = "zynq-zc702|zynq-zc706|zedboard|topic-miami"
+COMPATIBLE_MACHINE = "topic-miami"
 
 KERNEL_FLASH_DEVICE = "/dev/mtd4"
 
