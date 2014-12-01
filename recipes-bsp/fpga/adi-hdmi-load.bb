@@ -3,7 +3,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaabaa882bbe"
 inherit allarch
 
-PV = "7"
+PV = "8"
 PR = "r0"
 
 PACKAGES = "${PN}"
@@ -16,7 +16,6 @@ do_compile() {
 }
 
 do_install() {
-	install -d ${D}/etc
 	install -d ${D}/etc/modules-load.d
 	install -m 644 ${S}/modules.conf ${D}/etc/modules-load.d/adi-hdmi.conf
 }
