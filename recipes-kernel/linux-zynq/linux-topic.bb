@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 S = "${WORKDIR}/git"
 
 KBRANCH = "topic-miami"
-SRCREV = "31f86522e062bece2c683731f8335c8a38ca41fc"
+SRCREV = "b96974f9c209f008094b6ceaaa2088441f8888fb"
 LINUX_VERSION = "3.17"
 
 inherit kernel
