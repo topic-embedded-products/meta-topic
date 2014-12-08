@@ -1,4 +1,4 @@
-From c15baf153c6bc811ec67be81d88db7f9731b3f77 Mon Sep 17 00:00:00 2001
+From 41a442b763954bbb2109b69ee700bbe806b2be2a Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 26 Feb 2014 12:03:36 +0100
 Subject: [PATCH 4/8] Allow overriding flash offsets.
@@ -8,11 +8,11 @@ addresses to use in flash (because of sector alignment).
 
 Name bitstream "fpga.bin". Remove unused environment vars.
 ---
- include/configs/zynq-common.h |   22 +++++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
+ include/configs/zynq-common.h |   25 +++++++++++++++++++++----
+ 1 file changed, 21 insertions(+), 4 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index dd433c9..bf57592 100644
+index 30e590b..3f1a7e9 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
 @@ -11,6 +11,8 @@
@@ -24,7 +24,23 @@ index dd433c9..bf57592 100644
  #define CONFIG_ARMV7
  #define CONFIG_ZYNQ
  
-@@ -232,6 +234,12 @@
+@@ -30,7 +32,6 @@
+ #define CONFIG_SYS_BAUDRATE_TABLE  \
+ 	{300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400}
+ 
+-/* DCC driver */
+ #if defined(CONFIG_CMD_ZYNQ_RSA)
+ # define CONFIG_EXTRA_ENV_RSA_BOOT \
+ 	"boot_image=BOOT.bin\0"	\
+@@ -58,6 +59,7 @@
+ #else
+ # define CONFIG_EXTRA_ENV_RSA_BOOT ""
+ #endif
++/* DCC driver */
+ #if defined(CONFIG_ZYNQ_DCC)
+ # define CONFIG_ARM_DCC
+ # define CONFIG_CPU_V6 /* Required by CONFIG_ARM_DCC */
+@@ -286,6 +288,13 @@
  #ifndef CONFIG_EXTRA_ENV_BOOTSCRIPT
  # define CONFIG_EXTRA_ENV_BOOTSCRIPT "autorun.scr"
  #endif
@@ -34,10 +50,11 @@ index dd433c9..bf57592 100644
 +#ifndef CONFIG_SYS_SPI_UIMAGE_OFFS
 +# define CONFIG_SYS_SPI_UIMAGE_OFFS	0x80000
 +#endif
- 
++
  /* Default environment */
  #define CONFIG_EXTRA_ENV_SETTINGS	\
-@@ -259,8 +267,8 @@
+ 	"ethaddr=00:0a:35:00:01:22\0"	\
+@@ -315,8 +324,8 @@
  		"fpga load 0 ${loadbit_addr} ${filesize}\0" \
  	"qspiboot=echo Booting from QSPI flash... && " \
  		"sf probe 0 0 0 && " \
@@ -48,7 +65,7 @@ index dd433c9..bf57592 100644
  		"bootm ${kernel_addr} - 0x2A00000\0" \
  	"uenvboot=" \
  		"if run loadbootenv; then " \
-@@ -465,7 +473,9 @@
+@@ -518,7 +527,9 @@
  #define CONFIG_SPL_SPI_LOAD
  #define CONFIG_SPL_SPI_FLASH_SUPPORT
  #define CONFIG_SPL_SPI_BUS	0
@@ -58,7 +75,7 @@ index dd433c9..bf57592 100644
  #define CONFIG_SPL_SPI_CS	0
  #endif
  
-@@ -485,7 +495,13 @@
+@@ -538,7 +549,13 @@
  #define CONFIG_SPL_TEXT_BASE	0x0
  
  /* 3 * 64kB blocks of OCM - one is on the top because of bootrom */

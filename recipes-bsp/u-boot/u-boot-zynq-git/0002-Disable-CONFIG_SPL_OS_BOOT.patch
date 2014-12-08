@@ -1,33 +1,17 @@
-From 825769499d25bd9caa39e84fc4877a3f2e642990 Mon Sep 17 00:00:00 2001
+From 85d8876bcef07e737302d6f4b79f791e625bb14e Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 19 Feb 2014 15:18:47 +0100
 Subject: [PATCH 2/8] Disable CONFIG_SPL_OS_BOOT
 
 ---
- include/configs/zynq-common.h |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ include/configs/zynq-common.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index 38660c4..f5c425f 100644
+index d601426..9fe5c82 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
-@@ -58,6 +58,7 @@
- #else
- # define CONFIG_EXTRA_ENV_RSA_BOOT ""
- #endif
-+
- /* DCC driver */
- #if defined(CONFIG_ZYNQ_DCC)
- # define CONFIG_ARM_DCC
-@@ -231,6 +232,7 @@
- #ifndef CONFIG_EXTRA_ENV_BOOTSCRIPT
- # define CONFIG_EXTRA_ENV_BOOTSCRIPT "autorun.scr"
- #endif
-+
- /* Default environment */
- #define CONFIG_EXTRA_ENV_SETTINGS	\
- 	"ethaddr=00:0a:35:00:01:22\0"	\
-@@ -449,7 +451,7 @@
+@@ -504,7 +504,7 @@
  #define CONFIG_SYS_SPI_ARGS_OFFS	0 /* FIXME */
  #define CONFIG_SYS_SPI_ARGS_SIZE	0 /* FIXME */
  
@@ -36,7 +20,7 @@ index 38660c4..f5c425f 100644
  #define CONFIG_SPL_FAT_LOAD_KERNEL_NAME		"uImage"
  
  /* Not using MMC raw mode - just for compilation purpose */
-@@ -476,7 +478,7 @@
+@@ -531,7 +531,7 @@
  #endif
  
  /* for booting directly linux */

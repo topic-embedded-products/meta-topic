@@ -1,38 +1,37 @@
-From 1243167640b9f193442a84e62148776dc579cfe2 Mon Sep 17 00:00:00 2001
+From ca9faba6323bf31e0802d7d2aee8aaba23a01c1c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 21 Mar 2014 08:15:48 +0100
 Subject: [PATCH 5/8] Load FPGA from "big" u-boot instead of SPL
 
 ---
- include/configs/zynq-common.h |    7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ include/configs/zynq-common.h |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index bf57592..9551e18 100644
+index 3f1a7e9..8731721 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
-@@ -224,7 +224,9 @@
+@@ -278,7 +278,9 @@
  #  define CONFIG_ENV_IS_NOWHERE
  # endif
  
--# define CONFIG_ENV_SECT_SIZE		CONFIG_ENV_SIZE
 +# ifndef CONFIG_ENV_SECT_SIZE
-+#  define CONFIG_ENV_SECT_SIZE		CONFIG_ENV_SIZE
+ # define CONFIG_ENV_SECT_SIZE		CONFIG_ENV_SIZE
 +# endif
  # ifndef CONFIG_ENV_OFFSET
  #  define CONFIG_ENV_OFFSET		0x60000
  # endif
-@@ -247,7 +249,7 @@
- 	"kernel_image=uImage\0"	\
- 	"ramdisk_image=uramdisk.image.gz\0"	\
+@@ -304,7 +306,7 @@
+ 	"ramdisk_load_address=0x4000000\0"	\
  	"devicetree_image=devicetree.dtb\0"	\
+ 	"devicetree_load_address=0x2000000\0"	\
 -	"bitstream_image=system.bit.bin\0"	\
 +	"bitstream_image=fpga.bin\0"	\
  	"bootscript=" CONFIG_EXTRA_ENV_BOOTSCRIPT "\0" \
  	"loadbit_addr=0x100000\0"	\
  	"loadbootenv_addr=0x2000000\0" \
-@@ -423,7 +425,6 @@
- #endif
+@@ -477,7 +479,6 @@
+ #define CONFIG_SPL_LDSCRIPT	"arch/arm/cpu/armv7/zynq/u-boot-spl.lds"
  
  /* FPGA support */
 -#define CONFIG_SPL_FPGA_SUPPORT

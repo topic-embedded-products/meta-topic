@@ -1,13 +1,13 @@
-From 008f0ffb0e7e4706736d7dfefc36faa801041f05 Mon Sep 17 00:00:00 2001
+From daecc2229abfc7e2da2f90ec58118d559699afd7 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 2 Sep 2014 12:16:02 +0200
 Subject: [PATCH 8/8] Add topic-miami board support
 
 ---
- board/xilinx/dts/topic-miami.dts |   14 ++++++++++
+ board/xilinx/dts/topic-miami.dts |   14 +++++++++
  boards.cfg                       |    1 +
- include/configs/topic_miami.h    |   52 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 67 insertions(+)
+ include/configs/topic_miami.h    |   59 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 74 insertions(+)
  create mode 100644 board/xilinx/dts/topic-miami.dts
  create mode 100644 include/configs/topic_miami.h
 
@@ -45,10 +45,10 @@ index 7beb3c8..af82133 100644
  Active  arm         armv7          zynq        xilinx          zynq                zynq_zc770_XM010                     zynq_zc770:ZC770_XM010                                                                                                             Michal Simek <monstr@monstr.eu>:Jagannadha Sutradharudu Teki <jaganna@xilinx.com>
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
 new file mode 100644
-index 0000000..bf6d9ae
+index 0000000..02b421b
 --- /dev/null
 +++ b/include/configs/topic_miami.h
-@@ -0,0 +1,52 @@
+@@ -0,0 +1,59 @@
 +/*
 + * (C) Copyright 2014 Topic Embedded Products
 + *
@@ -99,6 +99,13 @@ index 0000000..bf6d9ae
 +
 +/* Extras */
 +#define CONFIG_CMD_MEMTEST
++
++/* Faster flash, ours may run at 108 MHz */
++#undef CONFIG_SF_DEFAULT_SPEED
++#define CONFIG_SF_DEFAULT_SPEED	108000000
++#define CONFIG_SF_DEFAULT_MODE SPI_MODE_0
++#undef CONFIG_SF_DUAL_FLASH
++#define CONFIG_ENV_SPI_MAX_HZ CONFIG_SF_DEFAULT_SPEED
 +
 +#endif /* __CONFIG_TOPIC_MIAMI_H */
 -- 

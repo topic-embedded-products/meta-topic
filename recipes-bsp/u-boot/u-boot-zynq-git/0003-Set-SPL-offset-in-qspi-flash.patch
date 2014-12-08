@@ -1,4 +1,4 @@
-From 99b848f3427a9bbe854c58604c7a662390b725d8 Mon Sep 17 00:00:00 2001
+From c7647d5a18ce5686614cbdec6a8d1927dfca4cd6 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 20 Feb 2014 18:13:49 +0100
 Subject: [PATCH 3/8] Set SPL offset in qspi flash
@@ -11,10 +11,10 @@ the environment is stored at 0x60000.
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index f5c425f..dd433c9 100644
+index 9fe5c82..30e590b 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
-@@ -465,7 +465,7 @@
+@@ -518,7 +518,7 @@
  #define CONFIG_SPL_SPI_LOAD
  #define CONFIG_SPL_SPI_FLASH_SUPPORT
  #define CONFIG_SPL_SPI_BUS	0
@@ -23,7 +23,7 @@ index f5c425f..dd433c9 100644
  #define CONFIG_SPL_SPI_CS	0
  #endif
  
-@@ -485,7 +485,7 @@
+@@ -538,7 +538,7 @@
  #define CONFIG_SPL_TEXT_BASE	0x0
  
  /* 3 * 64kB blocks of OCM - one is on the top because of bootrom */

@@ -1,4 +1,4 @@
-From 1f2972d0971d7d06ab5b39901f3c114c3cd65eea Mon Sep 17 00:00:00 2001
+From adc904915b2f156ef1871540abdc88881f8569a9 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 18 Apr 2014 11:15:34 +0200
 Subject: [PATCH 7/8] configs/zynq-common: Don't add parameters to "sf probe"
@@ -18,11 +18,11 @@ any parameters to sf probe.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index 9551e18..c38aaaa 100644
+index 8731721..051f670 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
-@@ -268,7 +268,7 @@
- 		"fatload mmc 0 ${loadbit_addr} ${bitstream_image} && " \
+@@ -325,7 +325,7 @@
+ 		"load mmc 0 ${loadbit_addr} ${bitstream_image} && " \
  		"fpga load 0 ${loadbit_addr} ${filesize}\0" \
  	"qspiboot=echo Booting from QSPI flash... && " \
 -		"sf probe 0 0 0 && " \
