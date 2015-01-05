@@ -2,7 +2,6 @@ DESCRIPTION = "Xilinx Zynq kernel with ADI and Topic extensions"
 SECTION = "kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
-S = "${WORKDIR}/git"
 
 KBRANCH = "topic-miami"
 SRCREV = "0feb6e4839a31309f51c474e2d322f5fd2f9fe1c"
@@ -10,6 +9,8 @@ LINUX_VERSION = "3.17"
 
 inherit kernel
 require recipes-kernel/linux/linux-dtb.inc
+
+S = "${WORKDIR}/git"
 
 # Using LZO compression in the kernel requires "lzop"
 DEPENDS += "lzop-native"
@@ -36,8 +37,6 @@ FILES_kernel-image = "${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}*"
 
 LINUX_VERSION_EXTENSION ?= "-topic"
 
-
-PR = "r0"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
 COMPATIBLE_MACHINE = "topic-miami"
