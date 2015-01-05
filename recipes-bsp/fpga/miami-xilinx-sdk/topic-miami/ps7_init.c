@@ -3828,8 +3828,8 @@ unsigned long ps7_peripherals_init_data_3_0[] = {
     // .. Holdb_dr = 1
     // .. ==> 0XE000D000[19:19] = 0x00000001U
     // ..     ==> MASK : 0x00080000U    VAL : 0x00080000U
-    // .. 
-    EMIT_MASKWRITE(0XE000D000, 0x00080000U ,0x00080000U),
+    // .. (master, clkdiv=2, mode=0)
+    EMIT_MASKWRITE(0XE000D000, 0x000800FFU ,0x000800C1U),
     // .. FINISH: QSPI REGISTERS
     // .. START: PL POWER ON RESET REGISTERS
     // .. PCFG_POR_CNT_4K = 0
