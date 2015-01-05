@@ -16,6 +16,7 @@ SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git;branch=master-next \
 	file://0006-zynq_zc70x.h-Add-missing-CONFIG_SYS_I2C_ZYNQ.patch \
 	file://0007-configs-zynq-common-Don-t-add-parameters-to-sf-probe.patch \
 	file://0008-Add-topic-miami-board-support.patch \
+	file://0001-zynq_qspi.c-Set-correct-frequency-regardless-of-hard.patch \
 	"
 
 S = "${WORKDIR}/git"

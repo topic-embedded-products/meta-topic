@@ -1,0 +1,44 @@
+From b5b625a7996896c57f02ce4dd9f018c349b7d34c Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 19 Dec 2014 15:05:12 +0100
+Subject: [PATCH] zynq_qspi.c: Set correct frequency regardless of hardware
+ setting
+
+The QSPI frequency set by the ROM may not be using the 1/2 clock divider,
+examining the E000D000 register at boot reveils it's usually set to 1/4.
+The driver always assumes it is set at 1/2 at boot, so it does not program
+the clock rate if the requested frequency happens to match that.
+
+This results in the QSPI clock running at 50MHz when 100MHz was requested.
+
+To fix, set the current rate of the master (speed_hz) to "0" at startup, so
+that the driver always programs the clock divider the first time the
+zynq_qspi_setup_transfer method is called. This assures that the QSPI is
+actually running at the requested clock rate.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/spi/zynq_qspi.c |    7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/spi/zynq_qspi.c b/drivers/spi/zynq_qspi.c
+index 818267d..bc076d3 100644
+--- a/drivers/spi/zynq_qspi.c
++++ b/drivers/spi/zynq_qspi.c
+@@ -817,9 +817,10 @@ struct spi_slave *spi_setup_slave(unsigned int bus, unsigned int cs,
+ 	qspi->slave.dio = is_dio;
+ 	qspi->slave.op_mode_rx = SPI_OPM_RX_QOF;
+ 	qspi->slave.op_mode_tx = SPI_OPM_TX_QPP;
+-	qspi->qspi.master.speed_hz = qspi->qspi.master.input_clk_hz / 2;
+-	qspi->qspi.max_speed_hz = (max_hz < qspi->qspi.master.speed_hz) ?
+-								max_hz : qspi->qspi.master.speed_hz;
++	qspi->qspi.master.speed_hz = 0; /* Current setting is unknown */
++	lqspi_frequency = qspi->qspi.master.input_clk_hz / 2;
++	qspi->qspi.max_speed_hz = (max_hz < lqspi_frequency) ?
++								max_hz : lqspi_frequency;
+ 	qspi->qspi.master.is_dio = is_dio;
+ 	qspi->qspi.master.is_dual = is_dual;
+ 	qspi->qspi.mode = mode;
+-- 
+1.7.9.5
+
