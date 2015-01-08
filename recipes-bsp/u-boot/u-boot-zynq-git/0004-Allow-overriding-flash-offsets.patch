@@ -1,7 +1,7 @@
 From 41a442b763954bbb2109b69ee700bbe806b2be2a Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 26 Feb 2014 12:03:36 +0100
-Subject: [PATCH 4/8] Allow overriding flash offsets.
+Subject: [PATCH 04/10] Allow overriding flash offsets.
 
 Modify zynq-xommon.h to allow a board include to specify which
 addresses to use in flash (because of sector alignment).

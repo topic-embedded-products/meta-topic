@@ -1,0 +1,43 @@
+From dc5b50536d45f8a8adc5d3600d78b3780428529c Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 8 Jan 2015 12:17:05 +0100
+Subject: [PATCH 10/10] spi_spl_load.c: Respect CONFIG_SF_DEFAULT_MODE setting
+
+The SPL SPI load code uses CONFIG_SF_DEFAULT_SPEED but had the
+SPI_MODE_3 hardcoded. Choose the mode CONFIG_SF_DEFAULT_MODE if
+this has been set in the configuration so that this matches what
+the "full" u-boot will use later, and to allow any mode to be used
+for loading images in SPL.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/mtd/spi/spi_spl_load.c |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/mtd/spi/spi_spl_load.c b/drivers/mtd/spi/spi_spl_load.c
+index 1954b7e..3626f8e 100644
+--- a/drivers/mtd/spi/spi_spl_load.c
++++ b/drivers/mtd/spi/spi_spl_load.c
+@@ -13,6 +13,10 @@
+ #include <spi_flash.h>
+ #include <spl.h>
+ 
++#ifndef CONFIG_SF_DEFAULT_MODE
++# define CONFIG_SF_DEFAULT_MODE		SPI_MODE_3
++#endif
++
+ #ifdef CONFIG_SPL_OS_BOOT
+ /*
+  * Load the kernel, check for a valid header we can parse, and if found load
+@@ -57,7 +61,7 @@ void spl_spi_load_image(void)
+ 	 */
+ 
+ 	flash = spi_flash_probe(CONFIG_SPL_SPI_BUS, CONFIG_SPL_SPI_CS,
+-				CONFIG_SF_DEFAULT_SPEED, SPI_MODE_3);
++				CONFIG_SF_DEFAULT_SPEED, CONFIG_SF_DEFAULT_MODE);
+ 	if (!flash) {
+ 		puts("SPI probe failed.\n");
+ 		hang();
+-- 
+1.7.9.5
+

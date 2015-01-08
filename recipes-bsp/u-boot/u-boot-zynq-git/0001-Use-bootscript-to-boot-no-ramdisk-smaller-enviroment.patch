@@ -1,7 +1,7 @@
 From be27969913760baa80b653c86318c1181a72dd36 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 27 Jan 2014 08:17:34 +0100
-Subject: [PATCH 1/8] Use bootscript to boot, no ramdisk, smaller enviroment
+Subject: [PATCH 01/10] Use bootscript to boot, no ramdisk, smaller enviroment
 
 Check for autorun bootscript and run it from SD.
 Boot without ramdisk because we expect real filesystems (ubi or ext4).

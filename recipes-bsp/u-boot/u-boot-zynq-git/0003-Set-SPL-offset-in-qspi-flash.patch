@@ -1,7 +1,7 @@
 From c7647d5a18ce5686614cbdec6a8d1927dfca4cd6 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 20 Feb 2014 18:13:49 +0100
-Subject: [PATCH 3/8] Set SPL offset in qspi flash
+Subject: [PATCH 03/10] Set SPL offset in qspi flash
 
 To allow existing images to boot, set the offset to 64k, so the second
 sector contains u-boot.img. Otherwise there isn't enough room because

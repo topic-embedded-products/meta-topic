@@ -1,8 +1,8 @@
 From adc904915b2f156ef1871540abdc88881f8569a9 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 18 Apr 2014 11:15:34 +0200
-Subject: [PATCH 7/8] configs/zynq-common: Don't add parameters to "sf probe"
- command
+Subject: [PATCH 07/10] configs/zynq-common: Don't add parameters to "sf
+ probe" command
 
 When booting from QSPI flash, the system "hangs" for a few seconds
 between reading the devicetree and reading the kernel.
