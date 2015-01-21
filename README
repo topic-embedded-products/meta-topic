@@ -41,10 +41,19 @@ for more information on how to do that.
 --- Yocto ---
 
 For Yocto, clone this repository to a local directory, and add it to the
-conf/bblayers.conf file. Change your MACHINE to "topic-miami-florida-med-xc7z015"
-or "topic-miami-florida-gen-xc7z030" for example, depending on the board
-you have, and bitbake core-image-minimal. See also the Yocto Quick start
-for more information:
+conf/bblayers.conf file. It should have a BBLAYERS that looks like this:
+BBLAYERS ?= " \
+  ${HOME}/poky/meta \
+  ${HOME}/poky/meta-yocto \
+  ${HOME}/poky/meta-yocto-bsp \
+  ${HOME}/poky/meta-oe/meta-oe \
+  ${HOME}/poky/meta-zynq \
+  "
+
+Change your MACHINE to, for example, "topic-miami-florida-med-xc7z015" or
+"topic-miami-florida-gen-xc7z030", depending on the board you have, and
+bitbake core-image-minimal. See also the Yocto Quick start for more
+information:
 http://www.yoctoproject.org/docs/1.6.1/yocto-project-qs/yocto-project-qs.html
 
 A few recipes still require the "gitpkgv" class from meta-openembedded.
