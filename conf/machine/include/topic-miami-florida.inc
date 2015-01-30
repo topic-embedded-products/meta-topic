@@ -10,7 +10,6 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-adv7511 \
 	kernel-module-adv7604 \
 	kernel-module-axi-hdmi-rx \
-	kernel-module-backlight \
 	kernel-module-bitblit \
 	kernel-module-clk-axi-clkgen \
 	kernel-module-drm-kms-helper \

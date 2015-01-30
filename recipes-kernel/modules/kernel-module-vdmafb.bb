@@ -10,7 +10,6 @@ RRECOMMENDS_${PN} = "\
 
 do_install_append() {
 	install -d ${D}/etc/modules-load.d
-	echo "backlight" > ${D}/etc/modules-load.d/${MODULE}.conf
 	echo "xilinx_dma" > ${D}/etc/modules-load.d/${MODULE}.conf
 	echo "${MODULE}" >> ${D}/etc/modules-load.d/${MODULE}.conf
 }

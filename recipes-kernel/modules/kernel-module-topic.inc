@@ -5,8 +5,8 @@ MODULE = "${@d.getVar('PN', True).split('-')[-1]}"
 
 inherit module gitpkgv
 
-PV = "2+${SRCPV}"
-PKGV = "2+${GITPKGV}"
+PV = "3+${SRCPV}"
+PKGV = "3+${GITPKGV}"
 S = "${WORKDIR}/git"
 SRCREV = "${AUTOREV}"
 
