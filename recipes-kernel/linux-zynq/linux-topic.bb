@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 KBRANCH = "topic-miami"
-SRCREV = "0b92b6b3641cd38f8285a84813aa5b36eceb0ce9"
+SRCREV = "88afe3d166c20b2bfad6507a001f4122a7bc0c60"
 LINUX_VERSION = "3.17"
 
 inherit kernel
@@ -27,8 +27,14 @@ SRC_URI = "\
 	"
 
 KERNEL_IMAGETYPE = "uImage"
-KERNEL_DEVICETREE = "arch/arm/boot/dts/${MACHINE}-dyplo.dts"
-KERNEL_DEVICETREE_topic-miami = "arch/arm/boot/dts/topic-miami-dyplo.dts"
+KERNEL_DEVICETREE = "arch/arm/boot/dts/${MACHINE}.dts"
+KERNEL_DEVICETREE_topic-miami = "\
+	arch/arm/boot/dts/topic-miami-dyplo.dts \
+	arch/arm/boot/dts/topic-miami-florida-gen.dts \
+	arch/arm/boot/dts/topic-miami-florida-med.dts \
+	arch/arm/boot/dts/topic-miami-florida-pci.dts \
+	arch/arm/boot/dts/topic-miami-vice.dts \
+	"
 # See http://permalink.gmane.org/gmane.linux.kernel.commits.head/371588
 KERNEL_EXTRA_ARGS += "LOADADDR=0x00008000"
 KERNEL_IMAGEDEST = "tmp/boot"
