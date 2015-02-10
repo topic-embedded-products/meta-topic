@@ -22,11 +22,13 @@ MY_THINGS = "\
 
 # Skip packagegroup-base to reduce the number of packages built. Thus, we need
 # to include the MACHINE_EXTRA_ stuff ourselves.
+IMAGE_INSTALL_MACHINE_EXTRAS ?= "packagegroup-machine-base"
+
 IMAGE_INSTALL = "\
 	packagegroup-core-boot \
 	packagegroup-core-ssh-dropbear \
 	packagegroup-distro-base \
-	packagegroup-machine-base \
+	${IMAGE_INSTALL_MACHINE_EXTRAS} \
 	${ROOTFS_PKGMANAGE} \
 	${MY_THINGS} \
 	"
