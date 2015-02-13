@@ -8,7 +8,7 @@ addresses to use in flash (because of sector alignment).
 
 Name bitstream "fpga.bin". Remove unused environment vars.
 ---
- include/configs/zynq-common.h |   25 +++++++++++++++++++++----
+ include/configs/zynq-common.h | 25 +++++++++++++++++++++----
  1 file changed, 21 insertions(+), 4 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
@@ -91,5 +91,5 @@ index 30e590b..3f1a7e9 100644
  
  /* The highest 64k OCM address */
 -- 
-1.7.9.5
+1.9.1
 

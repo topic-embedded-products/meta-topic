@@ -4,7 +4,7 @@ Date: Wed, 19 Feb 2014 15:18:47 +0100
 Subject: [PATCH 02/10] Disable CONFIG_SPL_OS_BOOT
 
 ---
- include/configs/zynq-common.h |    4 ++--
+ include/configs/zynq-common.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
@@ -30,5 +30,5 @@ index d601426..9fe5c82 100644
  
  /* SP location before relocation, must use scratch RAM */
 -- 
-1.7.9.5
+1.9.1
 

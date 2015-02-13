@@ -4,7 +4,7 @@ Date: Fri, 21 Mar 2014 08:15:48 +0100
 Subject: [PATCH 05/10] Load FPGA from "big" u-boot instead of SPL
 
 ---
- include/configs/zynq-common.h |    5 +++--
+ include/configs/zynq-common.h | 5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
@@ -39,5 +39,5 @@ index 3f1a7e9..8731721 100644
  /* #define CONFIG_SPL_FPGA_BIT */
  #ifdef CONFIG_SPL_FPGA_BIT
 -- 
-1.7.9.5
+1.9.1
 

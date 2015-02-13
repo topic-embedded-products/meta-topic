@@ -1,8 +1,8 @@
 From adc904915b2f156ef1871540abdc88881f8569a9 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 18 Apr 2014 11:15:34 +0200
-Subject: [PATCH 07/10] configs/zynq-common: Don't add parameters to "sf
- probe" command
+Subject: [PATCH 07/10] configs/zynq-common: Don't add parameters to "sf probe"
+ command
 
 When booting from QSPI flash, the system "hangs" for a few seconds
 between reading the devicetree and reading the kernel.
@@ -14,7 +14,7 @@ environment from flash somehow.
 "sf probe 0 0 0" triggers this, "sf probe" does not. So do not pass
 any parameters to sf probe.
 ---
- include/configs/zynq-common.h |    2 +-
+ include/configs/zynq-common.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
@@ -31,5 +31,5 @@ index 8731721..051f670 100644
  		"sf read ${kernel_addr} " STR(CONFIG_SYS_SPI_UIMAGE_OFFS) " ${kernel_size} && " \
  		"bootm ${kernel_addr} - 0x2A00000\0" \
 -- 
-1.7.9.5
+1.9.1
 

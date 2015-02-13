@@ -1,4 +1,4 @@
-From dc5b50536d45f8a8adc5d3600d78b3780428529c Mon Sep 17 00:00:00 2001
+From beb478a335d6b2504324546586fad9312b75a33e Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 8 Jan 2015 12:17:05 +0100
 Subject: [PATCH 10/10] spi_spl_load.c: Respect CONFIG_SF_DEFAULT_MODE setting
@@ -11,7 +11,7 @@ for loading images in SPL.
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 ---
- drivers/mtd/spi/spi_spl_load.c |    6 +++++-
+ drivers/mtd/spi/spi_spl_load.c | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/mtd/spi/spi_spl_load.c b/drivers/mtd/spi/spi_spl_load.c
@@ -39,5 +39,5 @@ index 1954b7e..3626f8e 100644
  		puts("SPI probe failed.\n");
  		hang();
 -- 
-1.7.9.5
+1.9.1
 

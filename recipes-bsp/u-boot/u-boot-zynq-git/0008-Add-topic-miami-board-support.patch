@@ -1,13 +1,13 @@
-From 0af474c5c15960e888d5f7ad61d49b00c31e7bff Mon Sep 17 00:00:00 2001
+From c3023dc153229cf2ef81fd2e8aebb2f3a4c0ddf3 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 2 Sep 2014 12:16:02 +0200
 Subject: [PATCH 08/10] Add topic-miami board support
 
 ---
- board/xilinx/dts/topic-miami.dts |   14 +++++++++
- boards.cfg                       |    1 +
- include/configs/topic_miami.h    |   60 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 75 insertions(+)
+ board/xilinx/dts/topic-miami.dts | 14 ++++++++++
+ boards.cfg                       |  1 +
+ include/configs/topic_miami.h    | 56 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 71 insertions(+)
  create mode 100644 board/xilinx/dts/topic-miami.dts
  create mode 100644 include/configs/topic_miami.h
 
@@ -45,10 +45,10 @@ index 7beb3c8..af82133 100644
  Active  arm         armv7          zynq        xilinx          zynq                zynq_zc770_XM010                     zynq_zc770:ZC770_XM010                                                                                                             Michal Simek <monstr@monstr.eu>:Jagannadha Sutradharudu Teki <jaganna@xilinx.com>
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
 new file mode 100644
-index 0000000..b140dfe
+index 0000000..93f8915
 --- /dev/null
 +++ b/include/configs/topic_miami.h
-@@ -0,0 +1,60 @@
+@@ -0,0 +1,56 @@
 +/*
 + * (C) Copyright 2014 Topic Embedded Products
 + *
@@ -90,11 +90,7 @@ index 0000000..b140dfe
 +
 +#include "zynq-common.h"
 +
-+/* No FPGA support required */
-+#undef CONFIG_FPGA
-+#undef CONFIG_FPGA_XILINX
-+#undef CONFIG_FPGA_ZYNQPL
-+#undef CONFIG_CMD_FPGA
++/* CONFIG_FPGA_LOADFS is broken anyway */
 +#undef CONFIG_FPGA_LOADFS
 +
 +/* Extras */
@@ -110,5 +106,5 @@ index 0000000..b140dfe
 +
 +#endif /* __CONFIG_TOPIC_MIAMI_H */
 -- 
-1.7.9.5
+1.9.1
 

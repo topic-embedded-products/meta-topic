@@ -1,8 +1,7 @@
 # Miami board common components
 require conf/machine/include/topic-miami.inc
 
-# TODO: Need a PCIe reference design
-MACHINE_FPGA_BITSTREAM ?= "fpga-image-miami-florida-gen-reference"
+MACHINE_FPGA_BITSTREAM ?= "fpga-image-miami-florida-pci-reference"
 
 # Extra packages to install for the board
 BOARD_FPGA_PACKAGES ?= "\

@@ -1,4 +1,4 @@
-From 2d925321d96cdc5c6a1d193a3841e502f030ead1 Mon Sep 17 00:00:00 2001
+From 3e2f9fa4fb84f158d8c6ccdd2020396b7bd6ed18 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 8 Jan 2015 09:30:51 +0100
 Subject: [PATCH 09/10] zynq_qspi.c: Set correct frequency regardless of
@@ -19,7 +19,7 @@ actually running at the requested clock rate.
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 Signed-off-by: Michal Simek <michal.simek@xilinx.com>
 ---
- drivers/spi/zynq_qspi.c |    5 ++---
+ drivers/spi/zynq_qspi.c | 5 ++---
  1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/spi/zynq_qspi.c b/drivers/spi/zynq_qspi.c
@@ -39,5 +39,5 @@ index 818267d..215b26f 100644
  	qspi->qspi.master.is_dual = is_dual;
  	qspi->qspi.mode = mode;
 -- 
-1.7.9.5
+1.9.1
 

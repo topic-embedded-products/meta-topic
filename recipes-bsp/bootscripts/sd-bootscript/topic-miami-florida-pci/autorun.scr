@@ -1,0 +1,11 @@
+echo FPGA
+if fatload mmc 0 0x100000 fpga.bin
+then
+	fpga load 0 0x100000 $filesize
+fi
+echo "Kernel..."
+fatload mmc 0 ${kernel_addr} ${kernel_image}
+fatload mmc 0 0x2A00000 ${devicetree_image}
+setenv bootargs "console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootfstype=ext4 rootwait quiet"
+echo "Booting..."
+bootm ${kernel_addr} - 0x2A00000

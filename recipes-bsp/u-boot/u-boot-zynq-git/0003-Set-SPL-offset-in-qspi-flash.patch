@@ -7,7 +7,7 @@ To allow existing images to boot, set the offset to 64k, so the second
 sector contains u-boot.img. Otherwise there isn't enough room because
 the environment is stored at 0x60000.
 ---
- include/configs/zynq-common.h |    4 ++--
+ include/configs/zynq-common.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
@@ -33,5 +33,5 @@ index 9fe5c82..30e590b 100644
  
  /* The highest 64k OCM address */
 -- 
-1.7.9.5
+1.9.1
 

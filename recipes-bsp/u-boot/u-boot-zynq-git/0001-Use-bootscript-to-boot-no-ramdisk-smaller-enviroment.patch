@@ -9,7 +9,7 @@ Set SPI speed to 50MHz (most chips can even do 100 with fast_read).
 Omit environments that can't be used (e.g. NOR, NAND, RSA) when their
 configs aren't defined.
 ---
- include/configs/zynq-common.h |  155 +++++++++++++++++++++--------------------
+ include/configs/zynq-common.h | 155 ++++++++++++++++++++++--------------------
  1 file changed, 81 insertions(+), 74 deletions(-)
 
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
@@ -294,5 +294,5 @@ index 67083c1..d601426 100644
  #define CONFIG_SPL
  #define CONFIG_CMD_SPL
 -- 
-1.7.9.5
+1.9.1
 

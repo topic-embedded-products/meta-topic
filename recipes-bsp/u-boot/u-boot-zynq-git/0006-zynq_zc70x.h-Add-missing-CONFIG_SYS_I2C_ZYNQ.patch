@@ -7,7 +7,7 @@ Fix compilation error:
 common/cmd_eeprom.c:164: undefined reference to `i2c_read'
 common/cmd_eeprom.c:342: undefined reference to `i2c_write'
 ---
- include/configs/zynq_zc70x.h |    1 +
+ include/configs/zynq_zc70x.h | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/include/configs/zynq_zc70x.h b/include/configs/zynq_zc70x.h
@@ -23,5 +23,5 @@ index cdcba34..afdb4f5 100644
  #define CONFIG_ZYNQ_USB
  #define CONFIG_ZYNQ_QSPI
 -- 
-1.7.9.5
+1.9.1
 
