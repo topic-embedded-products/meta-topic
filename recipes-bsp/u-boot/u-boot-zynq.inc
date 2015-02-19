@@ -18,6 +18,7 @@ SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git;branch=master-next \
 	file://0008-Add-topic-miami-board-support.patch \
 	file://0009-zynq_qspi.c-Set-correct-frequency-regardless-of-hard.patch \
 	file://0010-spi_spl_load.c-Respect-CONFIG_SF_DEFAULT_MODE-settin.patch \
+	file://0001-topic_miami-Do-not-load-environment.patch \
 	"
 
 S = "${WORKDIR}/git"

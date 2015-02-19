@@ -1,0 +1,27 @@
+From a7a707bf5faa778f003269f73d28237931f228ee Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 19 Feb 2015 11:36:48 +0100
+Subject: [PATCH] topic_miami: Do not load environment
+
+Speed up booting a bit, we've never used the environment for anything.
+---
+ include/configs/topic_miami.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
+index 93f8915..663be46 100644
+--- a/include/configs/topic_miami.h
++++ b/include/configs/topic_miami.h
+@@ -37,6 +37,9 @@
+ /* I2C test stuff */
+ #define CONFIG_SYS_I2C_ZYNQ
+ 
++/* Speed up boot time by ignoring the environment which we never used */
++#define CONFIG_ENV_IS_NOWHERE
++
+ #include "zynq-common.h"
+ 
+ /* CONFIG_FPGA_LOADFS is broken anyway */
+-- 
+1.9.1
+
