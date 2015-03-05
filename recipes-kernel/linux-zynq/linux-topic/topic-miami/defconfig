@@ -2903,7 +2903,7 @@ CONFIG_XILINX_XADC=y
 #
 # Digital to analog converters
 #
-# CONFIG_AD5064 is not set
+CONFIG_AD5064=m
 # CONFIG_AD5270 is not set
 # CONFIG_AD5360 is not set
 # CONFIG_AD5380 is not set
