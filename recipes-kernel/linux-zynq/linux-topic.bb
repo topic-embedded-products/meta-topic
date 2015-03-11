@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 KBRANCH = "topic-miami"
-SRCREV = "4742948c6c7964bca5645052b0b79b4ad9afdc78"
+SRCREV = "61d24ea14a74ccfebd25e16c96244bcbc885b8b4"
 LINUX_VERSION = "3.18"
 
 inherit kernel
@@ -35,6 +35,7 @@ KERNEL_DEVICETREE_topic-miami = "\
 	arch/arm/boot/dts/topic-miami-florida-med.dts \
 	arch/arm/boot/dts/topic-miami-florida-med-pt.dts \
 	arch/arm/boot/dts/topic-miami-florida-pci.dts \
+	arch/arm/boot/dts/topic-miami-florida-pci-pt.dts \
 	arch/arm/boot/dts/topic-miami-vice.dts \
 	"
 # See http://permalink.gmane.org/gmane.linux.kernel.commits.head/371588
