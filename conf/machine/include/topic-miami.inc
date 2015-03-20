@@ -32,7 +32,7 @@ PREFERRED_PROVIDER_virtual/xilinx-sdk = "miami-xilinx-sdk"
 UBOOT_MACHINE = "topic_miami_config"
 
 KERNEL_MODULE_AUTOLOAD ?= ""
-KERNEL_MODULE_AUTOLOAD += "xilinx_emacps rsi_sdio g_ether"
+KERNEL_MODULE_AUTOLOAD += "xilinx_emacps rsi_sdio g_ether spi-cadence"
 
 MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-ltc2990 \
