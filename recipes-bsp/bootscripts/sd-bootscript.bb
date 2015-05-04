@@ -10,6 +10,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 SRC_URI = "file://autorun.scr"
 
+S = "${WORKDIR}"
+
 do_compile () {
 	oe_mkimage_script -n "autorun" -d ${WORKDIR}/autorun.scr ${S}/autorun.uimage.scr
 }

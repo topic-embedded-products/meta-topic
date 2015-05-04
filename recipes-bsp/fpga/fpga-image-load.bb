@@ -1,12 +1,14 @@
 DESCRIPTION = "FPGA bitstream image loader, loads fpga.bin early at boot"
-# We don't need libc or gcc or whatever
-INHIBIT_DEFAULT_DEPS = "1"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaabaa882bbe"
 # Package is machine independent (shell script only)
-PACKAGE_ARCH = "all"
+inherit allarch
+
+PACKAGES = "${PN}"
 
 SRC_URI = "file://init"
+
+S = "${WORKDIR}"
 
 inherit update-rc.d
 
