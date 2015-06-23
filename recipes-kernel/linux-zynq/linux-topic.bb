@@ -4,8 +4,8 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 KBRANCH = "topic-miami"
-SRCREV = "cbb2f7b43d84bc90d601c43a6f038dca54f3b336"
-LINUX_VERSION = "3.19"
+SRCREV = "79cc33fcabe013de2e183a60e1e0b80f6c08b83f"
+LINUX_VERSION = "4.0"
 
 inherit kernel
 require recipes-kernel/linux/linux-dtb.inc
