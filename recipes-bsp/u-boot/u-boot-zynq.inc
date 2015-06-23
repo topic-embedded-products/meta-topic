@@ -16,3 +16,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 # Workaround for borked SSL dependendy
 DEPENDS += "openssl-native"
 EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC}" HOSTCFLAGS="${BUILD_CFLAGS}" HOSTLD="${BUILD_LD}" HOSTLDFLAGS="${BUILD_LDFLAGS}"'
+
+# For flows that need it (Xilinx SDSoc), provide the bin file too
+do_deploy_append() {
+	install ${S}/u-boot.bin ${DEPLOYDIR}/
+}
