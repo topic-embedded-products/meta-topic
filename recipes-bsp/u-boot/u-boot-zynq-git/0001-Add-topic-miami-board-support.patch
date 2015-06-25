@@ -144,7 +144,7 @@ index 0000000..a3e70e3
 +
 +/* Extras */
 +#define CONFIG_CMD_MEMTEST
-+#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_SDRAM_BASE + 0x8000000)
++#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_SDRAM_BASE + 0x18000000)
 +
 +/* Faster flash, ours may run at 108 MHz */
 +#undef CONFIG_SF_DEFAULT_SPEED
