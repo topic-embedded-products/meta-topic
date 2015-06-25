@@ -1,0 +1,63 @@
+From dff70cf571ef8cc8c10299663a02585f37b6586a Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 25 Jun 2015 11:25:55 +0200
+Subject: [PATCH] topic-miami SDSoc bootmode
+
+This patch changes the default boot script to load a ramdisk from SD
+and boot with that. This could have been accomplished with a simple
+bootscript, but SDSoc apparently doesn't support that.
+---
+ include/configs/topic_miami.h | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
+index c7ea2c1..05df536 100644
+--- a/include/configs/topic_miami.h
++++ b/include/configs/topic_miami.h
+@@ -19,7 +19,6 @@
+ #define CONFIG_SYS_NO_FLASH
+ /* SD and QSPI support. SD/USB is only availabe with a carrier board. */
+ #define CONFIG_ZYNQ_SDHCI0
+-#define CONFIG_ZYNQ_QSPI
+ /* #define CONFIG_ZYNQ_USB */
+ 
+ /* NAND SPL support for zynq is not available yet! */
+@@ -42,6 +41,8 @@
+ 
+ #include "zynq-common.h"
+ 
++#undef CONFIG_CMD_SPL
++
+ /* Fixup settings */
+ #define CONFIG_ENV_SIZE			0x10000
+ #define CONFIG_ENV_OFFSET		0x60000
+@@ -67,7 +68,6 @@
+ #undef CONFIG_CMD_EXT4_WRITE
+ 
+ /* Extras */
+-#define CONFIG_CMD_MEMTEST
+ #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_SDRAM_BASE + 0x18000000)
+ 
+ /* Faster flash, ours may run at 108 MHz */
+@@ -125,15 +125,16 @@
+ 		"sf read ${kernel_addr} 0x80000 ${kernel_size} && " \
+ 		"bootm ${kernel_addr} - ${devicetree_addr}\0" \
+ 	"sdboot=if mmcinfo; then " \
+-			"setenv bootargs console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootfstype=ext4 rootwait quiet ; " \
+ 			"load mmc 0 ${kernel_addr} ${kernel_image} && " \
+ 			"load mmc 0 ${devicetree_addr} ${devicetree_image} && " \
++			"load mmc 0 ${ramdisk_load_address} uramdisk.image.squashfs-xz && " \
++			"setenv bootargs console=ttyPS0,115200 root=/dev/ram0 initrd=${ramdisk_load_address},0x${filesize} && " \
+ 			"bootm ${kernel_addr} - ${devicetree_addr}; " \
+ 		"fi\0" \
+ 	CONFIG_EXTRA_ENV_USB \
+ 	DFU_ALT_INFO
+ 
+-#define CONFIG_BOOTCOMMAND	"if mmcinfo; then if fatload mmc 0 0x1900000 ${bootscript}; then source 0x1900000; fi; fi; run $modeboot"
++#define CONFIG_BOOTCOMMAND	"run $modeboot"
+ #define CONFIG_ZERO_BOOTDELAY_CHECK
+ #define CONFIG_BOOTDELAY	0
+ 
+-- 
+1.9.1
+
