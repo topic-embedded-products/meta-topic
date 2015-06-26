@@ -3,10 +3,11 @@ boards.
 
 This is an overlay intended for OpenEmbedded and/or Yocto.
 
---- OpenEmbedded ---
+# OpenEmbedded
 
 Here's a quick script for OE:
 
+```
 mkdir my-zynq
 cd my-zynq
 git clone git://git.openembedded.org/openembedded-core oe-core
@@ -28,6 +29,7 @@ vi conf/local.conf
 # Then build your first image and relax a bit:
 . ./profile
 nice bitbake my-image
+````
 
 Note that "my-image" was designed to be used with DISTRO=tiny. It
 expects to run with busybox-mdev instead of udev.
@@ -38,10 +40,11 @@ be loaded into RAM using JTAG and run from there, see README-JTAGBOOT
 for more information on how to do that.
 
 
---- Yocto ---
+# Yocto
 
 For Yocto, clone this repository to a local directory, and add it to the
 conf/bblayers.conf file. It should have a BBLAYERS that looks like this:
+````
 BBLAYERS ?= " \
   ${HOME}/poky/meta \
   ${HOME}/poky/meta-yocto \
@@ -49,6 +52,7 @@ BBLAYERS ?= " \
   ${HOME}/poky/meta-oe/meta-oe \
   ${HOME}/poky/meta-zynq \
   "
+````
 
 Change your MACHINE to, for example, "topic-miami-florida-med-xc7z015" or
 "topic-miami-florida-gen-xc7z030", depending on the board you have, and
@@ -62,7 +66,7 @@ the path to its "meta-oe" subdirectory to the conf/bblayers.conf list.
 Getting rid of this meta-oe dependency is still on my TODO list.
 
 
---- BOOT ---
+# BOOT
 
 The simplest way to boot the resulting image is to place it on an SD
 card. The scripts/partition-sd-card.sh script formats an SD card so it
@@ -76,7 +80,7 @@ jumpers on the miami to boot from SD (01010110) and switch on the power
 supply.
 
 
---- Additional information ---
+# Additional information
 
 In order to properly use the zynq for anything useful, you will need to
 build a bitstream image using the Xilinx tools. README-LOGIC contains
@@ -93,7 +97,7 @@ components, as to separate the board support package for Topic Miami
 boards, the Dyplo framework and the tiny distro.
 
 
---- Contact ---
+# Contact
 
 For questions or comments, contact Topic Embedded Products via the website:
 http://www.topicembeddedproducts.com/
