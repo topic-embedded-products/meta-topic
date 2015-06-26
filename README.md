@@ -50,7 +50,7 @@ BBLAYERS ?= " \
   ${HOME}/poky/meta-yocto \
   ${HOME}/poky/meta-yocto-bsp \
   ${HOME}/poky/meta-oe/meta-oe \
-  ${HOME}/poky/meta-zynq \
+  ${HOME}/poky/meta-topic \
   "
 ````
 
@@ -69,9 +69,9 @@ Getting rid of this meta-oe dependency is still on my TODO list.
 # BOOT
 
 The simplest way to boot the resulting image is to place it on an SD
-card. The scripts/partition-sd-card.sh script formats an SD card so it
+card. The `scripts/partition-sd-card.sh` script formats an SD card so it
 can be used directly. This needs to be done only once for a card.
-The install-to-sd scripts copy the required files to the card. You'll
+The `install-to-sd...` scripts copy the required files to the card. You'll
 have to run these scripts as root, as they require low-level access to
 the SD card.
 
@@ -82,19 +82,18 @@ supply.
 
 # Additional information
 
-In order to properly use the zynq for anything useful, you will need to
-build a bitstream image using the Xilinx tools. README-LOGIC contains
-some tips on that (mainly for myself because I keep forgetting these
-tricks).
+In order to properly use the Zynq for anything useful, you will need to
+build a bitstream image using the Xilinx tools.
 
 This started as a fork of Ballister's OE environment for Zynq boards.
 
-This repository also contains support for Dyplo, see
-http://www.topicembeddedproducts.com/products/dyplo/
+Support for Dyplo, which is not directly related to the hardware in this
+layer, is provided by `meta-dyplo`:
+https://github.com/topic-embedded-products/meta-dyplo
 
 In future, this OpenEmbedded overlay is to be split up into several
 components, as to separate the board support package for Topic Miami
-boards, the Dyplo framework and the tiny distro.
+boards and the tiny distro.
 
 
 # Contact
