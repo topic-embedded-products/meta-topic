@@ -1,14 +1,15 @@
-From 8e3dc23012278e33dd5368d76b5bdedea907e570 Mon Sep 17 00:00:00 2001
+From bc69e49bdfa6f817ceb49adfbdb78ba5c975da86 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 2 Sep 2014 12:16:02 +0200
 Subject: [PATCH] Add topic-miami board support
 
+Add support for the topic-miami SOM and associated Florida carrier boards.
 ---
- arch/arm/cpu/armv7/zynq/Kconfig  |   4 ++
+ arch/arm/cpu/armv7/zynq/Kconfig  |   4 +
  board/xilinx/dts/topic-miami.dts |  14 ++++
- configs/topic_miami_defconfig    |  11 ++++
- include/configs/topic_miami.h    | 137 +++++++++++++++++++++++++++++++++++++++
- 4 files changed, 166 insertions(+)
+ configs/topic_miami_defconfig    |  11 +++
+ include/configs/topic_miami.h    | 155 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 184 insertions(+)
  create mode 100644 board/xilinx/dts/topic-miami.dts
  create mode 100644 configs/topic_miami_defconfig
  create mode 100644 include/configs/topic_miami.h
@@ -73,10 +74,10 @@ index 0000000..62f4a12
 +CONFIG_DM=y
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
 new file mode 100644
-index 0000000..a3e70e3
+index 0000000..689cd97
 --- /dev/null
 +++ b/include/configs/topic_miami.h
-@@ -0,0 +1,137 @@
+@@ -0,0 +1,155 @@
 +/*
 + * (C) Copyright 2014 Topic Embedded Products
 + *
@@ -99,7 +100,7 @@ index 0000000..a3e70e3
 +/* SD and QSPI support. SD/USB is only availabe with a carrier board. */
 +#define CONFIG_ZYNQ_SDHCI0
 +#define CONFIG_ZYNQ_QSPI
-+/* #define CONFIG_ZYNQ_USB */
++#define CONFIG_ZYNQ_USB
 +
 +/* NAND SPL support for zynq is not available yet! */
 +#ifdef ZYNQ_NAND_SPL_IMPLEMENTED
@@ -128,6 +129,9 @@ index 0000000..a3e70e3
 +#define CONFIG_SPL_MAX_FOOTPRINT	0x10000
 +#define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME     "u-boot.img"
 +
++/* sspi command isn't useful */
++#undef CONFIG_CMD_SPI
++
 +/* No useful gpio */
 +#undef CONFIG_ZYNQ_GPIO
 +#undef CONFIG_CMD_GPIO
@@ -141,6 +145,12 @@ index 0000000..a3e70e3
 +/* No need to write to filesystems */
 +#undef CONFIG_FAT_WRITE
 +#undef CONFIG_CMD_EXT4_WRITE
++
++/* FPGA commands that we don't use */
++#undef CONFIG_CMD_FPGA_LOADMK
++#undef CONFIG_CMD_FPGA_LOADP
++#undef CONFIG_CMD_FPGA_LOADBP
++#undef CONFIG_CMD_FPGA_LOADFS
 +
 +/* Extras */
 +#define CONFIG_CMD_MEMTEST
@@ -161,7 +171,8 @@ index 0000000..a3e70e3
 +
 +#ifdef CONFIG_ZYNQ_USB
 +# define CONFIG_EXTRA_ENV_USB \
-+	"usbboot=if usb start; then " \
++	"usbreset=i2c dev 1 && i2c mw 41 1 ff && i2c mw 41 3 fe && i2c mw 41 1 fe && i2c mw 41 1 ff\0" \
++	"usbboot=run usbreset && if usb start; then " \
 +			"echo Booting from USB... && " \
 +			"if load usb 0 0x1900000 ${bootscript}; then source 0x1900000; fi; " \
 +			"load usb 0 ${kernel_addr} ${kernel_image} && " \
@@ -169,6 +180,14 @@ index 0000000..a3e70e3
 +			"load usb 0 ${ramdisk_load_address} ${ramdisk_image} && " \
 +			"bootm ${kernel_addr} ${ramdisk_load_address} ${devicetree_addr}; " \
 +		"fi\0"
++  /* Note that addresses here should match the addresses in the env */
++# define DFU_ALT_INFO \
++	"dfu_alt_info=" \
++	"uImage ram 0x2080000 0x500000;" \
++	"devicetree.dtb ram 0x2000000 0x20000;" \
++	"uramdisk.image.gz ram 0x4000000 0x10000000\0" \
++	"dfu_ram=run usbreset && dfu 0 ram 0\0" \
++	"thor_ram=run usbreset && thordown 0 ram 0\0"
 +#else
 +# define CONFIG_EXTRA_ENV_USB
 +#endif
