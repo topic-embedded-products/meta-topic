@@ -47,7 +47,7 @@ index c7ea2c1..05df536 100644
  			"load mmc 0 ${kernel_addr} ${kernel_image} && " \
  			"load mmc 0 ${devicetree_addr} ${devicetree_image} && " \
 +			"load mmc 0 ${ramdisk_load_address} uramdisk.image.squashfs-xz && " \
-+			"setenv bootargs console=ttyPS0,115200 root=/dev/ram0 initrd=${ramdisk_load_address},0x${filesize} && " \
++			"setenv bootargs console=ttyPS0,115200 root=/dev/ram0 initrd=${ramdisk_load_address},0x${filesize} quiet && " \
  			"bootm ${kernel_addr} - ${devicetree_addr}; " \
  		"fi\0" \
  	CONFIG_EXTRA_ENV_USB \
