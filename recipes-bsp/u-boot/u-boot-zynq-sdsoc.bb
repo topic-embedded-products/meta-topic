@@ -3,6 +3,9 @@
 
 require u-boot-zynq.inc
 
+# Don't provide virtual/bootloader, otherwise OE thinks they conflict.
+PROVIDES = ""
+
 DEPENDS += "virtual/xilinx-sdk"
 
 UBOOT_SUFFIX = "elf"
