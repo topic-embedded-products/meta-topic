@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 KBRANCH = "topic-miami"
-SRCREV = "bb020cc80aa55daac7ee6810e7ce5ab0e89eca42"
+SRCREV = "3d71abc38ce1fa073135ee029d21eb31e6cd7b8a"
 LINUX_VERSION = "4.0"
 
 inherit kernel
@@ -35,6 +35,7 @@ KERNEL_DEVICETREE_topic-miami = "\
 	arch/arm/boot/dts/topic-miami-florida-med.dts \
 	arch/arm/boot/dts/topic-miami-florida-med-pt.dts \
 	arch/arm/boot/dts/topic-miami-florida-mio.dts \
+	arch/arm/boot/dts/topic-miami-florida-mio-dyplo.dts \
 	arch/arm/boot/dts/topic-miami-florida-pci.dts \
 	arch/arm/boot/dts/topic-miami-florida-pci-pt.dts \
 	arch/arm/boot/dts/topic-miami-vice.dts \
