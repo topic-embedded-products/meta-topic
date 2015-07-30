@@ -12,6 +12,7 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-axi-hdmi-rx \
 	kernel-module-bitblit \
 	kernel-module-clk-axi-clkgen \
+	kernel-module-dma-axi-dmac \
 	kernel-module-drm-kms-helper \
 	kernel-module-fpgapower \
 	kernel-module-rsi-sdio \
@@ -24,6 +25,8 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-videobuf2-core \
 	kernel-module-videobuf2-dma-contig \
 	kernel-module-videobuf2-memops \
+	kernel-module-videobuf2-vmalloc \
+	kernel-module-virt-dma \
 	kernel-module-virtio-ring \
 	kernel-module-virtio-rpmsg-bus \
 	kernel-module-virtio \
