@@ -18,7 +18,7 @@ S = "${WORKDIR}"
 PV = "0"
 
 BITSTREAM_FILENAME = "${PN}-${FPGA_FAMILY}.bit"
-SRC_URI = "http://192.168.80.11/downloads/${BITSTREAM_FILENAME};name=${FPGA_FAMILY}"
+SRC_URI = "http://www.topicembeddedproducts.com/support/download/public/${BITSTREAM_FILENAME};name=${FPGA_FAMILY}"
 
 # Copy static bitstream to the source dir.
 do_compile() {
