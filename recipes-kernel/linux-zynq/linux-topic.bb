@@ -27,20 +27,20 @@ SRC_URI = "\
 	"
 
 KERNEL_IMAGETYPE = "uImage"
-KERNEL_DEVICETREE = "arch/arm/boot/dts/${MACHINE}.dts"
+KERNEL_DEVICETREE = "${MACHINE}.dtb"
 KERNEL_DEVICETREE_topic-miami = "\
-	arch/arm/boot/dts/topic-miami-dyplo.dts \
-	arch/arm/boot/dts/topic-miami-florida-gen.dts \
-	arch/arm/boot/dts/topic-miami-florida-gen-pt.dts \
-	arch/arm/boot/dts/topic-miami-florida-med.dts \
-	arch/arm/boot/dts/topic-miami-florida-med-nand.dts \
-	arch/arm/boot/dts/topic-miami-florida-med-pt.dts \
-	arch/arm/boot/dts/topic-miami-florida-mio.dts \
-	arch/arm/boot/dts/topic-miami-florida-mio-dyplo.dts \
-	arch/arm/boot/dts/topic-miami-florida-mio-nand-dyplo.dts \
-	arch/arm/boot/dts/topic-miami-florida-pci.dts \
-	arch/arm/boot/dts/topic-miami-florida-pci-pt.dts \
-	arch/arm/boot/dts/topic-miami-vice.dts \
+	topic-miami-dyplo.dtb \
+	topic-miami-florida-gen.dtb \
+	topic-miami-florida-gen-pt.dtb \
+	topic-miami-florida-med.dtb \
+	topic-miami-florida-med-nand.dtb \
+	topic-miami-florida-med-pt.dtb \
+	topic-miami-florida-mio.dtb \
+	topic-miami-florida-mio-dyplo.dtb \
+	topic-miami-florida-mio-nand-dyplo.dtb \
+	topic-miami-florida-pci.dtb \
+	topic-miami-florida-pci-pt.dtb \
+	topic-miami-vice.dtb \
 	"
 # See http://permalink.gmane.org/gmane.linux.kernel.commits.head/371588
 KERNEL_EXTRA_ARGS += "LOADADDR=0x00008000"
