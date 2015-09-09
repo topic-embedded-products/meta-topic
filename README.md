@@ -14,7 +14,7 @@ git clone git://git.openembedded.org/openembedded-core oe-core
 cd oe-core
 git checkout 4e0fb630d3bb0250ece6e2071ae49b2601ae3e57
 cd ..
-git clone git://github.com/openembedded/meta-oe.git meta-oe
+git clone git://github.com/openembedded/meta-openembedded.git meta-oe
 cd meta-oe
 git checkout 9a67b079a7deff2d6e53df031b26304a71c4e0f8
 cd ..
