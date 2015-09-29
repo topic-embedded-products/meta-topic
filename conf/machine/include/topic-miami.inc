@@ -38,23 +38,9 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-ltc2990 \
 	topic-miami-monitor-lib \
 	"
-# ubiattach /dev/ubi_ctrl -m 5
-# From dmesg:
-# UBI: attached mtd5 (name "qspi-rootfs", size 27 MiB) to ubi0
-# UBI: PEB size: 4096 bytes (4 KiB), LEB size: 3968 bytes
-# UBI: min./max. I/O unit sizes: 1/256, sub-page size 1
-# UBI: VID header offset: 64 (aligned 64), data offset: 128
-# UBI: good PEBs: 7040, bad PEBs: 0, corrupted PEBs: 0
-#
-# MKUBIFS_ARGS = "-m 1 -e 3968 -c 7040"
-# UBINIZE_ARGS = "-m 1 -p 4096"
-#
-# But using those values does not work and results in messages like:
-# "too small LEBs (3968 bytes), min. is 15360 bytes"
-# and mkfs.ubifs fails to create images. So we use the 64k version:
 
+# Use QSPI flash with 64k sector size
 MKUBIFS_ARGS = "-m 1 -e 65408 -c 440"
 UBINIZE_ARGS = "-m 1 -p 64KiB"
 UBI_VOLNAME = "qspi-rootfs"
 
-# This however requires to patch something in the kernel...
