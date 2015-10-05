@@ -18,7 +18,7 @@ KMACHINE = "${MACHINE_BOARD}"
 
 # The FPGA bitstreams will use FPGA_FAMILY as their package-arch, because they
 # are compatible with any FPGA of the same type, regardless of the board.
-FPGA_FAMILY = "${@d.getVar('MACHINE', True).split('-')[-1:][0]}"
+FPGA_FAMILY := "${@d.getVar('MACHINE', True).split('-')[-1:][0]}"
 FPGA_FAMILY_ARCH = "${@d.getVar('FPGA_FAMILY', True).replace('-','_')}"
 
 include conf/machine/include/zynq-base.inc
