@@ -17,6 +17,7 @@ MY_THINGS = "\
 	${@base_contains("IMAGE_FSTYPES", "ubi", "mtd-utils-ubifs" , "", d)} \
 	alsa-utils-aplay alsa-utils-speakertest alsa-utils-amixer alsa-utils-alsactl \
 	i2c-tools \
+	udhcpd-iface-config \
 	"
 
 # Skip packagegroup-base to reduce the number of packages built. Thus, we need
