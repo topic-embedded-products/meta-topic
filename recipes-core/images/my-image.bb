@@ -50,5 +50,10 @@ myimage_rootfs_postprocess() {
 	rm -f ${IMAGE_ROOTFS}/etc/resolv.conf
 	ln -s ../var/run/resolv.conf ${IMAGE_ROOTFS}/etc/resolv.conf
 	rm -rf ${IMAGE_ROOTFS}/dev/*
+	# Make links relative
+	rm -f ${IMAGE_ROOTFS}/var/run ${IMAGE_ROOTFS}/var/tmp ${IMAGE_ROOTFS}/var/log
+	ln -s volatile/tmp ${IMAGE_ROOTFS}/var/tmp
+	ln -s volatile/log ${IMAGE_ROOTFS}/var/log
+	ln -s ../run ${IMAGE_ROOTFS}/var/run
 }
 ROOTFS_POSTPROCESS_COMMAND += "myimage_rootfs_postprocess ; "
