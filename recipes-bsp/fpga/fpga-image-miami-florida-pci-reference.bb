@@ -6,9 +6,6 @@ COMPATIBLE_MACHINE = "topic-miami-florida-pci"
 
 require fpga-image.inc
 
-# The PCIe board loads the logic in the bootloader
-RRECOMMENDS_${PN} = ""
-
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
