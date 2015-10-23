@@ -5,6 +5,7 @@ MACHINE_FPGA_BITSTREAM ?= "fpga-image-miami-florida-gen-reference"
 
 # Extra packages to install for the board
 BOARD_FPGA_PACKAGES ?= "\
+	adi-hdmi-in-load \
 	adi-hdmi-load \
 	kernel-module-adi-axi-hdmi \
 	kernel-module-adv7511 \
