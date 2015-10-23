@@ -29,4 +29,4 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-xilinx-emacps \
 	"
 
-MACHINE_FEATURES += "usbhost ethernet"
+MACHINE_FEATURES += "usbhost usbgadget ethernet"
