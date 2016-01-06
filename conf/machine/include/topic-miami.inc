@@ -35,7 +35,6 @@ KERNEL_MODULE_AUTOLOAD ?= ""
 KERNEL_MODULE_AUTOLOAD += "xilinx_emacps rsi_sdio g_ether spi-cadence"
 
 MACHINE_EXTRA_RRECOMMENDS += "\
-	kernel-module-ltc2990 \
 	topic-miami-monitor-lib \
 	"
 
