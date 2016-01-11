@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce
 SRCREV = "dda3f58af8eb86c649114fa87e35257947d22629"
 PV = "z2015.1+git${SRCPV}"
 
-SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git;branch=master-next \
+SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git;branch=master \
 	file://0001-Add-topic-miami-board-support.patch"
 S = "${WORKDIR}/git"
 
