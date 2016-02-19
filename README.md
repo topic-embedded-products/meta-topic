@@ -19,6 +19,9 @@ cd meta-oe
 git checkout 9a67b079a7deff2d6e53df031b26304a71c4e0f8
 cd ..
 git clone git://git.openembedded.org/bitbake bitbake
+cd bitbake
+git checkout c2c778ad50aceaffb855baf5f4aa0fed98c880870
+cd ..
 git clone http://github.com/topic-embedded-products/meta-topic.git meta-topic
 
 meta-topic/scripts/init-oe.sh
