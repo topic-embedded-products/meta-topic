@@ -14,7 +14,6 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-bitblit \
 	kernel-module-clk-axi-clkgen \
 	kernel-module-dma-axi-dmac \
-	kernel-module-drm-kms-helper \
 	kernel-module-fpgapower \
 	kernel-module-rsi-sdio \
 	kernel-module-rsi-91x \
