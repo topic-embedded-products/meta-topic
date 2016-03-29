@@ -22,6 +22,9 @@ FPGA_FAMILY := "${@d.getVar('MACHINE', True).split('-')[-1:][0]}"
 FPGA_FAMILY_ARCH = "${@d.getVar('FPGA_FAMILY', True).replace('-','_')}"
 
 include conf/machine/include/zynq-base.inc
+
+# Use hard-float ABI and allow thumb2 instructions
+DEFAULTTUNE ?= "cortexa9thf-neon"
 include conf/machine/include/tune-cortexa9.inc
 
 MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
