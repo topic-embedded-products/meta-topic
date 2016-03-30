@@ -70,9 +70,8 @@ information:
 http://www.yoctoproject.org/docs/1.6.1/yocto-project-qs/yocto-project-qs.html
 
 A few recipes still require the "gitpkgv" class from meta-openembedded.
-Include it by cloning git://github.com/openembedded/meta-oe.git and add
+Include it by cloning git://github.com/openembedded/meta-openembedded.git and add
 the path to its "meta-oe" subdirectory to the conf/bblayers.conf list.
-Getting rid of this meta-oe dependency is still on my TODO list.
 
 
 # BOOT
