@@ -28,8 +28,7 @@ meta-topic/scripts/init-oe.sh
 
 cd build
 
-# Edit local.conf to match your setup. In particular, check the paths to
-# the Xilinx tools.
+# Edit local.conf to match your setup.
 vi conf/local.conf
 
 # The default machine is "topic-miami-florida-med-xc7z015", change it in the
