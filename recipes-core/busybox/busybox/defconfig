@@ -66,7 +66,7 @@ CONFIG_FEATURE_SYSLOG=y
 CONFIG_LFS=y
 CONFIG_CROSS_COMPILER_PREFIX="arm-oe-linux-gnueabi-"
 CONFIG_SYSROOT=""
-CONFIG_EXTRA_CFLAGS=" -O2 -pipe -g -feliminate-unused-debug-types -fdebug-prefix-map=/home/mike/projects/zynq-platform-next/build/tmp-glibc/work/cortexa9hf-neon-oe-linux-gnueabi/busybox/1.24.1-r0=/usr/src/debug/busybox/1.24.1-r0 -fdebug-prefix-map=/home/mike/projects/zynq-platform-next/build/tmp-glibc/sysroots/x86_64-linux= -fdebug-prefix-map=/home/mike/projects/zynq-platform-next/build/tmp-glibc/sysroots/topic-miami-florida-med-xc7z015=   -march=armv7-a -marm -mfpu=neon  -mfloat-abi=hard -mcpu=cortex-a9"
+CONFIG_EXTRA_CFLAGS=" -O2 -pipe -g -feliminate-unused-debug-types -fdebug-prefix-map=/home/mike/projects/zynq-platform-next/build/tmp-glibc/work/cortexa9hf-neon-oe-linux-gnueabi/busybox/1.24.1-r0=/usr/src/debug/busybox/1.24.1-r0 -fdebug-prefix-map=/home/mike/projects/zynq-platform-next/build/tmp-glibc/sysroots/x86_64-linux= -fdebug-prefix-map=/home/mike/projects/zynq-platform-next/build/tmp-glibc/sysroots/topic-miami-florida-gen-xc7z015=   -march=armv7-a -marm -mfpu=neon  -mfloat-abi=hard -mcpu=cortex-a9"
 CONFIG_EXTRA_LDFLAGS=""
 CONFIG_EXTRA_LDLIBS=""
 

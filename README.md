@@ -31,7 +31,7 @@ cd build
 # Edit local.conf to match your setup.
 vi conf/local.conf
 
-# The default machine is "topic-miami-florida-med-xc7z015", change it in the
+# The default machine is "topic-miami-florida-gen-xc7z015", change it in the
 # "profile" script or just export the MACHINE environment before building.
 
 # Then build your first image and relax a bit:
@@ -62,7 +62,7 @@ BBLAYERS ?= " \
   "
 ````
 
-Change your MACHINE to, for example, "topic-miami-florida-med-xc7z015" or
+Change your MACHINE to, for example, "topic-miami-florida-gen-xc7z015" or
 "topic-miami-florida-gen-xc7z030", depending on the board you have, and
 bitbake core-image-minimal. See also the Yocto Quick start for more
 information:

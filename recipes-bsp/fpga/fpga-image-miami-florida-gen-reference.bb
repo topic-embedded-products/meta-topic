@@ -1,4 +1,5 @@
 SUMMARY = "FPGA bitstream for Miami Florida GEN boards"
+COMPATIBLE_MACHINE = "topic-miami-florida-gen"
 
 # Downloads a precompiled bitstream from the TOPIC website
 
@@ -10,20 +11,18 @@ LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaa
 BOARD_DESIGN_URI = ""
 
 S = "${WORKDIR}"
-PV = "v2r3"
+PV = "v3r0"
 
-BITSTREAM_FILENAME ?= ""
-BITSTREAM_FILENAME_xc7z015 = "flo-med-7z15-ref-${PV}.bit"
-BITSTREAM_FILENAME_xc7z030 = "flo-med-7z30-ref-${PV}.bit"
-TOPICEMBEDDED_URIBASE ?= "http://www.topicembeddedproducts.com/support/download/public"
-SRC_URI = "${TOPICEMBEDDED_URIBASE}/${BITSTREAM_FILENAME};name=${FPGA_FAMILY}"
+BITSTREAM_FILENAME = "${MACHINE}-${PV}.bit"
+TOPICEMBEDDED_URIBASE ?= "http://www.topicembeddedproducts.com/support/download/public/reference-images/"
+SRC_URI = "${TOPICEMBEDDED_URIBASE}/${BITSTREAM_FILENAME};name=${MACHINE}"
 
 # Copy static bitstream to the source dir.
 do_compile() {
 	cp ${WORKDIR}/${BITSTREAM_FILENAME} ${S}/fpga.bit
 }
 
-SRC_URI[xc7z015.md5sum] = "872f962e2021136e9737eabdbd880878"
-SRC_URI[xc7z015.sha256sum] = "5341b7d82520be868a0c8426fc4065b45ab90593dfefef7e1fefeea2a9d678f1"
-SRC_URI[xc7z030.md5sum] = "563c1178c562eabdce6ae4cc78137b83"
-SRC_URI[xc7z030.sha256sum] = "02db22e9d0aed5b3d68620665ec5aa30bc926354b5dac5dc985d392cf6ee2364"
+SRC_URI[topic-miami-florida-gen-xc7z015.md5sum] = "c3d6ed361fbd5fca26273531564c6cd5"
+SRC_URI[topic-miami-florida-gen-xc7z015.sha256sum] = "6d63cef1dfe9709d65e0bcd5da38c060503bb066069b516680e711e3e8475f10"
+SRC_URI[topic-miami-florida-gen-xc7z030.md5sum] = "1137ed5ea193c0a41f7048cc22773190"
+SRC_URI[topic-miami-florida-gen-xc7z030.sha256sum] = "99f27ca82fd52235186231325b9365f4adc4131df824e176e296c4afbf8a4b6c"

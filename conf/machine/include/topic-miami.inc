@@ -3,7 +3,7 @@
 #
 # Machine names are expected to have this form:
 #  topic-miami-<carrier>-<fpga>
-# For example, "topic-miami-florida-med-xc7z015"
+# For example, "topic-miami-florida-gen-xc7z015"
 
 # The system-on-module contains flash, CPU+FPGA, RAM and various power supply
 # and clock sources.
