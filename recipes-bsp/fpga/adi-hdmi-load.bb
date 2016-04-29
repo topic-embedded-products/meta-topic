@@ -3,8 +3,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaabaa882bbe"
 inherit allarch
 
-PV = "8"
-PR = "r0"
+PV = "9"
 
 PACKAGES = "${PN}"
 

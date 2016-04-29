@@ -12,7 +12,6 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-adv7604 \
 	kernel-module-axi-hdmi-rx \
 	kernel-module-bitblit \
-	kernel-module-clk-axi-clkgen \
 	kernel-module-dma-axi-dmac \
 	kernel-module-fpgapower \
 	kernel-module-rsi-sdio \
