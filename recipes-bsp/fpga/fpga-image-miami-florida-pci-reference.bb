@@ -22,7 +22,7 @@ do_compile() {
 	cp ${WORKDIR}/${BITSTREAM_FILENAME} ${S}/fpga.bit
 }
 
-SRC_URI[topic-miami-florida-pci-xc7z015.md5sum] = "cb16d38453129d791b066642ce271203"
-SRC_URI[topic-miami-florida-pci-xc7z015.sha256sum] = "5307d7600cc91cc35ce80ef9104f71510a4fa2c4f3baacde74d66220775b4f32"
-SRC_URI[topic-miami-florida-pci-xc7z030.md5sum] = "0b3846fbd9b23617a421655108a0c790"
-SRC_URI[topic-miami-florida-pci-xc7z030.sha256sum] = "acea507b7dd21d220cfd7666cba96f74e004c8ecbe1a2320181207fdc4514e30"
+SRC_URI[topic-miami-florida-pci-xc7z015.md5sum] = "06417b941d8907f701b62e6d19111674"
+SRC_URI[topic-miami-florida-pci-xc7z015.sha256sum] = "33707a5b7311f947e834dba39d2970a47b4f59b677ece2c27a1d5b10cc494e81"
+SRC_URI[topic-miami-florida-pci-xc7z030.md5sum] = "4c55bfff6e5828c03b2c4dbd37f235fd"
+SRC_URI[topic-miami-florida-pci-xc7z030.sha256sum] = "fdbc9b340c7e6c0a7a28a91c60826d0ab25a963594d51ca0ef1457cd8aa9270f"
