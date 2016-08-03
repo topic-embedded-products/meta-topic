@@ -6,9 +6,13 @@ import struct
 def flip32(data):
 	sl = struct.Struct('<I')
 	sb = struct.Struct('>I')
-	b = buffer(data)
+	try:
+		b = buffer(data)
+	except NameError:
+		# Python 3 does not have 'buffer'
+		b = data
 	d = bytearray(len(data))
-	for offset in xrange(0, len(data), 4):
+	for offset in range(0, len(data), 4):
 		 sb.pack_into(d, offset, sl.unpack_from(b, offset)[0])
 	return d
 
@@ -26,22 +30,22 @@ bitfile = open(args.bitfile, 'rb')
 
 l = short.unpack(bitfile.read(2))[0]
 if l != 9:
-	raise Exception, "Missing <0009> header (0x%x), not a bit file" % l
+	raise Exception("Missing <0009> header (0x%x), not a bit file" % l)
 bitfile.read(l)
 l = short.unpack(bitfile.read(2))[0]
 d = bitfile.read(l)
-if d != 'a':
-	raise Exception, "Missing <a> header, not a bit file"
+if d != b'a':
+	raise Exception("Missing <a> header, not a bit file")
 
 l = short.unpack(bitfile.read(2))[0]
 d = bitfile.read(l)
-print "Design name:", d
+print("Design name: %s" % d)
 
-# If bitstream is a partial bitstream, get some information from filename and header 
-if d.find("PARTIAL=TRUE") != -1:
-	print "Partial bitstream"
+# If bitstream is a partial bitstream, get some information from filename and header
+if b"PARTIAL=TRUE" in d:
+	print("Partial bitstream")
 	partial = True;
-	
+
 	# Get node_nr from filename (last (group of) digits)
 	for i in range (len(args.bitfile) - 1, 0, -1):
 		if args.bitfile[i].isdigit():
@@ -55,34 +59,34 @@ if d.find("PARTIAL=TRUE") != -1:
 		node_nr = int(args.bitfile[pos_start:pos_end])
 	else:
 		node_nr = 0
-	print "NodeID:", node_nr
-	
+	print("NodeID: %s" % node_nr)
+
 	# Get 16 least significant bits of UserID in design name
-	pos_start = d.find("UserID=") 
+	pos_start = d.find(b"UserID=")
 	if pos_start != -1:
-		pos_end = d.find(";", pos_start)
+		pos_end = d.find(b";", pos_start)
 		pos_start = pos_end - 4
 		userid = d[pos_start:pos_end]
-		print "UserID:", userid	
-	
+		print("UserID: %s" % str(userid))
+
 else:
-	print "Full bitstream"
+	print("Full bitstream")
 	partial = False
 	node_nr = 0
 
-KEYNAMES = {'b': "Partname", 'c': "Date", 'd': "Time"}
+KEYNAMES = {b'b': "Partname", b'c': "Date", b'd': "Time"}
 
 while 1:
 	k = bitfile.read(1)
 	if not k:
 		bitfile.close()
-		raise Exception, "unexpected EOF"
-	elif k == 'e':
+		raise Exception("unexpected EOF")
+	elif k == b'e':
 		l = ulong.unpack(bitfile.read(4))[0]
-		print "Found binary data:", l
+		print("Found binary data: %s" % l)
 		d = bitfile.read(l)
 		if args.flip:
-			print "Flipping data..."
+			print("Flipping data...")
 			d = flip32(d)
 		# Open bin file
 		binfile = open(args.binfile, 'wb')
@@ -92,17 +96,17 @@ while 1:
 			binfile.write(struct.pack("B", node_nr))
 			binfile.write(struct.pack(">H", int("0x" + userid, 16)))
 		# Write the converted bit-2-bin data
-		print "Writing data..."
+		print("Writing data...")
 		binfile.write(d)
 		binfile.close()
 		break
 	elif k in KEYNAMES:
 		l = short.unpack(bitfile.read(2))[0]
 		d = bitfile.read(l)
-		print KEYNAMES[k], d
+		print(KEYNAMES[k], d)
 	else:
-		print "Unexpected key: ", k
+		print("Unexpected key: %s" % k)
 		l = short.unpack(bitfile.read(2))[0]
 		d = bitfile.read(l)
-		
+
 bitfile.close()
