@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 KBRANCH = "topic-miami"
-SRCREV = "0a03e1eccda1ee263dad5c02a844f9f7eb2a2e03"
+SRCREV = "bbf9a879a848412520ab263c277acc10a5747845"
 LINUX_VERSION = "4.4"
 
 inherit kernel
@@ -38,7 +38,7 @@ KERNEL_DEVICETREE_topic-miami = "\
 	topic-miami-florida-mio-nand-dyplo.dtb \
 	topic-miami-florida-pci.dtb \
 	topic-miami-florida-pci-pt.dtb \
-	topic-miami-vice.dtb \
+	topic-miamiplus-florida-test.dtb \
 	"
 # See http://permalink.gmane.org/gmane.linux.kernel.commits.head/371588
 KERNEL_EXTRA_ARGS += "LOADADDR=0x00008000"
