@@ -38,6 +38,7 @@ KERNEL_DEVICETREE_topic-miami = "\
 	topic-miami-florida-mio-nand-dyplo.dtb \
 	topic-miami-florida-pci.dtb \
 	topic-miami-florida-pci-pt.dtb \
+	topic-miami-vice.dtb \
 	topic-miamiplus-florida-test.dtb \
 	"
 # See http://permalink.gmane.org/gmane.linux.kernel.commits.head/371588
