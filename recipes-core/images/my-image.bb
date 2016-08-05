@@ -14,7 +14,7 @@ inherit core-image
 MY_THINGS = "\
 	kernel-modules \
 	modutils-loadscript \
-	${@base_contains("IMAGE_FSTYPES", "ubi", "mtd-utils-ubifs" , "", d)} \
+	${@bb.utils.contains("IMAGE_FSTYPES", "ubi", "mtd-utils-ubifs" , "", d)} \
 	alsa-utils-aplay alsa-utils-speakertest alsa-utils-amixer alsa-utils-alsactl \
 	i2c-tools \
 	udhcpd-iface-config \

@@ -20,6 +20,6 @@ ROOTFS_PKGMANAGE = ""
 
 MY_THINGS = "\
 	modutils-loadscript \
-	${@base_contains("IMAGE_FSTYPES", "ubi", "mtd-utils-ubifs" , "", d)} \
+	${@bb.utils.contains("IMAGE_FSTYPES", "ubi", "mtd-utils-ubifs" , "", d)} \
 	i2c-tools \
 	"
