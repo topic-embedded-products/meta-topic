@@ -110,6 +110,7 @@ do_convert_bitstreams() {
 		done
 	fi
 }
+do_convert_bitstreams[dirs] = "${B}"
 
 FILES_${PN} = "${datadir}"
 do_install() {

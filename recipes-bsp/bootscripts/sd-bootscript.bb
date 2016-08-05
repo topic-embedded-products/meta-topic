@@ -27,6 +27,7 @@ do_deploy () {
 	install -d ${DEPLOYDIR}
 	install ${S}/autorun.uimage.scr ${DEPLOYDIR}/autorun.scr
 }
+do_deploy[dirs] = "${B}"
 addtask deploy before do_build after do_compile
 
 do_configure[noexec] = "1"
