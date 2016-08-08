@@ -1,0 +1,98 @@
+From ff1bf842cd38575af5c993d0fdef1142e3238c7c Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 8 Aug 2016 09:21:59 +0200
+Subject: [PATCH 2/2] Add topic_miamiplus board
+
+Same as topic_miami, but with dual QSPI flash memories instead of NAND.
+---
+ arch/arm/cpu/armv7/zynq/Kconfig      |  4 ++++
+ board/xilinx/dts/topic-miamiplus.dts | 14 ++++++++++++++
+ configs/topic_miamiplus_defconfig    | 11 +++++++++++
+ include/configs/topic_miamiplus.h    | 15 +++++++++++++++
+ 4 files changed, 44 insertions(+)
+ create mode 100644 board/xilinx/dts/topic-miamiplus.dts
+ create mode 100644 configs/topic_miamiplus_defconfig
+ create mode 100644 include/configs/topic_miamiplus.h
+
+diff --git a/arch/arm/cpu/armv7/zynq/Kconfig b/arch/arm/cpu/armv7/zynq/Kconfig
+index 2002512..1dc31e5 100644
+--- a/arch/arm/cpu/armv7/zynq/Kconfig
++++ b/arch/arm/cpu/armv7/zynq/Kconfig
+@@ -27,6 +27,9 @@ config TARGET_ZYNQ_CSE
+ config TARGET_TOPIC_MIAMI
+ 	bool "Topic Miami Zynq Board"
+ 
++config TARGET_TOPIC_MIAMIPLUS
++	bool "Topic Miami+ Zynq Board"
++
+ endchoice
+ 
+ config SYS_BOARD
+@@ -47,5 +50,6 @@ config SYS_CONFIG_NAME
+ 	default "zynq_cse" if TARGET_ZYNQ_CSE
+ 	default "zynq_afx" if TARGET_ZYNQ_AFX
+ 	default "topic_miami" if TARGET_TOPIC_MIAMI
++	default "topic_miamiplus" if TARGET_TOPIC_MIAMIPLUS
+ 
+ endif
+diff --git a/board/xilinx/dts/topic-miamiplus.dts b/board/xilinx/dts/topic-miamiplus.dts
+new file mode 100644
+index 0000000..b80ee32
+--- /dev/null
++++ b/board/xilinx/dts/topic-miamiplus.dts
+@@ -0,0 +1,14 @@
++/*
++ * Topic Miami+ board DTS
++ *
++ * Copyright (C) 2016 Topic Embedded Products
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++/dts-v1/;
++#include "zynq-7000.dtsi"
++
++/ {
++	model = "Zynq Miami+ Board";
++	compatible = "xlnx,topic-miamiplus", "xlnx,topic-miami", "xlnx,zynq-7000";
++};
+diff --git a/configs/topic_miamiplus_defconfig b/configs/topic_miamiplus_defconfig
+new file mode 100644
+index 0000000..f7bd0db
+--- /dev/null
++++ b/configs/topic_miamiplus_defconfig
+@@ -0,0 +1,11 @@
++CONFIG_SPL=y
++CONFIG_ARM=y
++CONFIG_ZYNQ=y
++CONFIG_TARGET_TOPIC_MIAMIPLUS=y
++CONFIG_OF_CONTROL=n
++CONFIG_DEFAULT_DEVICE_TREE="topic-miamiplus"
++# CONFIG_SYS_MALLOC_F is not set
++CONFIG_FIT=y
++CONFIG_FIT_VERBOSE=y
++CONFIG_FIT_SIGNATURE=y
++CONFIG_DM=y
+diff --git a/include/configs/topic_miamiplus.h b/include/configs/topic_miamiplus.h
+new file mode 100644
+index 0000000..56c9884
+--- /dev/null
++++ b/include/configs/topic_miamiplus.h
+@@ -0,0 +1,15 @@
++#define CONFIG_SYS_SPI_DT_OFFS		0xA0000
++#define CONFIG_SYS_SPI_KERNEL_OFFS	0xC0000
++
++#include "topic_miami.h"
++
++#undef CONFIG_DEFAULT_DEVICE_TREE
++#define CONFIG_DEFAULT_DEVICE_TREE	topic-miamiplus
++
++/* Fixup settings (128k erase size) */
++#undef CONFIG_SYS_SPI_U_BOOT_OFFS
++#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x20000
++#undef CONFIG_SPL_MAX_FOOTPRINT
++#define CONFIG_SPL_MAX_FOOTPRINT	0x20000
++
++#define CONFIG_SF_DUAL_FLASH
+-- 
+1.9.1
+

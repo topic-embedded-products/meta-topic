@@ -1,15 +1,15 @@
-From bc69e49bdfa6f817ceb49adfbdb78ba5c975da86 Mon Sep 17 00:00:00 2001
+From b06554fc1a09a9221697816637521b3609c99e18 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 2 Sep 2014 12:16:02 +0200
-Subject: [PATCH] Add topic-miami board support
+Subject: [PATCH 1/2] Add topic-miami board support
 
 Add support for the topic-miami SOM and associated Florida carrier boards.
 ---
  arch/arm/cpu/armv7/zynq/Kconfig  |   4 +
  board/xilinx/dts/topic-miami.dts |  14 ++++
  configs/topic_miami_defconfig    |  11 +++
- include/configs/topic_miami.h    | 155 +++++++++++++++++++++++++++++++++++++++
- 4 files changed, 184 insertions(+)
+ include/configs/topic_miami.h    | 162 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 191 insertions(+)
  create mode 100644 board/xilinx/dts/topic-miami.dts
  create mode 100644 configs/topic_miami_defconfig
  create mode 100644 include/configs/topic_miami.h
@@ -74,10 +74,10 @@ index 0000000..62f4a12
 +CONFIG_DM=y
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
 new file mode 100644
-index 0000000..689cd97
+index 0000000..51c3655
 --- /dev/null
 +++ b/include/configs/topic_miami.h
-@@ -0,0 +1,155 @@
+@@ -0,0 +1,162 @@
 +/*
 + * (C) Copyright 2014 Topic Embedded Products
 + *
@@ -128,6 +128,13 @@ index 0000000..689cd97
 +#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x10000
 +#define CONFIG_SPL_MAX_FOOTPRINT	0x10000
 +#define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME     "u-boot.img"
++
++#ifndef CONFIG_SYS_SPI_DT_OFFS
++# define CONFIG_SYS_SPI_DT_OFFS 0x70000
++#endif
++#ifndef CONFIG_SYS_SPI_KERNEL_OFFS
++# define CONFIG_SYS_SPI_KERNEL_OFFS 0x80000
++#endif
 +
 +/* sspi command isn't useful */
 +#undef CONFIG_CMD_SPI
@@ -216,8 +223,8 @@ index 0000000..689cd97
 +		"fpga load 0 ${loadbit_addr} ${filesize}\0" \
 +	"qspiboot=echo Booting from QSPI flash... && " \
 +		"sf probe && " \
-+		"sf read ${devicetree_addr} 0x70000 ${devicetree_size} && " \
-+		"sf read ${kernel_addr} 0x80000 ${kernel_size} && " \
++		"sf read ${devicetree_addr} " __stringify(CONFIG_SYS_SPI_DT_OFFS) " ${devicetree_size} && " \
++		"sf read ${kernel_addr} " __stringify(CONFIG_SYS_SPI_KERNEL_OFFS) " ${kernel_size} && " \
 +		"bootm ${kernel_addr} - ${devicetree_addr}\0" \
 +	"sdboot=if mmcinfo; then " \
 +			"setenv bootargs console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootfstype=ext4 rootwait quiet ; " \

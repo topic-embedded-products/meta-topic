@@ -8,7 +8,9 @@ SRCREV = "dda3f58af8eb86c649114fa87e35257947d22629"
 PV = "z2015.2+git${SRCPV}"
 
 SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git;branch=master \
-	file://0001-Add-topic-miami-board-support.patch"
+	file://0001-Add-topic-miami-board-support.patch \
+	file://0002-Add-topic_miamiplus-board.patch \
+	"
 S = "${WORKDIR}/git"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
