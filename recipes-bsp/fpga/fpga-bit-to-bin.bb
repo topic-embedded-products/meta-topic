@@ -9,7 +9,7 @@ BBCLASSEXTEND = "native"
 SRC_URI = "file://fpga-bit-to-bin.py"
 
 S = "${WORKDIR}"
-PV = "3"
+PV = "3.1"
 
 # Patch the script to use the OE-provided Python interpreter
 do_compile() {

@@ -66,8 +66,8 @@ if b"PARTIAL=TRUE" in d:
 	if pos_start != -1:
 		pos_end = d.find(b";", pos_start)
 		pos_start = pos_end - 4
-		userid = d[pos_start:pos_end]
-		print("UserID: %s" % str(userid))
+		userid = int(d[pos_start:pos_end], 16)
+		print("UserID: 0x%x" % userid)
 
 else:
 	print("Full bitstream")
@@ -94,7 +94,7 @@ while 1:
 		if partial:
 			binfile.write(struct.pack("B", 0))
 			binfile.write(struct.pack("B", node_nr))
-			binfile.write(struct.pack(">H", int("0x" + userid, 16)))
+			binfile.write(struct.pack(">H", userid))
 		# Write the converted bit-2-bin data
 		print("Writing data...")
 		binfile.write(d)
