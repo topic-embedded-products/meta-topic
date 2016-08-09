@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 KBRANCH = "topic-miami"
-SRCREV = "a6b1f9ffa41f57e91f9459b54d6dda332be815cf"
+SRCREV = "87647368763302db667ceb377d1f722b11f293f2"
 LINUX_VERSION = "4.4"
 
 inherit kernel
