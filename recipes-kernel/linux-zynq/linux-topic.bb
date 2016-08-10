@@ -24,6 +24,7 @@ KERNEL_GIT_REPO ?= "git://github.com/topic-embedded-products/linux"
 SRC_URI = "\
 	${KERNEL_GIT_REPO};branch=${KBRANCH} \
 	file://defconfig \
+	file://0001-hwmon-max6650.c-Add-devicetree-support.patch \
 	"
 
 KERNEL_IMAGETYPE = "uImage"
