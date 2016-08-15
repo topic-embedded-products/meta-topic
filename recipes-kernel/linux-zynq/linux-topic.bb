@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 KBRANCH = "topic-miami"
-SRCREV = "87647368763302db667ceb377d1f722b11f293f2"
+SRCREV = "d2feddc9eb4364fe38d62b1cbc68768b60f948b9"
 LINUX_VERSION = "4.4"
 
 inherit kernel
@@ -25,6 +25,7 @@ SRC_URI = "\
 	${KERNEL_GIT_REPO};branch=${KBRANCH} \
 	file://defconfig \
 	file://0001-hwmon-max6650.c-Add-devicetree-support.patch \
+	file://0002-hwmon-max6650-Allow-fan-shutdown-and-a-more-intuitiv.patch \
 	"
 
 KERNEL_IMAGETYPE = "uImage"

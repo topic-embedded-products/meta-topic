@@ -1,7 +1,7 @@
-From b6926839a598e6efcc82bffb999f23702b3c972d Mon Sep 17 00:00:00 2001
+From e4d7b3d775ca024c4a348e5ada303a7961889e6a Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 9 Aug 2016 08:24:06 +0200
-Subject: [PATCH] hwmon/max6650.c: Add devicetree support
+Subject: [PATCH 1/2] hwmon/max6650.c: Add devicetree support
 
 Parse devicetree parameters for voltage and prescaler setting. This allows
 using multiple max6550 devices with varying settings, and also makes it
@@ -41,7 +41,7 @@ index 0000000..89d87c6
 +		fan-prescale = <4>;
 +	};
 diff --git a/drivers/hwmon/max6650.c b/drivers/hwmon/max6650.c
-index 162a520..858cd01 100644
+index 162a520..56a6c87 100644
 --- a/drivers/hwmon/max6650.c
 +++ b/drivers/hwmon/max6650.c
 @@ -41,14 +41,14 @@
@@ -57,7 +57,7 @@ index 162a520..858cd01 100644
  /* prescaler: Possible values are 1, 2, 4, 8, 16 or 0 for don't change */
  static int prescaler;
 -/* clock: The clock frequency of the chip the driver should assume */
-+/* clock: The clock frequency of the chip (Fixed for 6550, 6651 can be clocked externally) */
++/* clock: The clock frequency of the chip (max6651 can be clocked externally) */
  static int clock = 254000;
  
  module_param(fan_voltage, int, S_IRUGO);
@@ -72,7 +72,7 @@ index 162a520..858cd01 100644
 +				 &voltage))
 +		voltage = fan_voltage;
 +	if (of_property_read_u32(client->dev.of_node, "fan-prescale",
-+				 &voltage))
++				 &prescale))
 +		prescale = prescaler;
  
  	config = i2c_smbus_read_byte_data(client, MAX6650_REG_CONFIG);
