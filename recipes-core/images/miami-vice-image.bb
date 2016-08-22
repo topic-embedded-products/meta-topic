@@ -10,13 +10,7 @@ DESCRIPTION = "Boot image for Miami without Florida"
 #  setenv bootargs "console=ttyPS0,115200 root=/dev/ram0 initrd=0x8000000,0x${filesize}"
 #  bootm 0x3000000 - 0x2A00000
 
-require my-image.bb
-
-IMAGE_FEATURES += "read-only-rootfs"
-IMAGE_FSTYPES = "squashfs-xz"
-
-# No packaging
-ROOTFS_PKGMANAGE = ""
+require my-image-squashfs.bb
 
 MY_THINGS = "\
 	modutils-loadscript \

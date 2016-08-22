@@ -33,6 +33,9 @@ IMAGE_INSTALL = "\
 	${MY_THINGS} \
 	"
 
+# Reduce dropbear host key size to reduce boot time by about 5 seconds
+DROPBEAR_RSAKEY_SIZE="1024"
+
 # Postprocessing to reduce the amount of work to be done
 # by configuration scripts
 myimage_rootfs_postprocess() {
@@ -55,5 +58,6 @@ myimage_rootfs_postprocess() {
 	ln -s volatile/tmp ${IMAGE_ROOTFS}/var/tmp
 	ln -s volatile/log ${IMAGE_ROOTFS}/var/log
 	ln -s ../run ${IMAGE_ROOTFS}/var/run
+	echo 'DROPBEAR_RSAKEY_ARGS="-s ${DROPBEAR_RSAKEY_SIZE}"' >> ${IMAGE_ROOTFS}${sysconfdir}/default/dropbear
 }
 ROOTFS_POSTPROCESS_COMMAND += "myimage_rootfs_postprocess ; "
