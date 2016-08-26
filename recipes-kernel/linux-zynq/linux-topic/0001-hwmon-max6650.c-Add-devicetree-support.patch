@@ -1,7 +1,7 @@
-From e4d7b3d775ca024c4a348e5ada303a7961889e6a Mon Sep 17 00:00:00 2001
+From 6975beb758a16a7bbb0056d554d4b68db8d4422c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 9 Aug 2016 08:24:06 +0200
-Subject: [PATCH 1/2] hwmon/max6650.c: Add devicetree support
+Subject: [PATCH 1/3] hwmon: (max6650.c) Add devicetree support
 
 Parse devicetree parameters for voltage and prescaler setting. This allows
 using multiple max6550 devices with varying settings, and also makes it
@@ -9,50 +9,22 @@ possible to instantiate and configure the device using devicetree.
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 ---
- .../devicetree/bindings/hwmon/max6650.txt          | 20 ++++++++++++++++
- drivers/hwmon/max6650.c                            | 28 +++++++++++++---------
- 2 files changed, 37 insertions(+), 11 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/hwmon/max6650.txt
+ drivers/hwmon/max6650.c | 47 ++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 36 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/hwmon/max6650.txt b/Documentation/devicetree/bindings/hwmon/max6650.txt
-new file mode 100644
-index 0000000..89d87c6
---- /dev/null
-+++ b/Documentation/devicetree/bindings/hwmon/max6650.txt
-@@ -0,0 +1,20 @@
-+Bindings for MAX6651 and MAX6650 I2C fan controllers
-+
-+Required properties:
-+- compatible : One of "max6650" or "max6651"
-+- reg        : I2C address
-+
-+Optional properties:
-+- fan-voltage    : The supply voltage of the fan. Valid values are 5 and 12.
-+                   Default is to use the chip's current setting.
-+- fan-prescale   : Pre-scaling value as per datasheet. Valid are 1, 2, 4, 8, 16.
-+                   Default is to use the chip's current setting.
-+ 
-+
-+Example:
-+	fan-max6650: max6650@1b {
-+		reg = <0x1b>;
-+		compatible = "max6650";
-+		fan-voltage = <12>;
-+		fan-prescale = <4>;
-+	};
 diff --git a/drivers/hwmon/max6650.c b/drivers/hwmon/max6650.c
-index 162a520..56a6c87 100644
+index 162a520..c87517a 100644
 --- a/drivers/hwmon/max6650.c
 +++ b/drivers/hwmon/max6650.c
-@@ -41,14 +41,14 @@
+@@ -39,6 +39,7 @@
+ #include <linux/hwmon.h>
+ #include <linux/hwmon-sysfs.h>
  #include <linux/err.h>
++#include <linux/of_device.h>
  
  /*
-- * Insmod parameters
-+ * Insmod parameters (for backward compatibility)
-  */
- 
- /* fan_voltage: 5=5V fan, 12=12V fan, 0=don't change */
+  * Insmod parameters
+@@ -48,7 +49,7 @@
  static int fan_voltage;
  /* prescaler: Possible values are 1, 2, 4, 8, 16 or 0 for don't change */
  static int prescaler;
@@ -61,23 +33,45 @@ index 162a520..56a6c87 100644
  static int clock = 254000;
  
  module_param(fan_voltage, int, S_IRUGO);
-@@ -566,6 +566,15 @@ static int max6650_init_client(struct max6650_data *data,
+@@ -133,6 +134,19 @@ static const u8 tach_reg[] = {
+ 	MAX6650_REG_TACH3,
+ };
+ 
++static const struct of_device_id max6650_dt_match[] = {
++	{
++		.compatible = "maxim,max6650",
++		.data = (void *)1
++	},
++	{
++		.compatible = "maxim,max6651",
++		.data = (void *)4
++	},
++	{ },
++};
++MODULE_DEVICE_TABLE(of, max6650_dt_match);
++
+ static struct max6650_data *max6650_update_device(struct device *dev)
+ {
+ 	struct max6650_data *data = dev_get_drvdata(dev);
+@@ -566,6 +580,17 @@ static int max6650_init_client(struct max6650_data *data,
  	struct device *dev = &client->dev;
  	int config;
  	int err = -EIO;
 +	u32 voltage;
 +	u32 prescale;
 +
-+	if (of_property_read_u32(client->dev.of_node, "fan-voltage",
++	if (of_property_read_u32(dev->of_node, "maxim,fan-microvolt",
 +				 &voltage))
 +		voltage = fan_voltage;
-+	if (of_property_read_u32(client->dev.of_node, "fan-prescale",
++	else
++		voltage /= 1000000; /* Microvolts to volts */
++	if (of_property_read_u32(dev->of_node, "maxim,fan-prescale",
 +				 &prescale))
 +		prescale = prescaler;
  
  	config = i2c_smbus_read_byte_data(client, MAX6650_REG_CONFIG);
  
-@@ -574,7 +583,7 @@ static int max6650_init_client(struct max6650_data *data,
+@@ -574,7 +599,7 @@ static int max6650_init_client(struct max6650_data *data,
  		return err;
  	}
  
@@ -86,7 +80,7 @@ index 162a520..56a6c87 100644
  	case 0:
  		break;
  	case 5:
-@@ -584,14 +593,10 @@ static int max6650_init_client(struct max6650_data *data,
+@@ -584,14 +609,10 @@ static int max6650_init_client(struct max6650_data *data,
  		config |= MAX6650_CFG_V12;
  		break;
  	default:
@@ -103,7 +97,7 @@ index 162a520..56a6c87 100644
  	case 0:
  		break;
  	case 1:
-@@ -614,10 +619,11 @@ static int max6650_init_client(struct max6650_data *data,
+@@ -614,10 +635,11 @@ static int max6650_init_client(struct max6650_data *data,
  			 | MAX6650_CFG_PRESCALER_16;
  		break;
  	default:
@@ -117,6 +111,32 @@ index 162a520..56a6c87 100644
  		 1 << (config & MAX6650_CFG_PRESCALER_MASK));
  
  	/*
+@@ -651,6 +673,8 @@ static int max6650_probe(struct i2c_client *client,
+ 			 const struct i2c_device_id *id)
+ {
+ 	struct device *dev = &client->dev;
++	const struct of_device_id *of_id =
++		of_match_device(of_match_ptr(max6650_dt_match), dev);
+ 	struct max6650_data *data;
+ 	struct device *hwmon_dev;
+ 	int err;
+@@ -661,7 +685,7 @@ static int max6650_probe(struct i2c_client *client,
+ 
+ 	data->client = client;
+ 	mutex_init(&data->update_lock);
+-	data->nr_fans = id->driver_data;
++	data->nr_fans = of_id ? (int)(uintptr_t)of_id->data : id->driver_data;
+ 
+ 	/*
+ 	 * Initialize the max6650 chip
+@@ -691,6 +715,7 @@ MODULE_DEVICE_TABLE(i2c, max6650_id);
+ static struct i2c_driver max6650_driver = {
+ 	.driver = {
+ 		.name	= "max6650",
++		.of_match_table = of_match_ptr(max6650_dt_match),
+ 	},
+ 	.probe		= max6650_probe,
+ 	.id_table	= max6650_id,
 -- 
 1.9.1
 

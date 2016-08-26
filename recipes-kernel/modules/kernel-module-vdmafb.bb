@@ -1,7 +1,7 @@
 SUMMARY = "Kernel driver module VDMA video driver"
 require kernel-module-topic.inc
 
-SRCREV = "8ec9c7da053e785ad09d3e20d945600d011c38b7"
+SRCREV = "${AUTOREV}"
 
 RRECOMMENDS_${PN} = "\
 	kernel-module-backlight \
