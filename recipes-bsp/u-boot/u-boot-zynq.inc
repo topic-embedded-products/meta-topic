@@ -21,8 +21,8 @@ EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC}" HOSTCFLAGS="${BUILD_CFLAGS}" HOSTLD="${BUI
 
 # workaround non-existent gcc6 header
 do_compile_prepend() {
-    if [ ! -f include/linux/compiler-gcc6.h ]
+    if [ ! -f "${S}/include/linux/compiler-gcc6.h" ]
     then
-        ln -s compiler-gcc5.h include/linux/compiler-gcc6.h
+        ln -s compiler-gcc5.h "${S}/include/linux/compiler-gcc6.h"
     fi
 }
