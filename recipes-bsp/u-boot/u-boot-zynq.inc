@@ -9,8 +9,8 @@ PV = "z2016.07+git${SRCPV}"
 
 SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git \
     file://0001-mach-zynq-Kconfig-Make-SYS_VENDOR-configurable.patch \
-    file://0002-Add-support-for-the-topic-miami-system-on-modules-an.patch \
-    file://0001-topic-miami-Enable-second-ethernet-controller.patch \
+    file://0002-tools-mkimage-Add-support-for-initialization-table-f.patch \
+    file://0003-Add-support-for-the-topic-miami-system-on-modules-an.patch \
     "
 
 S = "${WORKDIR}/git"
