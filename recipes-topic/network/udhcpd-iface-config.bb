@@ -3,12 +3,14 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaabaa882bbe"
 inherit allarch
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-PV = "3"
+PV = "4"
 
 PACKAGES = "${PN}"
 SRC_URI = "file://udhcpd_up.sh file://udhcpd_down.sh file://udhcpd.*.conf"
 S = "${WORKDIR}"
 FILES_${PN} = "${sysconfdir}"
+
+RDEPENDS_${PN} = "ifplugd-auto-net"
 
 do_compile() {
 }
