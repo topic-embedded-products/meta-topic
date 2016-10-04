@@ -18,7 +18,6 @@ MY_THINGS = "\
 	alsa-utils-aplay alsa-utils-speakertest alsa-utils-amixer alsa-utils-alsactl \
 	i2c-tools \
 	udhcpd-iface-config \
-	iperf3 ethtool tcpdump \
 	"
 
 # Skip packagegroup-base to reduce the number of packages built. Thus, we need
