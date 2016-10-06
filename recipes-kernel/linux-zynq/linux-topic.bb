@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 KBRANCH = "topic-miami"
-SRCREV = "216bd6969ca03cfdd65f7fe479788d86c64d76ee"
+SRCREV = "6275c630d07062a4714bf1bc4b788084fa04d197"
 LINUX_VERSION = "4.6"
 
 inherit kernel
@@ -24,9 +24,6 @@ KERNEL_GIT_REPO ?= "git://github.com/topic-embedded-products/linux"
 SRC_URI = "\
 	${KERNEL_GIT_REPO};branch=${KBRANCH} \
 	file://defconfig \
-	file://0001-hwmon-max6650.c-Add-devicetree-support.patch \
-	file://0002-hwmon-max6650.c-Add-devicetree-support-documentation.patch \
-	file://0003-hwmon-max6650-Allow-fan-shutdown-and-initial-rpm-tar.patch \
 	"
 
 KERNEL_IMAGETYPE = "uImage"
