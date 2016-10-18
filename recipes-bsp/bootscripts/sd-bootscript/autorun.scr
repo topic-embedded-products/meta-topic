@@ -1,6 +1,6 @@
 echo "Load kernel from SD card..."
 fatload mmc 0 ${kernel_addr} ${kernel_image}
-fatload mmc 0 0x2A00000 ${devicetree_image}
+fatload mmc 0 ${devicetree_addr} ${devicetree_image}
 setenv bootargs "console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootfstype=ext4 rootwait quiet"
 echo "Booting..."
-bootm ${kernel_addr} - 0x2A00000
+bootm ${kernel_addr} - ${devicetree_addr}
