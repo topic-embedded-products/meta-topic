@@ -5,27 +5,24 @@ This is an overlay intended for OpenEmbedded and/or Yocto.
 
 # OpenEmbedded
 
-Here's a quick script for OE:
+Recommended way of building is to use the "topic-platform" repository:
+https://github.com/topic-embedded-products/topic-platform
+
+This will build a tested combination of the OE repositories and the meta-topic
+layer.
+
+For those who want to live on the cutting edge, you can try to build the current
+master branches for all repositories using this script. This is not guaranteed
+to work, since it always builds the "current state of affairs":
 
 ```
 mkdir my-zynq
 cd my-zynq
 git clone git://git.openembedded.org/openembedded-core oe-core
-cd oe-core
-git checkout 4e0fb630d3bb0250ece6e2071ae49b2601ae3e57
-cd ..
 git clone git://github.com/openembedded/meta-openembedded.git meta-oe
-cd meta-oe
-git checkout 9a67b079a7deff2d6e53df031b26304a71c4e0f8
-cd ..
 git clone git://git.openembedded.org/bitbake bitbake
-cd bitbake
-git checkout 2c778ad50aceaffb855baf5f4aa0fed98c880870
-cd ..
 git clone http://github.com/topic-embedded-products/meta-topic.git meta-topic
-
 meta-topic/scripts/init-oe.sh
-
 cd build
 
 # Edit local.conf to match your setup.
