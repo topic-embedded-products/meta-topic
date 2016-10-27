@@ -21,14 +21,29 @@ if [ -d /media/${SUDO_USER} ]
 then
 	MEDIA=/media/${SUDO_USER}
 else
-	MEDIA=/media
+    # Fedora/Arch/other systemd distro's use /var/run/media for mounts.
+    if [ -d /var/run/media/${SUDO_USER} ]
+    then
+        MEDIA=/var/run/media/${SUDO_USER}
+    else
+        MEDIA=/media
+    fi
 fi
 if [ ! -w ${MEDIA}/boot ]
 then
-	echo "${MEDIA}/boot is not accesible. Are you root (sudo me),"
-	echo "is the SD card inserted, and did you partition and"
-	echo "format it with partition_sd_card.sh?"
-	exit 1
+    # For some reason, vfat systems get mounted with CASE charactors under
+    # some distro's.
+    if [ ! -w ${MEDIA}/BOOT ]
+    then
+        echo "${MEDIA_BOOT} is not accesible. Are you root (sudo me),"
+        echo "is the SD card inserted, and did you partition and"
+        echo "format it with partition_sd_card.sh?"
+        exit 1
+    else
+        MEDIA_BOOT=${MEDIA}/BOOT
+    fi
+else
+    MEDIA_BOOT=${MEDIA}/boot
 fi
 if [ ! -w ${MEDIA}/rootfs ]
 then
@@ -65,22 +80,22 @@ if [ -d ${MEDIA}/data ]
 then
 	MEDIA_DATA=${MEDIA}/data
 else
-	MEDIA_DATA=${MEDIA}/boot
+	MEDIA_DATA=${MEDIA_BOOT}
 fi
 echo "Writing boot..."
-rm -f ${MEDIA}/boot/*.ubi ${MEDIA}/boot/*.squashfs-lzo
+rm -f ${MEDIA_BOOT}/*.ubi ${MEDIA_BOOT}/*.squashfs-lzo
 if [ -e ${IMAGE_ROOT}/BOOT.bin ]
 then
-	cp ${IMAGE_ROOT}/BOOT.bin ${MEDIA}/boot/BOOT.BIN
+	cp ${IMAGE_ROOT}/BOOT.bin ${MEDIA_BOOT}/BOOT.BIN
 	if [ -e ${IMAGE_ROOT}/u-boot.img ]
 	then
-		cp ${IMAGE_ROOT}/u-boot.img ${MEDIA}/boot/
+		cp ${IMAGE_ROOT}/u-boot.img ${MEDIA_BOOT}/
 	fi
-	cp ${IMAGE_ROOT}/${SD_BOOTSCRIPT} ${MEDIA}/boot/autorun.scr
-	cp ${IMAGE_ROOT}/uImage ${MEDIA}/boot/
-	cp ${IMAGE_ROOT}/${DTB} ${MEDIA}/boot/devicetree.dtb
+	cp ${IMAGE_ROOT}/${SD_BOOTSCRIPT} ${MEDIA_BOOT}/autorun.scr
+	cp ${IMAGE_ROOT}/uImage ${MEDIA_BOOT}/
+	cp ${IMAGE_ROOT}/${DTB} ${MEDIA_BOOT}/devicetree.dtb
 else
-	tar xaf ${IMAGE_ROOT}/boot.tar.gz --no-same-owner -C ${MEDIA}/boot
+	tar xaf ${IMAGE_ROOT}/boot.tar.gz --no-same-owner -C ${MEDIA_BOOT}
 fi
 for FS in ubi squashfs-lzo squashfs-xz
 do
@@ -104,14 +119,14 @@ then
 fi
 if [ ! -z "${FPGA_BOOT_IMAGE}" ]
 then
-	cp ${MEDIA}/rootfs/${FPGA_BOOT_IMAGE} ${MEDIA}/boot/fpga.bin
+	cp ${MEDIA}/rootfs/${FPGA_BOOT_IMAGE} ${MEDIA_BOOT}/fpga.bin
 fi
 
 if [ $DO_UNMOUNT -ne 0 ]
 then
 	sleep 1
 	echo -n "Unmounting"
-	for p in ${MEDIA}/boot ${MEDIA}/rootfs ${MEDIA}/data
+	for p in ${MEDIA_BOOT} ${MEDIA}/rootfs ${MEDIA}/data
 	do
 		if [ -d $p ]
 		then
