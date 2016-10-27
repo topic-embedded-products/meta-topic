@@ -11,7 +11,7 @@ You will need:
 - One or two USB cables.
 - The "xmd" program from the Xilinx Vivado or XPS software suites.
 - On Ubuntu, you may need the "libusb-driver" for the JTAG hardware.
-- The results of an OpenEmbedded image build (miami-vice-image)
+- The results of an OpenEmbedded image build (kernel and ramdisk)
 - The ps7_init.tcl script (created by Vivado or XPS)
 
 Instructions:

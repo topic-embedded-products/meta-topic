@@ -42,11 +42,6 @@ nice bitbake my-image
 Note that "my-image" was designed to be used with DISTRO=tiny. It
 expects to run with busybox-mdev instead of udev.
 
-For the Miami boards, there is a miami-vice-image that can be run on the
-miami board using only the "Miami Vice" debugging add-on. This image can
-be loaded into RAM using JTAG and run from there, see README-JTAGBOOT
-for more information on how to do that.
-
 
 # Yocto
 
