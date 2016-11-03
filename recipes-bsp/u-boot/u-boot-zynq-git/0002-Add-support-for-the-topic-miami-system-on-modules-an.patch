@@ -1,20 +1,17 @@
-From 77d1335cb7adee05af8191828544397be0a0d56e Mon Sep 17 00:00:00 2001
+From 357c79a48fb81d06f7aef2ad00da780916e887aa Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 2 Sep 2014 12:16:02 +0200
-Subject: [PATCH 3/3] Add support for the topic-miami system-on-modules and
+Subject: [PATCH 2/2] Add support for the topic-miami system-on-modules and
  carrier boards
 
 The topic-miami SoMs contain a Zynq xc7z015 or xc7z030 SoC, 1GB DDR3L RAM,
 32MB QSPI NOR flash and 256MB NAND flash.
 
-The topic-miamiplus SoMs contain a Zynq xc7z045 or xc7z100 SoC,
+The topic-miamiplus SoMs contain a Zynq xc7z035, xc7z045 or xc7z100 SoC,
 2x 1GB DDR3L RAM, 64MB dual-parallel QSPI flash, clock sources
 and a fan controller.
 
 The "Florida" carrier boards add SD, USB, ethernet and other interfaces.
-
-Implement MIO pin config to init table (set by ROM loader).
-Set QSPI divider and clock to ~100 MHz early on for faster boot.
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 ---
@@ -52,7 +49,7 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  create mode 100644 include/configs/topic_miamiplus.h
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index 71cf540..b11f99d 100644
+index f27bdb4..2afe4c8 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
 @@ -94,6 +94,8 @@ dtb-$(CONFIG_ARCH_ZYNQ) += zynq-zc702.dtb \
