@@ -52,3 +52,9 @@ ZYNQ_BOOTGEN ?= "${XILINX_TOOL_PATH}/ISE_DS/ISE/bin/lin64/bootgen"
 # The logic is usually placed in the rootfs, but if you insist you can put a
 # binary bitfile into the BOOT.bin and waste time and space.
 ZYNQ_BITFILE ?= ""
+
+# WIC image support.
+DEVICETREE ??= "zynq-7000.dtb"
+WKS_FILE = "sdimage-bootpart.wks"
+IMAGE_BOOT_FILES = "boot.bin u-boot.img uImage ${DEVICETREE};devicetree.dtb"
+do_image_wic[depends] += "mtools-native:do_populate_sysroot dosfstools-native:do_populate_sysroot"

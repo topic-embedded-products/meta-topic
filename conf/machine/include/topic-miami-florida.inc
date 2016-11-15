@@ -34,3 +34,5 @@ BOARD_FPGA_PACKAGES ?= "\
 	"
 
 MACHINE_FEATURES += "usbhost usbgadget screen touchscreen wifi alsa ethernet"
+
+DEVICETREE = "uImage-topic-miami-florida-gen.dtb"
