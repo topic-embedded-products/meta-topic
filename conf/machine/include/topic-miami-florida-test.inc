@@ -22,9 +22,6 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-videobuf2-dma-contig \
 	kernel-module-videobuf2-memops \
 	kernel-module-videobuf2-vmalloc \
-	kernel-module-virtio-ring \
-	kernel-module-virtio-rpmsg-bus \
-	kernel-module-virtio \
 	"
 
 MACHINE_FEATURES += "usbhost usbgadget"

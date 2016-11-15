@@ -26,9 +26,6 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-videobuf2-memops \
 	kernel-module-videobuf2-vmalloc \
 	kernel-module-virt-dma \
-	kernel-module-virtio-ring \
-	kernel-module-virtio-rpmsg-bus \
-	kernel-module-virtio \
 	kernel-module-xilinx-dma \
 	kernel-module-xilinx-emacps \
 	"
