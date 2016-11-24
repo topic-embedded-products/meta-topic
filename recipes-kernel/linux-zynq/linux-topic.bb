@@ -72,3 +72,9 @@ pkg_postinst_kernel-image () {
 	fi
 	true
 }
+
+# Workaround: Enforce using "our" defconfig and not some stale version from a
+# previous build. Pending real fix in OE-core.
+do_configure_prepend() {
+	cp "${WORKDIR}/defconfig" "${B}/.config"
+}
