@@ -16,7 +16,7 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-fpgapower \
 	kernel-module-rsi-sdio \
 	kernel-module-rsi-91x \
-	firmware-rsi-91x \
+	linux-firmware-rsi-91x \
 	kernel-module-snd-hwdep \
 	kernel-module-snd-soc-adi-axi-spdif \
 	kernel-module-snd-soc-adv7511-hdmi \
