@@ -1,9 +1,13 @@
 #!/bin/sh
+
+IFPLUGDLIST="*[0-9]"
+test ! -r /etc/default/ifplugd-auto-net || . /etc/default/ifplugd-auto-net
+
 case "$1" in
 start)
 	echo -n "Start ifplugd:"
 	cd /sys/class/net
-	for i in *[0-9]
+	for i in $IFPLUGDLIST
 	do
 		echo -n " $i"
 		ifplugd -i $i -r /etc/ifplugd.auto
@@ -14,7 +18,7 @@ start)
 stop)
 	echo -n "Stop ifplugd:"
 	cd /sys/class/net
-	for i in *[0-9]
+	for i in $IFPLUGDLIST
 	do
 		echo -n " $i"
 		ifplugd -i $i -k
