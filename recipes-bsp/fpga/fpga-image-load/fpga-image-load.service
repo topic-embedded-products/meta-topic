@@ -1,0 +1,11 @@
+[Unit]
+Description=FPGA bitstream loader
+DefaultDependencies=no
+Before=systemd-modules-load.service
+
+[Service]
+Type=oneshot
+ExecStart=@BINDIR@/fpga-image-load.sh
+
+[Install]
+WantedBy=multi-user.target
