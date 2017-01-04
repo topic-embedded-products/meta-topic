@@ -1,0 +1,11 @@
+if fatload mmc 0 0x100000 fpga.bin
+then
+	echo "Load FPGA bitstream from SD..."
+	fpga load 0 0x100000 $filesize
+fi
+echo "Load kernel from SD..."
+load mmc 0 ${kernel_addr_r} Image
+load mmc 0 ${fdt_addr_r} system.dtb
+setenv bootargs "root=/dev/mmcblk1p2 rw rootfstype=ext4 rootwait"
+echo "Booting..."
+booti ${kernel_addr_r} - ${fdt_addr_r}

@@ -1,7 +1,7 @@
-From 5841d68bd566b02943d3e597f9776da51fc1bd75 Mon Sep 17 00:00:00 2001
+From 2d5e0ac17a820467c0c650cdf9192e4aa91a88a2 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 17 Nov 2016 15:20:32 +0100
-Subject: [PATCH 1/4] board: topic: Detect RAM size at boot
+Subject: [PATCH 1/9] board: topic: Detect RAM size at boot
 
 Miami boards can have memory sizes of 256M, 512M or 1GB. To prevent requiring
 separate bootloaders for each variant, just detect the RAM size at boot time
@@ -60,29 +60,29 @@ index a95c9d1..8a5765e 100644
 +					   CONFIG_SYS_SDRAM_SIZE_MAX);
 +}
 diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
-index e7b6c0f..fce7daa 100644
+index 0cbcbcd..6a1ed52 100644
 --- a/configs/topic_miami_defconfig
 +++ b/configs/topic_miami_defconfig
-@@ -24,6 +24,7 @@ CONFIG_CMD_EXT4=y
+@@ -25,6 +25,7 @@ CONFIG_CMD_EXT4=y
  CONFIG_CMD_FAT=y
  CONFIG_CMD_FS_GENERIC=y
  CONFIG_OF_EMBED=y
 +CONFIG_OF_BOARD_SETUP=y
  CONFIG_SPL_DM_SEQ_ALIAS=y
- CONFIG_ZYNQ_SDHCI=y
- CONFIG_MMC_SDHCI=y
+ CONFIG_DM_GPIO=y
+ CONFIG_DM_MMC=y
 diff --git a/configs/topic_miamiplus_defconfig b/configs/topic_miamiplus_defconfig
-index 2141949e..dded3bb 100644
+index 76077d9..19d758c 100644
 --- a/configs/topic_miamiplus_defconfig
 +++ b/configs/topic_miamiplus_defconfig
-@@ -24,6 +24,7 @@ CONFIG_CMD_EXT4=y
+@@ -25,6 +25,7 @@ CONFIG_CMD_EXT4=y
  CONFIG_CMD_FAT=y
  CONFIG_CMD_FS_GENERIC=y
  CONFIG_OF_EMBED=y
 +CONFIG_OF_BOARD_SETUP=y
  CONFIG_SPL_DM_SEQ_ALIAS=y
- CONFIG_ZYNQ_SDHCI=y
- CONFIG_MMC_SDHCI=y
+ CONFIG_DM_GPIO=y
+ CONFIG_DM_MMC=y
 -- 
 1.9.1
 

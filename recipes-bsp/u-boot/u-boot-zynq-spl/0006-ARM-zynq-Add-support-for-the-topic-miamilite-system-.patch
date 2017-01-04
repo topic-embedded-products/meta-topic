@@ -1,7 +1,7 @@
-From 39474c4b4e54555793004ad3f44d5ba6dcdac176 Mon Sep 17 00:00:00 2001
+From 5e56fca1f9195f6c58bcd54fe35c2c342d4d1df0 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 23 Feb 2017 12:07:49 +0100
-Subject: [PATCH] ARM: zynq: Add support for the topic-miamilite
+Subject: [PATCH 6/9] ARM: zynq: Add support for the topic-miamilite
  system-on-module
 
 The topic-miamilite SoM contains a Zynq xc7z010 SoC, 1GB DDR3L RAM,
@@ -23,11 +23,11 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  create mode 100644 include/configs/topic_miamilite.h
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index 7514526..00021a4 100644
+index 424ab5b..7e3e10b 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -101,6 +101,7 @@ dtb-$(CONFIG_ARCH_ZYNQ) += zynq-zc702.dtb \
- 	zynq-microzed.dtb \
+@@ -111,6 +111,7 @@ dtb-$(CONFIG_ARCH_ZYNQ) += zynq-zc702.dtb \
+ 	zynq-cse-qspi-x2-stacked.dtb \
  	zynq-picozed.dtb \
  	zynq-topic-miami.dtb \
 +	zynq-topic-miamilite.dtb \

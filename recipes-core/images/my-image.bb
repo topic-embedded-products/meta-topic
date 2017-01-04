@@ -7,7 +7,7 @@ DEPENDS += "${DISTRO_EXTRA_DEPENDS} ${MACHINE_EXTRA_DEPENDS}"
 
 IMAGE_FEATURES += "package-management ssh-server-dropbear"
 
-IMAGE_FSTYPES = "tar.gz ubi"
+IMAGE_FSTYPES = "tar.gz wic.gz"
 
 inherit core-image
 

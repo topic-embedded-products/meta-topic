@@ -1,7 +1,7 @@
-From 49553c507d008cacfb9176e784d0f5c17774074d Mon Sep 17 00:00:00 2001
+From ec5b83075b7c20e8276b99d0e0328a2c0ac9d8c6 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 22 May 2017 09:33:52 +0200
-Subject: [PATCH] topic-miamiplus: Run CPU at 800MHz for speedgrade-2
+Subject: [PATCH 7/9] topic-miamiplus: Run CPU at 800MHz for speedgrade-2
 
 The miamiplus contains a speedgrade-2 device, which may run the CPU at 800MHz.
 Change the PLL setting to 800MHz, and adapt the setpoints in the devicetree.

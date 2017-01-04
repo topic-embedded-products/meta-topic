@@ -1,0 +1,54 @@
+From 9f86318826a675411d1a9779851731d92661cee7 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 25 Aug 2017 14:37:20 +0200
+Subject: [PATCH 9/9] mmc/sdhci: Add card detect method
+
+Detect whether a card is detected. This prevents probing problems
+when no card is in the reader. The board apparently reports "present"
+for the non-removable device as well, so we can get away with that.
+Proper CD would look at the "non-removable" boolean in the devicetree.
+---
+ drivers/mmc/sdhci.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/drivers/mmc/sdhci.c b/drivers/mmc/sdhci.c
+index a91a31d..4e62d28 100644
+--- a/drivers/mmc/sdhci.c
++++ b/drivers/mmc/sdhci.c
+@@ -687,6 +687,17 @@ static int sdhci_init(struct mmc *mmc)
+ 	return 0;
+ }
+ 
++static int sdhci_get_cd(struct udevice *dev)
++{
++	int ret;
++	struct mmc *mmc = mmc_get_mmc_dev(dev);
++	struct sdhci_host *host = mmc->priv;
++
++	ret = !!(sdhci_readl(host, SDHCI_PRESENT_STATE) & SDHCI_CARD_PRESENT);
++
++	return ret;
++}
++
+ #ifdef CONFIG_DM_MMC_OPS
+ int sdhci_probe(struct udevice *dev)
+ {
+@@ -701,6 +712,7 @@ const struct dm_mmc_ops sdhci_ops = {
+ 	.set_voltage	= sdhci_set_voltage,
+ 	.set_uhs	= sdhci_set_uhs,
+ 	.execute_tuning	= sdhci_execute_tuning,
++	.get_cd         = sdhci_get_cd,
+ };
+ #else
+ static const struct mmc_ops sdhci_ops = {
+@@ -710,6 +722,7 @@ static const struct mmc_ops sdhci_ops = {
+ 	.set_voltage	= sdhci_set_voltage,
+ 	.set_uhs	= sdhci_set_uhs,
+ 	.execute_tuning	= sdhci_execute_tuning,
++	.get_cd         = sdhci_get_cd,
+ };
+ #endif
+ 
+-- 
+1.9.1
+
