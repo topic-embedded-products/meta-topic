@@ -1,0 +1,67 @@
+#@TYPE: Machine
+#@DESCRIPTION: Machine support for Topic Miami MPSoC.
+#
+# Machine names are expected to have this form:
+#  topic-miamimp-<carrier>-<fpga>
+
+# The system-on-module contains flash, CPU+FPGA, RAM and various power supply
+# and clock sources.
+SOM_FAMILY = "topic-miamimp"
+
+# All software packages run on the ARM part, hence strip of the FPGA type from
+# the machine same in order to create the MACHINE_ARCH.
+MACHINE_BOARD := "${@'-'.join(d.getVar('MACHINE', True).split('-')[:-1])}"
+MACHINE_ARCH = "${@d.getVar('MACHINE_BOARD', True).replace('-','_')}"
+# The kernel also only depends on the board, not the FPGA
+KMACHINE = "${MACHINE_BOARD}"
+
+# The FPGA bitstreams will use FPGA_FAMILY as their package-arch, because they
+# are compatible with any FPGA of the same type, regardless of the board.
+FPGA_FAMILY := "${@d.getVar('MACHINE', True).split('-')[-1:][0]}"
+FPGA_FAMILY_ARCH = "${@d.getVar('FPGA_FAMILY', True).replace('-','_')}"
+# Default is not to have a bitstream, but machines will recommend their own,
+# or images may choose to use another application-specific bitstream provider.
+MACHINE_FPGA_BITSTREAM ??= ""
+# The board adds extra packages, usually kernel modules, that depend on the
+# FPGA to function properly. Changing the bitstream usually alters this list
+# too.
+BOARD_FPGA_PACKAGES ??= ""
+MACHINE_EXTRA_RRECOMMENDS = "${MACHINE_FPGA_BITSTREAM} ${BOARD_FPGA_PACKAGES}"
+
+KERNEL_MODULE_AUTOLOAD ?= ""
+
+require conf/machine/include/tune-zynqmp.inc
+require conf/machine/include/machine-xilinx-default.inc
+require conf/machine/include/machine-xilinx-board.inc
+
+MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
+PACKAGE_EXTRA_ARCHS_append = " ${FPGA_FAMILY_ARCH}"
+
+MACHINE_FEATURES = "rtc ext2 ext3 vfat usbhost mali"
+
+UBOOT_MACHINE = "topic_miamimp_config"
+SPL_BINARY = "spl/boot.bin"
+SPL_SYMLINK = "BOOT.bin"
+UBOOT_SUFFIX = "img"
+UBOOT_LOADADDRESS = "0x8000000"
+UBOOT_ENTRYPOINT = "0x8000000"
+
+SERIAL_CONSOLE = "115200 ttyPS0"
+
+KERNEL_DEVICETREE = "xilinx/zynqmp-topic-miamimp.dtb"
+
+PREFERRED_PROVIDER_virtual/kernel = "linux-topic"
+PREFERRED_PROVIDER_virtual/bootloader = "u-boot-zynq-spl"
+
+EXTRA_IMAGEDEPENDS += "arm-trusted-firmware"
+
+# Use QSPI flash with 128k sector size
+MKUBIFS_ARGS = "-m 1 -e 130944 -c 952"
+UBINIZE_ARGS = "-m 1 -p 128KiB"
+UBI_VOLNAME = "qspi-rootfs"
+
+# WIC image support.
+DEVICETREE ??= "Image-zynqmp-topic-miamimp.dtb"
+WKS_FILE = "sdimage-bootpart.wks"
+IMAGE_BOOT_FILES = "boot.bin u-boot.bin Image atf-uboot.ub ${DEVICETREE};system.dtb"
+do_image_wic[depends] += "mtools-native:do_populate_sysroot dosfstools-native:do_populate_sysroot"

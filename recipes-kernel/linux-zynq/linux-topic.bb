@@ -7,6 +7,10 @@ KBRANCH = "topic-miami"
 SRCREV = "ead0daeb11acee76ab3328383fc0d28077b3cdcf"
 LINUX_VERSION = "4.6"
 
+KBRANCH_topic-miamimp = "topic-miamimp-4.9-okay"
+SRCREV_topic-miamimp = "ec34e6ccc7a0e54ea42e0b588d304bcc73984b83"
+LINUX_VERSION_topic-miamimp = "4.9"
+
 inherit kernel
 require recipes-kernel/linux/linux-dtb.inc
 
@@ -21,13 +25,16 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/linux-topic:"
 # another kernel repo. Or to another kernel entirely.
 KERNEL_GIT_REPO ?= "git://github.com/topic-embedded-products/linux"
 
+EXTRA_PATCHES = "file://0001-dmaeninge-xilinx_dma-Fix-bug-in-multiple-frame-store.patch"
+EXTRA_PATCHES_topic-miamimp = ""
 SRC_URI = "\
 	${KERNEL_GIT_REPO};branch=${KBRANCH} \
 	file://defconfig \
-	file://0001-dmaeninge-xilinx_dma-Fix-bug-in-multiple-frame-store.patch \
+	${EXTRA_PATCHES} \
 	"
 
 KERNEL_IMAGETYPE = "uImage"
+KERNEL_IMAGETYPE_topic-miamimp = "Image"
 KERNEL_DEVICETREE = "${MACHINE}.dtb"
 KERNEL_DEVICETREE_topic-miami = "\
 	topic-miami-dyplo.dtb \
@@ -44,9 +51,17 @@ KERNEL_DEVICETREE_topic-miami = "\
 	topic-miami-florida-test.dtb \
 	topic-miamiplus-florida-test.dtb \
 	"
+KERNEL_DEVICETREE_topic-miamimp = "\
+	xilinx/zynqmp-topic-miamimp.dtb \
+	xilinx/zynqmp-topic-miamimp-florida-gen.dtb \
+	xilinx/zynqmp-topic-miamimp-florida-test.dtb \
+	"
+
 # See http://permalink.gmane.org/gmane.linux.kernel.commits.head/371588
 KERNEL_EXTRA_ARGS += "LOADADDR=0x00008000"
 KERNEL_IMAGEDEST = "tmp/boot"
+
+KERNEL_EXTRA_ARGS_topic-miamimp = ""
 
 FILES_kernel-image = "${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}*"
 

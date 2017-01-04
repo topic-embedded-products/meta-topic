@@ -1,29 +1,29 @@
-From 22a515f4270fcd6acba5de872eb12b7983798055 Mon Sep 17 00:00:00 2001
+From 7c4b49d33b2337dc9179492657950f942b0a8146 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 28 Nov 2016 07:26:34 +0100
-Subject: [PATCH 2/4] topic_miami_defconfig: Remove NFS and NET support
+Subject: [PATCH 2/9] topic_miami_defconfig: Remove NFS and NET support
 
 On the miami board, ethernet is accessed via logic. To use it, one
 would have to program logic first and then set up the rgmii conversion
 block as well. Not likely to ever be used, so disable network support
 by default to save some space.
 ---
- configs/topic_miami_defconfig | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ configs/topic_miami_defconfig | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
-index fce7daa..ddc7462 100644
+index 6a1ed52..3f3052e 100644
 --- a/configs/topic_miami_defconfig
 +++ b/configs/topic_miami_defconfig
-@@ -4,6 +4,7 @@ CONFIG_SYS_CONFIG_NAME="topic_miami"
- CONFIG_ARCH_ZYNQ=y
+@@ -5,6 +5,7 @@ CONFIG_ARCH_ZYNQ=y
  CONFIG_BOOT_INIT_FILE="board/topic/zynq/zynq-topic-miami/ps7_regs.txt"
+ CONFIG_SYS_TEXT_BASE=0x4000000
  CONFIG_DEFAULT_DEVICE_TREE="zynq-topic-miami"
 +CONFIG_OF_BOARD_SETUP=y
  CONFIG_BOOTDELAY=0
  CONFIG_SYS_NO_FLASH=y
  # CONFIG_DISPLAY_CPUINFO is not set
-@@ -19,12 +20,13 @@ CONFIG_CMD_USB=y
+@@ -20,12 +21,13 @@ CONFIG_CMD_USB=y
  CONFIG_CMD_DFU=y
  CONFIG_CMD_GPIO=y
  # CONFIG_CMD_SETEXPR is not set
@@ -36,16 +36,8 @@ index fce7daa..ddc7462 100644
  CONFIG_OF_EMBED=y
 -CONFIG_OF_BOARD_SETUP=y
  CONFIG_SPL_DM_SEQ_ALIAS=y
- CONFIG_ZYNQ_SDHCI=y
- CONFIG_MMC_SDHCI=y
-@@ -32,7 +34,6 @@ CONFIG_SPI_FLASH=y
- CONFIG_SPI_FLASH_BAR=y
- CONFIG_SPI_FLASH_STMICRO=y
- # CONFIG_SPI_FLASH_USE_4K_SECTORS is not set
--# CONFIG_NETDEVICES is not set
- CONFIG_DEBUG_UART=y
- CONFIG_DEBUG_UART_ZYNQ=y
- CONFIG_DEBUG_UART_BASE=0xe0000000
+ CONFIG_DM_GPIO=y
+ CONFIG_DM_MMC=y
 -- 
 1.9.1
 
