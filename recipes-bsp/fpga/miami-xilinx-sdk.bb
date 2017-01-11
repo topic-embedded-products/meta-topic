@@ -7,7 +7,7 @@ SUMMARY = "ps7_init.c and ps7_init.h for bootloader"
 PROVIDES = "virtual/xilinx-sdk"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaabaa882bbe"
-COMPATIBLE_MACHINE = "topic-miami"
+COMPATIBLE_MACHINE = "topic-miami-|topic-miamiplus-"
 
 PV = "4"
 SRC_URI = "file://ps7_init.c file://ps7_init.h"
