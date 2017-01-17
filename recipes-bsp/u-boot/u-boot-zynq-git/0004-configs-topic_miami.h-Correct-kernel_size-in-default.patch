@@ -1,0 +1,31 @@
+From b6b403d3158e75ad60cb6be1a31bf8b7214abe23 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 17 Jan 2017 09:38:08 +0100
+Subject: [PATCH 4/4] configs/topic_miami.h: Correct kernel_size in default
+ environment
+
+The kernel partition in QSPI is 0x440000 large, not 0x400000. Fix this
+in the environment, otherwise the kernel will fail to boot if it occupies
+more space.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ include/configs/topic_miami.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
+index 3b0fa29..42cfbb0 100644
+--- a/include/configs/topic_miami.h
++++ b/include/configs/topic_miami.h
+@@ -110,7 +110,7 @@
+ 	"bootscript=autorun.scr\0" \
+ 	"loadbit_addr=0x100000\0"	\
+ 	"loadbootenv_addr=0x2000000\0" \
+-	"kernel_size=0x400000\0"	\
++	"kernel_size=0x440000\0"	\
+ 	"devicetree_size=0x10000\0"	\
+ 	"boot_size=0xF00000\0"	\
+ 	"fdt_high=0x20000000\0"	\
+-- 
+1.9.1
+

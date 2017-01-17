@@ -1,0 +1,33 @@
+From 085b2b82874f96cd644940754449ce0319f9f043 Mon Sep 17 00:00:00 2001
+From: Michal Simek <michal.simek@xilinx.com>
+Date: Fri, 16 Dec 2016 13:16:14 +0100
+Subject: [PATCH] ARM: zynq: Setup modeboot variable based on boot mode
+
+modeboot variable is used for saving inforation which bootmode
+is used.
+
+Signed-off-by: Michal Simek <michal.simek@xilinx.com>
+---
+ board/xilinx/zynq/board.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/board/xilinx/zynq/board.c b/board/xilinx/zynq/board.c
+index 5cd9bbf..6a3cbe0 100644
+--- a/board/xilinx/zynq/board.c
++++ b/board/xilinx/zynq/board.c
+@@ -85,6 +85,12 @@ int board_init(void)
+ int board_late_init(void)
+ {
+ 	switch ((zynq_slcr_get_boot_mode()) & ZYNQ_BM_MASK) {
++	case ZYNQ_BM_QSPI:
++		setenv("modeboot", "qspiboot");
++		break;
++	case ZYNQ_BM_NAND:
++		setenv("modeboot", "nandboot");
++		break;
+ 	case ZYNQ_BM_NOR:
+ 		setenv("modeboot", "norboot");
+ 		break;
+-- 
+1.9.1
+
