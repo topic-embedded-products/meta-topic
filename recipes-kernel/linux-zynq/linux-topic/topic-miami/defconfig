@@ -1245,6 +1245,7 @@ CONFIG_MICREL_PHY=y
 # CONFIG_MDIO_BUS_MUX_MMIOREG is not set
 # CONFIG_MDIO_BCM_UNIMAC is not set
 # CONFIG_XILINX_PHY is not set
+# CONFIG_XILINX_GMII2RGMII is not set
 # CONFIG_MICREL_KS8995MA is not set
 # CONFIG_PPP is not set
 # CONFIG_SLIP is not set
@@ -1504,6 +1505,7 @@ CONFIG_XILINX_DEVCFG=y
 # CONFIG_RAW_DRIVER is not set
 # CONFIG_TCG_TPM is not set
 # CONFIG_XILLYBUS is not set
+# CONFIG_AXI_INTR_MONITOR is not set
 
 #
 # I2C support
@@ -2213,7 +2215,7 @@ CONFIG_DRM_KMS_CMA_HELPER=y
 #
 # I2C encoder or helper chips
 #
-CONFIG_DRM_I2C_ADV7511=m
+CONFIG_DRM_I2C_ADV7511=y
 # CONFIG_DRM_I2C_CH7006 is not set
 # CONFIG_DRM_I2C_SIL164 is not set
 # CONFIG_DRM_I2C_NXP_TDA998X is not set
@@ -2240,6 +2242,7 @@ CONFIG_DRM_BRIDGE=y
 # CONFIG_DRM_PARADE_PS8622 is not set
 # CONFIG_DRM_STI is not set
 # CONFIG_DRM_XILINX is not set
+# CONFIG_DRM_ZOCL is not set
 # CONFIG_DRM_XYLON is not set
 
 #
