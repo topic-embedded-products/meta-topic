@@ -7,7 +7,6 @@ MACHINE_FPGA_BITSTREAM ?= "fpga-image-miami-florida-gen-reference"
 BOARD_FPGA_PACKAGES ?= "\
 	${@bb.utils.contains('VIRTUAL-RUNTIME_dev_manager', 'busybox-mdev', 'adi-hdmi-in-load adi-hdmi-load', '', d)} \
 	kernel-module-adi-axi-hdmi \
-	kernel-module-adv7511 \
 	kernel-module-adv7604 \
 	kernel-module-axi-hdmi-rx \
 	kernel-module-bitblit \
