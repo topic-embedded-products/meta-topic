@@ -34,7 +34,7 @@ then
     # Some distros mount vfat systems with CASE characters.
     if [ ! -w ${MEDIA}/BOOT ]
     then
-        echo "${MEDIA_BOOT} is not accesible. Are you root (sudo me),"
+        echo "${MEDIA}/boot is not accesible. Are you root (sudo me),"
         echo "is the SD card inserted, and did you partition and"
         echo "format it with partition_sd_card.sh?"
         exit 1
