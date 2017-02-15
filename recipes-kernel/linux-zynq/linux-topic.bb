@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 KBRANCH = "topic-miami"
-SRCREV = "96139019f0968c31fe8adb0a07db3a49d99e1618"
+SRCREV = "1adc16daa7d14f8491827c255e7a52a810e60b6d"
 LINUX_VERSION = "4.6"
 
 inherit kernel
@@ -30,6 +30,7 @@ KERNEL_IMAGETYPE = "uImage"
 KERNEL_DEVICETREE = "${MACHINE}.dtb"
 KERNEL_DEVICETREE_topic-miami = "\
 	topic-miami-dyplo.dtb \
+	topic-miami-dyplo-acp.dtb \
 	topic-miami-florida-gen.dtb \
 	topic-miami-florida-gen-pt.dtb \
 	topic-miami-florida-gen-nand.dtb \
