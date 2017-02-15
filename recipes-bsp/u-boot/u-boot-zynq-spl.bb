@@ -8,6 +8,11 @@ DEPENDS += "dtc-native"
 #  "v2017.01"
 SRCREV = "a705ebc81b7f91bbd0ef7c634284208342901149"
 
+# The "plus" board has dual-QSPI which isn't supported in mainline (yet). So
+# fetch u-boot-xlnx instead.
+SRC_URI_topic-miamiplus = "git://github.com/Xilinx/u-boot-xlnx.git"
+SRCREV_topic-miamiplus = "c623f127e4c82885ab0d936616d628d37fb081c7"
+
 SRC_URI += "\
 	file://0001-board-topic-Detect-RAM-size-at-boot.patch \
 	file://0002-topic_miami_defconfig-Remove-NFS-and-NET-support.patch \
