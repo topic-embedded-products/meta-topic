@@ -24,6 +24,7 @@ KERNEL_GIT_REPO ?= "git://github.com/topic-embedded-products/linux"
 SRC_URI = "\
 	${KERNEL_GIT_REPO};branch=${KBRANCH} \
 	file://defconfig \
+	file://0001-dmaeninge-xilinx_dma-Fix-bug-in-multiple-frame-store.patch \
 	"
 
 KERNEL_IMAGETYPE = "uImage"
