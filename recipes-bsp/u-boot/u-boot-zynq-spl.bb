@@ -21,6 +21,7 @@ SRC_URI_append = "\
 	file://0002-topic_miami_defconfig-Remove-NFS-and-NET-support.patch \
 	file://0003-topic_miami-plus-defconfig-Enable-DFU-RAM-support.patch \
 	file://0004-configs-topic_miami.h-Correct-kernel_size-in-default.patch \
+	file://0005-zynq-topic-miami.dts-Add-usbotg0-alias-to-make-USB-a.patch \
 	file://0001-ARM-zynq-Add-support-for-the-topic-miamilite-system-.patch \
 	"
 # Patch only for mainline u-boot. Using += makes this only apply to SRC_URI without

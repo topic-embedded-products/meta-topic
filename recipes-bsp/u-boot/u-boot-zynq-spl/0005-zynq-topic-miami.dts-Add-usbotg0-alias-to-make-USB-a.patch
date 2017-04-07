@@ -1,0 +1,34 @@
+From 7d34445652b2a509bb3918e5ec8598b26c95a040 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 7 Apr 2017 08:47:59 +0200
+Subject: [PATCH 5/5] zynq-topic-miami.dts: Add usbotg0 alias to make USB
+ actually work
+
+Fixes the following problem:
+zynq-uboot> run dfu_ram
+Setting bus to 1
+g_dnl_register: failed!, error: -19
+
+The cause appears to be that the USB framework is looking for a usbotg aliases,
+so add the alias to point to our USB device.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ arch/arm/dts/zynq-topic-miami.dts | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/dts/zynq-topic-miami.dts b/arch/arm/dts/zynq-topic-miami.dts
+index aa05c4d..79a3671 100644
+--- a/arch/arm/dts/zynq-topic-miami.dts
++++ b/arch/arm/dts/zynq-topic-miami.dts
+@@ -19,6 +19,7 @@
+ 		i2c0 = &i2c0;
+ 		i2c1 = &i2c1;
+ 		mmc0 = &sdhci0;
++		usbotg0 = &usb0;
+ 	};
+ 
+ 	memory@0 {
+-- 
+1.9.1
+
