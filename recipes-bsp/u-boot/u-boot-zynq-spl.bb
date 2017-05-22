@@ -23,6 +23,7 @@ SRC_URI_append = "\
 	file://0004-configs-topic_miami.h-Correct-kernel_size-in-default.patch \
 	file://0005-zynq-topic-miami.dts-Add-usbotg0-alias-to-make-USB-a.patch \
 	file://0001-ARM-zynq-Add-support-for-the-topic-miamilite-system-.patch \
+	file://0001-topic-miamiplus-Run-CPU-at-800MHz-for-speedgrade-2.patch \
 	"
 # Patch only for mainline u-boot. Using += makes this only apply to SRC_URI without
 # overrides.

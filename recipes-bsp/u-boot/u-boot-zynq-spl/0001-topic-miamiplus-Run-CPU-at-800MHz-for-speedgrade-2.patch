@@ -1,0 +1,52 @@
+From 49553c507d008cacfb9176e784d0f5c17774074d Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 22 May 2017 09:33:52 +0200
+Subject: [PATCH] topic-miamiplus: Run CPU at 800MHz for speedgrade-2
+
+The miamiplus contains a speedgrade-2 device, which may run the CPU at 800MHz.
+Change the PLL setting to 800MHz, and adapt the setpoints in the devicetree.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ arch/arm/dts/zynq-topic-miamiplus.dts                | 9 +++++++++
+ board/topic/zynq/zynq-topic-miamiplus/ps7_init_gpl.c | 4 ++--
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/dts/zynq-topic-miamiplus.dts b/arch/arm/dts/zynq-topic-miamiplus.dts
+index 3036f6e..fef5941 100644
+--- a/arch/arm/dts/zynq-topic-miamiplus.dts
++++ b/arch/arm/dts/zynq-topic-miamiplus.dts
+@@ -12,6 +12,15 @@
+ 	compatible = "topic,miamiplus", "xlnx,zynq-7000";
+ };
+ 
++/* The miamiplus contains a speedgrade-2 device and runs at 800MHz */
++&cpu0 {
++	operating-points = <
++		/* kHz    uV */
++		800000  1000000
++		400000  1000000
++	>;
++};
++
+ &qspi {
+ 	is-dual = <1>;
+ };
+diff --git a/board/topic/zynq/zynq-topic-miamiplus/ps7_init_gpl.c b/board/topic/zynq/zynq-topic-miamiplus/ps7_init_gpl.c
+index 5a92336..97a59a5 100644
+--- a/board/topic/zynq/zynq-topic-miamiplus/ps7_init_gpl.c
++++ b/board/topic/zynq/zynq-topic-miamiplus/ps7_init_gpl.c
+@@ -9,8 +9,8 @@
+ 
+ static unsigned long ps7_pll_init_data_3_0[] = {
+ 	EMIT_MASKWRITE(0XF8000008, 0x0000FFFFU, 0x0000DF0DU),
+-	EMIT_MASKWRITE(0XF8000110, 0x003FFFF0U, 0x000FA220U),
+-	EMIT_MASKWRITE(0XF8000100, 0x0007F000U, 0x00028000U),
++	EMIT_MASKWRITE(0XF8000110, 0x003FFFF0U, 0x000FA240U),
++	EMIT_MASKWRITE(0XF8000100, 0x0007F000U, 0x00030000U),
+ 	EMIT_MASKWRITE(0XF8000100, 0x00000010U, 0x00000010U),
+ 	EMIT_MASKWRITE(0XF8000100, 0x00000001U, 0x00000001U),
+ 	EMIT_MASKWRITE(0XF8000100, 0x00000001U, 0x00000000U),
+-- 
+1.9.1
+
