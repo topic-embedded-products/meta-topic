@@ -10,11 +10,14 @@ start)
 	for i in $IFPLUGDLIST
 	do
 		echo -n " $i"
+		if [ -x /etc/ifplugd.$i ]
+		then
+			IFACE=$i /etc/ifplugd.$i $1
+		fi
 		ifplugd -i $i -r /etc/ifplugd.auto
 	done
 	echo "."
 	;;
-
 stop)
 	echo -n "Stop ifplugd:"
 	cd /sys/class/net
@@ -22,6 +25,10 @@ stop)
 	do
 		echo -n " $i"
 		ifplugd -i $i -k
+		if [ -x /etc/ifplugd.$i ]
+		then
+			IFACE=$i /etc/ifplugd.$i $1
+		fi
 	done
 	echo "."
 	;;
