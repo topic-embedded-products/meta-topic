@@ -1,7 +1,13 @@
 require recipes-bsp/u-boot/u-boot.inc
 
+# Copied from OE-core recipes-bsp/u-boot/u-boot-common_2017.01.inc since this
+# part was removed from u-boot.inc
+HOMEPAGE = "http://www.denx.de/wiki/U-Boot/WebHome"
+SECTION = "bootloaders"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://Licenses/README;md5=a2c678cfd4a4d97135585cad908541c6"
+SRC_URI = "git://git.denx.de/u-boot.git"
+S = "${WORKDIR}/git"
 
 DEPENDS += "dtc-native"
 
