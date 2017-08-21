@@ -11,7 +11,7 @@ S = "${WORKDIR}/git"
 SRCREV = "${AUTOREV}"
 
 GITHUB_TOPIC_URI ?= "git://github.com/topic-embedded-products"
-SRC_URI = "${GITHUB_TOPIC_URI}/${PN}"
+SRC_URI = "${GITHUB_TOPIC_URI}/${BPN}"
 
 # Add autoload files
 FILES_${PN} += "/etc/modules-load.d"
