@@ -28,6 +28,16 @@ MACHINE_FPGA_BITSTREAM ??= ""
 BOARD_FPGA_PACKAGES ??= ""
 MACHINE_EXTRA_RRECOMMENDS = "${MACHINE_FPGA_BITSTREAM} ${BOARD_FPGA_PACKAGES}"
 
+# XILINX tool locations (for in your site.conf) and input files
+# Override them in local.conf to suit your system
+# Use the "32" or "64" toolchain
+XILINX_TOOL_ARCH ?= "64"
+# The base install directory for Vivado
+XILINX_VIVADO_VERSION ??= "2017.2"
+XILINX_VIVADO_PATH ?= "/opt/Xilinx/Vivado/${XILINX_VIVADO_VERSION}"
+# Your LM_LICENSE_FILE is usually removed by Bitbake
+XILINX_LM_LICENSE_FILE ?= "${XILINX_VIVADO_PATH}/data/ip/core_licenses/Xilinx.lic"
+
 KERNEL_MODULE_AUTOLOAD ?= ""
 
 require conf/machine/include/tune-zynqmp.inc
