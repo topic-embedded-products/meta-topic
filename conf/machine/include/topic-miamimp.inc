@@ -65,6 +65,9 @@ PREFERRED_PROVIDER_virtual/bootloader = "u-boot-zynq-spl"
 
 EXTRA_IMAGEDEPENDS += "arm-trusted-firmware"
 
+# fpga-image-load does not work on MPSoC
+BAD_RECOMMENDATIONS += "fpga-image-load"
+
 # Use QSPI flash with 128k sector size
 MKUBIFS_ARGS = "-m 1 -e 130944 -c 952"
 UBINIZE_ARGS = "-m 1 -p 128KiB"
