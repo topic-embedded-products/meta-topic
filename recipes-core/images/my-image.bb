@@ -1,5 +1,4 @@
 DESCRIPTION = "An image"
-DEPENDS += "sd-bootscript"
 
 DISTRO_EXTRA_DEPENDS ?= ""
 MACHINE_EXTRA_DEPENDS ?= ""
