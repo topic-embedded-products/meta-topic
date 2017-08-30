@@ -1,4 +1,4 @@
-From 9f86318826a675411d1a9779851731d92661cee7 Mon Sep 17 00:00:00 2001
+From 95632c0b7b5caaa7ea62ebfb4d7cf1359aa2813a Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 25 Aug 2017 14:37:20 +0200
 Subject: [PATCH 9/9] mmc/sdhci: Add card detect method
