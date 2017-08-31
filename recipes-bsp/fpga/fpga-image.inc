@@ -5,11 +5,18 @@ INHIBIT_DEFAULT_DEPS = "1"
 # Need the bitstream converter on the build machine
 DEPENDS = "fpga-bit-to-bin-native"
 # Recommend bitstream to be loaded at boot
-RRECOMMENDS_${PN} = "fpga-image-load"
+RRECOMMENDS_${PN} = "${@bb.utils.contains("MACHINE_FEATURES", "fpgamgr", "fpga-firmware-load", "fpga-image-load", d)}"
 # Package is FPGA logic specific, usually not related to the machine.
 PACKAGE_ARCH = "${FPGA_FAMILY_ARCH}"
 # Workaround: XPS fails to build when there's a "+" in the path.
 SRCPV = "${@bb.fetch2.get_srcrev(d).replace('+','-')}"
+
+# By default, installs into /usr/share, but when using the fpga manager you
+# would want this to be /lib/firmware
+FPGA_STATIC_BITSTREAM_PATH ?= "${@bb.utils.contains("MACHINE_FEATURES", "fpgamgr", "/lib/firmware", "${datadir}", d)}"
+# Where you want to put the partials depends on what you want to do with them.
+# Dyplo likes them to be in /usr/share so that remains the default for all platforms
+FPGA_BITSTREAM_PATH ?= "${datadir}"
 
 # Tool paths and versions may differ, the output should be the same, so
 # do not take these into account.
@@ -29,10 +36,10 @@ PACKAGES = "${PN}"
 # update-alternatives to keep them apart
 inherit update-alternatives
 ALTERNATIVE_${PN} = "fpga.bin bitstreams"
-ALTERNATIVE_LINK_NAME[fpga.bin] = "${datadir}/fpga.bin"
-ALTERNATIVE_TARGET[fpga.bin] = "${datadir}/fpga.bin"
-ALTERNATIVE_LINK_NAME[bitstreams] = "${datadir}/bitstreams"
-ALTERNATIVE_TARGET[bitstreams] = "${datadir}/bitstreams"
+ALTERNATIVE_LINK_NAME[fpga.bin] = "${FPGA_STATIC_BITSTREAM_PATH}/fpga.bin"
+ALTERNATIVE_TARGET[fpga.bin] = "${FPGA_STATIC_BITSTREAM_PATH}/fpga.bin"
+ALTERNATIVE_LINK_NAME[bitstreams] = "${FPGA_BITSTREAM_PATH}/bitstreams"
+ALTERNATIVE_TARGET[bitstreams] = "${FPGA_BITSTREAM_PATH}/bitstreams"
 
 do_compile() {
 	export LM_LICENSE_FILE="${XILINX_LM_LICENSE_FILE}"
@@ -112,14 +119,15 @@ do_convert_bitstreams() {
 }
 do_convert_bitstreams[dirs] = "${B}"
 
-FILES_${PN} = "${datadir}"
+FILES_${PN} = "${FPGA_BITSTREAM_PATH} ${FPGA_STATIC_BITSTREAM_PATH}"
 do_install() {
-	install -d ${D}${datadir}
-	install -m 644 ${WORKDIR}/fpga.bin ${D}${datadir}/fpga.bin
-	install -d ${D}${datadir}/bitstreams
+	install -d ${D}${FPGA_BITSTREAM_PATH}
+	install -d ${D}${FPGA_STATIC_BITSTREAM_PATH}
+	install -m 644 ${WORKDIR}/fpga.bin ${D}${FPGA_STATIC_BITSTREAM_PATH}/fpga.bin
+	install -d ${D}${FPGA_BITSTREAM_PATH}/bitstreams
 	if [ -d ${WORKDIR}/bitstreams ]
 	then
-		cp -r ${WORKDIR}/bitstreams/* ${D}${datadir}/bitstreams/
+		cp -r ${WORKDIR}/bitstreams/* ${D}${FPGA_BITSTREAM_PATH}/bitstreams/
 	fi
 }
 
@@ -127,5 +135,5 @@ addtask convert_bitstreams after do_compile before do_install
 
 # Prevent bitstreams ending up in sysroot.
 sysroot_stage_dirs_append() {
-	rm -rf $to${datadir}/fpga.bin $to${datadir}/bitstreams
+	rm -rf $to${FPGA_STATIC_BITSTREAM_PATH}/fpga.bin $to${FPGA_BITSTREAM_PATH}/bitstreams
 }

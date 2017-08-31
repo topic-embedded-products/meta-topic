@@ -1,0 +1,13 @@
+[Unit]
+Description=FPGA bitstream loader
+DefaultDependencies=no
+Before=systemd-modules-load.service
+
+[Service]
+Type=oneshot
+ExecStart=@BINDIR@/fpga-firmware-load.sh
+RemainAfterExit=yes
+
+[Install]
+RequiredBy=systemd-modules-load.service
+WantedBy=multi-user.target
