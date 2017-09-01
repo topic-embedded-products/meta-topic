@@ -8,14 +8,11 @@ KERNEL_MODULE_AUTOLOAD += "g_ether"
 BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-g-ether \
 	kernel-module-g-mass-storage \
-	kernel-module-g-ncm \
 	kernel-module-u-ether \
 	kernel-module-usb-f-ecm \
 	kernel-module-usb-f-ecm-subset \
 	kernel-module-usb-f-mass-storage \
-	kernel-module-usb-f-ncm \
 	kernel-module-usb-f-rndis \
-	kernel-module-usbserial \
 	"
 
 MACHINE_FEATURES += "usbhost usbgadget"

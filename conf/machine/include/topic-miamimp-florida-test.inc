@@ -8,7 +8,6 @@ KERNEL_MODULE_AUTOLOAD += "g_ether"
 BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-g-ether \
 	kernel-module-g-mass-storage \
-	kernel-module-g-ncm \
 	kernel-module-u-ether \
 	"
 
