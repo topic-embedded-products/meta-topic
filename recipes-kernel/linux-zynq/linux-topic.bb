@@ -8,7 +8,7 @@ SRCREV = "ead0daeb11acee76ab3328383fc0d28077b3cdcf"
 LINUX_VERSION = "4.6"
 
 KBRANCH_topic-miamimp = "topic-miamimp-4.9-okay"
-SRCREV_topic-miamimp = "ec34e6ccc7a0e54ea42e0b588d304bcc73984b83"
+SRCREV_topic-miamimp = "edcfc19967d1cd2e4efbc6472c0cd250ba531c14"
 LINUX_VERSION_topic-miamimp = "4.9"
 
 inherit kernel
