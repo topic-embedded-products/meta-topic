@@ -9,7 +9,6 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-g-ether \
 	kernel-module-g-mass-storage \
 	kernel-module-g-ncm \
-	kernel-module-gspca-main \
 	kernel-module-u-ether \
 	kernel-module-usb-f-ecm \
 	kernel-module-usb-f-ecm-subset \
