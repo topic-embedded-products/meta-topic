@@ -1,4 +1,4 @@
-From 36418eb9cecaf964c5b323558b80b7061682519a Mon Sep 17 00:00:00 2001
+From ae667d8da5ca728afdaf8ad6f1d828d54a4ca721 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Jan 2017 15:35:41 +0100
 Subject: [PATCH 8/9] ARM: zynqmp: Add support for the topic-miamimp
@@ -18,8 +18,8 @@ The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
  .../zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h     | 34806 +++++++++++++++++++
  board/topic/zynqmp/zynqmp.c                        |     6 +
  configs/topic_miamimp_defconfig                    |    79 +
- include/configs/topic_miamimp.h                    |   114 +
- 12 files changed, 54190 insertions(+)
+ include/configs/topic_miamimp.h                    |   115 +
+ 12 files changed, 54191 insertions(+)
  create mode 100644 arch/arm/dts/zynqmp-topic-miamimp.dts
  create mode 100644 board/topic/zynqmp/MAINTAINERS
  create mode 100644 board/topic/zynqmp/Makefile
@@ -54179,10 +54179,10 @@ index 0000000..940a47e
 +CONFIG_EFI_LOADER_BOUNCE_BUFFER=y
 diff --git a/include/configs/topic_miamimp.h b/include/configs/topic_miamimp.h
 new file mode 100644
-index 0000000..0c003e3
+index 0000000..67bfada
 --- /dev/null
 +++ b/include/configs/topic_miamimp.h
-@@ -0,0 +1,114 @@
+@@ -0,0 +1,115 @@
 +/*
 + * Configuration for Topic Miami MPSoC
 + *
@@ -54253,8 +54253,9 @@ index 0000000..0c003e3
 +			"echo Running uenvcmd ...; " \
 +			"run uenvcmd; " \
 +		"fi\0" \
-+	"sdboot=mmc dev $sdbootdev && mmcinfo && run uenvboot || run sdroot$sdbootdev; " \
-+		"if load mmc $sdbootdev:2 $initrd_addr /usr/share/fpga.bin; then fpga load 0 $initrd_addr $filesize; fi; " \
++	"sdboot=mmc dev $sdbootdev && mmcinfo && " \
++		"if load mmc $sdbootdev:$partid 0x3F00000 autorun.scr; then source 0x3F00000; else; run uenvboot; fi; "\
++		"run sdroot$sdbootdev; " \
 +		"load mmc $sdbootdev:$partid $fdt_addr system.dtb && " \
 +		"load mmc $sdbootdev:$partid $kernel_addr Image && " \
 +		"booti $kernel_addr - $fdt_addr\0" \
