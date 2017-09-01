@@ -47,7 +47,7 @@ require conf/machine/include/machine-xilinx-board.inc
 MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 PACKAGE_EXTRA_ARCHS_append = " ${FPGA_FAMILY_ARCH}"
 
-MACHINE_FEATURES = "rtc ext2 ext3 vfat usbhost mali"
+MACHINE_FEATURES = "rtc ext2 ext3 vfat usbhost mali fpgamgr"
 
 UBOOT_MACHINE = "topic_miamimp_config"
 SPL_BINARY = "spl/boot.bin"
