@@ -4,12 +4,8 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 KBRANCH = "topic-miami"
-SRCREV = "b11a114738b6f0484b8465e6b6b1efd2cda28773"
+SRCREV = "bba6c5a2ec5f15e17ce1d6030d612719559c64c0"
 LINUX_VERSION = "4.9"
-
-# In the current "tip" the SD controller doesn't work, so use a special branch
-KBRANCH_topic-miamimp = "topic-miamimp-4.9-okay"
-SRCREV_topic-miamimp = "edcfc19967d1cd2e4efbc6472c0cd250ba531c14"
 
 inherit kernel
 require recipes-kernel/linux/linux-dtb.inc
