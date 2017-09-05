@@ -21,7 +21,9 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-videobuf2-vmalloc \
 	kernel-module-virt-dma \
 	kernel-module-xilinx-dma \
-	kernel-module-xilinx-emacps \
+	kernel-module-macb \
+	kernel-module-pps-core \
+	kernel-module-ptp \
 	"
 
 MACHINE_FEATURES += "usbhost usbgadget screen touchscreen wifi alsa ethernet"

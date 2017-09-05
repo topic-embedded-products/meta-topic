@@ -4,12 +4,12 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 KBRANCH = "topic-miami"
-SRCREV = "ead0daeb11acee76ab3328383fc0d28077b3cdcf"
-LINUX_VERSION = "4.6"
+SRCREV = "b11a114738b6f0484b8465e6b6b1efd2cda28773"
+LINUX_VERSION = "4.9"
 
+# In the current "tip" the SD controller doesn't work, so use a special branch
 KBRANCH_topic-miamimp = "topic-miamimp-4.9-okay"
 SRCREV_topic-miamimp = "edcfc19967d1cd2e4efbc6472c0cd250ba531c14"
-LINUX_VERSION_topic-miamimp = "4.9"
 
 inherit kernel
 require recipes-kernel/linux/linux-dtb.inc
@@ -25,8 +25,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/linux-topic:"
 # another kernel repo. Or to another kernel entirely.
 KERNEL_GIT_REPO ?= "git://github.com/topic-embedded-products/linux"
 
-EXTRA_PATCHES = "file://0001-dmaeninge-xilinx_dma-Fix-bug-in-multiple-frame-store.patch"
-EXTRA_PATCHES_topic-miamimp = ""
+EXTRA_PATCHES = ""
 SRC_URI = "\
 	${KERNEL_GIT_REPO};branch=${KBRANCH} \
 	file://defconfig \
