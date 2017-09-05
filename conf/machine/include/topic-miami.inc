@@ -35,7 +35,7 @@ PREFERRED_PROVIDER_virtual/xilinx-sdk = "miami-xilinx-sdk"
 UBOOT_MACHINE = "topic_miami_config"
 
 KERNEL_MODULE_AUTOLOAD ?= ""
-KERNEL_MODULE_AUTOLOAD += "xilinx_emacps rsi_sdio g_ether spi-cadence"
+KERNEL_MODULE_AUTOLOAD += "xilinx_emacps g_ether spi-cadence"
 
 MACHINE_EXTRA_RRECOMMENDS += "\
 	topic-miami-monitor-lib \

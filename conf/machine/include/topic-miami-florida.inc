@@ -11,10 +11,6 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-axi-hdmi-rx \
 	kernel-module-bitblit \
 	kernel-module-dma-axi-dmac \
-	kernel-module-fpgapower \
-	kernel-module-rsi-sdio \
-	kernel-module-rsi-91x \
-	linux-firmware-rsi-91x \
 	kernel-module-snd-hwdep \
 	kernel-module-snd-soc-adi-axi-spdif \
 	kernel-module-snd-soc-adv7511-hdmi \
