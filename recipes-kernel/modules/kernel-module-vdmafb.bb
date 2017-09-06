@@ -8,8 +8,5 @@ RRECOMMENDS_${PN} = "\
 	kernel-module-xilinx-dma \
 	"
 
-do_install_append() {
-	install -d ${D}/etc/modules-load.d
-	echo "xilinx_dma" > ${D}/etc/modules-load.d/${MODULE}.conf
-	echo "${MODULE}" >> ${D}/etc/modules-load.d/${MODULE}.conf
-}
+KERNEL_MODULE_AUTOLOAD += "${MODULE}"
+module_autoload_${MODULE} = "xilinx_dma ${MODULE}"
