@@ -1,4 +1,4 @@
-From ae667d8da5ca728afdaf8ad6f1d828d54a4ca721 Mon Sep 17 00:00:00 2001
+From b764cbfa474d6106fcd2d0be58e908eaf27dc270 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Jan 2017 15:35:41 +0100
 Subject: [PATCH 8/9] ARM: zynqmp: Add support for the topic-miamimp
