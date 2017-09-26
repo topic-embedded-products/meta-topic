@@ -1,0 +1,3480 @@
+From 199208d1c40e78611e8499ef8fb17028fec5f427 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 26 Sep 2017 13:51:21 +0200
+Subject: [PATCH 10/10] topic-miamimp: Support "final" silicon
+
+The topic-miamimp modules so far were engineering samples. Adjust the bootloader
+for the final silicon version. This enables support for the xczu6eg, xczu9eg and
+xczu15eg, thus dropping support for the xczu9eg-es1 we've been using so far.
+---
+ .../zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c     | 2668 +++++++++++++++-----
+ .../zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h     |  436 ++--
+ 2 files changed, 2265 insertions(+), 839 deletions(-)
+
+diff --git a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
+index 974cfb4..5e6c28d 100644
+--- a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
++++ b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
+@@ -75,7 +75,7 @@ unsigned long psu_pll_init_data(void)
+     *  PSU_CRL_APB_RPLL_CFG_RES                                    0x2
+ 
+     * PLL charge pump control
+-    *  PSU_CRL_APB_RPLL_CFG_CP                                     0x3
++    *  PSU_CRL_APB_RPLL_CFG_CP                                     0x4
+ 
+     * PLL loop filter high frequency capacitor control
+     *  PSU_CRL_APB_RPLL_CFG_LFHF                                   0x3
+@@ -87,9 +87,9 @@ unsigned long psu_pll_init_data(void)
+     *  PSU_CRL_APB_RPLL_CFG_LOCK_DLY                               0x3f
+ 
+     * Helper data. Values are to be looked up in a table from Data Sheet
+-    * (OFFSET, MASK, VALUE)      (0XFF5E0034, 0xFE7FEDEFU ,0x7E4B0C62U)
++    * (OFFSET, MASK, VALUE)      (0XFF5E0034, 0xFE7FEDEFU ,0x7E4B0C82U)
+     */
+-	PSU_Mask_Write(CRL_APB_RPLL_CFG_OFFSET, 0xFE7FEDEFU, 0x7E4B0C62U);
++	PSU_Mask_Write(CRL_APB_RPLL_CFG_OFFSET, 0xFE7FEDEFU, 0x7E4B0C82U);
+ /*##################################################################### */
+ 
+     /*
+@@ -104,16 +104,16 @@ unsigned long psu_pll_init_data(void)
+     *  PSU_CRL_APB_RPLL_CTRL_PRE_SRC                               0x0
+ 
+     * The integer portion of the feedback divider to the PLL
+-    *  PSU_CRL_APB_RPLL_CTRL_FBDIV                                 0x48
++    *  PSU_CRL_APB_RPLL_CTRL_FBDIV                                 0x5a
+ 
+     * This turns on the divide by 2 that is inside of the PLL. This does not c
+     * hange the VCO frequency, just the output frequency
+     *  PSU_CRL_APB_RPLL_CTRL_DIV2                                  0x1
+ 
+     * PLL Basic Control
+-    * (OFFSET, MASK, VALUE)      (0XFF5E0030, 0x00717F00U ,0x00014800U)
++    * (OFFSET, MASK, VALUE)      (0XFF5E0030, 0x00717F00U ,0x00015A00U)
+     */
+-	PSU_Mask_Write(CRL_APB_RPLL_CTRL_OFFSET, 0x00717F00U, 0x00014800U);
++	PSU_Mask_Write(CRL_APB_RPLL_CTRL_OFFSET, 0x00717F00U, 0x00015A00U);
+ /*##################################################################### */
+ 
+     /*
+@@ -1153,7 +1153,7 @@ unsigned long psu_clock_init_data(void)
+     *  PSU_CRL_APB_CPU_R5_CTRL_CLKACT                              0x1
+ 
+     * 6 bit divider
+-    *  PSU_CRL_APB_CPU_R5_CTRL_DIVISOR0                            0x2
++    *  PSU_CRL_APB_CPU_R5_CTRL_DIVISOR0                            0x3
+ 
+     * 000 = RPLL; 010 = IOPLL; 011 = DPLL; (This signal may only be toggled af
+     * ter 4 cycles of the old clock and 4 cycles of the new clock. This is not
+@@ -1161,9 +1161,9 @@ unsigned long psu_clock_init_data(void)
+     *  PSU_CRL_APB_CPU_R5_CTRL_SRCSEL                              0x0
+ 
+     * This register controls this reference clock
+-    * (OFFSET, MASK, VALUE)      (0XFF5E0090, 0x01003F07U ,0x01000200U)
++    * (OFFSET, MASK, VALUE)      (0XFF5E0090, 0x01003F07U ,0x01000300U)
+     */
+-	PSU_Mask_Write(CRL_APB_CPU_R5_CTRL_OFFSET, 0x01003F07U, 0x01000200U);
++	PSU_Mask_Write(CRL_APB_CPU_R5_CTRL_OFFSET, 0x01003F07U, 0x01000300U);
+ /*##################################################################### */
+ 
+     /*
+@@ -1194,17 +1194,17 @@ unsigned long psu_clock_init_data(void)
+     *  PSU_CRL_APB_PCAP_CTRL_CLKACT                                0x1
+ 
+     * 6 bit divider
+-    *  PSU_CRL_APB_PCAP_CTRL_DIVISOR0                              0x6
++    *  PSU_CRL_APB_PCAP_CTRL_DIVISOR0                              0x2
+ 
+     * 000 = IOPLL; 010 = RPLL; 011 = DPLL; (This signal may only be toggled af
+     * ter 4 cycles of the old clock and 4 cycles of the new clock. This is not
+     *  usually an issue, but designers must be aware.)
+-    *  PSU_CRL_APB_PCAP_CTRL_SRCSEL                                0x0
++    *  PSU_CRL_APB_PCAP_CTRL_SRCSEL                                0x3
+ 
+     * This register controls this reference clock
+-    * (OFFSET, MASK, VALUE)      (0XFF5E00A4, 0x01003F07U ,0x01000600U)
++    * (OFFSET, MASK, VALUE)      (0XFF5E00A4, 0x01003F07U ,0x01000203U)
+     */
+-	PSU_Mask_Write(CRL_APB_PCAP_CTRL_OFFSET, 0x01003F07U, 0x01000600U);
++	PSU_Mask_Write(CRL_APB_PCAP_CTRL_OFFSET, 0x01003F07U, 0x01000203U);
+ /*##################################################################### */
+ 
+     /*
+@@ -2157,12 +2157,12 @@ unsigned long psu_ddr_init_data(void)
+     *  CRC/parity retry is enabled (CRCPARCTL1.crc_parity_retry_enable = 1), d
+     * isable auto-refresh is not supported, and this bit must be set to '0'. T
+     * his register field is changeable on the fly.
+-    *  PSU_DDRC_RFSHCTL3_DIS_AUTO_REFRESH                          0x0
++    *  PSU_DDRC_RFSHCTL3_DIS_AUTO_REFRESH                          0x1
+ 
+     * Refresh Control Register 3
+-    * (OFFSET, MASK, VALUE)      (0XFD070060, 0x00000073U ,0x00000000U)
++    * (OFFSET, MASK, VALUE)      (0XFD070060, 0x00000073U ,0x00000001U)
+     */
+-	PSU_Mask_Write(DDRC_RFSHCTL3_OFFSET, 0x00000073U, 0x00000000U);
++	PSU_Mask_Write(DDRC_RFSHCTL3_OFFSET, 0x00000073U, 0x00000001U);
+ /*##################################################################### */
+ 
+     /*
+@@ -3123,7 +3123,7 @@ unsigned long psu_ddr_init_data(void)
+     * request from APB module. - 0 - Internally generate ZQCS/MPC(ZQ calibrati
+     * on) commands based on ZQCTL1.t_zq_short_interval_x1024. This is only pre
+     * sent for designs supporting DDR3/DDR4 or LPDDR2/LPDDR3/LPDDR4 devices.
+-    *  PSU_DDRC_ZQCTL0_DIS_AUTO_ZQ                                 0x0
++    *  PSU_DDRC_ZQCTL0_DIS_AUTO_ZQ                                 0x1
+ 
+     * - 1 - Disable issuing of ZQCL/MPC(ZQ calibration) command at Self-Refres
+     * h/SR-Powerdown exit. Only applicable when run in DDR3 or DDR4 or LPDDR2
+@@ -3166,9 +3166,9 @@ unsigned long psu_ddr_init_data(void)
+     *  PSU_DDRC_ZQCTL0_T_ZQ_SHORT_NOP                              0x12
+ 
+     * ZQ Control Register 0
+-    * (OFFSET, MASK, VALUE)      (0XFD070180, 0xF7FF03FFU ,0x02580012U)
++    * (OFFSET, MASK, VALUE)      (0XFD070180, 0xF7FF03FFU ,0x82580012U)
+     */
+-	PSU_Mask_Write(DDRC_ZQCTL0_OFFSET, 0xF7FF03FFU, 0x02580012U);
++	PSU_Mask_Write(DDRC_ZQCTL0_OFFSET, 0xF7FF03FFU, 0x82580012U);
+ /*##################################################################### */
+ 
+     /*
+@@ -3377,7 +3377,7 @@ unsigned long psu_ddr_init_data(void)
+     * When '1', disable the automatic dfi_ctrlupd_req generation by the uMCTL2
+     * . The core must issue the dfi_ctrlupd_req signal using register reg_ddrc
+     * _ctrlupd. When '0', uMCTL2 issues dfi_ctrlupd_req periodically.
+-    *  PSU_DDRC_DFIUPD0_DIS_AUTO_CTRLUPD                           0x0
++    *  PSU_DDRC_DFIUPD0_DIS_AUTO_CTRLUPD                           0x1
+ 
+     * When '1', disable the automatic dfi_ctrlupd_req generation by the uMCTL2
+     *  following a self-refresh exit. The core must issue the dfi_ctrlupd_req
+@@ -3388,7 +3388,7 @@ unsigned long psu_ddr_init_data(void)
+     * Specifies the maximum number of clock cycles that the dfi_ctrlupd_req si
+     * gnal can assert. Lowest value to assign to this variable is 0x40. Unit:
+     * Clocks
+-    *  PSU_DDRC_DFIUPD0_DFI_T_CTRLUP_MAX                           0x40
++    *  PSU_DDRC_DFIUPD0_DFI_T_CTRLUP_MAX                           0x3ff
+ 
+     * Specifies the minimum number of clock cycles that the dfi_ctrlupd_req si
+     * gnal must be asserted. The uMCTL2 expects the PHY to respond within this
+@@ -3398,9 +3398,9 @@ unsigned long psu_ddr_init_data(void)
+     *  PSU_DDRC_DFIUPD0_DFI_T_CTRLUP_MIN                           0x3
+ 
+     * DFI Update Register 0
+-    * (OFFSET, MASK, VALUE)      (0XFD0701A0, 0xC3FF03FFU ,0x00400003U)
++    * (OFFSET, MASK, VALUE)      (0XFD0701A0, 0xC3FF03FFU ,0x83FF0003U)
+     */
+-	PSU_Mask_Write(DDRC_DFIUPD0_OFFSET, 0xC3FF03FFU, 0x00400003U);
++	PSU_Mask_Write(DDRC_DFIUPD0_OFFSET, 0xC3FF03FFU, 0x83FF0003U);
+ /*##################################################################### */
+ 
+     /*
+@@ -10690,93 +10690,6 @@ unsigned long psu_ddr_init_data(void)
+ /*##################################################################### */
+ 
+     /*
+-    * PHY_PIR
+-    */
+-    /*
+-    * Register : PIR @ 0XFD080004
+-
+-    * Reserved. Return zeroes on reads.
+-    *  PSU_DDR_PHY_PIR_RESERVED_31                                 0x0
+-
+-    * Impedance Calibration Bypass
+-    *  PSU_DDR_PHY_PIR_ZCALBYP                                     0x0
+-
+-    * Digital Delay Line (DDL) Calibration Pause
+-    *  PSU_DDR_PHY_PIR_DCALPSE                                     0x0
+-
+-    * Reserved. Return zeroes on reads.
+-    *  PSU_DDR_PHY_PIR_RESERVED_28_21                              0x0
+-
+-    * Write DQS2DQ Training
+-    *  PSU_DDR_PHY_PIR_DQS2DQ                                      0x0
+-
+-    * RDIMM Initialization
+-    *  PSU_DDR_PHY_PIR_RDIMMINIT                                   0x0
+-
+-    * Controller DRAM Initialization
+-    *  PSU_DDR_PHY_PIR_CTLDINIT                                    0x1
+-
+-    * VREF Training
+-    *  PSU_DDR_PHY_PIR_VREF                                        0x0
+-
+-    * Static Read Training
+-    *  PSU_DDR_PHY_PIR_SRD                                         0x0
+-
+-    * Write Data Eye Training
+-    *  PSU_DDR_PHY_PIR_WREYE                                       0x0
+-
+-    * Read Data Eye Training
+-    *  PSU_DDR_PHY_PIR_RDEYE                                       0x0
+-
+-    * Write Data Bit Deskew
+-    *  PSU_DDR_PHY_PIR_WRDSKW                                      0x0
+-
+-    * Read Data Bit Deskew
+-    *  PSU_DDR_PHY_PIR_RDDSKW                                      0x0
+-
+-    * Write Leveling Adjust
+-    *  PSU_DDR_PHY_PIR_WLADJ                                       0x0
+-
+-    * Read DQS Gate Training
+-    *  PSU_DDR_PHY_PIR_QSGATE                                      0x0
+-
+-    * Write Leveling
+-    *  PSU_DDR_PHY_PIR_WL                                          0x0
+-
+-    * DRAM Initialization
+-    *  PSU_DDR_PHY_PIR_DRAMINIT                                    0x0
+-
+-    * DRAM Reset (DDR3/DDR4/LPDDR4 Only)
+-    *  PSU_DDR_PHY_PIR_DRAMRST                                     0x0
+-
+-    * PHY Reset
+-    *  PSU_DDR_PHY_PIR_PHYRST                                      0x1
+-
+-    * Digital Delay Line (DDL) Calibration
+-    *  PSU_DDR_PHY_PIR_DCAL                                        0x1
+-
+-    * PLL Initialiazation
+-    *  PSU_DDR_PHY_PIR_PLLINIT                                     0x1
+-
+-    * Reserved. Return zeroes on reads.
+-    *  PSU_DDR_PHY_PIR_RESERVED_3                                  0x0
+-
+-    * CA Training
+-    *  PSU_DDR_PHY_PIR_CA                                          0x0
+-
+-    * Impedance Calibration
+-    *  PSU_DDR_PHY_PIR_ZCAL                                        0x1
+-
+-    * Initialization Trigger
+-    *  PSU_DDR_PHY_PIR_INIT                                        0x1
+-
+-    * PHY Initialization Register
+-    * (OFFSET, MASK, VALUE)      (0XFD080004, 0xFFFFFFFFU ,0x00040073U)
+-    */
+-	PSU_Mask_Write(DDR_PHY_PIR_OFFSET, 0xFFFFFFFFU, 0x00040073U);
+-/*##################################################################### */
+-
+-    /*
+     * DDR QOS CONTROLLER
+     */
+ 
+@@ -15923,251 +15836,1637 @@ unsigned long psu_peripherals_powerdwn_data(void)
+ }
+ unsigned long psu_lpd_xppu_data(void)
+ {
+-
+-	return 1;
+-}
+-unsigned long psu_ddr_xmpu0_data(void)
+-{
+-
+-	return 1;
+-}
+-unsigned long psu_ddr_xmpu1_data(void)
+-{
+-
+-	return 1;
+-}
+-unsigned long psu_ddr_xmpu2_data(void)
+-{
+-
+-	return 1;
+-}
+-unsigned long psu_ddr_xmpu3_data(void)
+-{
+-
+-	return 1;
+-}
+-unsigned long psu_ddr_xmpu4_data(void)
+-{
+-
+-	return 1;
+-}
+-unsigned long psu_ddr_xmpu5_data(void)
+-{
+-
+-	return 1;
+-}
+-unsigned long psu_ocm_xmpu_data(void)
+-{
+-
+-	return 1;
+-}
+-unsigned long psu_fpd_xmpu_data(void)
+-{
+-
+-	return 1;
+-}
+-unsigned long psu_protection_lock_data(void)
+-{
+-
+-	return 1;
+-}
+-unsigned long psu_apply_master_tz(void)
+-{
+     /*
+-    * RPU
++    * MASTER ID LIST
+     */
+     /*
+-    * DP TZ
++    * APERTURE PERMISIION LIST
+     */
+     /*
+-    * Register : slcr_dpdma @ 0XFD690040
+-
+-    * TrustZone classification for DisplayPort DMA
+-    *  PSU_FPD_SLCR_SECURE_SLCR_DPDMA_TZ                           1
+-
+-    * DPDMA TrustZone Settings
+-    * (OFFSET, MASK, VALUE)      (0XFD690040, 0x00000001U ,0x00000001U)
++    * APERTURE NAME: UART0, START ADDRESS: FF000000, END ADDRESS: FF00FFFF
+     */
+-	PSU_Mask_Write(FPD_SLCR_SECURE_SLCR_DPDMA_OFFSET,
+-		0x00000001U, 0x00000001U);
+-/*##################################################################### */
+-
+     /*
+-    * SATA TZ
++    * APERTURE NAME: UART1, START ADDRESS: FF010000, END ADDRESS: FF01FFFF
+     */
+     /*
+-    * PCIE TZ
++    * APERTURE NAME: I2C0, START ADDRESS: FF020000, END ADDRESS: FF02FFFF
+     */
+     /*
+-    * Register : slcr_pcie @ 0XFD690030
+-
+-    * TrustZone classification for DMA Channel 0
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_DMA_0                      1
+-
+-    * TrustZone classification for DMA Channel 1
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_DMA_1                      1
+-
+-    * TrustZone classification for DMA Channel 2
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_DMA_2                      1
+-
+-    * TrustZone classification for DMA Channel 3
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_DMA_3                      1
+-
+-    * TrustZone classification for Ingress Address Translation 0
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_0                  1
+-
+-    * TrustZone classification for Ingress Address Translation 1
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_1                  1
+-
+-    * TrustZone classification for Ingress Address Translation 2
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_2                  1
+-
+-    * TrustZone classification for Ingress Address Translation 3
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_3                  1
+-
+-    * TrustZone classification for Ingress Address Translation 4
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_4                  1
+-
+-    * TrustZone classification for Ingress Address Translation 5
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_5                  1
+-
+-    * TrustZone classification for Ingress Address Translation 6
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_6                  1
+-
+-    * TrustZone classification for Ingress Address Translation 7
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_7                  1
+-
+-    * TrustZone classification for Egress Address Translation 0
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_0                   1
+-
+-    * TrustZone classification for Egress Address Translation 1
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_1                   1
+-
+-    * TrustZone classification for Egress Address Translation 2
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_2                   1
+-
+-    * TrustZone classification for Egress Address Translation 3
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_3                   1
+-
+-    * TrustZone classification for Egress Address Translation 4
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_4                   1
+-
+-    * TrustZone classification for Egress Address Translation 5
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_5                   1
+-
+-    * TrustZone classification for Egress Address Translation 6
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_6                   1
+-
+-    * TrustZone classification for Egress Address Translation 7
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_7                   1
+-
+-    * TrustZone classification for DMA Registers
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_DMA_REGS                   1
+-
+-    * TrustZone classification for MSIx Table
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_MSIX_TABLE                 1
+-
+-    * TrustZone classification for MSIx PBA
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_MSIX_PBA                   1
+-
+-    * TrustZone classification for ECAM
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_ECAM                       1
+-
+-    * TrustZone classification for Bridge Common Registers
+-    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_BRIDGE_REGS                1
+-
+-    * PCIe TrustZone settings. This register may only be modified during bootu
+-    * p (while PCIe block is disabled)
+-    * (OFFSET, MASK, VALUE)      (0XFD690030, 0x01FFFFFFU ,0x01FFFFFFU)
++    * APERTURE NAME: I2C1, START ADDRESS: FF030000, END ADDRESS: FF03FFFF
+     */
+-	PSU_Mask_Write(FPD_SLCR_SECURE_SLCR_PCIE_OFFSET,
+-		0x01FFFFFFU, 0x01FFFFFFU);
+-/*##################################################################### */
+-
+     /*
+-    * USB TZ
++    * APERTURE NAME: SPI0, START ADDRESS: FF040000, END ADDRESS: FF04FFFF
+     */
+     /*
+-    * Register : slcr_usb @ 0XFF4B0034
+-
+-    * TrustZone Classification for USB3_0
+-    *  PSU_LPD_SLCR_SECURE_SLCR_USB_TZ_USB3_0                      1
+-
+-    * TrustZone Classification for USB3_1
+-    *  PSU_LPD_SLCR_SECURE_SLCR_USB_TZ_USB3_1                      1
+-
+-    * USB3 TrustZone settings
+-    * (OFFSET, MASK, VALUE)      (0XFF4B0034, 0x00000003U ,0x00000003U)
++    * APERTURE NAME: SPI1, START ADDRESS: FF050000, END ADDRESS: FF05FFFF
+     */
+-	PSU_Mask_Write(LPD_SLCR_SECURE_SLCR_USB_OFFSET,
+-		0x00000003U, 0x00000003U);
+-/*##################################################################### */
+-
+     /*
+-    * SD TZ
++    * APERTURE NAME: CAN0, START ADDRESS: FF060000, END ADDRESS: FF06FFFF
+     */
+     /*
+-    * Register : IOU_AXI_RPRTCN @ 0XFF240004
+-
+-    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
+-    * 1] = '0' : Secure access [1] = '1' : No secure access [2] = '0' : Data a
+-    * ccess [2] = '1'' : Instruction access
+-    *  PSU_IOU_SECURE_SLCR_IOU_AXI_RPRTCN_SD0_AXI_ARPROT           2
+-
+-    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
+-    * 1] = '0' : Secure access [1] = '1' : No secure access [2] = '0' : Data a
+-    * ccess [2] = '1'' : Instruction access
+-    *  PSU_IOU_SECURE_SLCR_IOU_AXI_RPRTCN_SD1_AXI_ARPROT           2
+-
+-    * AXI read protection type selection
+-    * (OFFSET, MASK, VALUE)      (0XFF240004, 0x003F0000U ,0x00120000U)
++    * APERTURE NAME: CAN1, START ADDRESS: FF070000, END ADDRESS: FF07FFFF
+     */
+-	PSU_Mask_Write(IOU_SECURE_SLCR_IOU_AXI_RPRTCN_OFFSET,
+-		0x003F0000U, 0x00120000U);
+-/*##################################################################### */
+-
+     /*
+-    * Register : IOU_AXI_WPRTCN @ 0XFF240000
+-
+-    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
+-    * 1] = '0' : Secure access [1] = '1' : No secure access [2] = '0' : Data a
+-    * ccess [2] = '1'' : Instruction access
+-    *  PSU_IOU_SECURE_SLCR_IOU_AXI_WPRTCN_SD0_AXI_AWPROT           2
+-
+-    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
+-    * 1] = '0' : Secure access [1] = '1' : No secure access [2] = '0' : Data a
+-    * ccess [2] = '1'' : Instruction access
+-    *  PSU_IOU_SECURE_SLCR_IOU_AXI_WPRTCN_SD1_AXI_AWPROT           2
+-
+-    * AXI write protection type selection
+-    * (OFFSET, MASK, VALUE)      (0XFF240000, 0x003F0000U ,0x00120000U)
++    * APERTURE NAME: RPU_UNUSED_12, START ADDRESS: FF080000, END ADDRESS: FF09
++    * FFFF
+     */
+-	PSU_Mask_Write(IOU_SECURE_SLCR_IOU_AXI_WPRTCN_OFFSET,
+-		0x003F0000U, 0x00120000U);
+-/*##################################################################### */
+-
+     /*
+-    * GEM TZ
++    * APERTURE NAME: RPU_UNUSED_12, START ADDRESS: FF080000, END ADDRESS: FF09
++    * FFFF
+     */
+     /*
+-    * Register : IOU_AXI_RPRTCN @ 0XFF240004
+-
+-    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
+-    * 1] = '0' : Secure access [1] = '1' : No secure access [2] = '0' : Data a
+-    * ccess [2] = '1'' : Instruction access
+-    *  PSU_IOU_SECURE_SLCR_IOU_AXI_RPRTCN_GEM0_AXI_ARPROT          2
+-
+-    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
+-    * 1] = '0' : Secure access [1] = '1' : No secure access [2] = '0' : Data a
+-    * ccess [2] = '1'' : Instruction access
+-    *  PSU_IOU_SECURE_SLCR_IOU_AXI_RPRTCN_GEM1_AXI_ARPROT          2
+-
+-    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
+-    * 1] = '0' : Secure access [1] = '1' : No secure access [2] = '0' : Data a
+-    * ccess [2] = '1'' : Instruction access
+-    *  PSU_IOU_SECURE_SLCR_IOU_AXI_RPRTCN_GEM2_AXI_ARPROT          2
+-
+-    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
++    * APERTURE NAME: GPIO, START ADDRESS: FF0A0000, END ADDRESS: FF0AFFFF
++    */
++    /*
++    * APERTURE NAME: GEM0, START ADDRESS: FF0B0000, END ADDRESS: FF0BFFFF
++    */
++    /*
++    * APERTURE NAME: GEM1, START ADDRESS: FF0C0000, END ADDRESS: FF0CFFFF
++    */
++    /*
++    * APERTURE NAME: GEM2, START ADDRESS: FF0D0000, END ADDRESS: FF0DFFFF
++    */
++    /*
++    * APERTURE NAME: GEM3, START ADDRESS: FF0E0000, END ADDRESS: FF0EFFFF
++    */
++    /*
++    * APERTURE NAME: QSPI, START ADDRESS: FF0F0000, END ADDRESS: FF0FFFFF
++    */
++    /*
++    * APERTURE NAME: NAND, START ADDRESS: FF100000, END ADDRESS: FF10FFFF
++    */
++    /*
++    * APERTURE NAME: TTC0, START ADDRESS: FF110000, END ADDRESS: FF11FFFF
++    */
++    /*
++    * APERTURE NAME: TTC1, START ADDRESS: FF120000, END ADDRESS: FF12FFFF
++    */
++    /*
++    * APERTURE NAME: TTC2, START ADDRESS: FF130000, END ADDRESS: FF13FFFF
++    */
++    /*
++    * APERTURE NAME: TTC3, START ADDRESS: FF140000, END ADDRESS: FF14FFFF
++    */
++    /*
++    * APERTURE NAME: SWDT, START ADDRESS: FF150000, END ADDRESS: FF15FFFF
++    */
++    /*
++    * APERTURE NAME: SD0, START ADDRESS: FF160000, END ADDRESS: FF16FFFF
++    */
++    /*
++    * APERTURE NAME: SD1, START ADDRESS: FF170000, END ADDRESS: FF17FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_SLCR, START ADDRESS: FF180000, END ADDRESS: FF23FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_SLCR, START ADDRESS: FF180000, END ADDRESS: FF23FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_SLCR, START ADDRESS: FF180000, END ADDRESS: FF23FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_SLCR, START ADDRESS: FF180000, END ADDRESS: FF23FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_SLCR, START ADDRESS: FF180000, END ADDRESS: FF23FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_SLCR, START ADDRESS: FF180000, END ADDRESS: FF23FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_SLCR, START ADDRESS: FF180000, END ADDRESS: FF23FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_SLCR, START ADDRESS: FF180000, END ADDRESS: FF23FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_SLCR, START ADDRESS: FF180000, END ADDRESS: FF23FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_SLCR, START ADDRESS: FF180000, END ADDRESS: FF23FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_SLCR, START ADDRESS: FF180000, END ADDRESS: FF23FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_SLCR, START ADDRESS: FF180000, END ADDRESS: FF23FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_SECURE_SLCR, START ADDRESS: FF240000, END ADDRESS: FF
++    * 24FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_SCNTR, START ADDRESS: FF250000, END ADDRESS: FF25FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_SCNTRS, START ADDRESS: FF260000, END ADDRESS: FF26FFF
++    * F
++    */
++    /*
++    * APERTURE NAME: RPU_UNUSED_11, START ADDRESS: FF270000, END ADDRESS: FF2A
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: RPU_UNUSED_11, START ADDRESS: FF270000, END ADDRESS: FF2A
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: RPU_UNUSED_11, START ADDRESS: FF270000, END ADDRESS: FF2A
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: RPU_UNUSED_11, START ADDRESS: FF270000, END ADDRESS: FF2A
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_14, START ADDRESS: FF2B0000, END ADDRESS: FF2F
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_14, START ADDRESS: FF2B0000, END ADDRESS: FF2F
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_14, START ADDRESS: FF2B0000, END ADDRESS: FF2F
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_14, START ADDRESS: FF2B0000, END ADDRESS: FF2F
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_14, START ADDRESS: FF2B0000, END ADDRESS: FF2F
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_CTRL, START ADDRESS: FF380000, END ADDRESS: FF3FFFFF
++    */
++    /*
++    * APERTURE NAME: IPI_CTRL, START ADDRESS: FF380000, END ADDRESS: FF3FFFFF
++    */
++    /*
++    * APERTURE NAME: IPI_CTRL, START ADDRESS: FF380000, END ADDRESS: FF3FFFFF
++    */
++    /*
++    * APERTURE NAME: IPI_CTRL, START ADDRESS: FF380000, END ADDRESS: FF3FFFFF
++    */
++    /*
++    * APERTURE NAME: IPI_CTRL, START ADDRESS: FF380000, END ADDRESS: FF3FFFFF
++    */
++    /*
++    * APERTURE NAME: IPI_CTRL, START ADDRESS: FF380000, END ADDRESS: FF3FFFFF
++    */
++    /*
++    * APERTURE NAME: IPI_CTRL, START ADDRESS: FF380000, END ADDRESS: FF3FFFFF
++    */
++    /*
++    * APERTURE NAME: IPI_CTRL, START ADDRESS: FF380000, END ADDRESS: FF3FFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_1, START ADDRESS: FF400000, END ADDRESS: FF40F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_SLCR, START ADDRESS: FF410000, END ADDRESS: FF4AFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_SLCR, START ADDRESS: FF410000, END ADDRESS: FF4AFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_SLCR, START ADDRESS: FF410000, END ADDRESS: FF4AFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_SLCR, START ADDRESS: FF410000, END ADDRESS: FF4AFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_SLCR, START ADDRESS: FF410000, END ADDRESS: FF4AFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_SLCR, START ADDRESS: FF410000, END ADDRESS: FF4AFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_SLCR, START ADDRESS: FF410000, END ADDRESS: FF4AFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_SLCR, START ADDRESS: FF410000, END ADDRESS: FF4AFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_SLCR, START ADDRESS: FF410000, END ADDRESS: FF4AFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_SLCR, START ADDRESS: FF410000, END ADDRESS: FF4AFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_SLCR_SECURE, START ADDRESS: FF4B0000, END ADDRESS: FF
++    * 4DFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_SLCR_SECURE, START ADDRESS: FF4B0000, END ADDRESS: FF
++    * 4DFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_SLCR_SECURE, START ADDRESS: FF4B0000, END ADDRESS: FF
++    * 4DFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_2, START ADDRESS: FF4E0000, END ADDRESS: FF5DF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: CRL_APB, START ADDRESS: FF5E0000, END ADDRESS: FF85FFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_3, START ADDRESS: FF860000, END ADDRESS: FF95F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: OCM_SLCR, START ADDRESS: FF960000, END ADDRESS: FF96FFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_4, START ADDRESS: FF970000, END ADDRESS: FF97F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_XPPU, START ADDRESS: FF980000, END ADDRESS: FF99FFFF
++    */
++    /*
++    * APERTURE NAME: RPU, START ADDRESS: FF9A0000, END ADDRESS: FF9AFFFF
++    */
++    /*
++    * APERTURE NAME: AFIFM6, START ADDRESS: FF9B0000, END ADDRESS: FF9BFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_XPPU_SINK, START ADDRESS: FF9C0000, END ADDRESS: FF9C
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: USB3_0, START ADDRESS: FF9D0000, END ADDRESS: FF9DFFFF
++    */
++    /*
++    * APERTURE NAME: USB3_1, START ADDRESS: FF9E0000, END ADDRESS: FF9EFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_5, START ADDRESS: FF9F0000, END ADDRESS: FF9FF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: APM0, START ADDRESS: FFA00000, END ADDRESS: FFA0FFFF
++    */
++    /*
++    * APERTURE NAME: APM1, START ADDRESS: FFA10000, END ADDRESS: FFA1FFFF
++    */
++    /*
++    * APERTURE NAME: APM_INTC_IOU, START ADDRESS: FFA20000, END ADDRESS: FFA2F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: APM_FPD_LPD, START ADDRESS: FFA30000, END ADDRESS: FFA3FF
++    * FF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_6, START ADDRESS: FFA40000, END ADDRESS: FFA4F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: AMS, START ADDRESS: FFA50000, END ADDRESS: FFA5FFFF
++    */
++    /*
++    * APERTURE NAME: RTC, START ADDRESS: FFA60000, END ADDRESS: FFA6FFFF
++    */
++    /*
++    * APERTURE NAME: OCM_XMPU_CFG, START ADDRESS: FFA70000, END ADDRESS: FFA7F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: ADMA_0, START ADDRESS: FFA80000, END ADDRESS: FFA8FFFF
++    */
++    /*
++    * APERTURE NAME: ADMA_1, START ADDRESS: FFA90000, END ADDRESS: FFA9FFFF
++    */
++    /*
++    * APERTURE NAME: ADMA_2, START ADDRESS: FFAA0000, END ADDRESS: FFAAFFFF
++    */
++    /*
++    * APERTURE NAME: ADMA_3, START ADDRESS: FFAB0000, END ADDRESS: FFABFFFF
++    */
++    /*
++    * APERTURE NAME: ADMA_4, START ADDRESS: FFAC0000, END ADDRESS: FFACFFFF
++    */
++    /*
++    * APERTURE NAME: ADMA_5, START ADDRESS: FFAD0000, END ADDRESS: FFADFFFF
++    */
++    /*
++    * APERTURE NAME: ADMA_6, START ADDRESS: FFAE0000, END ADDRESS: FFAEFFFF
++    */
++    /*
++    * APERTURE NAME: ADMA_7, START ADDRESS: FFAF0000, END ADDRESS: FFAFFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_7, START ADDRESS: FFB00000, END ADDRESS: FFBFF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: CSU_ROM, START ADDRESS: FFC00000, END ADDRESS: FFC1FFFF
++    */
++    /*
++    * APERTURE NAME: CSU_ROM, START ADDRESS: FFC00000, END ADDRESS: FFC1FFFF
++    */
++    /*
++    * APERTURE NAME: CSU_LOCAL, START ADDRESS: FFC20000, END ADDRESS: FFC2FFFF
++    */
++    /*
++    * APERTURE NAME: PUF, START ADDRESS: FFC30000, END ADDRESS: FFC3FFFF
++    */
++    /*
++    * APERTURE NAME: CSU_RAM, START ADDRESS: FFC40000, END ADDRESS: FFC5FFFF
++    */
++    /*
++    * APERTURE NAME: CSU_RAM, START ADDRESS: FFC40000, END ADDRESS: FFC5FFFF
++    */
++    /*
++    * APERTURE NAME: CSU_IOMODULE, START ADDRESS: FFC60000, END ADDRESS: FFC7F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: CSU_IOMODULE, START ADDRESS: FFC60000, END ADDRESS: FFC7F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: CSUDMA, START ADDRESS: FFC80000, END ADDRESS: FFC9FFFF
++    */
++    /*
++    * APERTURE NAME: CSUDMA, START ADDRESS: FFC80000, END ADDRESS: FFC9FFFF
++    */
++    /*
++    * APERTURE NAME: CSU, START ADDRESS: FFCA0000, END ADDRESS: FFCAFFFF
++    */
++    /*
++    * APERTURE NAME: CSU_WDT, START ADDRESS: FFCB0000, END ADDRESS: FFCBFFFF
++    */
++    /*
++    * APERTURE NAME: EFUSE, START ADDRESS: FFCC0000, END ADDRESS: FFCCFFFF
++    */
++    /*
++    * APERTURE NAME: BBRAM, START ADDRESS: FFCD0000, END ADDRESS: FFCDFFFF
++    */
++    /*
++    * APERTURE NAME: RSA_CORE, START ADDRESS: FFCE0000, END ADDRESS: FFCEFFFF
++    */
++    /*
++    * APERTURE NAME: MBISTJTAG, START ADDRESS: FFCF0000, END ADDRESS: FFCFFFFF
++    */
++    /*
++    * APERTURE NAME: PMU_ROM, START ADDRESS: FFD00000, END ADDRESS: FFD3FFFF
++    */
++    /*
++    * APERTURE NAME: PMU_ROM, START ADDRESS: FFD00000, END ADDRESS: FFD3FFFF
++    */
++    /*
++    * APERTURE NAME: PMU_ROM, START ADDRESS: FFD00000, END ADDRESS: FFD3FFFF
++    */
++    /*
++    * APERTURE NAME: PMU_ROM, START ADDRESS: FFD00000, END ADDRESS: FFD3FFFF
++    */
++    /*
++    * APERTURE NAME: PMU_IOMODULE, START ADDRESS: FFD40000, END ADDRESS: FFD5F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: PMU_IOMODULE, START ADDRESS: FFD40000, END ADDRESS: FFD5F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: PMU_LOCAL, START ADDRESS: FFD60000, END ADDRESS: FFD7FFFF
++    */
++    /*
++    * APERTURE NAME: PMU_LOCAL, START ADDRESS: FFD60000, END ADDRESS: FFD7FFFF
++    */
++    /*
++    * APERTURE NAME: PMU_GLOBAL, START ADDRESS: FFD80000, END ADDRESS: FFDBFFF
++    * F
++    */
++    /*
++    * APERTURE NAME: PMU_GLOBAL, START ADDRESS: FFD80000, END ADDRESS: FFDBFFF
++    * F
++    */
++    /*
++    * APERTURE NAME: PMU_GLOBAL, START ADDRESS: FFD80000, END ADDRESS: FFDBFFF
++    * F
++    */
++    /*
++    * APERTURE NAME: PMU_GLOBAL, START ADDRESS: FFD80000, END ADDRESS: FFDBFFF
++    * F
++    */
++    /*
++    * APERTURE NAME: PMU_RAM, START ADDRESS: FFDC0000, END ADDRESS: FFDFFFFF
++    */
++    /*
++    * APERTURE NAME: PMU_RAM, START ADDRESS: FFDC0000, END ADDRESS: FFDFFFFF
++    */
++    /*
++    * APERTURE NAME: PMU_RAM, START ADDRESS: FFDC0000, END ADDRESS: FFDFFFFF
++    */
++    /*
++    * APERTURE NAME: PMU_RAM, START ADDRESS: FFDC0000, END ADDRESS: FFDFFFFF
++    */
++    /*
++    * APERTURE NAME: R5_0_ATCM, START ADDRESS: FFE00000, END ADDRESS: FFE0FFFF
++    */
++    /*
++    * APERTURE NAME: R5_0_ATCM_LOCKSTEP, START ADDRESS: FFE10000, END ADDRESS:
++    *  FFE1FFFF
++    */
++    /*
++    * APERTURE NAME: R5_0_BTCM, START ADDRESS: FFE20000, END ADDRESS: FFE2FFFF
++    */
++    /*
++    * APERTURE NAME: R5_0_BTCM_LOCKSTEP, START ADDRESS: FFE30000, END ADDRESS:
++    *  FFE3FFFF
++    */
++    /*
++    * APERTURE NAME: R5_0_INSTRUCTION_CACHE, START ADDRESS: FFE40000, END ADDR
++    * ESS: FFE4FFFF
++    */
++    /*
++    * APERTURE NAME: R5_0_DATA_CACHE, START ADDRESS: FFE50000, END ADDRESS: FF
++    * E5FFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_8, START ADDRESS: FFE60000, END ADDRESS: FFE8F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_8, START ADDRESS: FFE60000, END ADDRESS: FFE8F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_8, START ADDRESS: FFE60000, END ADDRESS: FFE8F
++    * FFF
++    */
++    /*
++    * APERTURE NAME: R5_1_ATCM_, START ADDRESS: FFE90000, END ADDRESS: FFE9FFF
++    * F
++    */
++    /*
++    * APERTURE NAME: RPU_UNUSED_10, START ADDRESS: FFEA0000, END ADDRESS: FFEA
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: R5_1_BTCM_, START ADDRESS: FFEB0000, END ADDRESS: FFEBFFF
++    * F
++    */
++    /*
++    * APERTURE NAME: R5_1_INSTRUCTION_CACHE, START ADDRESS: FFEC0000, END ADDR
++    * ESS: FFECFFFF
++    */
++    /*
++    * APERTURE NAME: R5_1_DATA_CACHE, START ADDRESS: FFED0000, END ADDRESS: FF
++    * EDFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_9, START ADDRESS: FFEE0000, END ADDRESS: FFFBF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_9, START ADDRESS: FFEE0000, END ADDRESS: FFFBF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_9, START ADDRESS: FFEE0000, END ADDRESS: FFFBF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_9, START ADDRESS: FFEE0000, END ADDRESS: FFFBF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_9, START ADDRESS: FFEE0000, END ADDRESS: FFFBF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_9, START ADDRESS: FFEE0000, END ADDRESS: FFFBF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_9, START ADDRESS: FFEE0000, END ADDRESS: FFFBF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_9, START ADDRESS: FFEE0000, END ADDRESS: FFFBF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_9, START ADDRESS: FFEE0000, END ADDRESS: FFFBF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_9, START ADDRESS: FFEE0000, END ADDRESS: FFFBF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_9, START ADDRESS: FFEE0000, END ADDRESS: FFFBF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_9, START ADDRESS: FFEE0000, END ADDRESS: FFFBF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_9, START ADDRESS: FFEE0000, END ADDRESS: FFFBF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_9, START ADDRESS: FFEE0000, END ADDRESS: FFFBF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_9, START ADDRESS: FFEE0000, END ADDRESS: FFFBF
++    * FFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_15, START ADDRESS: FFFD0000, END ADDRESS: FFFF
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_15, START ADDRESS: FFFD0000, END ADDRESS: FFFF
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_15, START ADDRESS: FFFD0000, END ADDRESS: FFFF
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_1, START ADDRESS: FF310000, END ADDRESS: FF31FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_2, START ADDRESS: FF320000, END ADDRESS: FF32FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_0, START ADDRESS: FF300000, END ADDRESS: FF30FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_7, START ADDRESS: FF340000, END ADDRESS: FF34FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_8, START ADDRESS: FF350000, END ADDRESS: FF35FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_9, START ADDRESS: FF360000, END ADDRESS: FF36FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_10, START ADDRESS: FF370000, END ADDRESS: FF37FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IPI_PMU, START ADDRESS: FF330000, END ADDRESS: FF33FFFF
++    */
++    /*
++    * APERTURE NAME: IOU_GPV, START ADDRESS: FE000000, END ADDRESS: FE0FFFFF
++    */
++    /*
++    * APERTURE NAME: LPD_GPV, START ADDRESS: FE100000, END ADDRESS: FE1FFFFF
++    */
++    /*
++    * APERTURE NAME: USB3_0_XHCI, START ADDRESS: FE200000, END ADDRESS: FE2FFF
++    * FF
++    */
++    /*
++    * APERTURE NAME: USB3_1_XHCI, START ADDRESS: FE300000, END ADDRESS: FE3FFF
++    * FF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_13, START ADDRESS: FE400000, END ADDRESS: FE7F
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_13, START ADDRESS: FE400000, END ADDRESS: FE7F
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_13, START ADDRESS: FE400000, END ADDRESS: FE7F
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: LPD_UNUSED_13, START ADDRESS: FE400000, END ADDRESS: FE7F
++    * FFFF
++    */
++    /*
++    * APERTURE NAME: CORESIGHT, START ADDRESS: FE800000, END ADDRESS: FEFFFFFF
++    */
++    /*
++    * APERTURE NAME: CORESIGHT, START ADDRESS: FE800000, END ADDRESS: FEFFFFFF
++    */
++    /*
++    * APERTURE NAME: CORESIGHT, START ADDRESS: FE800000, END ADDRESS: FEFFFFFF
++    */
++    /*
++    * APERTURE NAME: CORESIGHT, START ADDRESS: FE800000, END ADDRESS: FEFFFFFF
++    */
++    /*
++    * APERTURE NAME: CORESIGHT, START ADDRESS: FE800000, END ADDRESS: FEFFFFFF
++    */
++    /*
++    * APERTURE NAME: CORESIGHT, START ADDRESS: FE800000, END ADDRESS: FEFFFFFF
++    */
++    /*
++    * APERTURE NAME: CORESIGHT, START ADDRESS: FE800000, END ADDRESS: FEFFFFFF
++    */
++    /*
++    * APERTURE NAME: CORESIGHT, START ADDRESS: FE800000, END ADDRESS: FEFFFFFF
++    */
++    /*
++    * APERTURE NAME: QSPI_LINEAR_ADDRESS, START ADDRESS: C0000000, END ADDRESS
++    * : DFFFFFFF
++    */
++    /*
++    * XPPU CONTROL
++    */
++
++	return 1;
++}
++unsigned long psu_ddr_xmpu0_data(void)
++{
++    /*
++    * DDR XMPU0
++    */
++
++	return 1;
++}
++unsigned long psu_ddr_xmpu1_data(void)
++{
++    /*
++    * DDR XMPU1
++    */
++
++	return 1;
++}
++unsigned long psu_ddr_xmpu2_data(void)
++{
++    /*
++    * DDR XMPU2
++    */
++
++	return 1;
++}
++unsigned long psu_ddr_xmpu3_data(void)
++{
++    /*
++    * DDR XMPU3
++    */
++
++	return 1;
++}
++unsigned long psu_ddr_xmpu4_data(void)
++{
++    /*
++    * DDR XMPU4
++    */
++
++	return 1;
++}
++unsigned long psu_ddr_xmpu5_data(void)
++{
++    /*
++    * DDR XMPU5
++    */
++
++	return 1;
++}
++unsigned long psu_ocm_xmpu_data(void)
++{
++    /*
++    * OCM XMPU
++    */
++
++	return 1;
++}
++unsigned long psu_fpd_xmpu_data(void)
++{
++    /*
++    * FPD XMPU
++    */
++
++	return 1;
++}
++unsigned long psu_protection_lock_data(void)
++{
++    /*
++    * LOCKING PROTECTION MODULE
++    */
++    /*
++    * XPPU LOCK
++    */
++    /*
++    * APERTURE NAME: LPD_XPPU, START ADDRESS: FF980000, END ADDRESS: FF99FFFF
++    */
++    /*
++    * XMPU LOCK
++    */
++    /*
++    * LOCK OCM XMPU ONLY IF IT IS NOT PROTECTED BY ANY MASTER
++    */
++    /*
++    * LOCK FPD XMPU ONLY IF IT IS NOT PROTECTED BY ANY MASTER
++    */
++    /*
++    * LOCK DDR XMPU ONLY IF IT IS NOT PROTECTED BY ANY MASTER
++    */
++    /*
++    * LOCK DDR XMPU ONLY IF IT IS NOT PROTECTED BY ANY MASTER
++    */
++    /*
++    * LOCK DDR XMPU ONLY IF IT IS NOT PROTECTED BY ANY MASTER
++    */
++    /*
++    * LOCK DDR XMPU ONLY IF IT IS NOT PROTECTED BY ANY MASTER
++    */
++    /*
++    * LOCK DDR XMPU ONLY IF IT IS NOT PROTECTED BY ANY MASTER
++    */
++    /*
++    * LOCK DDR XMPU ONLY IF IT IS NOT PROTECTED BY ANY MASTER
++    */
++
++	return 1;
++}
++unsigned long psu_apply_master_tz(void)
++{
++    /*
++    * RPU
++    */
++    /*
++    * DP TZ
++    */
++    /*
++    * Register : slcr_dpdma @ 0XFD690040
++
++    * TrustZone classification for DisplayPort DMA
++    *  PSU_FPD_SLCR_SECURE_SLCR_DPDMA_TZ                           1
++
++    * DPDMA TrustZone Settings
++    * (OFFSET, MASK, VALUE)      (0XFD690040, 0x00000001U ,0x00000001U)
++    */
++	PSU_Mask_Write(FPD_SLCR_SECURE_SLCR_DPDMA_OFFSET,
++		0x00000001U, 0x00000001U);
++/*##################################################################### */
++
++    /*
++    * SATA TZ
++    */
++    /*
++    * PCIE TZ
++    */
++    /*
++    * Register : slcr_pcie @ 0XFD690030
++
++    * TrustZone classification for DMA Channel 0
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_DMA_0                      1
++
++    * TrustZone classification for DMA Channel 1
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_DMA_1                      1
++
++    * TrustZone classification for DMA Channel 2
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_DMA_2                      1
++
++    * TrustZone classification for DMA Channel 3
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_DMA_3                      1
++
++    * TrustZone classification for Ingress Address Translation 0
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_0                  1
++
++    * TrustZone classification for Ingress Address Translation 1
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_1                  1
++
++    * TrustZone classification for Ingress Address Translation 2
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_2                  1
++
++    * TrustZone classification for Ingress Address Translation 3
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_3                  1
++
++    * TrustZone classification for Ingress Address Translation 4
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_4                  1
++
++    * TrustZone classification for Ingress Address Translation 5
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_5                  1
++
++    * TrustZone classification for Ingress Address Translation 6
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_6                  1
++
++    * TrustZone classification for Ingress Address Translation 7
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_INGR_7                  1
++
++    * TrustZone classification for Egress Address Translation 0
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_0                   1
++
++    * TrustZone classification for Egress Address Translation 1
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_1                   1
++
++    * TrustZone classification for Egress Address Translation 2
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_2                   1
++
++    * TrustZone classification for Egress Address Translation 3
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_3                   1
++
++    * TrustZone classification for Egress Address Translation 4
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_4                   1
++
++    * TrustZone classification for Egress Address Translation 5
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_5                   1
++
++    * TrustZone classification for Egress Address Translation 6
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_6                   1
++
++    * TrustZone classification for Egress Address Translation 7
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_AT_EGR_7                   1
++
++    * TrustZone classification for DMA Registers
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_DMA_REGS                   1
++
++    * TrustZone classification for MSIx Table
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_MSIX_TABLE                 1
++
++    * TrustZone classification for MSIx PBA
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_MSIX_PBA                   1
++
++    * TrustZone classification for ECAM
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_ECAM                       1
++
++    * TrustZone classification for Bridge Common Registers
++    *  PSU_FPD_SLCR_SECURE_SLCR_PCIE_TZ_BRIDGE_REGS                1
++
++    * PCIe TrustZone settings. This register may only be modified during bootu
++    * p (while PCIe block is disabled)
++    * (OFFSET, MASK, VALUE)      (0XFD690030, 0x01FFFFFFU ,0x01FFFFFFU)
++    */
++	PSU_Mask_Write(FPD_SLCR_SECURE_SLCR_PCIE_OFFSET,
++		0x01FFFFFFU, 0x01FFFFFFU);
++/*##################################################################### */
++
++    /*
++    * USB TZ
++    */
++    /*
++    * Register : slcr_usb @ 0XFF4B0034
++
++    * TrustZone Classification for USB3_0
++    *  PSU_LPD_SLCR_SECURE_SLCR_USB_TZ_USB3_0                      1
++
++    * TrustZone Classification for USB3_1
++    *  PSU_LPD_SLCR_SECURE_SLCR_USB_TZ_USB3_1                      1
++
++    * USB3 TrustZone settings
++    * (OFFSET, MASK, VALUE)      (0XFF4B0034, 0x00000003U ,0x00000003U)
++    */
++	PSU_Mask_Write(LPD_SLCR_SECURE_SLCR_USB_OFFSET,
++		0x00000003U, 0x00000003U);
++/*##################################################################### */
++
++    /*
++    * SD TZ
++    */
++    /*
++    * Register : IOU_AXI_RPRTCN @ 0XFF240004
++
++    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
++    * 1] = '0' : Secure access [1] = '1' : No secure access [2] = '0' : Data a
++    * ccess [2] = '1'' : Instruction access
++    *  PSU_IOU_SECURE_SLCR_IOU_AXI_RPRTCN_SD0_AXI_ARPROT           2
++
++    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
++    * 1] = '0' : Secure access [1] = '1' : No secure access [2] = '0' : Data a
++    * ccess [2] = '1'' : Instruction access
++    *  PSU_IOU_SECURE_SLCR_IOU_AXI_RPRTCN_SD1_AXI_ARPROT           2
++
++    * AXI read protection type selection
++    * (OFFSET, MASK, VALUE)      (0XFF240004, 0x003F0000U ,0x00120000U)
++    */
++	PSU_Mask_Write(IOU_SECURE_SLCR_IOU_AXI_RPRTCN_OFFSET,
++		0x003F0000U, 0x00120000U);
++/*##################################################################### */
++
++    /*
++    * Register : IOU_AXI_WPRTCN @ 0XFF240000
++
++    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
++    * 1] = '0' : Secure access [1] = '1' : No secure access [2] = '0' : Data a
++    * ccess [2] = '1'' : Instruction access
++    *  PSU_IOU_SECURE_SLCR_IOU_AXI_WPRTCN_SD0_AXI_AWPROT           2
++
++    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
++    * 1] = '0' : Secure access [1] = '1' : No secure access [2] = '0' : Data a
++    * ccess [2] = '1'' : Instruction access
++    *  PSU_IOU_SECURE_SLCR_IOU_AXI_WPRTCN_SD1_AXI_AWPROT           2
++
++    * AXI write protection type selection
++    * (OFFSET, MASK, VALUE)      (0XFF240000, 0x003F0000U ,0x00120000U)
++    */
++	PSU_Mask_Write(IOU_SECURE_SLCR_IOU_AXI_WPRTCN_OFFSET,
++		0x003F0000U, 0x00120000U);
++/*##################################################################### */
++
++    /*
++    * GEM TZ
++    */
++    /*
++    * Register : IOU_AXI_RPRTCN @ 0XFF240004
++
++    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
++    * 1] = '0' : Secure access [1] = '1' : No secure access [2] = '0' : Data a
++    * ccess [2] = '1'' : Instruction access
++    *  PSU_IOU_SECURE_SLCR_IOU_AXI_RPRTCN_GEM0_AXI_ARPROT          2
++
++    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
++    * 1] = '0' : Secure access [1] = '1' : No secure access [2] = '0' : Data a
++    * ccess [2] = '1'' : Instruction access
++    *  PSU_IOU_SECURE_SLCR_IOU_AXI_RPRTCN_GEM1_AXI_ARPROT          2
++
++    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
++    * 1] = '0' : Secure access [1] = '1' : No secure access [2] = '0' : Data a
++    * ccess [2] = '1'' : Instruction access
++    *  PSU_IOU_SECURE_SLCR_IOU_AXI_RPRTCN_GEM2_AXI_ARPROT          2
++
++    * AXI protection [0] = '0' : Normal access [0] = '1' : Previleged access [
+     * 1] = '0' : Secure access [1] = '1' : No secure access [2] = '0' : Data a
+     * ccess [2] = '1'' : Instruction access
+     *  PSU_IOU_SECURE_SLCR_IOU_AXI_RPRTCN_GEM3_AXI_ARPROT          2
+@@ -16885,6 +18184,18 @@ unsigned long psu_serdes_init_data(void)
+ /*##################################################################### */
+ 
+     /*
++    * Register : L0_TM_ILL13 @ 0XFD401994
++
++    * ILL cal idle val refcnt
++    *  PSU_SERDES_L0_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT              0x7
++
++    * ill cal idle value count
++    * (OFFSET, MASK, VALUE)      (0XFD401994, 0x00000007U ,0x00000007U)
++    */
++	PSU_Mask_Write(SERDES_L0_TM_ILL13_OFFSET, 0x00000007U, 0x00000007U);
++/*##################################################################### */
++
++    /*
+     * Register : L1_TM_MISC2 @ 0XFD40589C
+ 
+     * ILL calib counts BYPASSED with calcode bits
+@@ -17060,9 +18371,93 @@ unsigned long psu_serdes_init_data(void)
+ /*##################################################################### */
+ 
+     /*
++    * Register : L1_TM_ILL13 @ 0XFD405994
++
++    * ILL cal idle val refcnt
++    *  PSU_SERDES_L1_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT              0x7
++
++    * ill cal idle value count
++    * (OFFSET, MASK, VALUE)      (0XFD405994, 0x00000007U ,0x00000007U)
++    */
++	PSU_Mask_Write(SERDES_L1_TM_ILL13_OFFSET, 0x00000007U, 0x00000007U);
++/*##################################################################### */
++
++    /*
++    * Register : L2_TM_ILL13 @ 0XFD409994
++
++    * ILL cal idle val refcnt
++    *  PSU_SERDES_L2_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT              0x7
++
++    * ill cal idle value count
++    * (OFFSET, MASK, VALUE)      (0XFD409994, 0x00000007U ,0x00000007U)
++    */
++	PSU_Mask_Write(SERDES_L2_TM_ILL13_OFFSET, 0x00000007U, 0x00000007U);
++/*##################################################################### */
++
++    /*
++    * Register : L3_TM_ILL13 @ 0XFD40D994
++
++    * ILL cal idle val refcnt
++    *  PSU_SERDES_L3_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT              0x7
++
++    * ill cal idle value count
++    * (OFFSET, MASK, VALUE)      (0XFD40D994, 0x00000007U ,0x00000007U)
++    */
++	PSU_Mask_Write(SERDES_L3_TM_ILL13_OFFSET, 0x00000007U, 0x00000007U);
++/*##################################################################### */
++
++    /*
+     * SYMBOL LOCK AND WAIT
+     */
+     /*
++    * Register : L0_TM_DIG_10 @ 0XFD40107C
++
++    * CDR lock wait time. (1-16 us). cdr_lock_wait_time = 4'b xxxx + 4'b 0001
++    *  PSU_SERDES_L0_TM_DIG_10_CDR_BIT_LOCK_TIME                   0x1
++
++    * test control for changing cdr lock wait time
++    * (OFFSET, MASK, VALUE)      (0XFD40107C, 0x0000000FU ,0x00000001U)
++    */
++	PSU_Mask_Write(SERDES_L0_TM_DIG_10_OFFSET, 0x0000000FU, 0x00000001U);
++/*##################################################################### */
++
++    /*
++    * Register : L1_TM_DIG_10 @ 0XFD40507C
++
++    * CDR lock wait time. (1-16 us). cdr_lock_wait_time = 4'b xxxx + 4'b 0001
++    *  PSU_SERDES_L1_TM_DIG_10_CDR_BIT_LOCK_TIME                   0x1
++
++    * test control for changing cdr lock wait time
++    * (OFFSET, MASK, VALUE)      (0XFD40507C, 0x0000000FU ,0x00000001U)
++    */
++	PSU_Mask_Write(SERDES_L1_TM_DIG_10_OFFSET, 0x0000000FU, 0x00000001U);
++/*##################################################################### */
++
++    /*
++    * Register : L2_TM_DIG_10 @ 0XFD40907C
++
++    * CDR lock wait time. (1-16 us). cdr_lock_wait_time = 4'b xxxx + 4'b 0001
++    *  PSU_SERDES_L2_TM_DIG_10_CDR_BIT_LOCK_TIME                   0x1
++
++    * test control for changing cdr lock wait time
++    * (OFFSET, MASK, VALUE)      (0XFD40907C, 0x0000000FU ,0x00000001U)
++    */
++	PSU_Mask_Write(SERDES_L2_TM_DIG_10_OFFSET, 0x0000000FU, 0x00000001U);
++/*##################################################################### */
++
++    /*
++    * Register : L3_TM_DIG_10 @ 0XFD40D07C
++
++    * CDR lock wait time. (1-16 us). cdr_lock_wait_time = 4'b xxxx + 4'b 0001
++    *  PSU_SERDES_L3_TM_DIG_10_CDR_BIT_LOCK_TIME                   0x1
++
++    * test control for changing cdr lock wait time
++    * (OFFSET, MASK, VALUE)      (0XFD40D07C, 0x0000000FU ,0x00000001U)
++    */
++	PSU_Mask_Write(SERDES_L3_TM_DIG_10_OFFSET, 0x0000000FU, 0x00000001U);
++/*##################################################################### */
++
++    /*
+     * SIOU SETTINGS FOR BYPASS CONTROL,HSRX-DIG
+     */
+     /*
+@@ -17296,6 +18691,54 @@ unsigned long psu_serdes_init_data(void)
+     * DISABLE DYNAMIC OFFSET CALIBRATION
+     */
+     /*
++    * Register : L0_TM_EQ11 @ 0XFD401978
++
++    * Force EQ offset correction algo off if not forced on
++    *  PSU_SERDES_L0_TM_EQ11_FORCE_EQ_OFFS_OFF                     0x1
++
++    * eq dynamic offset correction
++    * (OFFSET, MASK, VALUE)      (0XFD401978, 0x00000010U ,0x00000010U)
++    */
++	PSU_Mask_Write(SERDES_L0_TM_EQ11_OFFSET, 0x00000010U, 0x00000010U);
++/*##################################################################### */
++
++    /*
++    * Register : L1_TM_EQ11 @ 0XFD405978
++
++    * Force EQ offset correction algo off if not forced on
++    *  PSU_SERDES_L1_TM_EQ11_FORCE_EQ_OFFS_OFF                     0x1
++
++    * eq dynamic offset correction
++    * (OFFSET, MASK, VALUE)      (0XFD405978, 0x00000010U ,0x00000010U)
++    */
++	PSU_Mask_Write(SERDES_L1_TM_EQ11_OFFSET, 0x00000010U, 0x00000010U);
++/*##################################################################### */
++
++    /*
++    * Register : L2_TM_EQ11 @ 0XFD409978
++
++    * Force EQ offset correction algo off if not forced on
++    *  PSU_SERDES_L2_TM_EQ11_FORCE_EQ_OFFS_OFF                     0x1
++
++    * eq dynamic offset correction
++    * (OFFSET, MASK, VALUE)      (0XFD409978, 0x00000010U ,0x00000010U)
++    */
++	PSU_Mask_Write(SERDES_L2_TM_EQ11_OFFSET, 0x00000010U, 0x00000010U);
++/*##################################################################### */
++
++    /*
++    * Register : L3_TM_EQ11 @ 0XFD40D978
++
++    * Force EQ offset correction algo off if not forced on
++    *  PSU_SERDES_L3_TM_EQ11_FORCE_EQ_OFFS_OFF                     0x1
++
++    * eq dynamic offset correction
++    * (OFFSET, MASK, VALUE)      (0XFD40D978, 0x00000010U ,0x00000010U)
++    */
++	PSU_Mask_Write(SERDES_L3_TM_EQ11_OFFSET, 0x00000010U, 0x00000010U);
++/*##################################################################### */
++
++    /*
+     * DISABLE ECO FOR PCIE
+     */
+     /*
+@@ -17665,6 +19108,21 @@ unsigned long psu_resetout_init_data(void)
+     * er is not supported. This bit always reads as 1'b0.
+     *  PSU_USB3_0_XHCI_GUSB2PHYCFG_PHYSEL                          0x0
+ 
++    * Suspend USB2.0 HS/FS/LS PHY (SusPHY) When set, USB2.0 PHY enters Suspend
++    *  mode if Suspend conditions are valid. For DRD/OTG configurations, it is
++    *  recommended that this bit is set to 0 during coreConsultant configurati
++    * on. If it is set to 1, then the application must clear this bit after po
++    * wer-on reset. Application needs to set it to 1 after the core initializa
++    * tion completes. For all other configurations, this bit can be set to 1 d
++    * uring core configuration. Note: - In host mode, on reset, this bit is se
++    * t to 1. Software can override this bit after reset. - In device mode, be
++    * fore issuing any device endpoint command when operating in 2.0 speeds, d
++    * isable this bit and enable it after the command completes. If you issue
++    * a command without disabling this bit when the device is in L2 state and
++    * if mac2_clk (utmi_clk/ulpi_clk) is gated off, the command will not get c
++    * ompleted.
++    *  PSU_USB3_0_XHCI_GUSB2PHYCFG_SUSPENDUSB20                    0x1
++
+     * Full-Speed Serial Interface Select (FSIntf) The application uses this bi
+     * t to select a unidirectional or bidirectional USB 1.1 full-speed serial
+     * transceiver interface. - 1'b0: 6-pin unidirectional full-speed serial in
+@@ -17719,10 +19177,10 @@ unsigned long psu_resetout_init_data(void)
+     *  register before starting any transactions on either the SoC bus or the
+     * USB. In Device-only configurations, only one register is needed. In Host
+     *  mode, per-port registers are implemented.
+-    * (OFFSET, MASK, VALUE)      (0XFE20C200, 0x00023FBFU ,0x00022417U)
++    * (OFFSET, MASK, VALUE)      (0XFE20C200, 0x00023FFFU ,0x00022457U)
+     */
+ 	PSU_Mask_Write(USB3_0_XHCI_GUSB2PHYCFG_OFFSET,
+-		0x00023FBFU, 0x00022417U);
++		0x00023FFFU, 0x00022457U);
+ /*##################################################################### */
+ 
+     /*
+@@ -17759,6 +19217,22 @@ unsigned long psu_resetout_init_data(void)
+ /*##################################################################### */
+ 
+     /*
++    * Register : GUCTL1 @ 0XFE20C11C
++
++    * When this bit is set to '0', termsel, xcvrsel will become 0 during end o
++    * f resume while the opmode will become 0 once controller completes end of
++    *  resume and enters U0 state (2 separate commandswill be issued). When th
++    * is bit is set to '1', all the termsel, xcvrsel, opmode becomes 0 during
++    * end of resume itself (only 1 command will be issued)
++    *  PSU_USB3_0_XHCI_GUCTL1_RESUME_TERMSEL_XCVRSEL_UNIFY         0x1
++
++    * Global User Control Register 1
++    * (OFFSET, MASK, VALUE)      (0XFE20C11C, 0x00000400U ,0x00000400U)
++    */
++	PSU_Mask_Write(USB3_0_XHCI_GUCTL1_OFFSET, 0x00000400U, 0x00000400U);
++/*##################################################################### */
++
++    /*
+     * Register : GUCTL @ 0XFE20C12C
+ 
+     * Host IN Auto Retry (USBHstInAutoRetryEn) When set, this field enables th
+@@ -18272,6 +19746,18 @@ unsigned long psu_ddr_phybringup_data(void)
+ 
+ 	unsigned int regval = 0;
+ 
++	for (int tp=0; tp<20; tp++) {
++		regval = Xil_In32(0xFD070018);
++	}
++	int cur_fbdiv;
++
++	cur_fbdiv = (Xil_In32(0xFD1A002CU) & 0x00007F00U) >> 0x00000008U;
++	dpll_prog(48, DPLL_CFG_LOCK_DLY, DPLL_CFG_LOCK_CNT,
++	DPLL_CFG_LFHF, DPLL_CFG_CP, DPLL_CFG_RES);
++	for (int tp=0; tp<20; tp++) {
++		regval = Xil_In32(0xFD070018);
++	}
++	Xil_Out32(0xFD080004U, 0x00040073U);
+ 	/* PHY BRINGUP SEQ */
+ 	while ((Xil_In32(0xFD080030U) & 0x0000000FU) != 0x0000000FU) {
+ 	/*****TODO*****/
+@@ -18392,266 +19878,149 @@ unsigned long psu_ddr_phybringup_data(void)
+ 
+ 	}
+ 
+-	/*
+-	 * LPDDR4 training work around code 
+-	*/
++	prog_reg(0xFD0701B0U, 0x00000001U, 0x00000000U, 0x00000000U);
+ 	prog_reg(0xFD080014U, 0x00000040U, 0x00000006U, 0x00000001U);
+-	prog_reg(0xFD080680U, 0x000000E0U, 0x00000005U, 0x00000000U);
+ 	prog_reg(0xFD080028U, 0x00000001U, 0x00000000U, 0x00000001U);
+-	prog_reg(0xFD070320U, 0x00000001U, 0x00000000U, 0x00000000U);
+-	prog_reg(0xFD0701A0U, 0x80000000U, 0x0000001FU, 0x00000001U);
+-	prog_reg(0xFD080004U, 0x00000400U, 0x0000000AU, 0x00000001U);
+-	prog_reg(0xFD080004U, 0x00000200U, 0x00000009U, 0x00000001U);
++	prog_reg(0xFD080004U, 0x20000000U, 0x0000001DU, 0x00000001U);
++	prog_reg(0xFD08016CU, 0x00000004U, 0x00000002U, 0x00000001U);
++	prog_reg(0xFD080168U, 0x000000F0U, 0x00000004U, 0x00000007U);
++	prog_reg(0xFD080168U, 0x00000F00U, 0x00000008U, 0x00000002U);
++	prog_reg(0xFD080168U, 0x0000000FU, 0x00000000U, 0x00000001U);
++	for (int tp=0; tp<20; tp++) {
++		regval = Xil_In32(0xFD070018);
++	}
++dpll_prog (cur_fbdiv, DPLL_CFG_LOCK_DLY, DPLL_CFG_LOCK_CNT, DPLL_CFG_LFHF, DPLL_CFG_CP, DPLL_CFG_RES);
++	for (int tp=0; tp<2000; tp++) {
++		regval = Xil_In32(0xFD070018);
++	}
++	prog_reg(0xFD080004U, 0x20000000U, 0x0000001DU, 0x00000000U);
++	prog_reg(0xFD080004U, 0x00040000U, 0x00000012U, 0x00000001U);
++	prog_reg(0xFD080004U, 0x00000040U, 0x00000006U, 0x00000001U);
++	prog_reg(0xFD080004U, 0x00000020U, 0x00000005U, 0x00000001U);
++	prog_reg(0xFD080004U, 0x00000010U, 0x00000004U, 0x00000001U);
+ 	prog_reg(0xFD080004U, 0x00000001U, 0x00000000U, 0x00000001U);
+-	while ((Xil_In32(0xFD080030U) & 0x00000001U) != 0x00000001U) {
++/*PHY BRINGUP SEQ*/
++	while ((Xil_In32(0xFD080030U) & 0x0000000FU) != 0x0000000FU) {
+ 	/*****TODO*****/
+ 
+ 	/*TIMEOUT poll mechanism need to be inserted in this block*/
+ 
+ 	}
+ 
+-	int wdqsl_a0;
+-
+-	wdqsl_a0 = (Xil_In32(0xFD0807C0U) & 0x07000000U) >> 0x00000018U;
+-	int wdqsl_a1;
+-
+-	wdqsl_a1 = (Xil_In32(0xFD0808C0U) & 0x07000000U) >> 0x00000018U;
+-	int wdqsl_a2;
+-
+-	wdqsl_a2 = (Xil_In32(0xFD0809C0U) & 0x07000000U) >> 0x00000018U;
+-	int wdqsl_a3;
+-
+-	wdqsl_a3 = (Xil_In32(0xFD080AC0U) & 0x07000000U) >> 0x00000018U;
+-	int lcdl_a0;
+-
+-	lcdl_a0 = (Xil_In32(0xFD080784U) & 0x000001FFU) >> 0x00000000U;
+-	int lcdl_a1;
+-
+-	lcdl_a1 = (Xil_In32(0xFD080884U) & 0x000001FFU) >> 0x00000000U;
+-	int lcdl_a2;
+-
+-	lcdl_a2 = (Xil_In32(0xFD080984U) & 0x000001FFU) >> 0x00000000U;
+-	int lcdl_a3;
+-
+-	lcdl_a3 = (Xil_In32(0xFD080A84U) & 0x000001FFU) >> 0x00000000U;
+-	int iprd0;
+-
+-	iprd0 = (Xil_In32(0xFD0807A0U) & 0x000001FFU) >> 0x00000000U;
+-	int iprd1;
+-
+-	iprd1 = (Xil_In32(0xFD0808A0U) & 0x000001FFU) >> 0x00000000U;
+-	int iprd2;
+-
+-	iprd2 = (Xil_In32(0xFD0809A0U) & 0x000001FFU) >> 0x00000000U;
+-	int iprd3;
+-
+-	iprd3 = (Xil_In32(0xFD080AA0U) & 0x000001FFU) >> 0x00000000U;
+-	prog_reg(0xFD0804DCU, 0x000F0000U, 0x00000010U, 0x00000001U);
+-	prog_reg(0xFD0804DCU, 0x0000000FU, 0x00000000U, 0x00000001U);
+-	tmp_regval = Xil_In32(0xFD070004U);
+-	int wdqsl_a0_rk1;
+-
+-	wdqsl_a0_rk1 = (Xil_In32(0xFD0807C0U) & 0x07000000U) >> 0x00000018U;
+-	int wdqsl_a1_rk1;
+-
+-	wdqsl_a1_rk1 = (Xil_In32(0xFD0808C0U) & 0x07000000U) >> 0x00000018U;
+-	int wdqsl_a2_rk1;
+-
+-	wdqsl_a2_rk1 = (Xil_In32(0xFD0809C0U) & 0x07000000U) >> 0x00000018U;
+-	int wdqsl_a3_rk1;
+-
+-	wdqsl_a3_rk1 = (Xil_In32(0xFD080AC0U) & 0x07000000U) >> 0x00000018U;
+-	int lcdl_a0_rk1;
+-
+-	lcdl_a0_rk1 = (Xil_In32(0xFD080784U) & 0x000001FFU) >> 0x00000000U;
+-	int lcdl_a1_rk1;
+-
+-	lcdl_a1_rk1 = (Xil_In32(0xFD080884U) & 0x000001FFU) >> 0x00000000U;
+-	int lcdl_a2_rk1;
+-
+-	lcdl_a2_rk1 = (Xil_In32(0xFD080984U) & 0x000001FFU) >> 0x00000000U;
+-	int lcdl_a3_rk1;
+-
+-	lcdl_a3_rk1 = (Xil_In32(0xFD080A84U) & 0x000001FFU) >> 0x00000000U;
+-	int iprd0_rk1;
+-
+-	iprd0_rk1 = (Xil_In32(0xFD0807A0U) & 0x000001FFU) >> 0x00000000U;
+-	int iprd1_rk1;
+-
+-	iprd1_rk1 = (Xil_In32(0xFD0808A0U) & 0x000001FFU) >> 0x00000000U;
+-	int iprd2_rk1;
+-
+-	iprd2_rk1 = (Xil_In32(0xFD0809A0U) & 0x000001FFU) >> 0x00000000U;
+-	int iprd3_rk1;
+-
+-	iprd3_rk1 = (Xil_In32(0xFD080AA0U) & 0x000001FFU) >> 0x00000000U;
+-	prog_reg(0xFD0804DCU, 0x000F0000U, 0x00000010U, 0x00000000U);
+-	prog_reg(0xFD0804DCU, 0x0000000FU, 0x00000000U, 0x00000000U);
+-	tmp_regval = Xil_In32(0xFD070004U);
+-	prog_reg(0xFD080004U, 0x00100000U, 0x00000014U, 0x00000001U);
+ 	prog_reg(0xFD080004U, 0x00000001U, 0x00000000U, 0x00000001U);
+-	while ((Xil_In32(0xFD080030U) & 0x00008001U) != 0x00008001U) {
++/*poll for PHY initialization to complete*/
++	while ((Xil_In32(0xFD080030U) & 0x000000FFU) != 0x0000001FU) {
+ 	/*****TODO*****/
+ 
+ 	/*TIMEOUT poll mechanism need to be inserted in this block*/
+ 
+ 	}
+ 
+-	int wdqsl_b0;
+-
+-	wdqsl_b0 = (Xil_In32(0xFD0807C0U) & 0x07000000U) >> 0x00000018U;
+-	int wdqsl_b1;
+-
+-	wdqsl_b1 = (Xil_In32(0xFD0808C0U) & 0x07000000U) >> 0x00000018U;
+-	int wdqsl_b2;
+-
+-	wdqsl_b2 = (Xil_In32(0xFD0809C0U) & 0x07000000U) >> 0x00000018U;
+-	int wdqsl_b3;
+-
+-	wdqsl_b3 = (Xil_In32(0xFD080AC0U) & 0x07000000U) >> 0x00000018U;
+-	int lcdl_b0;
+-
+-	lcdl_b0 = (Xil_In32(0xFD080784U) & 0x000001FFU) >> 0x00000000U;
+-	int lcdl_b1;
+-
+-	lcdl_b1 = (Xil_In32(0xFD080884U) & 0x000001FFU) >> 0x00000000U;
+-	int lcdl_b2;
+-
+-	lcdl_b2 = (Xil_In32(0xFD080984U) & 0x000001FFU) >> 0x00000000U;
+-	int lcdl_b3;
+-
+-	lcdl_b3 = (Xil_In32(0xFD080A84U) & 0x000001FFU) >> 0x00000000U;
+-	prog_reg(0xFD0804DCU, 0x000F0000U, 0x00000010U, 0x00000001U);
+-	prog_reg(0xFD0804DCU, 0x0000000FU, 0x00000000U, 0x00000001U);
+-	tmp_regval = Xil_In32(0xFD070004U);
+-	int wdqsl_b0_rk1;
+-
+-	wdqsl_b0_rk1 = (Xil_In32(0xFD0807C0U) & 0x07000000U) >> 0x00000018U;
+-	int wdqsl_b1_rk1;
+-
+-	wdqsl_b1_rk1 = (Xil_In32(0xFD0808C0U) & 0x07000000U) >> 0x00000018U;
+-	int wdqsl_b2_rk1;
+-
+-	wdqsl_b2_rk1 = (Xil_In32(0xFD0809C0U) & 0x07000000U) >> 0x00000018U;
+-	int wdqsl_b3_rk1;
+-
+-	wdqsl_b3_rk1 = (Xil_In32(0xFD080AC0U) & 0x07000000U) >> 0x00000018U;
+-	int lcdl_b0_rk1;
+-
+-	lcdl_b0_rk1 = (Xil_In32(0xFD080784U) & 0x000001FFU) >> 0x00000000U;
+-	int lcdl_b1_rk1;
+-
+-	lcdl_b1_rk1 = (Xil_In32(0xFD080884U) & 0x000001FFU) >> 0x00000000U;
+-	int lcdl_b2_rk1;
+-
+-	lcdl_b2_rk1 = (Xil_In32(0xFD080984U) & 0x000001FFU) >> 0x00000000U;
+-	int lcdl_b3_rk1;
+-
+-	lcdl_b3_rk1 = (Xil_In32(0xFD080A84U) & 0x000001FFU) >> 0x00000000U;
+-	prog_reg(0xFD0804DCU, 0x000F0000U, 0x00000010U, 0x00000000U);
+-	prog_reg(0xFD0804DCU, 0x0000000FU, 0x00000000U, 0x00000000U);
+-	tmp_regval = Xil_In32(0xFD070004U);
+-	
+-/* declare variables used for calculation */
+-
+-	int calc10, calc11, calc12, calc13, calc20, calc21, calc22, calc23;
+-
+-	int calc10_rk1, calc11_rk1, calc12_rk1, calc13_rk1, calc20_rk1,
+-	calc21_rk1, calc22_rk1, calc23_rk1;
+-
+-	calc10 = ((wdqsl_b0 * iprd0) + lcdl_b0) - ((wdqsl_a0 * iprd0) + lcdl_a0);
+-	calc11 = ((wdqsl_b1 * iprd1) + lcdl_b1) - ((wdqsl_a1 * iprd1) + lcdl_a1);
+-	calc12 = ((wdqsl_b2 * iprd2) + lcdl_b2) - ((wdqsl_a2 * iprd2) + lcdl_a2);
+-	calc13 = ((wdqsl_b3 * iprd3) + lcdl_b3) - ((wdqsl_a3 * iprd3) + lcdl_a3);
+-
+-	calc20 = (calc10 / 2) + ((wdqsl_a0 * iprd0) + lcdl_a0);
+-	calc21 = (calc11 / 2) + ((wdqsl_a1 * iprd1) + lcdl_a1);
+-	calc22 = (calc12 / 2) + ((wdqsl_a2 * iprd2) + lcdl_a2);
+-	calc23 = (calc13 / 2) + ((wdqsl_a3 * iprd3) + lcdl_a3);
+-
+-	calc10_rk1 = ((wdqsl_b0_rk1 * iprd0_rk1) + lcdl_b0_rk1) - ((wdqsl_a0_rk1 * iprd0_rk1) + lcdl_a0_rk1);
+-	calc11_rk1 = ((wdqsl_b1_rk1 * iprd1_rk1) + lcdl_b1_rk1) - ((wdqsl_a1_rk1 * iprd1_rk1) + lcdl_a1_rk1);
+-	calc12_rk1 = ((wdqsl_b2_rk1 * iprd2_rk1) + lcdl_b2_rk1) - ((wdqsl_a2_rk1 * iprd2_rk1) + lcdl_a2_rk1);
+-	calc13_rk1 = ((wdqsl_b3_rk1 * iprd3_rk1) + lcdl_b3_rk1) - ((wdqsl_a3_rk1 * iprd3_rk1) + lcdl_a3_rk1);
+-
+-	calc20_rk1 = (calc10_rk1 / 2) + ((wdqsl_a0_rk1 * iprd0_rk1) + lcdl_a0_rk1);
+-	calc21_rk1 = (calc11_rk1 / 2) + ((wdqsl_a1_rk1 * iprd1_rk1) + lcdl_a1_rk1);
+-	calc22_rk1 = (calc12_rk1 / 2) + ((wdqsl_a2_rk1 * iprd2_rk1) + lcdl_a2_rk1);
+-	calc23_rk1 = (calc13_rk1 / 2) + ((wdqsl_a3_rk1 * iprd3_rk1) + lcdl_a3_rk1);
+-
+-	prog_reg(0xFD0807C0U, 0x07000000U, 0x00000018U, 0x00000000U);
+-	prog_reg(0xFD0808C0U, 0x07000000U, 0x00000018U, 0x00000000U);
+-	prog_reg(0xFD0809C0U, 0x07000000U, 0x00000018U, 0x00000000U);
+-	prog_reg(0xFD080AC0U, 0x07000000U, 0x00000018U, 0x00000000U);
+-	prog_reg(0xFD080784U, 0x000001FFU, 0, calc20);
+-	prog_reg(0xFD080884U, 0x000001FFU, 0, calc21);
+-	prog_reg(0xFD080984U, 0x000001FFU, 0, calc22);
+-	prog_reg(0xFD080A84U, 0x000001FFU, 0, calc23);
+-	prog_reg(0xFD0804DCU, 0x000F0000U, 0x00000010U, 0x00000001U);
+-	prog_reg(0xFD0804DCU, 0x0000000FU, 0x00000000U, 0x00000001U);
+-	tmp_regval = Xil_In32(0xFD070004U);
+-	prog_reg(0xFD0807C0U, 0x07000000U, 0x00000018U, 0x00000000U);
+-	prog_reg(0xFD0808C0U, 0x07000000U, 0x00000018U, 0x00000000U);
+-	prog_reg(0xFD0809C0U, 0x07000000U, 0x00000018U, 0x00000000U);
+-	prog_reg(0xFD080AC0U, 0x07000000U, 0x00000018U, 0x00000000U);
+-	prog_reg(0xFD080784U, 0x000001FFU, 0, calc20_rk1);
+-	prog_reg(0xFD080884U, 0x000001FFU, 0, calc21_rk1);
+-	prog_reg(0xFD080984U, 0x000001FFU, 0, calc22_rk1);
+-	prog_reg(0xFD080A84U, 0x000001FFU, 0, calc23_rk1);
+-	prog_reg(0xFD0804DCU, 0x000F0000U, 0x00000010U, 0x00000000U);
+-	prog_reg(0xFD0804DCU, 0x0000000FU, 0x00000000U, 0x00000000U);
+-	tmp_regval = Xil_In32(0xFD070004U);
+-	prog_reg(0xFD080004U, 0x00004000U, 0x0000000EU, 0x00000001U);
+-	prog_reg(0xFD080004U, 0x00000001U, 0x00000000U, 0x00000001U);
+-	while ((Xil_In32(0xFD080030U) & 0x00000401U) != 0x00000401U) {
+-	/*****TODO*****/
+-
+-	/*TIMEOUT poll mechanism need to be inserted in this block*/
+ 
++	for (int tp=0; tp<2000; tp++) {
++		regval = Xil_In32(0xFD070018);
+ 	}
++	prog_reg(0xFD080028U, 0x00000001U, 0x00000000U, 0x00000000U);
++	prog_reg(0xFD08016CU, 0x00000004U, 0x00000002U, 0x00000001U);
++	prog_reg(0xFD080168U, 0x000000F0U, 0x00000004U, 0x00000007U);
++	prog_reg(0xFD080168U, 0x00000F00U, 0x00000008U, 0x00000003U);
++	prog_reg(0xFD080168U, 0x0000000FU, 0x00000000U, 0x00000001U);
++	for (int tp=0; tp<2000; tp++) {
++		regval = Xil_In32(0xFD070018);
++	}
++	prog_reg(0xFD080014U, 0x00000040U, 0x00000006U, 0x00000001U);
++	Xil_Out32(0xFD080004, 0x0014FE01); /*PUB_PIR*/
+ 
+-	prog_reg(0xFD080004U, 0x00000800U, 0x0000000BU, 0x00000001U);
+-	prog_reg(0xFD080004U, 0x00001000U, 0x0000000CU, 0x00000001U);
+-	prog_reg(0xFD080004U, 0x00002000U, 0x0000000DU, 0x00000001U);
+-	prog_reg(0xFD080004U, 0x00004000U, 0x0000000EU, 0x00000001U);
+-	prog_reg(0xFD080004U, 0x00008000U, 0x0000000FU, 0x00000001U);
+-	prog_reg(0xFD080004U, 0x00000001U, 0x00000000U, 0x00000001U);
+-	while ((Xil_In32(0xFD080030U) & 0x00000001U) != 0x00000001U) {
+-	/*****TODO*****/
+-
+-	/*TIMEOUT poll mechanism need to be inserted in this block*/
++	regval = Xil_In32(0xFD080030); /*PUB_PGSR0*/
++	while (regval != 0x8000007E) {
++/*Wait till qs_gate_train done*/
++	/*PUB_PGSR0*/
++		regval = Xil_In32(0xFD080030);
++	}
+ 
++/*Disabling REF before dqs2dq training - DTCR0.RFSHDT=0*/ 
++	Xil_Out32(0xFD080200U, 0x010091C7U);
++	regval = Xil_In32(0xFD080030); /*PUB_PGSR0*/
++	while (regval != 0x80008FFF) {
++	/*PUB_PGSR0*/
++		regval = Xil_In32(0xFD080030);
+ 	}
+ 
+-	prog_reg(0xFD080018U, 0x0003FFFFU, 0x00000000U, 0x00002300U);
++/*Enabling REF after dqs2dq training - DTCR0.RFSHDT=8*/
++	Xil_Out32(0xFD080200U, 0x810091C7U);
++
++/* Run Vref training in static read mode*/
++	Xil_Out32(0xFD080200U, 0x810091C7U);
++	Xil_Out32(0xFD080018U, 0x00F122F0U);
+ 	prog_reg(0xFD08001CU, 0x00000018U, 0x00000003U, 0x00000003U);
+ 	prog_reg(0xFD08142CU, 0x00000030U, 0x00000004U, 0x00000003U);
+ 	prog_reg(0xFD08146CU, 0x00000030U, 0x00000004U, 0x00000003U);
+ 	prog_reg(0xFD0814ACU, 0x00000030U, 0x00000004U, 0x00000003U);
+ 	prog_reg(0xFD0814ECU, 0x00000030U, 0x00000004U, 0x00000003U);
+ 	prog_reg(0xFD08152CU, 0x00000030U, 0x00000004U, 0x00000003U);
+-	prog_reg(0xFD080004U, 0x00020000U, 0x00000011U, 0x00000001U);
+-	prog_reg(0xFD080004U, 0x00000001U, 0x00000000U, 0x00000001U);
+-	while ((Xil_In32(0xFD080030U) & 0x00000001U) != 0x00000001U) {
+-	/*****TODO*****/
+ 
+-	/*TIMEOUT poll mechanism need to be inserted in this block*/
+ 
++	Xil_Out32(0xFD080004, 0x00060001); /*PUB_PIR*/
++	regval = Xil_In32(0xFD080030); /*PUB_PGSR0*/
++	while ((regval & 0x80004001) != 0x80004001) {
++	/*PUB_PGSR0*/
++		regval = Xil_In32(0xFD080030);
+ 	}
+ 
+-	prog_reg(0xFD080200U, 0xF0000000U, 0x0000001CU, 0x00000008U);
+ 	prog_reg(0xFD08001CU, 0x00000018U, 0x00000003U, 0x00000000U);
+ 	prog_reg(0xFD08142CU, 0x00000030U, 0x00000004U, 0x00000000U);
+ 	prog_reg(0xFD08146CU, 0x00000030U, 0x00000004U, 0x00000000U);
+ 	prog_reg(0xFD0814ACU, 0x00000030U, 0x00000004U, 0x00000000U);
+ 	prog_reg(0xFD0814ECU, 0x00000030U, 0x00000004U, 0x00000000U);
+ 	prog_reg(0xFD08152CU, 0x00000030U, 0x00000004U, 0x00000000U);
+-	prog_reg(0xFD080680U, 0x000000E0U, 0x00000005U, 0x00000002U);
+-	prog_reg(0xFD080028U, 0x00000001U, 0x00000000U, 0x00000000U);
++/*Vref training is complete, disabling static read mode*/
++	Xil_Out32(0xFD080200U, 0x810091C7U);
++	Xil_Out32(0xFD080018U, 0x00F14780U);
++
++
++	Xil_Out32(0xFD080004, 0x0000C001); /*PUB_PIR*/
++	regval = Xil_In32(0xFD080030); /*PUB_PGSR0*/
++	while ((regval & 0x80000C01) != 0x80000C01) {
++	/*PUB_PGSR0*/
++		regval = Xil_In32(0xFD080030);
++	}
++
++	prog_reg(0xFD070320U, 0x00000001U, 0x00000000U, 0x00000000U);
++	prog_reg(0xFD0701B0U, 0x00000001U, 0x00000000U, 0x00000001U);
+ 	prog_reg(0xFD0701A0U, 0x80000000U, 0x0000001FU, 0x00000000U);
+ 	prog_reg(0xFD070320U, 0x00000001U, 0x00000000U, 0x00000001U);
++	Xil_Out32(0xFD070180U, 0x02580012U);
++	Xil_Out32(0xFD070060U, 0x00000000U);
+ 	prog_reg(0xFD070020U, 0x00000001U, 0x00000000U, 0x00000001U);
+ 	prog_reg(0xFD080014U, 0x00000040U, 0x00000006U, 0x00000000U);
++	for (int tp=0; tp<4000; tp++) {
++		regval = Xil_In32(0xFD070018);
++	}
++	prog_reg(0xFD080090U, 0x00000FC0U, 0x00000006U, 0x00000009U);
++	prog_reg(0xFD080090U, 0x00000004U, 0x00000002U, 0x00000001U);
++	prog_reg(0xFD08070CU, 0x02000000U, 0x00000019U, 0x00000000U);
++	prog_reg(0xFD08080CU, 0x02000000U, 0x00000019U, 0x00000000U);
++	prog_reg(0xFD08090CU, 0x02000000U, 0x00000019U, 0x00000000U);
++	prog_reg(0xFD080A0CU, 0x02000000U, 0x00000019U, 0x00000000U);
++	prog_reg(0xFD080F0CU, 0x02000000U, 0x00000019U, 0x00000000U);
++	prog_reg(0xFD080200U, 0x00000010U, 0x00000004U, 0x00000001U);
++	prog_reg(0xFD080250U, 0x00000002U, 0x00000001U, 0x00000000U);
++	prog_reg(0xFD080250U, 0x0000000CU, 0x00000002U, 0x00000001U);
++	prog_reg(0xFD080250U, 0x000000F0U, 0x00000004U, 0x00000000U);
++	prog_reg(0xFD080250U, 0x00300000U, 0x00000014U, 0x00000001U);
++	prog_reg(0xFD080250U, 0xF0000000U, 0x0000001CU, 0x00000002U);
++	prog_reg(0xFD08070CU, 0x08000000U, 0x0000001BU, 0x00000000U);
++	prog_reg(0xFD08080CU, 0x08000000U, 0x0000001BU, 0x00000000U);
++	prog_reg(0xFD08090CU, 0x08000000U, 0x0000001BU, 0x00000000U);
++	prog_reg(0xFD080A0CU, 0x08000000U, 0x0000001BU, 0x00000000U);
++	prog_reg(0xFD080B0CU, 0x08000000U, 0x0000001BU, 0x00000000U);
++	prog_reg(0xFD080C0CU, 0x08000000U, 0x0000001BU, 0x00000000U);
++	prog_reg(0xFD080D0CU, 0x08000000U, 0x0000001BU, 0x00000000U);
++	prog_reg(0xFD080E0CU, 0x08000000U, 0x0000001BU, 0x00000000U);
++	prog_reg(0xFD080F0CU, 0x08000000U, 0x0000001BU, 0x00000000U);
++	prog_reg(0xFD080254U, 0x000000FFU, 0x00000000U, 0x00000001U);
++	prog_reg(0xFD080254U, 0x000F0000U, 0x00000010U, 0x0000000AU);
++	prog_reg(0xFD080250U, 0x00000001U, 0x00000000U, 0x00000001U);
+ 
+ return 1;
+ }
+@@ -18842,43 +20211,6 @@ static void dpll_prog(int ddr_pll_fbdiv, int d_lock_dly, int d_lock_cnt,
+  */
+ 
+ 
+-static int serdes_fixcal_code(void)
+-{
+-	int MaskStatus = 1;
+-
+-    /* L3_TM_CALIB_DIG19*/
+-	Xil_Out32(0xFD40EC4C, 0x00000020);
+-    /*ICM_CFG0*/
+-	Xil_Out32(0xFD410010, 0x00000001);
+-
+-    /*is calibration done, polling on L3_CALIB_DONE_STATUS*/
+-	MaskStatus = mask_poll(0xFD40EF14, 0x2);
+-
+-	if (MaskStatus == 0)
+-		xil_printf("SERDES initialization timed out\n\r");
+-
+-	unsigned int tmp_0_1;
+-
+-	tmp_0_1 = mask_read(0xFD400B0C, 0x3F);
+-
+-	unsigned int tmp_0_2 = tmp_0_1 & (0x7); 
+-	unsigned int tmp_0_3 = tmp_0_1 & (0x38);
+-    /*Configure ICM for de-asserting CMN_Resetn*/
+-	Xil_Out32(0xFD410010, 0x00000000);
+-	Xil_Out32(0xFD410014, 0x00000000);
+-
+-	unsigned int tmp_0_2_mod = (tmp_0_2 <<1) | (0x1); 
+-	tmp_0_2_mod = (tmp_0_2_mod <<4); 
+-
+-	tmp_0_3 = tmp_0_3 >>3;
+-	Xil_Out32(0xFD40EC4C, tmp_0_3);
+-
+-    /*L3_TM_CALIB_DIG18*/
+-	Xil_Out32(0xFD40EC48, tmp_0_2_mod);
+-	return MaskStatus;
+-
+-
+-}
+ static int serdes_enb_coarse_saturation(void)
+ {
+   /*Enable PLL Coarse Code saturation Logic*/
+@@ -18889,6 +20221,168 @@ static int serdes_enb_coarse_saturation(void)
+   return 1;
+ }
+ 
++int serdes_fixcal_code() {
++  int MaskStatus = 1;
++
++  //The valid codes are from 0x26 to 0x3C. There are 23 valid codes in total.
++  unsigned int match_pmos_code[23]; //Each element of array stands for count of occurence of valid code.
++  unsigned int match_nmos_code[23]; //Each element of array stands for count of occurence of valid code.
++                                    //The valid codes are from 0xC to 0x12. There are 7 valid codes in total.
++  unsigned int match_ical_code[7]; //Each element of array stands for count of occurence of valid code.
++                                   //The valid codes are from 0x6 to 0xC. There are 7 valid codes in total.
++  unsigned int match_rcal_code[7]; //Each element of array stands for count of occurence of valid code.
++
++  unsigned int p_code = 0;
++  unsigned int n_code = 0;
++  unsigned int i_code = 0;
++  unsigned int r_code = 0;
++  unsigned int repeat_count = 0;
++  unsigned int L3_TM_CALIB_DIG20 = 0;
++  unsigned int L3_TM_CALIB_DIG19 = 0;
++  unsigned int L3_TM_CALIB_DIG18 = 0;
++  unsigned int L3_TM_CALIB_DIG16 = 0;
++  unsigned int L3_TM_CALIB_DIG15 = 0;
++  unsigned int L3_TM_CALIB_DIG14 = 0;
++
++
++  int i = 0;
++  for (i = 0; i < 23; i++)
++  {
++    match_pmos_code[i] = 0;
++    match_nmos_code[i] = 0;
++  }
++  for (i = 0; i < 7; i++)
++  {
++    match_ical_code[i] = 0;
++    match_rcal_code[i] = 0;
++  }
++
++
++  do {
++    //Clear ICM_CFG value
++    Xil_Out32(0xFD410010, 0x00000000);
++    Xil_Out32(0xFD410014, 0x00000000);
++
++    //Set ICM_CFG value
++    //This will trigger recalibration of all stages
++    Xil_Out32(0xFD410010, 0x00000001);
++    Xil_Out32(0xFD410014, 0x00000000);
++
++    //is calibration done? polling on L3_CALIB_DONE_STATUS
++    MaskStatus = mask_poll(0xFD40EF14, 0x2);
++    if (MaskStatus == 0)
++    {
++      //failure here is because of calibration done timeout
++      xil_printf("#SERDES initialization timed out\n\r");
++      return MaskStatus;
++    }
++
++    p_code = mask_read(0xFD40EF18, 0xFFFFFFFF); //PMOS code
++    n_code = mask_read(0xFD40EF1C, 0xFFFFFFFF); //NMOS code
++                                                //m_code = mask_read(0xFD40EF20, 0xFFFFFFFF); //MPHY code
++    i_code = mask_read(0xFD40EF24, 0xFFFFFFFF); //ICAL code
++    r_code = mask_read(0xFD40EF28, 0xFFFFFFFF); //RX code
++                                                //u_code = mask_read(0xFD40EF2C, 0xFFFFFFFF); //USB2 code
++
++    //xil_printf("#SERDES initialization VALUES NMOS = 0x%x, PMOS = 0x%x, ICAL = 0x%x, RCAL = 0x%x\n\r", p_code, n_code, i_code, r_code);
++
++    if ((p_code >= 0x26) && (p_code <= 0x3C)) //PMOS code in acceptable range
++    {
++      match_pmos_code[p_code - 0x26] += 1;
++    }
++
++    if ((n_code >= 0x26) && (n_code <= 0x3C)) //NMOS code in acceptable range
++    {
++      match_nmos_code[n_code - 0x26] += 1;
++    }
++
++    if ((i_code >= 0xC) && (i_code <= 0x12)) //PMOS code in acceptable range
++    {
++      match_ical_code[i_code - 0xC] += 1;
++    }
++
++    if ((r_code >= 0x6) && (r_code <= 0xC)) //NMOS code in acceptable range
++    {
++      match_rcal_code[r_code - 0x6] += 1;
++    }
++
++
++  } while (repeat_count++ < 10);
++
++  //find the valid code which resulted in maximum times in 10 iterations
++  for (i = 0; i < 23; i++)
++  {
++    if (match_pmos_code[i] >= match_pmos_code[0])
++    {
++      match_pmos_code[0] = match_pmos_code[i];
++      p_code = 0x26 + i;
++    }
++    if (match_nmos_code[i] >= match_nmos_code[0])
++    {
++      match_nmos_code[0] = match_nmos_code[i];
++      n_code = 0x26 + i;
++    }
++  }
++
++  for (i = 0; i < 7; i++)
++  {
++    if (match_ical_code[i] >= match_ical_code[0])
++    {
++      match_ical_code[0] = match_ical_code[i];
++      i_code = 0xC + i;
++    }
++    if (match_rcal_code[i] >= match_rcal_code[0])
++    {
++      match_rcal_code[0] = match_rcal_code[i];
++      r_code = 0x6 + i;
++    }
++  }
++  //xil_printf("#SERDES initialization PASSED NMOS = 0x%x, PMOS = 0x%x, ICAL = 0x%x, RCAL = 0x%x\n\r", p_code, n_code, i_code, r_code);
++  //L3_TM_CALIB_DIG20[3] PSW MSB Override
++  //L3_TM_CALIB_DIG20[2:0]	PSW Code [4:2]
++  L3_TM_CALIB_DIG20 = mask_read(0xFD40EC50, 0xFFFFFFF0); //read DIG20
++  L3_TM_CALIB_DIG20 = L3_TM_CALIB_DIG20 | 0x8 | ((p_code >> 2) & 0x7);
++
++
++  //L3_TM_CALIB_DIG19[7:6]	PSW Code [1:0]
++  //L3_TM_CALIB_DIG19[5]	PSW Override
++  //L3_TM_CALIB_DIG19[2]	NSW MSB Override
++  //L3_TM_CALIB_DIG19[1:0]	NSW Code [4:3]
++  L3_TM_CALIB_DIG19 = mask_read(0xFD40EC4C, 0xFFFFFF18); //read DIG19
++  L3_TM_CALIB_DIG19 = L3_TM_CALIB_DIG19 | ((p_code & 0x3) << 6) | 0x20 | 0x4 | ((n_code >> 3) & 0x3);
++
++  //L3_TM_CALIB_DIG18[7:5]	NSW Code [2:0]
++  //L3_TM_CALIB_DIG18[4]	NSW Override
++  L3_TM_CALIB_DIG18 = mask_read(0xFD40EC48, 0xFFFFFF0F); //read DIG18
++  L3_TM_CALIB_DIG18 = L3_TM_CALIB_DIG18 | ((n_code & 0x7) << 5) | 0x10;
++
++
++  //L3_TM_CALIB_DIG16[2:0]	RX Code [3:1]
++  L3_TM_CALIB_DIG16 = mask_read(0xFD40EC40, 0xFFFFFFF8); //read DIG16
++  L3_TM_CALIB_DIG16 = L3_TM_CALIB_DIG16 | ((r_code >> 1) & 0x7);
++
++  //L3_TM_CALIB_DIG15[7]	RX Code [0]
++  //L3_TM_CALIB_DIG15[6]	RX CODE Override
++  //L3_TM_CALIB_DIG15[3]	ICAL MSB Override
++  //L3_TM_CALIB_DIG15[2:0]	ICAL Code [3:1]
++  L3_TM_CALIB_DIG15 = mask_read(0xFD40EC3C, 0xFFFFFF30); //read DIG15
++  L3_TM_CALIB_DIG15 = L3_TM_CALIB_DIG15 | ((r_code & 0x1) << 7) | 0x40 | 0x8 | ((i_code >> 1) & 0x7);
++
++  //L3_TM_CALIB_DIG14[7]	ICAL Code [0]
++  //L3_TM_CALIB_DIG14[6]	ICAL Override
++  L3_TM_CALIB_DIG14 = mask_read(0xFD40EC38, 0xFFFFFF3F); //read DIG14
++  L3_TM_CALIB_DIG14 = L3_TM_CALIB_DIG14 | ((i_code & 0x1) << 7) | 0x40;
++
++  //Forces the calibration values
++  Xil_Out32(0xFD40EC50, L3_TM_CALIB_DIG20);
++  Xil_Out32(0xFD40EC4C, L3_TM_CALIB_DIG19);
++  Xil_Out32(0xFD40EC48, L3_TM_CALIB_DIG18);
++  Xil_Out32(0xFD40EC40, L3_TM_CALIB_DIG16);
++  Xil_Out32(0xFD40EC3C, L3_TM_CALIB_DIG15);
++  Xil_Out32(0xFD40EC38, L3_TM_CALIB_DIG14);
++  return MaskStatus;
++
++}
+ static int init_serdes(void)
+ {
+ 	int status = 1;
+diff --git a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h
+index 442e81c..77fa80c 100644
+--- a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h
++++ b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h
+@@ -1831,6 +1831,7 @@
+ #define CRL_APB_PL2_REF_CTRL_SRCSEL_DEFVAL                     0x00052000
+ #define CRL_APB_PL2_REF_CTRL_SRCSEL_SHIFT                      0
+ #define CRL_APB_PL2_REF_CTRL_SRCSEL_MASK                       0x00000007U
++
+ /*
+ * Clock active signal. Switch to 0 to disable the clock
+ */
+@@ -2860,8 +2861,6 @@
+ #define DDR_PHY_DX8SLBPLLCR0_OFFSET                                                0XFD0817C4
+ #undef DDR_PHY_DX8SLBDQSCTL_OFFSET 
+ #define DDR_PHY_DX8SLBDQSCTL_OFFSET                                                0XFD0817DC
+-#undef DDR_PHY_PIR_OFFSET 
+-#define DDR_PHY_PIR_OFFSET                                                         0XFD080004
+ 
+ /*
+ * DDR block level reset inside of the DDR Sub System
+@@ -21404,256 +21403,6 @@
+ #define DDR_PHY_DX8SLBDQSCTL_DQSRES_DEFVAL                     0x00000000
+ #define DDR_PHY_DX8SLBDQSCTL_DQSRES_SHIFT                      0
+ #define DDR_PHY_DX8SLBDQSCTL_DQSRES_MASK                       0x0000000FU
+-
+-/*
+-* Reserved. Return zeroes on reads.
+-*/
+-#undef DDR_PHY_PIR_RESERVED_31_DEFVAL 
+-#undef DDR_PHY_PIR_RESERVED_31_SHIFT 
+-#undef DDR_PHY_PIR_RESERVED_31_MASK 
+-#define DDR_PHY_PIR_RESERVED_31_DEFVAL                         0x00000000
+-#define DDR_PHY_PIR_RESERVED_31_SHIFT                          31
+-#define DDR_PHY_PIR_RESERVED_31_MASK                           0x80000000U
+-
+-/*
+-* Impedance Calibration Bypass
+-*/
+-#undef DDR_PHY_PIR_ZCALBYP_DEFVAL 
+-#undef DDR_PHY_PIR_ZCALBYP_SHIFT 
+-#undef DDR_PHY_PIR_ZCALBYP_MASK 
+-#define DDR_PHY_PIR_ZCALBYP_DEFVAL                             0x00000000
+-#define DDR_PHY_PIR_ZCALBYP_SHIFT                              30
+-#define DDR_PHY_PIR_ZCALBYP_MASK                               0x40000000U
+-
+-/*
+-* Digital Delay Line (DDL) Calibration Pause
+-*/
+-#undef DDR_PHY_PIR_DCALPSE_DEFVAL 
+-#undef DDR_PHY_PIR_DCALPSE_SHIFT 
+-#undef DDR_PHY_PIR_DCALPSE_MASK 
+-#define DDR_PHY_PIR_DCALPSE_DEFVAL                             0x00000000
+-#define DDR_PHY_PIR_DCALPSE_SHIFT                              29
+-#define DDR_PHY_PIR_DCALPSE_MASK                               0x20000000U
+-
+-/*
+-* Reserved. Return zeroes on reads.
+-*/
+-#undef DDR_PHY_PIR_RESERVED_28_21_DEFVAL 
+-#undef DDR_PHY_PIR_RESERVED_28_21_SHIFT 
+-#undef DDR_PHY_PIR_RESERVED_28_21_MASK 
+-#define DDR_PHY_PIR_RESERVED_28_21_DEFVAL                      0x00000000
+-#define DDR_PHY_PIR_RESERVED_28_21_SHIFT                       21
+-#define DDR_PHY_PIR_RESERVED_28_21_MASK                        0x1FE00000U
+-
+-/*
+-* Write DQS2DQ Training
+-*/
+-#undef DDR_PHY_PIR_DQS2DQ_DEFVAL 
+-#undef DDR_PHY_PIR_DQS2DQ_SHIFT 
+-#undef DDR_PHY_PIR_DQS2DQ_MASK 
+-#define DDR_PHY_PIR_DQS2DQ_DEFVAL                              0x00000000
+-#define DDR_PHY_PIR_DQS2DQ_SHIFT                               20
+-#define DDR_PHY_PIR_DQS2DQ_MASK                                0x00100000U
+-
+-/*
+-* RDIMM Initialization
+-*/
+-#undef DDR_PHY_PIR_RDIMMINIT_DEFVAL 
+-#undef DDR_PHY_PIR_RDIMMINIT_SHIFT 
+-#undef DDR_PHY_PIR_RDIMMINIT_MASK 
+-#define DDR_PHY_PIR_RDIMMINIT_DEFVAL                           0x00000000
+-#define DDR_PHY_PIR_RDIMMINIT_SHIFT                            19
+-#define DDR_PHY_PIR_RDIMMINIT_MASK                             0x00080000U
+-
+-/*
+-* Controller DRAM Initialization
+-*/
+-#undef DDR_PHY_PIR_CTLDINIT_DEFVAL 
+-#undef DDR_PHY_PIR_CTLDINIT_SHIFT 
+-#undef DDR_PHY_PIR_CTLDINIT_MASK 
+-#define DDR_PHY_PIR_CTLDINIT_DEFVAL                            0x00000000
+-#define DDR_PHY_PIR_CTLDINIT_SHIFT                             18
+-#define DDR_PHY_PIR_CTLDINIT_MASK                              0x00040000U
+-
+-/*
+-* VREF Training
+-*/
+-#undef DDR_PHY_PIR_VREF_DEFVAL 
+-#undef DDR_PHY_PIR_VREF_SHIFT 
+-#undef DDR_PHY_PIR_VREF_MASK 
+-#define DDR_PHY_PIR_VREF_DEFVAL                                0x00000000
+-#define DDR_PHY_PIR_VREF_SHIFT                                 17
+-#define DDR_PHY_PIR_VREF_MASK                                  0x00020000U
+-
+-/*
+-* Static Read Training
+-*/
+-#undef DDR_PHY_PIR_SRD_DEFVAL 
+-#undef DDR_PHY_PIR_SRD_SHIFT 
+-#undef DDR_PHY_PIR_SRD_MASK 
+-#define DDR_PHY_PIR_SRD_DEFVAL                                 0x00000000
+-#define DDR_PHY_PIR_SRD_SHIFT                                  16
+-#define DDR_PHY_PIR_SRD_MASK                                   0x00010000U
+-
+-/*
+-* Write Data Eye Training
+-*/
+-#undef DDR_PHY_PIR_WREYE_DEFVAL 
+-#undef DDR_PHY_PIR_WREYE_SHIFT 
+-#undef DDR_PHY_PIR_WREYE_MASK 
+-#define DDR_PHY_PIR_WREYE_DEFVAL                               0x00000000
+-#define DDR_PHY_PIR_WREYE_SHIFT                                15
+-#define DDR_PHY_PIR_WREYE_MASK                                 0x00008000U
+-
+-/*
+-* Read Data Eye Training
+-*/
+-#undef DDR_PHY_PIR_RDEYE_DEFVAL 
+-#undef DDR_PHY_PIR_RDEYE_SHIFT 
+-#undef DDR_PHY_PIR_RDEYE_MASK 
+-#define DDR_PHY_PIR_RDEYE_DEFVAL                               0x00000000
+-#define DDR_PHY_PIR_RDEYE_SHIFT                                14
+-#define DDR_PHY_PIR_RDEYE_MASK                                 0x00004000U
+-
+-/*
+-* Write Data Bit Deskew
+-*/
+-#undef DDR_PHY_PIR_WRDSKW_DEFVAL 
+-#undef DDR_PHY_PIR_WRDSKW_SHIFT 
+-#undef DDR_PHY_PIR_WRDSKW_MASK 
+-#define DDR_PHY_PIR_WRDSKW_DEFVAL                              0x00000000
+-#define DDR_PHY_PIR_WRDSKW_SHIFT                               13
+-#define DDR_PHY_PIR_WRDSKW_MASK                                0x00002000U
+-
+-/*
+-* Read Data Bit Deskew
+-*/
+-#undef DDR_PHY_PIR_RDDSKW_DEFVAL 
+-#undef DDR_PHY_PIR_RDDSKW_SHIFT 
+-#undef DDR_PHY_PIR_RDDSKW_MASK 
+-#define DDR_PHY_PIR_RDDSKW_DEFVAL                              0x00000000
+-#define DDR_PHY_PIR_RDDSKW_SHIFT                               12
+-#define DDR_PHY_PIR_RDDSKW_MASK                                0x00001000U
+-
+-/*
+-* Write Leveling Adjust
+-*/
+-#undef DDR_PHY_PIR_WLADJ_DEFVAL 
+-#undef DDR_PHY_PIR_WLADJ_SHIFT 
+-#undef DDR_PHY_PIR_WLADJ_MASK 
+-#define DDR_PHY_PIR_WLADJ_DEFVAL                               0x00000000
+-#define DDR_PHY_PIR_WLADJ_SHIFT                                11
+-#define DDR_PHY_PIR_WLADJ_MASK                                 0x00000800U
+-
+-/*
+-* Read DQS Gate Training
+-*/
+-#undef DDR_PHY_PIR_QSGATE_DEFVAL 
+-#undef DDR_PHY_PIR_QSGATE_SHIFT 
+-#undef DDR_PHY_PIR_QSGATE_MASK 
+-#define DDR_PHY_PIR_QSGATE_DEFVAL                              0x00000000
+-#define DDR_PHY_PIR_QSGATE_SHIFT                               10
+-#define DDR_PHY_PIR_QSGATE_MASK                                0x00000400U
+-
+-/*
+-* Write Leveling
+-*/
+-#undef DDR_PHY_PIR_WL_DEFVAL 
+-#undef DDR_PHY_PIR_WL_SHIFT 
+-#undef DDR_PHY_PIR_WL_MASK 
+-#define DDR_PHY_PIR_WL_DEFVAL                                  0x00000000
+-#define DDR_PHY_PIR_WL_SHIFT                                   9
+-#define DDR_PHY_PIR_WL_MASK                                    0x00000200U
+-
+-/*
+-* DRAM Initialization
+-*/
+-#undef DDR_PHY_PIR_DRAMINIT_DEFVAL 
+-#undef DDR_PHY_PIR_DRAMINIT_SHIFT 
+-#undef DDR_PHY_PIR_DRAMINIT_MASK 
+-#define DDR_PHY_PIR_DRAMINIT_DEFVAL                            0x00000000
+-#define DDR_PHY_PIR_DRAMINIT_SHIFT                             8
+-#define DDR_PHY_PIR_DRAMINIT_MASK                              0x00000100U
+-
+-/*
+-* DRAM Reset (DDR3/DDR4/LPDDR4 Only)
+-*/
+-#undef DDR_PHY_PIR_DRAMRST_DEFVAL 
+-#undef DDR_PHY_PIR_DRAMRST_SHIFT 
+-#undef DDR_PHY_PIR_DRAMRST_MASK 
+-#define DDR_PHY_PIR_DRAMRST_DEFVAL                             0x00000000
+-#define DDR_PHY_PIR_DRAMRST_SHIFT                              7
+-#define DDR_PHY_PIR_DRAMRST_MASK                               0x00000080U
+-
+-/*
+-* PHY Reset
+-*/
+-#undef DDR_PHY_PIR_PHYRST_DEFVAL 
+-#undef DDR_PHY_PIR_PHYRST_SHIFT 
+-#undef DDR_PHY_PIR_PHYRST_MASK 
+-#define DDR_PHY_PIR_PHYRST_DEFVAL                              0x00000000
+-#define DDR_PHY_PIR_PHYRST_SHIFT                               6
+-#define DDR_PHY_PIR_PHYRST_MASK                                0x00000040U
+-
+-/*
+-* Digital Delay Line (DDL) Calibration
+-*/
+-#undef DDR_PHY_PIR_DCAL_DEFVAL 
+-#undef DDR_PHY_PIR_DCAL_SHIFT 
+-#undef DDR_PHY_PIR_DCAL_MASK 
+-#define DDR_PHY_PIR_DCAL_DEFVAL                                0x00000000
+-#define DDR_PHY_PIR_DCAL_SHIFT                                 5
+-#define DDR_PHY_PIR_DCAL_MASK                                  0x00000020U
+-
+-/*
+-* PLL Initialiazation
+-*/
+-#undef DDR_PHY_PIR_PLLINIT_DEFVAL 
+-#undef DDR_PHY_PIR_PLLINIT_SHIFT 
+-#undef DDR_PHY_PIR_PLLINIT_MASK 
+-#define DDR_PHY_PIR_PLLINIT_DEFVAL                             0x00000000
+-#define DDR_PHY_PIR_PLLINIT_SHIFT                              4
+-#define DDR_PHY_PIR_PLLINIT_MASK                               0x00000010U
+-
+-/*
+-* Reserved. Return zeroes on reads.
+-*/
+-#undef DDR_PHY_PIR_RESERVED_3_DEFVAL 
+-#undef DDR_PHY_PIR_RESERVED_3_SHIFT 
+-#undef DDR_PHY_PIR_RESERVED_3_MASK 
+-#define DDR_PHY_PIR_RESERVED_3_DEFVAL                          0x00000000
+-#define DDR_PHY_PIR_RESERVED_3_SHIFT                           3
+-#define DDR_PHY_PIR_RESERVED_3_MASK                            0x00000008U
+-
+-/*
+-* CA Training
+-*/
+-#undef DDR_PHY_PIR_CA_DEFVAL 
+-#undef DDR_PHY_PIR_CA_SHIFT 
+-#undef DDR_PHY_PIR_CA_MASK 
+-#define DDR_PHY_PIR_CA_DEFVAL                                  0x00000000
+-#define DDR_PHY_PIR_CA_SHIFT                                   2
+-#define DDR_PHY_PIR_CA_MASK                                    0x00000004U
+-
+-/*
+-* Impedance Calibration
+-*/
+-#undef DDR_PHY_PIR_ZCAL_DEFVAL 
+-#undef DDR_PHY_PIR_ZCAL_SHIFT 
+-#undef DDR_PHY_PIR_ZCAL_MASK 
+-#define DDR_PHY_PIR_ZCAL_DEFVAL                                0x00000000
+-#define DDR_PHY_PIR_ZCAL_SHIFT                                 1
+-#define DDR_PHY_PIR_ZCAL_MASK                                  0x00000002U
+-
+-/*
+-* Initialization Trigger
+-*/
+-#undef DDR_PHY_PIR_INIT_DEFVAL 
+-#undef DDR_PHY_PIR_INIT_SHIFT 
+-#undef DDR_PHY_PIR_INIT_MASK 
+-#define DDR_PHY_PIR_INIT_DEFVAL                                0x00000000
+-#define DDR_PHY_PIR_INIT_SHIFT                                 0
+-#define DDR_PHY_PIR_INIT_MASK                                  0x00000001U
+ #undef IOU_SLCR_MIO_PIN_0_OFFSET 
+ #define IOU_SLCR_MIO_PIN_0_OFFSET                                                  0XFF180000
+ #undef IOU_SLCR_MIO_PIN_1_OFFSET 
+@@ -32859,6 +32608,8 @@
+ #define SERDES_L0_TM_E_ILL8_OFFSET                                                 0XFD401940
+ #undef SERDES_L0_TM_E_ILL9_OFFSET 
+ #define SERDES_L0_TM_E_ILL9_OFFSET                                                 0XFD401944
++#undef SERDES_L0_TM_ILL13_OFFSET 
++#define SERDES_L0_TM_ILL13_OFFSET                                                  0XFD401994
+ #undef SERDES_L1_TM_MISC2_OFFSET 
+ #define SERDES_L1_TM_MISC2_OFFSET                                                  0XFD40589C
+ #undef SERDES_L1_TM_IQ_ILL1_OFFSET 
+@@ -32887,6 +32638,20 @@
+ #define SERDES_L1_TM_E_ILL8_OFFSET                                                 0XFD405940
+ #undef SERDES_L1_TM_E_ILL9_OFFSET 
+ #define SERDES_L1_TM_E_ILL9_OFFSET                                                 0XFD405944
++#undef SERDES_L1_TM_ILL13_OFFSET 
++#define SERDES_L1_TM_ILL13_OFFSET                                                  0XFD405994
++#undef SERDES_L2_TM_ILL13_OFFSET 
++#define SERDES_L2_TM_ILL13_OFFSET                                                  0XFD409994
++#undef SERDES_L3_TM_ILL13_OFFSET 
++#define SERDES_L3_TM_ILL13_OFFSET                                                  0XFD40D994
++#undef SERDES_L0_TM_DIG_10_OFFSET 
++#define SERDES_L0_TM_DIG_10_OFFSET                                                 0XFD40107C
++#undef SERDES_L1_TM_DIG_10_OFFSET 
++#define SERDES_L1_TM_DIG_10_OFFSET                                                 0XFD40507C
++#undef SERDES_L2_TM_DIG_10_OFFSET 
++#define SERDES_L2_TM_DIG_10_OFFSET                                                 0XFD40907C
++#undef SERDES_L3_TM_DIG_10_OFFSET 
++#define SERDES_L3_TM_DIG_10_OFFSET                                                 0XFD40D07C
+ #undef SERDES_L0_TM_RST_DLY_OFFSET 
+ #define SERDES_L0_TM_RST_DLY_OFFSET                                                0XFD4019A4
+ #undef SERDES_L0_TM_ANA_BYP_15_OFFSET 
+@@ -32919,6 +32684,14 @@
+ #define SERDES_L2_TM_MISC3_OFFSET                                                  0XFD4099AC
+ #undef SERDES_L3_TM_MISC3_OFFSET 
+ #define SERDES_L3_TM_MISC3_OFFSET                                                  0XFD40D9AC
++#undef SERDES_L0_TM_EQ11_OFFSET 
++#define SERDES_L0_TM_EQ11_OFFSET                                                   0XFD401978
++#undef SERDES_L1_TM_EQ11_OFFSET 
++#define SERDES_L1_TM_EQ11_OFFSET                                                   0XFD405978
++#undef SERDES_L2_TM_EQ11_OFFSET 
++#define SERDES_L2_TM_EQ11_OFFSET                                                   0XFD409978
++#undef SERDES_L3_TM_EQ11_OFFSET 
++#define SERDES_L3_TM_EQ11_OFFSET                                                   0XFD40D978
+ #undef SERDES_ICM_CFG0_OFFSET 
+ #define SERDES_ICM_CFG0_OFFSET                                                     0XFD410010
+ #undef SERDES_L0_TX_ANA_TM_118_OFFSET 
+@@ -33530,6 +33303,16 @@
+ #define SERDES_L0_TM_E_ILL9_ILL_BYPASS_E_POLYTIM_MASK          0x00000001U
+ 
+ /*
++* ILL cal idle val refcnt
++*/
++#undef SERDES_L0_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_DEFVAL 
++#undef SERDES_L0_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_SHIFT 
++#undef SERDES_L0_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_MASK 
++#define SERDES_L0_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_DEFVAL      0x00000001
++#define SERDES_L0_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_SHIFT       0
++#define SERDES_L0_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_MASK        0x00000007U
++
++/*
+ * ILL calib counts BYPASSED with calcode bits
+ */
+ #undef SERDES_L1_TM_MISC2_ILL_CAL_BYPASS_COUNTS_DEFVAL 
+@@ -33672,6 +33455,76 @@
+ #define SERDES_L1_TM_E_ILL9_ILL_BYPASS_E_POLYTIM_MASK          0x00000001U
+ 
+ /*
++* ILL cal idle val refcnt
++*/
++#undef SERDES_L1_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_DEFVAL 
++#undef SERDES_L1_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_SHIFT 
++#undef SERDES_L1_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_MASK 
++#define SERDES_L1_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_DEFVAL      0x00000001
++#define SERDES_L1_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_SHIFT       0
++#define SERDES_L1_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_MASK        0x00000007U
++
++/*
++* ILL cal idle val refcnt
++*/
++#undef SERDES_L2_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_DEFVAL 
++#undef SERDES_L2_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_SHIFT 
++#undef SERDES_L2_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_MASK 
++#define SERDES_L2_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_DEFVAL      0x00000001
++#define SERDES_L2_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_SHIFT       0
++#define SERDES_L2_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_MASK        0x00000007U
++
++/*
++* ILL cal idle val refcnt
++*/
++#undef SERDES_L3_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_DEFVAL 
++#undef SERDES_L3_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_SHIFT 
++#undef SERDES_L3_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_MASK 
++#define SERDES_L3_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_DEFVAL      0x00000001
++#define SERDES_L3_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_SHIFT       0
++#define SERDES_L3_TM_ILL13_ILL_CAL_IDLE_VAL_REFCNT_MASK        0x00000007U
++
++/*
++* CDR lock wait time. (1-16 us). cdr_lock_wait_time = 4'b xxxx + 4'b 0001
++*/
++#undef SERDES_L0_TM_DIG_10_CDR_BIT_LOCK_TIME_DEFVAL 
++#undef SERDES_L0_TM_DIG_10_CDR_BIT_LOCK_TIME_SHIFT 
++#undef SERDES_L0_TM_DIG_10_CDR_BIT_LOCK_TIME_MASK 
++#define SERDES_L0_TM_DIG_10_CDR_BIT_LOCK_TIME_DEFVAL           0x00000001
++#define SERDES_L0_TM_DIG_10_CDR_BIT_LOCK_TIME_SHIFT            0
++#define SERDES_L0_TM_DIG_10_CDR_BIT_LOCK_TIME_MASK             0x0000000FU
++
++/*
++* CDR lock wait time. (1-16 us). cdr_lock_wait_time = 4'b xxxx + 4'b 0001
++*/
++#undef SERDES_L1_TM_DIG_10_CDR_BIT_LOCK_TIME_DEFVAL 
++#undef SERDES_L1_TM_DIG_10_CDR_BIT_LOCK_TIME_SHIFT 
++#undef SERDES_L1_TM_DIG_10_CDR_BIT_LOCK_TIME_MASK 
++#define SERDES_L1_TM_DIG_10_CDR_BIT_LOCK_TIME_DEFVAL           0x00000001
++#define SERDES_L1_TM_DIG_10_CDR_BIT_LOCK_TIME_SHIFT            0
++#define SERDES_L1_TM_DIG_10_CDR_BIT_LOCK_TIME_MASK             0x0000000FU
++
++/*
++* CDR lock wait time. (1-16 us). cdr_lock_wait_time = 4'b xxxx + 4'b 0001
++*/
++#undef SERDES_L2_TM_DIG_10_CDR_BIT_LOCK_TIME_DEFVAL 
++#undef SERDES_L2_TM_DIG_10_CDR_BIT_LOCK_TIME_SHIFT 
++#undef SERDES_L2_TM_DIG_10_CDR_BIT_LOCK_TIME_MASK 
++#define SERDES_L2_TM_DIG_10_CDR_BIT_LOCK_TIME_DEFVAL           0x00000001
++#define SERDES_L2_TM_DIG_10_CDR_BIT_LOCK_TIME_SHIFT            0
++#define SERDES_L2_TM_DIG_10_CDR_BIT_LOCK_TIME_MASK             0x0000000FU
++
++/*
++* CDR lock wait time. (1-16 us). cdr_lock_wait_time = 4'b xxxx + 4'b 0001
++*/
++#undef SERDES_L3_TM_DIG_10_CDR_BIT_LOCK_TIME_DEFVAL 
++#undef SERDES_L3_TM_DIG_10_CDR_BIT_LOCK_TIME_SHIFT 
++#undef SERDES_L3_TM_DIG_10_CDR_BIT_LOCK_TIME_MASK 
++#define SERDES_L3_TM_DIG_10_CDR_BIT_LOCK_TIME_DEFVAL           0x00000001
++#define SERDES_L3_TM_DIG_10_CDR_BIT_LOCK_TIME_SHIFT            0
++#define SERDES_L3_TM_DIG_10_CDR_BIT_LOCK_TIME_MASK             0x0000000FU
++
++/*
+ * Delay apb reset by specified amount
+ */
+ #undef SERDES_L0_TM_RST_DLY_APB_RST_DLY_DEFVAL 
+@@ -33872,6 +33725,46 @@
+ #define SERDES_L3_TM_MISC3_CDR_EN_FFL_MASK                     0x00000001U
+ 
+ /*
++* Force EQ offset correction algo off if not forced on
++*/
++#undef SERDES_L0_TM_EQ11_FORCE_EQ_OFFS_OFF_DEFVAL 
++#undef SERDES_L0_TM_EQ11_FORCE_EQ_OFFS_OFF_SHIFT 
++#undef SERDES_L0_TM_EQ11_FORCE_EQ_OFFS_OFF_MASK 
++#define SERDES_L0_TM_EQ11_FORCE_EQ_OFFS_OFF_DEFVAL             0x00000000
++#define SERDES_L0_TM_EQ11_FORCE_EQ_OFFS_OFF_SHIFT              4
++#define SERDES_L0_TM_EQ11_FORCE_EQ_OFFS_OFF_MASK               0x00000010U
++
++/*
++* Force EQ offset correction algo off if not forced on
++*/
++#undef SERDES_L1_TM_EQ11_FORCE_EQ_OFFS_OFF_DEFVAL 
++#undef SERDES_L1_TM_EQ11_FORCE_EQ_OFFS_OFF_SHIFT 
++#undef SERDES_L1_TM_EQ11_FORCE_EQ_OFFS_OFF_MASK 
++#define SERDES_L1_TM_EQ11_FORCE_EQ_OFFS_OFF_DEFVAL             0x00000000
++#define SERDES_L1_TM_EQ11_FORCE_EQ_OFFS_OFF_SHIFT              4
++#define SERDES_L1_TM_EQ11_FORCE_EQ_OFFS_OFF_MASK               0x00000010U
++
++/*
++* Force EQ offset correction algo off if not forced on
++*/
++#undef SERDES_L2_TM_EQ11_FORCE_EQ_OFFS_OFF_DEFVAL 
++#undef SERDES_L2_TM_EQ11_FORCE_EQ_OFFS_OFF_SHIFT 
++#undef SERDES_L2_TM_EQ11_FORCE_EQ_OFFS_OFF_MASK 
++#define SERDES_L2_TM_EQ11_FORCE_EQ_OFFS_OFF_DEFVAL             0x00000000
++#define SERDES_L2_TM_EQ11_FORCE_EQ_OFFS_OFF_SHIFT              4
++#define SERDES_L2_TM_EQ11_FORCE_EQ_OFFS_OFF_MASK               0x00000010U
++
++/*
++* Force EQ offset correction algo off if not forced on
++*/
++#undef SERDES_L3_TM_EQ11_FORCE_EQ_OFFS_OFF_DEFVAL 
++#undef SERDES_L3_TM_EQ11_FORCE_EQ_OFFS_OFF_SHIFT 
++#undef SERDES_L3_TM_EQ11_FORCE_EQ_OFFS_OFF_MASK 
++#define SERDES_L3_TM_EQ11_FORCE_EQ_OFFS_OFF_DEFVAL             0x00000000
++#define SERDES_L3_TM_EQ11_FORCE_EQ_OFFS_OFF_SHIFT              4
++#define SERDES_L3_TM_EQ11_FORCE_EQ_OFFS_OFF_MASK               0x00000010U
++
++/*
+ * Controls UPHY Lane 0 protocol configuration. 0 - PowerDown, 1 - PCIe .0,
+     *  2 - Sata0, 3 - USB0, 4 - DP.1, 5 - SGMII0, 6 - Unused, 7 - Unused
+ */
+@@ -34072,6 +33965,8 @@
+ #define USB3_0_XHCI_GUSB2PHYCFG_OFFSET                                             0XFE20C200
+ #undef USB3_0_XHCI_GFLADJ_OFFSET 
+ #define USB3_0_XHCI_GFLADJ_OFFSET                                                  0XFE20C630
++#undef USB3_0_XHCI_GUCTL1_OFFSET 
++#define USB3_0_XHCI_GUCTL1_OFFSET                                                  0XFE20C11C
+ #undef USB3_0_XHCI_GUCTL_OFFSET 
+ #define USB3_0_XHCI_GUCTL_OFFSET                                                   0XFE20C12C
+ #undef PCIE_ATTRIB_ATTR_25_OFFSET 
+@@ -34243,6 +34138,28 @@
+ #define USB3_0_XHCI_GUSB2PHYCFG_PHYSEL_MASK                    0x00000080U
+ 
+ /*
++* Suspend USB2.0 HS/FS/LS PHY (SusPHY) When set, USB2.0 PHY enters Suspend
++    *  mode if Suspend conditions are valid. For DRD/OTG configurations, it is
++    *  recommended that this bit is set to 0 during coreConsultant configurati
++    * on. If it is set to 1, then the application must clear this bit after po
++    * wer-on reset. Application needs to set it to 1 after the core initializa
++    * tion completes. For all other configurations, this bit can be set to 1 d
++    * uring core configuration. Note: - In host mode, on reset, this bit is se
++    * t to 1. Software can override this bit after reset. - In device mode, be
++    * fore issuing any device endpoint command when operating in 2.0 speeds, d
++    * isable this bit and enable it after the command completes. If you issue
++    * a command without disabling this bit when the device is in L2 state and
++    * if mac2_clk (utmi_clk/ulpi_clk) is gated off, the command will not get c
++    * ompleted.
++*/
++#undef USB3_0_XHCI_GUSB2PHYCFG_SUSPENDUSB20_DEFVAL 
++#undef USB3_0_XHCI_GUSB2PHYCFG_SUSPENDUSB20_SHIFT 
++#undef USB3_0_XHCI_GUSB2PHYCFG_SUSPENDUSB20_MASK 
++#define USB3_0_XHCI_GUSB2PHYCFG_SUSPENDUSB20_DEFVAL            0x00000000
++#define USB3_0_XHCI_GUSB2PHYCFG_SUSPENDUSB20_SHIFT             6
++#define USB3_0_XHCI_GUSB2PHYCFG_SUSPENDUSB20_MASK              0x00000040U
++
++/*
+ * Full-Speed Serial Interface Select (FSIntf) The application uses this bi
+     * t to select a unidirectional or bidirectional USB 1.1 full-speed serial
+     * transceiver interface. - 1'b0: 6-pin unidirectional full-speed serial in
+@@ -34353,6 +34270,20 @@
+ #define USB3_0_XHCI_GFLADJ_GFLADJ_REFCLK_FLADJ_MASK            0x003FFF00U
+ 
+ /*
++* When this bit is set to '0', termsel, xcvrsel will become 0 during end o
++    * f resume while the opmode will become 0 once controller completes end of
++    *  resume and enters U0 state (2 separate commandswill be issued). When th
++    * is bit is set to '1', all the termsel, xcvrsel, opmode becomes 0 during
++    * end of resume itself (only 1 command will be issued)
++*/
++#undef USB3_0_XHCI_GUCTL1_RESUME_TERMSEL_XCVRSEL_UNIFY_DEFVAL 
++#undef USB3_0_XHCI_GUCTL1_RESUME_TERMSEL_XCVRSEL_UNIFY_SHIFT 
++#undef USB3_0_XHCI_GUCTL1_RESUME_TERMSEL_XCVRSEL_UNIFY_MASK 
++#define USB3_0_XHCI_GUCTL1_RESUME_TERMSEL_XCVRSEL_UNIFY_DEFVAL  0x00000000
++#define USB3_0_XHCI_GUCTL1_RESUME_TERMSEL_XCVRSEL_UNIFY_SHIFT  10
++#define USB3_0_XHCI_GUCTL1_RESUME_TERMSEL_XCVRSEL_UNIFY_MASK   0x00000400U
++
++/*
+ * Host IN Auto Retry (USBHstInAutoRetryEn) When set, this field enables th
+     * e Auto Retry feature. For IN transfers (non-isochronous) that encounter
+     * data packets with CRC errors or internal overrun scenarios, the auto ret
+@@ -34774,6 +34705,7 @@
+ #define AFIFM2_AFIFM_WRCTRL_FABRIC_WIDTH_DEFVAL                0x000003B0
+ #define AFIFM2_AFIFM_WRCTRL_FABRIC_WIDTH_SHIFT                 0
+ #define AFIFM2_AFIFM_WRCTRL_FABRIC_WIDTH_MASK                  0x00000003U
++
+ /*
+ * Configures the Write Channel Fabric interface width. 2'b11 : Reserved 2'
+     * b10 : 32-bit Fabric 2'b01 : 64-bit enabled 2'b00 : 128-bit enabled
+-- 
+1.9.1
+

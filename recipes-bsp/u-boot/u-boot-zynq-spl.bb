@@ -23,6 +23,7 @@ SRC_URI_append = "\
 	file://0007-topic-miamiplus-Run-CPU-at-800MHz-for-speedgrade-2.patch \
 	file://0008-ARM-zynqmp-Add-support-for-the-topic-miamimp-system-.patch \
 	file://0009-mmc-sdhci-Add-card-detect-method.patch \
+	file://0010-topic-miamimp-Support-final-silicon.patch \
 	file://pmufw.bin.xz \
 	"
 
