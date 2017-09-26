@@ -1,4 +1,4 @@
-From b764cbfa474d6106fcd2d0be58e908eaf27dc270 Mon Sep 17 00:00:00 2001
+From af18638a7b7918148f8440f148d89cc932485d27 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Jan 2017 15:35:41 +0100
 Subject: [PATCH 8/9] ARM: zynqmp: Add support for the topic-miamimp
@@ -14,12 +14,12 @@ The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
  board/topic/zynqmp/sleep.h                         |     0
  board/topic/zynqmp/tap_delays.c                    |     1 +
  board/topic/zynqmp/xil_io.h                        |    41 +
- .../zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c     | 18943 ++++++++++
- .../zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h     | 34806 +++++++++++++++++++
+ .../zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c     | 18993 ++++++++++
+ .../zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h     | 34874 +++++++++++++++++++
  board/topic/zynqmp/zynqmp.c                        |     6 +
  configs/topic_miamimp_defconfig                    |    79 +
  include/configs/topic_miamimp.h                    |   115 +
- 12 files changed, 54191 insertions(+)
+ 12 files changed, 54309 insertions(+)
  create mode 100644 arch/arm/dts/zynqmp-topic-miamimp.dts
  create mode 100644 board/topic/zynqmp/MAINTAINERS
  create mode 100644 board/topic/zynqmp/Makefile
@@ -321,10 +321,10 @@ index 0000000..5340280
 +#endif /* XIL_IO_H */
 diff --git a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
 new file mode 100644
-index 0000000..b55c2f8
+index 0000000..974cfb4
 --- /dev/null
 +++ b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
-@@ -0,0 +1,18943 @@
+@@ -0,0 +1,18993 @@
 +/******************************************************************************
 +*
 +* Copyright (C) 2015 Xilinx, Inc.  All rights reserved.
@@ -1457,18 +1457,18 @@ index 0000000..b55c2f8
 +    *  PSU_CRL_APB_SPI0_REF_CTRL_DIVISOR1                          0x1
 +
 +    * 6 bit divider
-+    *  PSU_CRL_APB_SPI0_REF_CTRL_DIVISOR0                          0x6
++    *  PSU_CRL_APB_SPI0_REF_CTRL_DIVISOR0                          0x2
 +
 +    * 000 = IOPLL; 010 = RPLL; 011 = DPLL; (This signal may only be toggled af
 +    * ter 4 cycles of the old clock and 4 cycles of the new clock. This is not
 +    *  usually an issue, but designers must be aware.)
-+    *  PSU_CRL_APB_SPI0_REF_CTRL_SRCSEL                            0x2
++    *  PSU_CRL_APB_SPI0_REF_CTRL_SRCSEL                            0x3
 +
 +    * This register controls this reference clock
-+    * (OFFSET, MASK, VALUE)      (0XFF5E007C, 0x013F3F07U ,0x01010602U)
++    * (OFFSET, MASK, VALUE)      (0XFF5E007C, 0x013F3F07U ,0x01010203U)
 +    */
 +	PSU_Mask_Write(CRL_APB_SPI0_REF_CTRL_OFFSET,
-+		0x013F3F07U, 0x01010602U);
++		0x013F3F07U, 0x01010203U);
 +/*##################################################################### */
 +
 +    /*
@@ -1500,18 +1500,18 @@ index 0000000..b55c2f8
 +    *  PSU_CRL_APB_IOU_SWITCH_CTRL_CLKACT                          0x1
 +
 +    * 6 bit divider
-+    *  PSU_CRL_APB_IOU_SWITCH_CTRL_DIVISOR0                        0x5
++    *  PSU_CRL_APB_IOU_SWITCH_CTRL_DIVISOR0                        0x6
 +
 +    * 000 = RPLL; 010 = IOPLL; 011 = DPLL; (This signal may only be toggled af
 +    * ter 4 cycles of the old clock and 4 cycles of the new clock. This is not
 +    *  usually an issue, but designers must be aware.)
-+    *  PSU_CRL_APB_IOU_SWITCH_CTRL_SRCSEL                          0x0
++    *  PSU_CRL_APB_IOU_SWITCH_CTRL_SRCSEL                          0x2
 +
 +    * This register controls this reference clock
-+    * (OFFSET, MASK, VALUE)      (0XFF5E009C, 0x01003F07U ,0x01000500U)
++    * (OFFSET, MASK, VALUE)      (0XFF5E009C, 0x01003F07U ,0x01000602U)
 +    */
 +	PSU_Mask_Write(CRL_APB_IOU_SWITCH_CTRL_OFFSET,
-+		0x01003F07U, 0x01000500U);
++		0x01003F07U, 0x01000602U);
 +/*##################################################################### */
 +
 +    /*
@@ -1521,17 +1521,17 @@ index 0000000..b55c2f8
 +    *  PSU_CRL_APB_PCAP_CTRL_CLKACT                                0x1
 +
 +    * 6 bit divider
-+    *  PSU_CRL_APB_PCAP_CTRL_DIVISOR0                              0x5
++    *  PSU_CRL_APB_PCAP_CTRL_DIVISOR0                              0x6
 +
 +    * 000 = IOPLL; 010 = RPLL; 011 = DPLL; (This signal may only be toggled af
 +    * ter 4 cycles of the old clock and 4 cycles of the new clock. This is not
 +    *  usually an issue, but designers must be aware.)
-+    *  PSU_CRL_APB_PCAP_CTRL_SRCSEL                                0x2
++    *  PSU_CRL_APB_PCAP_CTRL_SRCSEL                                0x0
 +
 +    * This register controls this reference clock
-+    * (OFFSET, MASK, VALUE)      (0XFF5E00A4, 0x01003F07U ,0x01000502U)
++    * (OFFSET, MASK, VALUE)      (0XFF5E00A4, 0x01003F07U ,0x01000600U)
 +    */
-+	PSU_Mask_Write(CRL_APB_PCAP_CTRL_OFFSET, 0x01003F07U, 0x01000502U);
++	PSU_Mask_Write(CRL_APB_PCAP_CTRL_OFFSET, 0x01003F07U, 0x01000600U);
 +/*##################################################################### */
 +
 +    /*
@@ -1676,18 +1676,42 @@ index 0000000..b55c2f8
 +    *  PSU_CRL_APB_PL2_REF_CTRL_DIVISOR1                           0x1
 +
 +    * 6 bit divider
-+    *  PSU_CRL_APB_PL2_REF_CTRL_DIVISOR0                           0x6
++    *  PSU_CRL_APB_PL2_REF_CTRL_DIVISOR0                           0x2
 +
 +    * 000 = IOPLL; 010 = RPLL; 011 = DPLL; (This signal may only be toggled af
 +    * ter 4 cycles of the old clock and 4 cycles of the new clock. This is not
 +    *  usually an issue, but designers must be aware.)
-+    *  PSU_CRL_APB_PL2_REF_CTRL_SRCSEL                             0x2
++    *  PSU_CRL_APB_PL2_REF_CTRL_SRCSEL                             0x3
 +
 +    * This register controls this reference clock
-+    * (OFFSET, MASK, VALUE)      (0XFF5E00C8, 0x013F3F07U ,0x01010602U)
++    * (OFFSET, MASK, VALUE)      (0XFF5E00C8, 0x013F3F07U ,0x01010203U)
 +    */
 +	PSU_Mask_Write(CRL_APB_PL2_REF_CTRL_OFFSET,
-+		0x013F3F07U, 0x01010602U);
++		0x013F3F07U, 0x01010203U);
++/*##################################################################### */
++
++    /*
++    * Register : PL3_REF_CTRL @ 0XFF5E00CC
++
++    * Clock active signal. Switch to 0 to disable the clock
++    *  PSU_CRL_APB_PL3_REF_CTRL_CLKACT                             0x1
++
++    * 6 bit divider
++    *  PSU_CRL_APB_PL3_REF_CTRL_DIVISOR1                           0x1
++
++    * 6 bit divider
++    *  PSU_CRL_APB_PL3_REF_CTRL_DIVISOR0                           0x5
++
++    * 000 = IOPLL; 010 = RPLL; 011 = DPLL; (This signal may only be toggled af
++    * ter 4 cycles of the old clock and 4 cycles of the new clock. This is not
++    *  usually an issue, but designers must be aware.)
++    *  PSU_CRL_APB_PL3_REF_CTRL_SRCSEL                             0x0
++
++    * This register controls this reference clock
++    * (OFFSET, MASK, VALUE)      (0XFF5E00CC, 0x013F3F07U ,0x01010500U)
++    */
++	PSU_Mask_Write(CRL_APB_PL3_REF_CTRL_OFFSET,
++		0x013F3F07U, 0x01010500U);
 +/*##################################################################### */
 +
 +    /*
@@ -18428,6 +18452,19 @@ index 0000000..b55c2f8
 +/*##################################################################### */
 +
 +    /*
++    * Register : AFIFM_RDCTRL @ 0XFD390000
++
++    * Configures the Read Channel Fabric interface width. 2'b11 : Reserved 2'b
++    * 10 : 32-bit Fabric 2'b01 : 64-bit enabled 2'b00 : 128-bit enabled
++    *  PSU_AFIFM3_AFIFM_RDCTRL_FABRIC_WIDTH                        0x0
++
++    * Read Channel Control Register
++    * (OFFSET, MASK, VALUE)      (0XFD390000, 0x00000003U ,0x00000000U)
++    */
++	PSU_Mask_Write(AFIFM3_AFIFM_RDCTRL_OFFSET, 0x00000003U, 0x00000000U);
++/*##################################################################### */
++
++    /*
 +    * Register : AFIFM_WRCTRL @ 0XFD380014
 +
 +    * Configures the Write Channel Fabric interface width. 2'b11 : Reserved 2'
@@ -18438,6 +18475,19 @@ index 0000000..b55c2f8
 +    * (OFFSET, MASK, VALUE)      (0XFD380014, 0x00000003U ,0x00000001U)
 +    */
 +	PSU_Mask_Write(AFIFM2_AFIFM_WRCTRL_OFFSET, 0x00000003U, 0x00000001U);
++/*##################################################################### */
++
++    /*
++    * Register : AFIFM_WRCTRL @ 0XFD390014
++
++    * Configures the Write Channel Fabric interface width. 2'b11 : Reserved 2'
++    * b10 : 32-bit Fabric 2'b01 : 64-bit enabled 2'b00 : 128-bit enabled
++    *  PSU_AFIFM3_AFIFM_WRCTRL_FABRIC_WIDTH                        0x0
++
++    * Write Channel Control Register
++    * (OFFSET, MASK, VALUE)      (0XFD390014, 0x00000003U ,0x00000000U)
++    */
++	PSU_Mask_Write(AFIFM3_AFIFM_WRCTRL_OFFSET, 0x00000003U, 0x00000000U);
 +/*##################################################################### */
 +
 +
@@ -19270,10 +19320,10 @@ index 0000000..b55c2f8
 +}
 diff --git a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h
 new file mode 100644
-index 0000000..bfca321
+index 0000000..442e81c
 --- /dev/null
 +++ b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h
-@@ -0,0 +1,34806 @@
+@@ -0,0 +1,34874 @@
 +/******************************************************************************
 +*
 +* Copyright (C) 2015 Xilinx, Inc.  All rights reserved.
@@ -20203,6 +20253,8 @@ index 0000000..bfca321
 +#define CRL_APB_PL1_REF_CTRL_OFFSET                                                0XFF5E00C4
 +#undef CRL_APB_PL2_REF_CTRL_OFFSET 
 +#define CRL_APB_PL2_REF_CTRL_OFFSET                                                0XFF5E00C8
++#undef CRL_APB_PL3_REF_CTRL_OFFSET 
++#define CRL_APB_PL3_REF_CTRL_OFFSET                                                0XFF5E00CC
 +#undef CRL_APB_AMS_REF_CTRL_OFFSET 
 +#define CRL_APB_AMS_REF_CTRL_OFFSET                                                0XFF5E0108
 +#undef CRL_APB_DLL_REF_CTRL_OFFSET 
@@ -21105,6 +21157,47 @@ index 0000000..bfca321
 +#define CRL_APB_PL2_REF_CTRL_SRCSEL_DEFVAL                     0x00052000
 +#define CRL_APB_PL2_REF_CTRL_SRCSEL_SHIFT                      0
 +#define CRL_APB_PL2_REF_CTRL_SRCSEL_MASK                       0x00000007U
++/*
++* Clock active signal. Switch to 0 to disable the clock
++*/
++#undef CRL_APB_PL3_REF_CTRL_CLKACT_DEFVAL 
++#undef CRL_APB_PL3_REF_CTRL_CLKACT_SHIFT 
++#undef CRL_APB_PL3_REF_CTRL_CLKACT_MASK 
++#define CRL_APB_PL3_REF_CTRL_CLKACT_DEFVAL                     0x00052000
++#define CRL_APB_PL3_REF_CTRL_CLKACT_SHIFT                      24
++#define CRL_APB_PL3_REF_CTRL_CLKACT_MASK                       0x01000000U
++
++/*
++* 6 bit divider
++*/
++#undef CRL_APB_PL3_REF_CTRL_DIVISOR1_DEFVAL 
++#undef CRL_APB_PL3_REF_CTRL_DIVISOR1_SHIFT 
++#undef CRL_APB_PL3_REF_CTRL_DIVISOR1_MASK 
++#define CRL_APB_PL3_REF_CTRL_DIVISOR1_DEFVAL                   0x00052000
++#define CRL_APB_PL3_REF_CTRL_DIVISOR1_SHIFT                    16
++#define CRL_APB_PL3_REF_CTRL_DIVISOR1_MASK                     0x003F0000U
++
++/*
++* 6 bit divider
++*/
++#undef CRL_APB_PL3_REF_CTRL_DIVISOR0_DEFVAL 
++#undef CRL_APB_PL3_REF_CTRL_DIVISOR0_SHIFT 
++#undef CRL_APB_PL3_REF_CTRL_DIVISOR0_MASK 
++#define CRL_APB_PL3_REF_CTRL_DIVISOR0_DEFVAL                   0x00052000
++#define CRL_APB_PL3_REF_CTRL_DIVISOR0_SHIFT                    8
++#define CRL_APB_PL3_REF_CTRL_DIVISOR0_MASK                     0x00003F00U
++
++/*
++* 000 = IOPLL; 010 = RPLL; 011 = DPLL; (This signal may only be toggled af
++    * ter 4 cycles of the old clock and 4 cycles of the new clock. This is not
++    *  usually an issue, but designers must be aware.)
++*/
++#undef CRL_APB_PL3_REF_CTRL_SRCSEL_DEFVAL 
++#undef CRL_APB_PL3_REF_CTRL_SRCSEL_SHIFT 
++#undef CRL_APB_PL3_REF_CTRL_SRCSEL_MASK 
++#define CRL_APB_PL3_REF_CTRL_SRCSEL_DEFVAL                     0x00052000
++#define CRL_APB_PL3_REF_CTRL_SRCSEL_SHIFT                      0
++#define CRL_APB_PL3_REF_CTRL_SRCSEL_MASK                       0x00000007U
 +
 +/*
 +* 6 bit divider
@@ -53886,8 +53979,12 @@ index 0000000..bfca321
 +#define FPD_SLCR_AFI_FS_OFFSET                                                     0XFD615000
 +#undef AFIFM2_AFIFM_RDCTRL_OFFSET 
 +#define AFIFM2_AFIFM_RDCTRL_OFFSET                                                 0XFD380000
++#undef AFIFM3_AFIFM_RDCTRL_OFFSET 
++#define AFIFM3_AFIFM_RDCTRL_OFFSET                                                 0XFD390000
 +#undef AFIFM2_AFIFM_WRCTRL_OFFSET 
 +#define AFIFM2_AFIFM_WRCTRL_OFFSET                                                 0XFD380014
++#undef AFIFM3_AFIFM_WRCTRL_OFFSET 
++#define AFIFM3_AFIFM_WRCTRL_OFFSET                                                 0XFD390014
 +
 +/*
 +* AF_FM0 block level reset
@@ -53983,6 +54080,17 @@ index 0000000..bfca321
 +#define AFIFM2_AFIFM_RDCTRL_FABRIC_WIDTH_MASK                  0x00000003U
 +
 +/*
++* Configures the Read Channel Fabric interface width. 2'b11 : Reserved 2'b
++    * 10 : 32-bit Fabric 2'b01 : 64-bit enabled 2'b00 : 128-bit enabled
++*/
++#undef AFIFM3_AFIFM_RDCTRL_FABRIC_WIDTH_DEFVAL 
++#undef AFIFM3_AFIFM_RDCTRL_FABRIC_WIDTH_SHIFT 
++#undef AFIFM3_AFIFM_RDCTRL_FABRIC_WIDTH_MASK 
++#define AFIFM3_AFIFM_RDCTRL_FABRIC_WIDTH_DEFVAL                0x000003B0
++#define AFIFM3_AFIFM_RDCTRL_FABRIC_WIDTH_SHIFT                 0
++#define AFIFM3_AFIFM_RDCTRL_FABRIC_WIDTH_MASK                  0x00000003U
++
++/*
 +* Configures the Write Channel Fabric interface width. 2'b11 : Reserved 2'
 +    * b10 : 32-bit Fabric 2'b01 : 64-bit enabled 2'b00 : 128-bit enabled
 +*/
@@ -53992,6 +54100,16 @@ index 0000000..bfca321
 +#define AFIFM2_AFIFM_WRCTRL_FABRIC_WIDTH_DEFVAL                0x000003B0
 +#define AFIFM2_AFIFM_WRCTRL_FABRIC_WIDTH_SHIFT                 0
 +#define AFIFM2_AFIFM_WRCTRL_FABRIC_WIDTH_MASK                  0x00000003U
++/*
++* Configures the Write Channel Fabric interface width. 2'b11 : Reserved 2'
++    * b10 : 32-bit Fabric 2'b01 : 64-bit enabled 2'b00 : 128-bit enabled
++*/
++#undef AFIFM3_AFIFM_WRCTRL_FABRIC_WIDTH_DEFVAL 
++#undef AFIFM3_AFIFM_WRCTRL_FABRIC_WIDTH_SHIFT 
++#undef AFIFM3_AFIFM_WRCTRL_FABRIC_WIDTH_MASK 
++#define AFIFM3_AFIFM_WRCTRL_FABRIC_WIDTH_DEFVAL                0x000003B0
++#define AFIFM3_AFIFM_WRCTRL_FABRIC_WIDTH_SHIFT                 0
++#define AFIFM3_AFIFM_WRCTRL_FABRIC_WIDTH_MASK                  0x00000003U
 +#undef GPIO_MASK_DATA_5_MSW_OFFSET 
 +#define GPIO_MASK_DATA_5_MSW_OFFSET                                                0XFF0A002C
 +#undef GPIO_DIRM_5_OFFSET 
