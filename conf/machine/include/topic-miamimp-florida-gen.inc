@@ -25,6 +25,7 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-videobuf2-memops \
 	kernel-module-videobuf2-vmalloc \
 	kernel-module-xilinx-dma \
+	kernel-module-mali \
 	"
 
 MACHINE_FEATURES += "usbhost usbgadget"
