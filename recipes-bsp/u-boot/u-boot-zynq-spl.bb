@@ -10,6 +10,7 @@ SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git"
 S = "${WORKDIR}/git"
 
 DEPENDS += "dtc-native"
+DEPENDS_append_zynqmp = " zynqmp-pmu-pmu-firmware"
 
 SRCREV = "078231750fcf486e9fca79b4ca6a30424846b8e8"
 
@@ -24,11 +25,11 @@ SRC_URI_append = "\
 	file://0008-ARM-zynqmp-Add-support-for-the-topic-miamimp-system-.patch \
 	file://0009-mmc-sdhci-Add-card-detect-method.patch \
 	file://0010-topic-miamimp-Support-final-silicon.patch \
-	file://pmufw.bin.xz \
 	"
 
-do_compile_prepend() {
-	cp ${WORKDIR}/pmufw.bin ${S}/board/topic/zynqmp/
+do_compile_zynqmp[depends] += "zynqmp-pmu-pmu-firmware:do_deploy"
+do_compile_prepend_zynqmp() {
+	cp ${DEPLOY_DIR_IMAGE}/pmu-${MACHINE}.bin ${S}/board/topic/zynqmp/pmufw.bin
 }
 
 PV = "v2017.01+git${SRCPV}"

@@ -43,6 +43,7 @@ KERNEL_MODULE_AUTOLOAD ?= ""
 require conf/machine/include/tune-zynqmp.inc
 require conf/machine/include/machine-xilinx-default.inc
 require conf/machine/include/machine-xilinx-board.inc
+require conf/machine/include/zynqmp-pmu-config.inc
 
 MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 PACKAGE_EXTRA_ARCHS_append = " ${FPGA_FAMILY_ARCH}"

@@ -2,7 +2,7 @@ require conf/machine/include/topic-miamimp.inc
 
 MACHINE_FPGA_BITSTREAM ?= "fpga-image-miamimp-florida-gen-reference"
 
-KERNEL_MODULE_AUTOLOAD += "macb g_ether spi-cadence"
+KERNEL_MODULE_AUTOLOAD += "macb g_ether spi-cadence mali"
 
 # Extra packages to install for the board
 BOARD_FPGA_PACKAGES ?= "\
