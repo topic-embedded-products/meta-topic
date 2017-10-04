@@ -45,7 +45,8 @@ require conf/machine/include/machine-xilinx-default.inc
 require conf/machine/include/machine-xilinx-board.inc
 require conf/machine/include/zynqmp-pmu-config.inc
 
-MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
+# The SOM_FAMILY is more specific than the SOC_FAMILY (=zynqmp) in the MACHINEOVERRIDES
+SOC_FAMILY .= ":${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}"
 PACKAGE_EXTRA_ARCHS_append = " ${FPGA_FAMILY_ARCH}"
 
 MACHINE_FEATURES = "rtc ext2 ext3 vfat usbhost mali fpgamgr"
