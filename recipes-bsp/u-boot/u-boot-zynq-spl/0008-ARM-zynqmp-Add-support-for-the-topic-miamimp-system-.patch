@@ -1,4 +1,4 @@
-From af18638a7b7918148f8440f148d89cc932485d27 Mon Sep 17 00:00:00 2001
+From b77445ec18b8d71cbdf90ab676ea7458b4b5d23c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Jan 2017 15:35:41 +0100
 Subject: [PATCH 08/10] ARM: zynqmp: Add support for the topic-miamimp
@@ -321,7 +321,7 @@ index 0000000..5340280
 +#endif /* XIL_IO_H */
 diff --git a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
 new file mode 100644
-index 0000000..974cfb4
+index 0000000..15f71d0
 --- /dev/null
 +++ b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
 @@ -0,0 +1,18993 @@
@@ -402,7 +402,7 @@ index 0000000..974cfb4
 +    *  PSU_CRL_APB_RPLL_CFG_RES                                    0x2
 +
 +    * PLL charge pump control
-+    *  PSU_CRL_APB_RPLL_CFG_CP                                     0x3
++    *  PSU_CRL_APB_RPLL_CFG_CP                                     0x4
 +
 +    * PLL loop filter high frequency capacitor control
 +    *  PSU_CRL_APB_RPLL_CFG_LFHF                                   0x3
@@ -414,9 +414,9 @@ index 0000000..974cfb4
 +    *  PSU_CRL_APB_RPLL_CFG_LOCK_DLY                               0x3f
 +
 +    * Helper data. Values are to be looked up in a table from Data Sheet
-+    * (OFFSET, MASK, VALUE)      (0XFF5E0034, 0xFE7FEDEFU ,0x7E4B0C62U)
++    * (OFFSET, MASK, VALUE)      (0XFF5E0034, 0xFE7FEDEFU ,0x7E4B0C82U)
 +    */
-+	PSU_Mask_Write(CRL_APB_RPLL_CFG_OFFSET, 0xFE7FEDEFU, 0x7E4B0C62U);
++	PSU_Mask_Write(CRL_APB_RPLL_CFG_OFFSET, 0xFE7FEDEFU, 0x7E4B0C82U);
 +/*##################################################################### */
 +
 +    /*
@@ -431,16 +431,16 @@ index 0000000..974cfb4
 +    *  PSU_CRL_APB_RPLL_CTRL_PRE_SRC                               0x0
 +
 +    * The integer portion of the feedback divider to the PLL
-+    *  PSU_CRL_APB_RPLL_CTRL_FBDIV                                 0x48
++    *  PSU_CRL_APB_RPLL_CTRL_FBDIV                                 0x5a
 +
 +    * This turns on the divide by 2 that is inside of the PLL. This does not c
 +    * hange the VCO frequency, just the output frequency
 +    *  PSU_CRL_APB_RPLL_CTRL_DIV2                                  0x1
 +
 +    * PLL Basic Control
-+    * (OFFSET, MASK, VALUE)      (0XFF5E0030, 0x00717F00U ,0x00014800U)
++    * (OFFSET, MASK, VALUE)      (0XFF5E0030, 0x00717F00U ,0x00015A00U)
 +    */
-+	PSU_Mask_Write(CRL_APB_RPLL_CTRL_OFFSET, 0x00717F00U, 0x00014800U);
++	PSU_Mask_Write(CRL_APB_RPLL_CTRL_OFFSET, 0x00717F00U, 0x00015A00U);
 +/*##################################################################### */
 +
 +    /*
@@ -1480,7 +1480,7 @@ index 0000000..974cfb4
 +    *  PSU_CRL_APB_CPU_R5_CTRL_CLKACT                              0x1
 +
 +    * 6 bit divider
-+    *  PSU_CRL_APB_CPU_R5_CTRL_DIVISOR0                            0x2
++    *  PSU_CRL_APB_CPU_R5_CTRL_DIVISOR0                            0x3
 +
 +    * 000 = RPLL; 010 = IOPLL; 011 = DPLL; (This signal may only be toggled af
 +    * ter 4 cycles of the old clock and 4 cycles of the new clock. This is not
@@ -1488,9 +1488,9 @@ index 0000000..974cfb4
 +    *  PSU_CRL_APB_CPU_R5_CTRL_SRCSEL                              0x0
 +
 +    * This register controls this reference clock
-+    * (OFFSET, MASK, VALUE)      (0XFF5E0090, 0x01003F07U ,0x01000200U)
++    * (OFFSET, MASK, VALUE)      (0XFF5E0090, 0x01003F07U ,0x01000300U)
 +    */
-+	PSU_Mask_Write(CRL_APB_CPU_R5_CTRL_OFFSET, 0x01003F07U, 0x01000200U);
++	PSU_Mask_Write(CRL_APB_CPU_R5_CTRL_OFFSET, 0x01003F07U, 0x01000300U);
 +/*##################################################################### */
 +
 +    /*
@@ -1521,17 +1521,17 @@ index 0000000..974cfb4
 +    *  PSU_CRL_APB_PCAP_CTRL_CLKACT                                0x1
 +
 +    * 6 bit divider
-+    *  PSU_CRL_APB_PCAP_CTRL_DIVISOR0                              0x6
++    *  PSU_CRL_APB_PCAP_CTRL_DIVISOR0                              0x2
 +
 +    * 000 = IOPLL; 010 = RPLL; 011 = DPLL; (This signal may only be toggled af
 +    * ter 4 cycles of the old clock and 4 cycles of the new clock. This is not
 +    *  usually an issue, but designers must be aware.)
-+    *  PSU_CRL_APB_PCAP_CTRL_SRCSEL                                0x0
++    *  PSU_CRL_APB_PCAP_CTRL_SRCSEL                                0x3
 +
 +    * This register controls this reference clock
-+    * (OFFSET, MASK, VALUE)      (0XFF5E00A4, 0x01003F07U ,0x01000600U)
++    * (OFFSET, MASK, VALUE)      (0XFF5E00A4, 0x01003F07U ,0x01000203U)
 +    */
-+	PSU_Mask_Write(CRL_APB_PCAP_CTRL_OFFSET, 0x01003F07U, 0x01000600U);
++	PSU_Mask_Write(CRL_APB_PCAP_CTRL_OFFSET, 0x01003F07U, 0x01000203U);
 +/*##################################################################### */
 +
 +    /*
