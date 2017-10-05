@@ -1,7 +1,7 @@
-From 333dbd2598e13864e6f061dfcc90295399795479 Mon Sep 17 00:00:00 2001
+From 3a1f60c4dd7d68f5243629890a57a37a34e45671 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 3 Oct 2017 10:09:07 +0200
-Subject: [PATCH] Load XPm_ConfigObject at boot
+Subject: [PATCH 1/2] Load XPm_ConfigObject at boot
 
 This appears to be something that the FSBL does, but not the SPL loader, so
 do it here.
@@ -10,7 +10,7 @@ do it here.
  1 file changed, 6 insertions(+)
 
 diff --git a/lib/sw_apps/zynqmp_pmufw/src/pm_binding.c b/lib/sw_apps/zynqmp_pmufw/src/pm_binding.c
-index 6087348..cb4b923 100644
+index c0144b1..efaf18d 100644
 --- a/lib/sw_apps/zynqmp_pmufw/src/pm_binding.c
 +++ b/lib/sw_apps/zynqmp_pmufw/src/pm_binding.c
 @@ -46,6 +46,9 @@
