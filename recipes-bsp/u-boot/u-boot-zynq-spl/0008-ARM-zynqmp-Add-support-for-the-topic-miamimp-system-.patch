@@ -1,7 +1,7 @@
-From b77445ec18b8d71cbdf90ab676ea7458b4b5d23c Mon Sep 17 00:00:00 2001
+From 892b4c6fbac4050ad2b2003814d989918f0b1d5c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Jan 2017 15:35:41 +0100
-Subject: [PATCH 08/10] ARM: zynqmp: Add support for the topic-miamimp
+Subject: [PATCH 08/11] ARM: zynqmp: Add support for the topic-miamimp
  system-on-module
 
 The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
@@ -321,7 +321,7 @@ index 0000000..5340280
 +#endif /* XIL_IO_H */
 diff --git a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
 new file mode 100644
-index 0000000..15f71d0
+index 0000000..b482215
 --- /dev/null
 +++ b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
 @@ -0,0 +1,18993 @@
@@ -1700,7 +1700,7 @@ index 0000000..15f71d0
 +    *  PSU_CRL_APB_PL3_REF_CTRL_DIVISOR1                           0x1
 +
 +    * 6 bit divider
-+    *  PSU_CRL_APB_PL3_REF_CTRL_DIVISOR0                           0x5
++    *  PSU_CRL_APB_PL3_REF_CTRL_DIVISOR0                           0x4
 +
 +    * 000 = IOPLL; 010 = RPLL; 011 = DPLL; (This signal may only be toggled af
 +    * ter 4 cycles of the old clock and 4 cycles of the new clock. This is not
@@ -1708,10 +1708,10 @@ index 0000000..15f71d0
 +    *  PSU_CRL_APB_PL3_REF_CTRL_SRCSEL                             0x0
 +
 +    * This register controls this reference clock
-+    * (OFFSET, MASK, VALUE)      (0XFF5E00CC, 0x013F3F07U ,0x01010500U)
++    * (OFFSET, MASK, VALUE)      (0XFF5E00CC, 0x013F3F07U ,0x01010400U)
 +    */
 +	PSU_Mask_Write(CRL_APB_PL3_REF_CTRL_OFFSET,
-+		0x013F3F07U, 0x01010500U);
++		0x013F3F07U, 0x01010400U);
 +/*##################################################################### */
 +
 +    /*

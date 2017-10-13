@@ -1,7 +1,7 @@
-From d6dc09726ffc6cf42f0f579f33a291b2370a37e6 Mon Sep 17 00:00:00 2001
+From ac798e3725d1cb324966c412ed95c1d31fa1f855 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 26 Sep 2017 13:51:21 +0200
-Subject: [PATCH 10/10] topic-miamimp: Support "final" silicon
+Subject: [PATCH 10/11] topic-miamimp: Support "final" silicon
 
 The topic-miamimp modules so far were engineering samples. Adjust the bootloader
 for the final silicon version. This enables support for the xczu6eg, xczu9eg and
@@ -12,7 +12,7 @@ xczu15eg, thus dropping support for the xczu9eg-es1 we've been using so far.
  2 files changed, 646 insertions(+), 606 deletions(-)
 
 diff --git a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
-index 15f71d0..e24a23d 100644
+index b482215..c050742 100644
 --- a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
 +++ b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
 @@ -2157,12 +2157,12 @@ unsigned long psu_ddr_init_data(void)

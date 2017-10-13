@@ -1,7 +1,7 @@
 From a57f650e847f89aaeea3ecad857b39d15efba469 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 17 Jan 2017 08:52:37 +0100
-Subject: [PATCH 03/10] topic_miami(plus) defconfig: Enable DFU RAM support
+Subject: [PATCH 03/11] topic_miami(plus) defconfig: Enable DFU RAM support
 
 Allow sending firmware to RAM. Without this, the DFU support was not
 of much use.
