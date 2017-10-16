@@ -12,10 +12,10 @@ BOARD_DESIGN_URI = ""
 
 S = "${WORKDIR}"
 
-PV = "v3r0.3"
-SRC_URI[topic-miamimp-florida-gen-xczu9eg.sha256sum] = "8274312b9402d0e49683d15d69f6a0c77d7a6d81ad5694d99abc5716b4bcfd57"
-SRC_URI[topic-miamimp-florida-gen-xczu6eg.sha256sum] = "1efc0ee27410d2dd9934903f60d7161e393f08fdc2342c727dd5ce08373e2e34"
-SRC_URI[topic-miamimp-florida-gen-xczu15eg.sha256sum] = "ec2125a068ab67124331b70a9268b57fe786e60e5343710ca882f99a120da3cd"
+PV = "v3r0.4"
+SRC_URI[topic-miamimp-florida-gen-xczu9eg.sha256sum] = "6e9e72f52d2383108a50335366a8a289122a306fbc6aebbf470264e75a2713ac"
+SRC_URI[topic-miamimp-florida-gen-xczu6eg.sha256sum] = "d328e8a8f01a700d4971cf74dacd5fa530c36ec10b7e2054a58c9bbbc31e7244"
+SRC_URI[topic-miamimp-florida-gen-xczu15eg.sha256sum] = "a1d96dcadb9f74b0bd8ed437915a94945cb4edab3bc832d4db63c06aaf184f4c"
 
 BITSTREAM_FILENAME = "${MACHINE}-${PV}.bit"
 TOPICEMBEDDED_URIBASE ?= "http://www.topicembeddedproducts.com/support/download/public/reference-images"
