@@ -26,6 +26,7 @@ SRC_URI_append = "\
 	file://0009-mmc-sdhci-Add-card-detect-method.patch \
 	file://0010-topic-miamimp-Support-final-silicon.patch \
 	file://0011-topic_miamimp-Quietly-boot-kernel-and-skip-bootdelay.patch \
+	file://0012-board-topic_miamilite-Support-cost-reduced-version.patch \
 	"
 
 do_compile_zynqmp[depends] += "zynqmp-pmu-pmu-firmware:do_deploy"

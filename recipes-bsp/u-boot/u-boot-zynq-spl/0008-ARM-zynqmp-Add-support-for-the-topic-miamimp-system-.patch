@@ -1,7 +1,7 @@
 From 892b4c6fbac4050ad2b2003814d989918f0b1d5c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Jan 2017 15:35:41 +0100
-Subject: [PATCH 08/11] ARM: zynqmp: Add support for the topic-miamimp
+Subject: [PATCH 08/12] ARM: zynqmp: Add support for the topic-miamimp
  system-on-module
 
 The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,

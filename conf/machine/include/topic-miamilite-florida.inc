@@ -1,0 +1,31 @@
+# Florida board common components
+require conf/machine/include/topic-miamilite.inc
+
+MACHINE_FPGA_BITSTREAM ?= "fpga-image-miamilite-florida-gen-reference"
+
+# Extra packages to install for the board
+BOARD_FPGA_PACKAGES ?= "\
+	${@bb.utils.contains('VIRTUAL-RUNTIME_dev_manager', 'busybox-mdev', 'adi-hdmi-in-load adi-hdmi-load', '', d)} \
+	kernel-module-adi-axi-hdmi \
+	kernel-module-adv7604 \
+	kernel-module-axi-hdmi-rx \
+	kernel-module-bitblit \
+	kernel-module-dma-axi-dmac \
+	kernel-module-snd-hwdep \
+	kernel-module-snd-soc-adi-axi-spdif \
+	kernel-module-snd-soc-adv7511-hdmi \
+	kernel-module-vdmafb \
+	kernel-module-videobuf2-core \
+	kernel-module-videobuf2-dma-contig \
+	kernel-module-videobuf2-memops \
+	kernel-module-videobuf2-vmalloc \
+	kernel-module-virt-dma \
+	kernel-module-xilinx-dma \
+	kernel-module-macb \
+	kernel-module-pps-core \
+	kernel-module-ptp \
+	"
+
+MACHINE_FEATURES += "usbhost usbgadget screen touchscreen wifi alsa ethernet"
+
+DEVICETREE = "uImage-topic-miamilite-florida-gen.dtb"

@@ -1,7 +1,7 @@
 From 7819abefa115d73e98b13ded2353c459c99c15be Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 17 Jan 2017 09:38:08 +0100
-Subject: [PATCH 04/11] configs/topic_miami.h: Correct kernel_size in default
+Subject: [PATCH 04/12] configs/topic_miami.h: Correct kernel_size in default
  environment
 
 The kernel partition in QSPI is 0x440000 large, not 0x400000. Fix this

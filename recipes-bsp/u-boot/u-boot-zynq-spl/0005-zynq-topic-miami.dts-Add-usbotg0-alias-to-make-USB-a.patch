@@ -1,7 +1,7 @@
 From cb42d0fc5a3c1d0f21a7eebcd72056e459eea085 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 7 Apr 2017 08:47:59 +0200
-Subject: [PATCH 05/11] zynq-topic-miami.dts: Add usbotg0 alias to make USB
+Subject: [PATCH 05/12] zynq-topic-miami.dts: Add usbotg0 alias to make USB
  actually work
 
 Fixes the following problem:

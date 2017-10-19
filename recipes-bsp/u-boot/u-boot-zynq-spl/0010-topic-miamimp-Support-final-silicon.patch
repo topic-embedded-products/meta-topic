@@ -1,7 +1,7 @@
 From ac798e3725d1cb324966c412ed95c1d31fa1f855 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 26 Sep 2017 13:51:21 +0200
-Subject: [PATCH 10/11] topic-miamimp: Support "final" silicon
+Subject: [PATCH 10/12] topic-miamimp: Support "final" silicon
 
 The topic-miamimp modules so far were engineering samples. Adjust the bootloader
 for the final silicon version. This enables support for the xczu6eg, xczu9eg and
