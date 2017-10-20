@@ -1,4 +1,4 @@
-From 3bf55c4d77fbd9b89806b712c9ea2bfe7ef2cd97 Mon Sep 17 00:00:00 2001
+From 1e7e82a62e8a158b7dd6f38e8f00a28f75a26fc6 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 18 Oct 2017 14:32:28 +0200
 Subject: [PATCH 12/12] board: topic_miamilite: Support cost-reduced version
@@ -12,10 +12,9 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  arch/arm/dts/zynq-topic-miamilite.dts                |  7 ++++---
  board/topic/zynq/zynq-topic-miamilite/ps7_init_gpl.c | 14 +++++++-------
  board/topic/zynq/zynq-topic-miamilite/ps7_regs.txt   | 14 +++++++-------
- configs/topic_miamilite_defconfig                    |  2 +-
- include/configs/topic_miamilite.h                    |  2 --
- 5 files changed, 19 insertions(+), 20 deletions(-)
- delete mode 100644 include/configs/topic_miamilite.h
+ include/configs/topic_miami.h                        |  7 +++++--
+ include/configs/topic_miamilite.h                    | 11 ++++++++++-
+ 5 files changed, 33 insertions(+), 20 deletions(-)
 
 diff --git a/arch/arm/dts/zynq-topic-miamilite.dts b/arch/arm/dts/zynq-topic-miamilite.dts
 index f88cb4b..eff9a66 100644
@@ -114,25 +113,41 @@ index db6e642..08d5344 100644
  0xE000D038 0x00000020 // QSPI loopback - internal, 0 delay
 -0xE000D0A0 0xE2FF06EB // LQSPI_CFG - Quad read, dual flash
 +0xE000D0A0 0x82FF04EB // LQSPI_CFG - QIOREAD mode, Numonyx/Micron
-diff --git a/configs/topic_miamilite_defconfig b/configs/topic_miamilite_defconfig
-index 3c19bb7..f3114a8 100644
---- a/configs/topic_miamilite_defconfig
-+++ b/configs/topic_miamilite_defconfig
-@@ -1,6 +1,6 @@
- CONFIG_ARM=y
- CONFIG_SYS_VENDOR="topic"
--CONFIG_SYS_CONFIG_NAME="topic_miamilite"
-+CONFIG_SYS_CONFIG_NAME="topic_miami"
- CONFIG_ARCH_ZYNQ=y
- CONFIG_BOOT_INIT_FILE="board/topic/zynq/zynq-topic-miamilite/ps7_regs.txt"
- CONFIG_SYS_TEXT_BASE=0x4000000
+diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
+index 42cfbb0..632f3af 100644
+--- a/include/configs/topic_miami.h
++++ b/include/configs/topic_miami.h
+@@ -70,9 +70,12 @@
+ /* Setup proper boot sequences for Miami boards */
+ 
+ #if defined(CONFIG_USB)
++# ifndef ENV_USB_RESET
++#  define ENV_USB_RESET "i2c dev 1 && i2c mw 41 1 ff && i2c mw 41 3 fe && "\
++		"i2c mw 41 1 fe && i2c mw 41 1 ff"
++# endif
+ # define EXTRA_ENV_USB \
+-	"usbreset=i2c dev 1 && i2c mw 41 1 ff && i2c mw 41 3 fe && "\
+-		"i2c mw 41 1 fe && i2c mw 41 1 ff\0" \
++	"usbreset=" ENV_USB_RESET "\0" \
+ 	"usbboot=run usbreset && if usb start; then " \
+ 		"echo Booting from USB... && " \
+ 		"if load usb 0 0x1900000 ${bootscript}; then "\
 diff --git a/include/configs/topic_miamilite.h b/include/configs/topic_miamilite.h
-deleted file mode 100644
-index 46ca6bd..0000000
+index 46ca6bd..7ec48d4 100644
 --- a/include/configs/topic_miamilite.h
-+++ /dev/null
-@@ -1,2 +0,0 @@
--#include "topic_miami.h"
++++ b/include/configs/topic_miamilite.h
+@@ -1,2 +1,11 @@
++/*
++ * (C) Copyright 2017 Topic Embedded Products
++ *
++ * Configuration for Miami Lite Zynq Evaluation and Development Board
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++/* USB reset is on GPIO signal instead of expander */
++#define ENV_USB_RESET "gpio clear 0 && gpio set 0"
+ #include "topic_miami.h"
 -#define CONFIG_SF_DUAL_FLASH
 -- 
 1.9.1
