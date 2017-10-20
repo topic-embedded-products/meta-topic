@@ -1,7 +1,7 @@
 From 7c4b49d33b2337dc9179492657950f942b0a8146 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 28 Nov 2016 07:26:34 +0100
-Subject: [PATCH 02/12] topic_miami_defconfig: Remove NFS and NET support
+Subject: [PATCH 02/13] topic_miami_defconfig: Remove NFS and NET support
 
 On the miami board, ethernet is accessed via logic. To use it, one
 would have to program logic first and then set up the rgmii conversion
