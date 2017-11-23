@@ -9,8 +9,3 @@ MACHINEOVERRIDES =. "topic-miami:"
 
 # Different MIO configuration, hence different u-boot
 UBOOT_MACHINE = "topic_miamilite_config"
-
-# Use QSPI flash with 128k sector size (dual parallel qspi flash)
-MKUBIFS_ARGS = "-m 1 -e 130944 -c 472"
-UBINIZE_ARGS = "-m 1 -p 128KiB"
-UBI_VOLNAME = "qspi-rootfs"
