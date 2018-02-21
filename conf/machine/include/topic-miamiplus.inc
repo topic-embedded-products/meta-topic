@@ -1,6 +1,8 @@
 # The miami plus boards have extra I/O connectors and slightly different hardware
 require conf/machine/include/topic-miami.inc
 
+PREFERRED_PROVIDER_virtual/kernel = "linux-topic"
+
 # This makes the "topic-miamiplus" override work
 SOM_FAMILY = "topic-miamiplus"
 

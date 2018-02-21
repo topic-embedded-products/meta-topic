@@ -1,3 +1,5 @@
+echo "FPGA"
+load mmc 0:2 0x100000 /lib/firmware/fpga.bin.fpga-image-miami-florida-gen-reference && fpga load 0 0x100000 $filesize                                      
 echo "Loading kernel from SD card..."
 if load mmc 0 ${kernel_addr} ${kernel_image} && load mmc 0 ${devicetree_addr} ${devicetree_image}; then
    echo "Load from SD card succeeded"

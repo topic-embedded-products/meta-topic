@@ -1,0 +1,44 @@
+From a9e810f6123e75235c4933e7ba28eea92b4a1977 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Wed, 21 Feb 2018 13:41:58 +0100
+Subject: [PATCH] usb: phy-generic: Use gpiod_set_value_cansleep
+
+The nop_reset and shutdown methods are called in a context that can sleep,
+so use gpiod_set_value_cansleep instead of gpiod_set_value.
+
+If you've connected the reset line to a GPIO expander, you'd get a kernel
+"slowpath" warning with gpiod_set_value.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/usb/phy/phy-generic.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/usb/phy/phy-generic.c b/drivers/usb/phy/phy-generic.c
+index 74ba882..a53b89b 100644
+--- a/drivers/usb/phy/phy-generic.c
++++ b/drivers/usb/phy/phy-generic.c
+@@ -63,9 +63,9 @@ static void nop_reset(struct usb_phy_generic *nop)
+ 	if (!nop->gpiod_reset)
+ 		return;
+ 
+-	gpiod_set_value(nop->gpiod_reset, 1);
++	gpiod_set_value_cansleep(nop->gpiod_reset, 1);
+ 	usleep_range(10000, 20000);
+-	gpiod_set_value(nop->gpiod_reset, 0);
++	gpiod_set_value_cansleep(nop->gpiod_reset, 0);
+ }
+ 
+ /* interface to regulator framework */
+@@ -159,7 +159,7 @@ void usb_gen_phy_shutdown(struct usb_phy *phy)
+ {
+ 	struct usb_phy_generic *nop = dev_get_drvdata(phy->dev);
+ 
+-	gpiod_set_value(nop->gpiod_reset, 1);
++	gpiod_set_value_cansleep(nop->gpiod_reset, 1);
+ 
+ 	if (!IS_ERR(nop->clk))
+ 		clk_disable_unprepare(nop->clk);
+-- 
+1.9.1
+

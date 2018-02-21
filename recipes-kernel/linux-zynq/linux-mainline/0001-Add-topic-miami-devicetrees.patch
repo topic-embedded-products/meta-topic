@@ -1,0 +1,1579 @@
+From dee2f269be65e0898ffbea8775b90bcb450ccfb5 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Wed, 21 Feb 2018 09:37:54 +0100
+Subject: [PATCH] Add topic-miami devicetrees
+
+Since NAND and QSPI don't exist yet in mainline, provide "dummy" nodes
+as a workaround so we don't have to patch all dts files.
+
+Disabled the non-working nodes for display and such.
+---
+ arch/arm/boot/dts/topic-dyplo.dtsi                 |  12 +
+ arch/arm/boot/dts/topic-miami-dyplo-acp.dts        |  11 +
+ arch/arm/boot/dts/topic-miami-dyplo.dts            |   3 +
+ arch/arm/boot/dts/topic-miami-florida-gen-amp.dts  |  34 ++
+ arch/arm/boot/dts/topic-miami-florida-gen-mio.dtsi |  18 +
+ arch/arm/boot/dts/topic-miami-florida-gen-nand.dts |   3 +
+ arch/arm/boot/dts/topic-miami-florida-gen-pt.dts   |   4 +
+ arch/arm/boot/dts/topic-miami-florida-gen.dts      |   2 +
+ arch/arm/boot/dts/topic-miami-florida-gen.dtsi     | 274 ++++++++++++++++
+ .../arm/boot/dts/topic-miami-florida-mio-dyplo.dts |   4 +
+ .../dts/topic-miami-florida-mio-nand-dyplo.dts     |   5 +
+ arch/arm/boot/dts/topic-miami-florida-mio.dts      |   2 +
+ arch/arm/boot/dts/topic-miami-florida-mio.dtsi     | 143 ++++++++
+ arch/arm/boot/dts/topic-miami-florida-pci-pt.dts   |   3 +
+ arch/arm/boot/dts/topic-miami-florida-pci.dts      |  12 +
+ arch/arm/boot/dts/topic-miami-florida-test.dts     |  52 +++
+ arch/arm/boot/dts/topic-miami-florida-test.dtsi    | 125 +++++++
+ .../boot/dts/topic-miami-florida-xadc-test.dtsi    |  15 +
+ arch/arm/boot/dts/topic-miami-florida.dtsi         |  27 ++
+ arch/arm/boot/dts/topic-miami-nand.dtsi            |  13 +
+ arch/arm/boot/dts/topic-miami-vice.dts             |   2 +
+ arch/arm/boot/dts/topic-miami.dtsi                 | 361 +++++++++++++++++++++
+ arch/arm/boot/dts/topic-miamilite-florida-test.dts |  32 ++
+ arch/arm/boot/dts/topic-miamilite.dtsi             |  51 +++
+ arch/arm/boot/dts/topic-miamiplus-florida-test.dts |  51 +++
+ arch/arm/boot/dts/topic-miamiplus.dtsi             |  97 ++++++
+ 26 files changed, 1356 insertions(+)
+ create mode 100644 arch/arm/boot/dts/topic-dyplo.dtsi
+ create mode 100644 arch/arm/boot/dts/topic-miami-dyplo-acp.dts
+ create mode 100644 arch/arm/boot/dts/topic-miami-dyplo.dts
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida-gen-amp.dts
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida-gen-mio.dtsi
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida-gen-nand.dts
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida-gen-pt.dts
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida-gen.dts
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida-gen.dtsi
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio-dyplo.dts
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio-nand-dyplo.dts
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dts
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dtsi
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida-pci-pt.dts
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida-pci.dts
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida-test.dts
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida-test.dtsi
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida-xadc-test.dtsi
+ create mode 100644 arch/arm/boot/dts/topic-miami-florida.dtsi
+ create mode 100644 arch/arm/boot/dts/topic-miami-nand.dtsi
+ create mode 100644 arch/arm/boot/dts/topic-miami-vice.dts
+ create mode 100644 arch/arm/boot/dts/topic-miami.dtsi
+ create mode 100644 arch/arm/boot/dts/topic-miamilite-florida-test.dts
+ create mode 100644 arch/arm/boot/dts/topic-miamilite.dtsi
+ create mode 100644 arch/arm/boot/dts/topic-miamiplus-florida-test.dts
+ create mode 100644 arch/arm/boot/dts/topic-miamiplus.dtsi
+
+diff --git a/arch/arm/boot/dts/topic-dyplo.dtsi b/arch/arm/boot/dts/topic-dyplo.dtsi
+new file mode 100644
+index 0000000..c86e647
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-dyplo.dtsi
+@@ -0,0 +1,12 @@
++/* DTS snippet to add DYPLO to the kernel configuration. This assumes
++ * a default configuration of IRQ 89 and address 0x64400000 */
++&amba {
++	dyplo: dyplo@64400000 {
++		compatible = "topic,dyplo-1.00.a";
++		reg = <0x64400000 0x200000>;
++		interrupt-parent = <&intc>;
++		interrupts = <0 57 0x4>;
++		nvmem-cells = <&dyplolicense>;
++		nvmem-cell-names = "license";
++	};
++};
+diff --git a/arch/arm/boot/dts/topic-miami-dyplo-acp.dts b/arch/arm/boot/dts/topic-miami-dyplo-acp.dts
+new file mode 100644
+index 0000000..a71bb01
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-dyplo-acp.dts
+@@ -0,0 +1,11 @@
++/dts-v1/;
++/include/ "topic-miami-florida-gen.dtsi"
++/include/ "topic-dyplo.dtsi"
++
++/*
++ * When Dyplo's DMA nodes are connected to the ACP port, everything is coherent
++ * so we tell the system that no cache maintenance is needed.
++ */
++&dyplo {
++	dma-coherent;
++};
+diff --git a/arch/arm/boot/dts/topic-miami-dyplo.dts b/arch/arm/boot/dts/topic-miami-dyplo.dts
+new file mode 100644
+index 0000000..f6e3de1
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-dyplo.dts
+@@ -0,0 +1,3 @@
++/dts-v1/;
++/include/ "topic-miami-florida-gen.dtsi"
++/include/ "topic-dyplo.dtsi"
+diff --git a/arch/arm/boot/dts/topic-miami-florida-gen-amp.dts b/arch/arm/boot/dts/topic-miami-florida-gen-amp.dts
+new file mode 100644
+index 0000000..43d6db5
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida-gen-amp.dts
+@@ -0,0 +1,34 @@
++/* Devicetree for use with Asymetric Multiple Processing */
++/dts-v1/;
++/include/ "topic-miami-florida-gen.dtsi"
++
++/ {
++	reserved-memory {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++
++		/* Reserve the top 2 MB of the 0.5GB DDR RAM */
++		remoteproc_reserved: remoteproc@0x1fe00000 {
++			reg = <0x1fe00000 0x200000>;
++			no-map; /* For dma_declare_coherent_memory() */
++		};
++	};
++
++	/* Boot CPU1 with AMP software, using reserved memory for firmware */
++	zynq_remoteproc@1 {
++		compatible = "xlnx,zynq_remoteproc";
++		memory-region = <&remoteproc_reserved>;
++		interrupt-parent = <&intc>;
++		interrupts = <0 37 0>, <0 38 0>;
++		firmware = "amp1.elf";
++		/* vring0 is the ipino */
++		vring0 = <15>;
++		vring1 = <14>;
++	};
++};
++
++/* Remove the "alive" LED so it can be controlled by the AMP firmware */
++&led_alive {
++	status = "disabled";
++};
+diff --git a/arch/arm/boot/dts/topic-miami-florida-gen-mio.dtsi b/arch/arm/boot/dts/topic-miami-florida-gen-mio.dtsi
+new file mode 100644
+index 0000000..af36d08
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida-gen-mio.dtsi
+@@ -0,0 +1,18 @@
++/ {
++		charger: battery-charger {
++			compatible = "gpio-charger";
++			charger-type = "mains";
++			gpios = <&gpioexf 6 1>; /* Pin 6 of IO expander, active low */
++		};
++};
++
++&i2cmux_2 {
++	/* Battery gauge */
++	fuelgauge: battery-gauge {
++		compatible = "ltc2943";
++		reg = <0x64>;
++		lltc,resistor-sense = <15>; /* 15 mOhm */
++		lltc,prescaler-exponent = <5>; /* 2^(2*5) = 1024 */
++		power-supplies = <&charger>;
++	};
++};
+diff --git a/arch/arm/boot/dts/topic-miami-florida-gen-nand.dts b/arch/arm/boot/dts/topic-miami-florida-gen-nand.dts
+new file mode 100644
+index 0000000..a4f4a58
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida-gen-nand.dts
+@@ -0,0 +1,3 @@
++/dts-v1/;
++/include/ "topic-miami-florida-gen.dtsi"
++/include/ "topic-miami-nand.dtsi"
+diff --git a/arch/arm/boot/dts/topic-miami-florida-gen-pt.dts b/arch/arm/boot/dts/topic-miami-florida-gen-pt.dts
+new file mode 100644
+index 0000000..846d460
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida-gen-pt.dts
+@@ -0,0 +1,4 @@
++/dts-v1/;
++/include/ "topic-miami-florida-gen.dtsi"
++/include/ "topic-miami-florida-xadc-test.dtsi"
++/include/ "topic-dyplo.dtsi"
+diff --git a/arch/arm/boot/dts/topic-miami-florida-gen.dts b/arch/arm/boot/dts/topic-miami-florida-gen.dts
+new file mode 100644
+index 0000000..4fbfd8f
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida-gen.dts
+@@ -0,0 +1,2 @@
++/dts-v1/;
++/include/ "topic-miami-florida-gen.dtsi"
+diff --git a/arch/arm/boot/dts/topic-miami-florida-gen.dtsi b/arch/arm/boot/dts/topic-miami-florida-gen.dtsi
+new file mode 100644
+index 0000000..7f2c03d
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida-gen.dtsi
+@@ -0,0 +1,274 @@
++/include/ "topic-miami-florida.dtsi"
++/include/ "topic-miami-florida-gen-mio.dtsi"
++
++/* On-board push buttons connected to EMIO GPIO 4 and 5 in reference design */
++&gpio_keys {
++	s2 {
++		label = "s2";
++		gpios = <&gpio0 58 1>; /* EMIO 4, active low */
++		linux,code = <60>; /* KEY_F2 */
++		gpio-key,wakeup;
++	};
++	s3 {
++		label = "s3";
++		gpios = <&gpio0 59 1>; /* EMIO 5, active low */
++		linux,code = <61>; /* KEY_F3 */
++		gpio-key,wakeup;
++	};
++};
++
++/* I2C bus layout */
++&i2cmux_0 {
++	/* HDMI OUT */
++	adv7511: adv7511@39 {
++		compatible = "adi,adv7511";
++		reg = <0x39>, <0x3f>;
++		reg-names = "primary", "edid";
++		adi,input-depth = <8>;
++		adi,input-colorspace = "rgb";
++		adi,input-clock = "1x";
++		adi,input-style = <1>;
++		adi,input-justification = "right";
++		adi,clock-delay = <0>;
++		#sound-dai-cells = <0>;
++
++		ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			port@0 {
++				reg = <0>;
++				adv7511_in: endpoint {
++					remote-endpoint = <&axi_hdmi_out>;
++				};
++			};
++			port@1 {
++				reg = <1>;
++			};
++		};
++	};
++};
++
++&i2cmux_2 {
++	/* Touch */
++	touch: ad7879@2f {
++		compatible = "ad7879";
++		reg = <0x2F>;
++		interrupt-parent = <&gpio0>;
++		interrupts = <64 0x2>; /* GPIO 64 (EMIO 10), falling edge */
++		touchscreen-swapped-x-y;
++		adi,resistance-plate-x = <620>;
++		touchscreen-max-pressure = <4096>;
++		adi,first-conversion-delay = /bits/ 8 <3>;
++		adi,acquisition-time = /bits/ 8 <1>;
++		adi,median-filter-size = /bits/ 8 <2>;
++		adi,averaging = /bits/ 8 <1>;
++		adi,conversion-interval = /bits/ 8 <255>;
++	};
++};
++
++&i2cmux {
++	i2c@1 {
++		/* HDMI O - Connects directly to HDMI connector */
++		#address-cells = <1>;
++		#size-cells = <0>;
++		reg = <1>;
++	};
++	i2c@3 {
++		/* HDMI IN */
++		#address-cells = <1>;
++		#size-cells = <0>;
++		reg = <3>;
++		/* copied from zynq-zed-imageon.dts */
++		adv7611@4c {
++			compatible = "adi,adv7611";
++			reg = <0x4c>;
++			#address-cells = <0x1>;
++			#size-cells = <0x0>;
++			bus-width = <24>;
++			hsync-active = <0>; /* Parallel bus */
++			vsync-active = <0>;
++			interrupt-parent = <&gpio0>;
++			interrupts = <57 4>; /* EMIO GPIO 3 */
++			adi,int1-config = <1>; /* ADV76XX_INT1_CONFIG_ACTIVE_LOW */
++			reset-gpios = <&gpio0 55 0>; /* EMIO GPIO 1 */
++			port@0 {
++				reg = <0x0>;
++			};
++			port@1 {
++				reg = <0x1>;
++				adv7611: endpoint {
++					bus-width = <16>;
++					remote-endpoint = <&axi_hdmi_rx>;
++				};
++			};
++		};
++	};
++};
++
++&amba {
++	/* FPGA IP blocks */
++
++	axi_vdma_0: axivdma@43000000 {
++		status = "disabled";
++		compatible = "xlnx,axi-vdma-1.00.a";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		#dma-cells = <1>;
++		#dma-channels = <1>;
++		reg = <0x43000000 0x1000>;
++		dma-ranges = <0x00000000 0x00000000 0x40000000>;
++		xlnx,num-fstores = <3>;
++		xlnx,flush-fsync = <1>;
++		xlnx,addrwidth = <32>;
++		clocks = <&clkc 15>; /* FCLK0 */
++		clock-names = "s_axi_lite_aclk";
++		dma-channel@43000000 {
++			compatible = "xlnx,axi-vdma-mm2s-channel";
++			interrupts = <0 59 0x4>;
++			xlnx,datawidth = <64>;
++			xlnx,genlock-mode = <0x0>;
++			xlnx,include-dre = <0x0>;
++		};
++	};
++
++	axi_hdmi_0: axi_hdmi@70e00000 {
++		status = "disabled";
++		compatible = "adi,axi-hdmi-tx-1.00.a";
++		reg = <0x70e00000 0x10000>;
++		adi,is-rgb;
++		dmas = <&axi_vdma_0 0>;
++		dma-names = "video";
++		clocks = <&clockgen 3>;
++		port {
++			axi_hdmi_out: endpoint {
++				remote-endpoint = <&adv7511_in>;
++			};
++		};
++	};
++
++	axi_spdif_tx_0: axi-spdif-tx@0x75c00000 {
++		status = "disabled";
++		compatible = "adi,axi-spdif-tx-1.00.a";
++		reg = <0x75c00000 0x1000>;
++		dmas = <&dmac_s 0>;
++		dma-names = "tx";
++		clocks = <&clkc 15>, <&clockgen 1>, <&clockgen 1>;
++		clock-names = "axi", "ref", "spdif";
++
++		#sound-dai-cells = <0>;
++	};
++
++	axi_hdmi_rx_core: axi-hdmi-rx@43c10000 {
++		status = "disabled";
++		compatible = "adi,axi-hdmi-rx-1.00.a";
++		reg = <0x43c10000 0x10000>;
++		dmas = <&axi_dmac 0>;
++		dma-names = "rx";
++		gpios = <&gpioexf 3 0>; /* HPD, hotplug control (?) */
++
++		port {
++			#address-cells = <0>;
++			#size-cells = <0>;
++
++			axi_hdmi_rx: endpoint {
++				remote-endpoint = <&adv7611>;
++				bus-width = <24>;
++			};
++		};
++	};
++
++	axi_dmac: dmac@43c00000 {
++		status = "disabled";
++		compatible = "adi,axi-dmac-1.00.a";
++		reg = <0x43c00000 0x10000>;
++		#dma-cells = <1>;
++		interrupts = <0 58 0>;
++		clocks = <&clkc 16>;
++
++		adi,channels {
++			#size-cells = <0>;
++			#address-cells = <1>;
++			dma-channel@0 {
++				reg = <0>;
++				adi,length-width = <14>;
++				adi,source-bus-width = <64>;
++				adi,source-bus-type = <2>;
++				adi,destination-bus-width = <64>;
++				adi,destination-bus-type = <0>;
++				adi,2d;
++			};
++		};
++	};
++
++	axi_vdma_1: axivdma@43010000 {
++		status = "disabled";
++		compatible = "xlnx,axi-vdma-1.00.a";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		#dma-cells = <1>;
++		#dma-channels = <1>;
++		reg = <0x43010000 0x1000>;
++		dma-ranges = <0x00000000 0x00000000 0x40000000>;
++		xlnx,num-fstores = <3>;
++		xlnx,flush-fsync = <1>;
++		xlnx,addrwidth = <32>;
++		clocks = <&clkc 15>; /* FCLK0 */
++		clock-names = "s_axi_lite_aclk";
++		dma-channel@43000000 {
++			compatible = "xlnx,axi-vdma-mm2s-channel";
++			interrupts = <0 55 0x4>;
++			xlnx,datawidth = <64>;
++			xlnx,genlock-mode = <0x0>;
++			xlnx,include-dre = <0x0>;
++		};
++	};
++
++	axi_vdma_vga: axi_vdma_vga@7e000000 {
++		status = "disabled";
++		compatible = "topic,vdma-fb";
++		reg = <0x7e000000 0x10000>;
++		dmas = <&axi_vdma_1 0>;
++		dma-names = "video";
++		num-fstores = <3>;
++		width = <1024>;
++		height = <600>;
++		horizontal-sync = <136>;
++		horizontal-front-porch = <24>;
++		horizontal-back-porch = <160>;
++		horizontal-polarity = <0>;
++		vertical-sync = <8>;
++		vertical-front-porch = <4>;
++		vertical-back-porch = <23>;
++		vertical-polarity = <0>;
++	};
++};
++
++/ {
++	adv7511_hdmi_snd {
++		status = "disabled";
++		compatible = "simple-audio-card";
++		simple-audio-card,name = "HDMI monitor";
++		simple-audio-card,widgets =
++			"Speaker", "Speaker";
++		simple-audio-card,routing =
++			"Speaker", "TX";
++
++		simple-audio-card,dai-link@0 {
++			format = "spdif";
++			cpu {
++				sound-dai = <&axi_spdif_tx_0>;
++				frame-master;
++				bitclock-master;
++			};
++			codec {
++				sound-dai = <&adv7511>;
++			};
++		};
++	};
++};
++
++/* Make it so that the internal display is always fb0 */
++&aliases {
++	display0 = &axi_vdma_vga;
++	display1 = &axi_hdmi_0;
++};
+diff --git a/arch/arm/boot/dts/topic-miami-florida-mio-dyplo.dts b/arch/arm/boot/dts/topic-miami-florida-mio-dyplo.dts
+new file mode 100644
+index 0000000..a94df26
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida-mio-dyplo.dts
+@@ -0,0 +1,4 @@
++/dts-v1/;
++/include/ "topic-miami-florida-mio.dtsi"
++/include/ "topic-miami-florida-gen-mio.dtsi"
++/include/ "topic-dyplo.dtsi"
+diff --git a/arch/arm/boot/dts/topic-miami-florida-mio-nand-dyplo.dts b/arch/arm/boot/dts/topic-miami-florida-mio-nand-dyplo.dts
+new file mode 100644
+index 0000000..d718394
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida-mio-nand-dyplo.dts
+@@ -0,0 +1,5 @@
++/dts-v1/;
++/include/ "topic-miami-florida-mio.dtsi"
++/include/ "topic-miami-florida-gen-mio.dtsi"
++/include/ "topic-miami-nand.dtsi"
++/include/ "topic-dyplo.dtsi"
+diff --git a/arch/arm/boot/dts/topic-miami-florida-mio.dts b/arch/arm/boot/dts/topic-miami-florida-mio.dts
+new file mode 100644
+index 0000000..5cf840f
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida-mio.dts
+@@ -0,0 +1,2 @@
++/dts-v1/;
++/include/ "topic-miami-florida-mio.dtsi"
+diff --git a/arch/arm/boot/dts/topic-miami-florida-mio.dtsi b/arch/arm/boot/dts/topic-miami-florida-mio.dtsi
+new file mode 100644
+index 0000000..c1b8f33
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida-mio.dtsi
+@@ -0,0 +1,143 @@
++/include/ "topic-miami.dtsi"
++
++/* Common components for MIO parts of Florida boards. These are
++ * accessible even without programming any logic. */
++
++/ {
++	/* Regulator for the 5V USB VBUS power line. This is connected
++	 * to the second output of the GPIO expander. */
++	reg_usb0_vbus: regulator_usb {
++		compatible = "regulator-fixed";
++		regulator-name = "usb0-vbus";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		gpio = <&gpioexf 1 0>;
++		enable-active-high;
++	};
++
++	xtal_27Mhz: clock_xtal_27Mhz {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <27000000>;
++	};
++
++	gpio_keys: gpio-keys {
++		compatible = "gpio-keys";
++		#address-cells = <1>;
++		#size-cells = <0>;
++		power {
++			label = "power";
++			gpios = <&gpioexf 2 1>; /* Input 2, active low */
++			linux,code = <116>; /* KEY_POWER */
++			gpio-key,wakeup;
++		};
++	};
++
++	gpio-poweroff {
++		compatible = "gpio-poweroff";
++		gpios = <&gpioexf 5 1>; /* Output 5, active low */
++		input;
++	};
++
++	usb_phy0: phy0 {
++		compatible = "usb-nop-xceiv";
++		#phy-cells = <0>;
++		reset-gpios = <&gpioex 0 1>;
++	};
++};
++
++/* I2C bus layout */
++&i2c0 {
++	i2cmux: i2cswitch@70 {
++		compatible = "nxp,pca9546";
++		#address-cells = <1>;
++		#size-cells = <0>;
++		reg = <0x70>;
++
++		i2cmux_0: i2c@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++			/* Clock generator TI I2C chip, 27MHz . */
++			clockgen: cdce925pw@64 {
++				compatible = "ti,cdce925";
++				reg = <0x64>;
++				clocks = <&xtal_27Mhz>;
++				xtal-load-pf = <5>; /* Crystal load-capacitor value */
++				#clock-cells = <1>;
++				/* PLL options, optional. For example to get SSC 1%
++				 * centered, supply the following extra data:
++				 *PLL2 {
++				 *	spread-spectrum = <4>;
++				 *	spread-spectrum-center;
++				 *};
++				 */
++			};
++		};
++		i2cmux_2: i2c@2 {
++			/* GEN */
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <2>;
++			/* GPIO expander */
++			gpioexf: pca953x@20 {
++				compatible = "nxp,pca9534";
++				reg = <0x20>;
++				/* 0=USB_OTG_OC_N 1=USB_OTG_EN_N 2=n.c. ...*/
++				gpio-controller;
++				#gpio-cells = <2>;
++				interrupt-controller;
++				/* IRQ line connected to MIO 15 */
++				interrupt-parent = <&gpio0>;
++				interrupts = <15 0x8>; /* GPIO 15, IRQ_TYPE_LEVEL_LOW */
++			};
++			/* EEPROM (v3r1 board)*/
++			eepromc: eepromc@50 {
++				compatible = "at24,24c04";
++				reg = <0x50>;
++			};
++			/* Programmable clock */
++			si514: si514@55 {
++				reg = <0x55>;
++				#clock-cells = <0>;
++				compatible = "silabs,si514";
++			};
++		};
++	};
++};
++
++/* USB connected through MIO and GPIO expander */
++&usb0 {
++	status = "okay";
++	vbus-supply = <&reg_usb0_vbus>;
++	dr_mode = "host";
++	usb-phy = <&usb_phy0>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_usb0_default>;
++};
++
++&pinctrl0 {
++	pinctrl_usb0_default: usb0-default {
++		mux {
++			groups = "usb0_0_grp";
++			function = "usb0";
++		};
++
++		conf {
++			groups = "usb0_0_grp";
++			slew-rate = <0>;
++			io-standard = <1>;
++		};
++
++		conf-rx {
++			pins = "MIO29", "MIO31", "MIO36";
++			bias-high-impedance;
++		};
++
++		conf-tx {
++			pins = "MIO28", "MIO30", "MIO32", "MIO33", "MIO34",
++			       "MIO35", "MIO37", "MIO38", "MIO39";
++			bias-disable;
++		};
++	};
++};
+diff --git a/arch/arm/boot/dts/topic-miami-florida-pci-pt.dts b/arch/arm/boot/dts/topic-miami-florida-pci-pt.dts
+new file mode 100644
+index 0000000..84f13a4
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida-pci-pt.dts
+@@ -0,0 +1,3 @@
++/dts-v1/;
++/include/ "topic-miami-florida.dtsi"
++/include/ "topic-dyplo.dtsi"
+diff --git a/arch/arm/boot/dts/topic-miami-florida-pci.dts b/arch/arm/boot/dts/topic-miami-florida-pci.dts
+new file mode 100644
+index 0000000..897b155
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida-pci.dts
+@@ -0,0 +1,12 @@
++/dts-v1/;
++/include/ "topic-miami-florida.dtsi"
++
++/* DTS snippet to add the PCI sender to the kernel configuration. */
++&amba {
++	pcisender@40000000 {
++		compatible = "topic,pcisender";
++		reg = <0x40000000 4096>;
++		interrupt-parent = <&intc>;
++		interrupts = <0 60 0x4>; /* Not used in driver (yet) */
++	};
++};
+diff --git a/arch/arm/boot/dts/topic-miami-florida-test.dts b/arch/arm/boot/dts/topic-miami-florida-test.dts
+new file mode 100644
+index 0000000..ba887a3
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida-test.dts
+@@ -0,0 +1,52 @@
++/dts-v1/;
++/include/ "topic-miami.dtsi"
++/include/ "topic-miami-florida-test.dtsi"
++
++&gpioexf {
++	/* IRQ line connected to MIO 15 */
++	interrupts = <15 0x8>; /* GPIO 15, IRQ_TYPE_LEVEL_LOW */
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_gpio15_default>;
++};
++
++
++/* The test board doesn't have PS JTAG, mux these pins as GPIO instead */
++&gpio0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_gpio0_default>;
++};
++
++&pinctrl0 {
++	pinctrl_gpio0_default: gpio0-default {
++		mux {
++			function = "gpio0";
++			groups =
++				"gpio0_46_grp",	"gpio0_47_grp",	"gpio0_48_grp",
++				"gpio0_49_grp";
++		};
++
++		conf {
++			groups =
++				"gpio0_46_grp",	"gpio0_47_grp",	"gpio0_48_grp",
++				"gpio0_49_grp";
++			slew-rate = <0>;
++			io-standard = <1>;
++			bias-disable;
++		};
++	};
++
++	pinctrl_gpio15_default: gpio15-default {
++		mux {
++			function = "gpio0";
++			groups = "gpio0_15_grp";
++		};
++
++		conf {
++			groups = "gpio0_15_grp";
++			bias-pull-up;
++			bias-high-impedance;
++			io-standard = <1>;
++		};
++	};
++};
++
+diff --git a/arch/arm/boot/dts/topic-miami-florida-test.dtsi b/arch/arm/boot/dts/topic-miami-florida-test.dtsi
+new file mode 100644
+index 0000000..447005c
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida-test.dtsi
+@@ -0,0 +1,125 @@
++/* Periferals on the florida-test board. Can be combined with miami and miamiplus */
++
++/* No ethernet on this board */
++&gem0 {
++	status = "disabled";
++};
++
++
++/ {
++	/* Regulator for the 5V USB VBUS power line. This is connected
++	 * to the second output of the GPIO expander. */
++	reg_usb0_vbus: regulator_usb {
++		compatible = "regulator-fixed";
++		regulator-name = "usb0-vbus";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		gpio = <&gpioexf 1 0>;
++		enable-active-high;
++	};
++
++	gpio-keys {
++		compatible = "gpio-keys";
++		#address-cells = <1>;
++		#size-cells = <0>;
++		power {
++			label = "power";
++			gpios = <&gpioexf 2 1>; /* Input 2, active low */
++			linux,code = <116>; /* KEY_POWER */
++			gpio-key,wakeup;
++		};
++	};
++
++	gpio-poweroff {
++		compatible = "gpio-poweroff";
++		gpios = <&gpioexf 5 1>; /* Output 5, active low */
++		input;
++	};
++};
++
++/* I2C bus layout */
++&i2c0 {
++	/* GPIO expander 3v3 */
++	gpioexf: pca953x@20 {
++		compatible = "nxp,pca9534";
++		reg = <0x20>;
++		/* 0=USB_OTG_OC_N 1=USB_OTG_EN_N 2=n.c. ...*/
++		gpio-controller;
++		#gpio-cells = <2>;
++		interrupt-controller;
++		interrupt-parent = <&gpio0>;
++	};
++
++	/* Programmable clock, to clock-capable pins on FPGA */
++	si514c: si514@carrier {
++		reg = <0x55>;
++		#clock-cells = <0>;
++		compatible = "silabs,si514";
++		clock-output-names = "si514carrier";
++	};
++
++	/* GPIO expanders 1v8 */
++	gpiotst1: pca953x@21 {
++		compatible = "nxp,pca9534";
++		reg = <0x21>;
++		gpio-controller;
++		#gpio-cells = <2>;
++	};
++	gpiotst2: pca953x@22 {
++		compatible = "nxp,pca9534";
++		reg = <0x22>;
++		gpio-controller;
++		#gpio-cells = <2>;
++	};
++	gpiotst3: pca953x@23 {
++		compatible = "nxp,pca9534";
++		reg = <0x23>;
++		gpio-controller;
++		#gpio-cells = <2>;
++	};
++};
++
++/* USB connected through MIO and GPIO expander */
++&usb0 {
++	status = "okay";
++	vbus-supply = <&reg_usb0_vbus>;
++	dr_mode = "otg";
++	/* USB reset connected to output 0 of expander */
++	xlnx,phy-reset-gpio = <&gpioex 0 0>;
++	xlnx,phy-reset-gpio-tristate;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_usb0_default>;
++};
++
++&pinctrl0 {
++	pinctrl_usb0_default: usb0-default {
++		mux {
++			groups = "usb0_0_grp";
++			function = "usb0";
++		};
++
++		conf {
++			groups = "usb0_0_grp";
++			slew-rate = <0>;
++			io-standard = <1>;
++		};
++
++		conf-rx {
++			pins = "MIO29", "MIO31", "MIO36";
++			bias-high-impedance;
++		};
++
++		conf-tx {
++			pins = "MIO28", "MIO30", "MIO32", "MIO33", "MIO34",
++			       "MIO35", "MIO37", "MIO38", "MIO39";
++			bias-disable;
++		};
++	};
++};
++
++/* Fake dependency on clock to force it to run at 100Mhz instead of the
++ * factory preset. */
++&uart0 {
++    assigned-clocks = <&si514c>;
++    assigned-clock-rates = <100000000>;
++};
+diff --git a/arch/arm/boot/dts/topic-miami-florida-xadc-test.dtsi b/arch/arm/boot/dts/topic-miami-florida-xadc-test.dtsi
+new file mode 100644
+index 0000000..aa78879
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida-xadc-test.dtsi
+@@ -0,0 +1,15 @@
++&spi1 {
++	status = "okay";
++	speed-hz = <100000000>;
++	/* DAC */
++	ad5065: ad5065@0 {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		#clock-cells = <1>;
++		compatible = "ad5065";
++		/* SPI Setup */
++		reg = <0>;
++		spi-cpha;
++		spi-max-frequency = <50000000>;
++	};
++};
+diff --git a/arch/arm/boot/dts/topic-miami-florida.dtsi b/arch/arm/boot/dts/topic-miami-florida.dtsi
+new file mode 100644
+index 0000000..ab3e379
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-florida.dtsi
+@@ -0,0 +1,27 @@
++/include/ "topic-miami-florida-mio.dtsi"
++
++/* Common components for ALL florida boards */
++
++/* Ethernet PHY via EMIO. Logic contains a GMII to RGMII conversion, so
++ * the emac should see a GMII interface */
++&gem0 {
++	status = "okay";
++	phy-handle = <&gmiitorgmii>;
++	phy-mode = "gmii";
++
++	gmiitorgmii: gmiitorgmii@8 {
++		compatible = "xlnx,gmii-to-rgmii-1.0";
++		reg = <0x8>;
++		phy-handle = <&phy3>;
++	};
++
++	phy3: phy@3 {
++		/* PHY on the board */
++		device_type = "ethernet-phy";
++		reg = <0x3>;
++		interrupt-parent = <&gpio0>;
++		interrupts = <65 0x8>; /* GPIO 65 (EMIO 11), IRQ_TYPE_LEVEL_LOW */
++		rxc-skew-ps = <1080>; /* Skew RX clock pad by 180 ps */
++		txc-skew-ps = <840>;  /* Skew TX clock pad by -60 ps */
++	};
++};
+diff --git a/arch/arm/boot/dts/topic-miami-nand.dtsi b/arch/arm/boot/dts/topic-miami-nand.dtsi
+new file mode 100644
+index 0000000..a6ae708
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-nand.dtsi
+@@ -0,0 +1,13 @@
++/* Disables the QSPI controller and activates NAND instead. */
++
++&smcc {
++	status = "okay";
++};
++
++&nand0 {
++	status = "okay";
++};
++
++&qspi {
++	status = "disabled"; /* conflicts with NAND pins */
++};
+diff --git a/arch/arm/boot/dts/topic-miami-vice.dts b/arch/arm/boot/dts/topic-miami-vice.dts
+new file mode 100644
+index 0000000..e4cf68d
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami-vice.dts
+@@ -0,0 +1,2 @@
++/dts-v1/;
++/include/ "topic-miami.dtsi"
+diff --git a/arch/arm/boot/dts/topic-miami.dtsi b/arch/arm/boot/dts/topic-miami.dtsi
+new file mode 100644
+index 0000000..f82a55b
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami.dtsi
+@@ -0,0 +1,361 @@
++/include/ "zynq-7000.dtsi"
++
++/* Remove broken I2C driver and replace with bitbang GPIO */
++/delete-node/ &i2c0;
++/delete-node/ &i2c1;
++
++/ {
++	model = "Topic Zynq Miami";
++
++	interrupt-parent = <&intc>;
++
++	/* Arrange that UART0 is ttyPS0 */
++	aliases: aliases {
++		serial0 = &uart0;
++		serial1 = &uart1;
++		ethernet0 = &gem0;
++		mmc0 = &sdhci0;
++		mmc1 = &sdhci1;
++	};
++
++	memory {
++		device_type = "memory";
++		reg = <0x000000000 0x20000000>;
++	};
++
++	chosen {
++		/* Boot using squashfs system, nice for QSPI NOR flash */
++		bootargs = "console=ttyPS0,115200 root=/dev/mtdblock5 ro rootfstype=squashfs rootwait quiet";
++		/* bootargs = "console=ttyPS0,115200 ubi.mtd=qspi-rootfs root=ubi0:qspi-rootfs rw rootfstype=ubifs rootwait"; */
++		linux,stdout-path = "/amba@0/uart@e0000000";
++	};
++
++	/* Represents the 3v3 supply on the Miami SOM. */
++	reg_3v3_miami: regulator_3v3_miami {
++		compatible = "regulator-fixed";
++		regulator-name = "3v3-miami";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++	};
++
++	leds: leds {
++		compatible = "gpio-leds";
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_leds_default>;
++		led_alive: alive {
++			label = "alive:green";
++			gpios = <&gpio0 25 0>;
++			linux,default-trigger = "heartbeat";
++		};
++	};
++
++	i2c0: gpios-i2c@50 {
++		bus-id = <0>;
++		compatible = "i2c-gpio";
++		gpios = <&gpio0 51 0 /* sda */
++			 &gpio0 50 0 /* scl */
++			>;
++		i2c-gpio,delay-us = <3>;	/* 333 kHz (?) */
++		#address-cells = <1>;
++		#size-cells = <0>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_i2c0_default>;
++	};
++
++	i2c1: gpios-i2c@52 {
++		bus-id = <1>;
++		compatible = "i2c-gpio";
++		gpios = <&gpio0 53 0 /* sda */
++			 &gpio0 52 0 /* scl */
++			>;
++		i2c-gpio,delay-us = <3>;	/* 333 kHz (?) */
++		#address-cells = <1>;
++		#size-cells = <0>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_i2c1_default>;
++	};
++};
++
++&amba {
++	/* Dummy QSPI and NAND nodes, these drivers aren't in mainline */
++	qspi: spi@e000d000 {
++		clock-names = "ref_clk", "pclk";
++		clocks = <&clkc 10>, <&clkc 43>;
++		compatible = "xlnx,zynq-qspi-1.0";
++		status = "disabled";
++		interrupt-parent = <&intc>;
++		interrupts = <0 19 4>;
++		reg = <0xe000d000 0x1000>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++	};
++	smcc: memory-controller@e000e000 {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		status = "disabled";
++		clock-names = "memclk", "aclk";
++		clocks = <&clkc 11>, <&clkc 44>;
++		compatible = "arm,pl353-smc-r2p1";
++		interrupt-parent = <&intc>;
++		interrupts = <0 18 4>;
++		ranges ;
++		reg = <0xe000e000 0x1000>;
++		nand0: flash@e1000000 {
++			status = "disabled";
++			compatible = "arm,pl353-nand-r2p1";
++			reg = <0xe1000000 0x1000000>;
++			#address-cells = <0x1>;
++			#size-cells = <0x1>;
++		};
++		nor0: flash@e2000000 {
++			status = "disabled";
++			compatible = "cfi-flash";
++			reg = <0xe2000000 0x2000000>;
++			#address-cells = <1>;
++			#size-cells = <1>;
++		};
++	};
++};
++
++&fpga_full {
++	firmware-name = "fpga.bin";
++};
++
++/* Disable the ARM timer. This clocksource does not compensate for frequency
++   scaling. The TTC timer does this, but has a lower rating so it would not
++   get selected as system clocksource.
++   Alternatives to disabling this clock are setting the source in sysfs or
++   adding clocksource=ttc_clocksource to the kernel bootargs */
++&global_timer {
++	status = "disabled";
++};
++
++&uart0 {
++	status = "okay";
++};
++
++&uart1 {
++	status = "okay";
++};
++
++&sdhci0 {
++	disable-wp; /* We don't have a write-protect detection */
++	status = "okay";
++};
++
++
++&i2c1 {
++	/* AD converter for voltage monitoring */
++	monitorvolt: ad799x@29 {
++		compatible = "ad7999";
++		reg = <0x29>;
++		vcc-supply = <&reg_3v3_miami>;
++		vref-supply = <&reg_3v3_miami>;
++	};
++	/* GPIO expander */
++	gpioex: pca953x@41 {
++		compatible = "nxp,pca9536";
++		reg = <0x41>;
++		/* 0=USB_RESET 1=VTT_SHDWN_N 2=V_PRESENT 3=DEBUG_PRESENT */
++		gpio-controller;
++		#gpio-cells = <2>;
++	};
++	/* Current monitoring chip */
++	monitorcurrent: ltc2990@4C {
++		compatible = "ltc2990";
++		reg = <0x4C>;
++	};
++	/* EEPROM */
++	eeprom: eeprom@50 {
++		compatible = "at24,24c04";
++		reg = <0x50>;
++		#address-cells = <1>;
++		#size-cells = <1>;
++		/* NVMEM entries */
++		miamiserial: serial@1f4 {
++			reg = <0x1f4 4>;
++		};
++		dyplolicense: dyplolicense@1f8 {
++			reg = <0x1f8 8>;
++		};
++	};
++	/* IO Voltage controller */
++	ltc3562: ltc3562@65 {
++		compatible = "lltc,ltc3562";
++		reg = <0x65>; /* 0b1100101 */
++		regulators {
++			R400B_reg: R400B {
++				/* Supplies VCCO2 to bank 34 */
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-boot-on;
++				regulator-always-on;
++				lltc,operating-mode = <1>;
++			};
++			R600B_reg: R600B {
++				/* Supplies VCCO0 to Bank 13 */
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++			/* R400A Not connected */
++			R600A_reg: R600A {
++				/* Supplies VCCO1 to bank 35 */
++				/* We actually want 1v8, but the wiring of
++				 * the regulator is weird so you can only get
++				 * 1768mV */
++				regulator-min-microvolt = <1768000>;
++				regulator-max-microvolt = <1768000>;
++				lltc,fb-voltage-divider = <316 100>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++		};
++	};
++};
++
++&nand0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_smc0_nand_default>;
++
++	/* Micron MT29F2G16ABBFAH4 timings */
++	arm,nand-cycle-t0 = <0x4>;
++	arm,nand-cycle-t1 = <0x4>;
++	arm,nand-cycle-t2 = <0x1>;
++	arm,nand-cycle-t3 = <0x2>;
++	arm,nand-cycle-t4 = <0x2>;
++	arm,nand-cycle-t5 = <0x2>;
++	arm,nand-cycle-t6 = <0x4>;
++
++	#address-cells = <0x1>;
++	#size-cells = <0x1>;
++	partition@nand-all {
++		label = "nand-all";
++		reg = <0x0 0x10000000>; /* 256 MB */
++	};
++	/* to mount as UBI:
++	   ubiattach /dev/ubi_ctrl -m 0
++	   ubimkvol /dev/ubi0 -N nand -m
++	   mkdir /media/nand
++	   mount -t ubifs /dev/ubi0_0 /media/nand
++	 */
++};
++
++&usb0 {
++	dr_mode = "host";
++};
++
++&qspi {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_qspi0_default>;
++	is-dual = <0>;
++	num-cs = <1>;
++	primary_flash: ps7-qspi@0 {
++		compatible = "jedec,spi-nor";
++		/* Max frequency for quad read is 108MHz according to data sheet */
++		spi-max-frequency = <108000000>;
++		spi-tx-bus-width = <1>;
++		spi-rx-bus-width = <4>;
++		#address-cells = <1>;
++		#size-cells = <1>;
++		reg = <0x0>;
++		partition@qspi-u-boot-spl {
++			label = "qspi-u-boot-spl";
++			reg = <0x00000 0x20000>;
++		};
++		partition@qspi-u-boot-img {
++			label = "qspi-u-boot-img";
++			reg = <0x20000 0x60000>;
++		};
++		partition@qspi-u-boot-env {
++			label = "qspi-u-boot-env";
++			reg = <0x80000 0x20000>;
++		};
++		partition@qspi-device-tree {
++			label = "qspi-device-tree";
++			reg = <0xA0000 0x20000>;
++		};
++		partition@qspi-linux {
++			label = "qspi-linux";
++			reg = <0xC0000 0x440000>;
++		};
++		partition@qspi-rootfs {
++			label = "qspi-rootfs";
++			reg = <0x500000 0x1b00000>;
++		};
++		/* Everything */
++		partition@qspi-all {
++			label = "qspi-all";
++			reg = <0x0 0x2000000>;
++		};
++	};
++};
++
++&pinctrl0 {
++	pinctrl_qspi0_default: qspi0_default {
++		mux {
++			groups = "qspi0_0_grp";
++			function = "qspi0";
++		};
++		mux-fbclk {
++			groups = "qspi_fbclk_grp";
++			function = "qspi_fbclk";
++		};
++		conf {
++			groups = "qspi0_0_grp", "qspi_fbclk_grp";
++			slew-rate = <0>;
++			io-standard = <1>;
++			bias-disable;
++		};
++	};
++
++	pinctrl_smc0_nand_default: smc0_nand_default {
++		mux {
++			groups = "smc0_nand_grp";
++			function = "smc0_nand";
++		};
++	};
++
++	pinctrl_leds_default: leds-default {
++		mux {
++			groups = "gpio0_25_grp";
++			function = "gpio0";
++		};
++
++		conf {
++			groups = "gpio0_25_grp";
++			slew-rate = <0>;
++			io-standard = <1>;
++		};
++	};
++
++	pinctrl_i2c0_default: i2c0-default {
++		mux {
++			groups = "gpio0_50_grp", "gpio0_51_grp";
++			function = "gpio0";
++		};
++
++		conf {
++			groups = "gpio0_50_grp", "gpio0_51_grp";
++			bias-pull-up;
++			slew-rate = <0>;
++			io-standard = <1>;
++		};
++	};
++
++	pinctrl_i2c1_default: i2c1-default {
++		mux {
++			groups = "gpio0_52_grp", "gpio0_53_grp";
++			function = "gpio0";
++		};
++
++		conf {
++			groups = "gpio0_52_grp", "gpio0_53_grp";
++			bias-pull-up;
++			slew-rate = <0>;
++			io-standard = <1>;
++		};
++	};
++};
+diff --git a/arch/arm/boot/dts/topic-miamilite-florida-test.dts b/arch/arm/boot/dts/topic-miamilite-florida-test.dts
+new file mode 100644
+index 0000000..fe1e733
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miamilite-florida-test.dts
+@@ -0,0 +1,32 @@
++/dts-v1/;
++/include/ "topic-miami.dtsi"
++/include/ "topic-miamilite.dtsi"
++/include/ "topic-miami-florida-test.dtsi"
++
++&usb0 {
++	xlnx,phy-reset-gpio = <&gpio0 0 0>;
++};
++
++&gpioexf {
++	/* IRQ line connected to MIO 46 */
++	interrupts = <46 0x8>; /* GPIO 46, IRQ_TYPE_LEVEL_LOW */
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_gpio46_default>;
++};
++
++&pinctrl0 {
++	pinctrl_gpio46_default: gpio46-default {
++		mux {
++			function = "gpio0";
++			groups = "gpio0_46_grp";
++		};
++
++		conf {
++			groups = "gpio0_46_grp";
++			bias-pull-up;
++			bias-high-impedance;
++			io-standard = <1>;
++		};
++	};
++};
++
+diff --git a/arch/arm/boot/dts/topic-miamilite.dtsi b/arch/arm/boot/dts/topic-miamilite.dtsi
+new file mode 100644
+index 0000000..8b352dd
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miamilite.dtsi
+@@ -0,0 +1,51 @@
++/* The "lite" version has less I/O pins and less periferals */
++
++/* Remove missing periferals */
++/delete-node/ &monitorcurrent;
++/delete-node/ &monitorvolt;
++/delete-node/ &ltc3562;
++/delete-node/ &gpioex;
++
++/* Alive LED is on MIO9 */
++&led_alive {
++	gpios = <&gpio0 9 1>; /* Active low */
++};
++
++&pinctrl_leds_default {
++	mux {
++		groups = "gpio0_9_grp";
++		function = "gpio0";
++	};
++	conf {
++		groups = "gpio0_9_grp";
++		slew-rate = <0>;
++		io-standard = <1>;
++	};
++};
++
++/* I2C bus 1 using pins 48+49 */
++&i2c1 {
++	gpios = <&gpio0 49 0 /* sda */
++		 &gpio0 48 0 /* scl */
++		>;
++   
++	/* 32Kb EEPROM */
++	eeprom: eeprom@50 {
++		compatible = "at24,24c32";
++		reg = <0x50>;
++	};
++};
++
++&pinctrl_i2c1_default {
++	mux {
++		groups = "gpio0_48_grp", "gpio0_49_grp";
++		function = "gpio0";
++	};
++
++	conf {
++		groups = "gpio0_48_grp", "gpio0_49_grp";
++		bias-pull-up;
++		slew-rate = <0>;
++		io-standard = <1>;
++	};
++};
+diff --git a/arch/arm/boot/dts/topic-miamiplus-florida-test.dts b/arch/arm/boot/dts/topic-miamiplus-florida-test.dts
+new file mode 100644
+index 0000000..43b9177
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miamiplus-florida-test.dts
+@@ -0,0 +1,51 @@
++/dts-v1/;
++/include/ "topic-miami.dtsi"
++/include/ "topic-miamiplus.dtsi"
++/include/ "topic-miami-florida-test.dtsi"
++
++&gpioexf {
++	/* IRQ line connected to MIO 46 */
++	interrupts = <46 0x8>; /* GPIO 46, IRQ_TYPE_LEVEL_LOW */
++};
++
++/* The test board doesn't have ethernet, mux these pins as GPIO instead */
++&gpio0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_gpio0_default>;
++};
++
++&pinctrl0 {
++	pinctrl_gpio0_default: gpio0-default {
++		mux {
++			function = "gpio0";
++			groups =
++				"gpio0_16_grp",	"gpio0_17_grp",	"gpio0_18_grp",
++				"gpio0_19_grp",	"gpio0_20_grp",	"gpio0_21_grp",
++				"gpio0_22_grp",	"gpio0_23_grp",	"gpio0_24_grp",
++				"gpio0_25_grp",	"gpio0_26_grp",	"gpio0_27_grp",
++				"gpio0_52_grp", "gpio0_53_grp";
++		};
++
++		conf {
++			groups =
++				"gpio0_16_grp",	"gpio0_17_grp",	"gpio0_18_grp",
++				"gpio0_19_grp",	"gpio0_20_grp",	"gpio0_21_grp",
++				"gpio0_22_grp",	"gpio0_23_grp",	"gpio0_24_grp",
++				"gpio0_25_grp",	"gpio0_26_grp",	"gpio0_27_grp",
++				"gpio0_52_grp", "gpio0_53_grp";
++			slew-rate = <0>;
++			io-standard = <1>;
++		};
++
++		conf-pull-none {
++			pins = "MIO52", "MIO53";
++			bias-disable;
++		};
++	};
++};
++
++/* Fake dependency on clock to force it to run at some frequency we'd like to see */
++&uart0 {
++	assigned-clock-rates = <103125000>;
++};
++
+diff --git a/arch/arm/boot/dts/topic-miamiplus.dtsi b/arch/arm/boot/dts/topic-miamiplus.dtsi
+new file mode 100644
+index 0000000..c63b302
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miamiplus.dtsi
+@@ -0,0 +1,97 @@
++/* the "plus" version has much more I/O pins, but lacks some periferals,
++ * and the NAND was replaced by a dual-QSPI NOR setup. */
++
++/* The miamiplus contains a speedgrade-2 device and runs at 800MHz */
++&cpu0 {
++	operating-points = <
++		/* kHz    uV */
++		800000  1000000
++		400000  1000000
++	>;
++};
++
++/* Remove missing periferals */
++/delete-node/ &monitorcurrent;
++/delete-node/ &ltc3562;
++
++/* Different voltage monitoring IC */
++&monitorvolt {
++	compatible = "ad7997";
++	reg = <0x21>;
++	/* TODO: gpios */
++};
++
++/* Dual QSPI configuration */
++&qspi {
++	is-dual = <1>;
++};
++
++/* Dual flash, also double the capacity so adjust rootfs and "all" partitions */
++&primary_flash {
++	partition@qspi-rootfs {
++		label = "qspi-rootfs";
++		reg = <0x500000 0x3b00000>;
++	};
++	partition@qspi-all {
++		label = "qspi-all";
++		reg = <0x0 0x4000000>;
++	};
++};
++
++/* The plus SOMs have a programmable clock for the high-speed tranceivers */
++&i2c1 {
++	si514s: si514@55 {
++		reg = <0x55>;
++		#clock-cells = <0>;
++		compatible = "silabs,si514";
++		clock-output-names = "si514miami";
++	};
++	max31760: max31760@57 {
++		reg = <0x57>; /* Address pins "111" hence address 1010111b */
++		compatible = "maxim,max31760";
++	};
++};
++
++/* Extra user board LED on GPIO expander */
++&leds {
++	led_user2: user2 {
++		label = "user2:green";
++		gpios = <&gpioex 3 0>;
++	};
++};
++/* Alive LED is on MIO7 instead of 25 */
++&led_alive {
++	gpios = <&gpio0 7 0>;
++};
++&pinctrl_leds_default {
++	mux {
++		groups = "gpio0_7_grp";
++		function = "gpio0";
++	};
++	conf {
++		groups = "gpio0_7_grp";
++		slew-rate = <0>;
++		io-standard = <1>;
++	};
++};
++
++/* I2C bus 1 using pins 48+49 */
++&i2c1 {
++	gpios = <&gpio0 49 0 /* sda */
++		 &gpio0 48 0 /* scl */
++		>;
++};
++
++&pinctrl_i2c1_default {
++	mux {
++		groups = "gpio0_48_grp", "gpio0_49_grp";
++		function = "gpio0";
++	};
++
++	conf {
++		groups = "gpio0_48_grp", "gpio0_49_grp";
++		bias-pull-up;
++		slew-rate = <0>;
++		io-standard = <1>;
++	};
++};
+-- 
+1.9.1
+
