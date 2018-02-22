@@ -1,10 +1,10 @@
 DESCRIPTION = "Mainline Linux Zynq kernel for Topic boards"
 SECTION = "kernel"
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
+LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
-SRCREV = "d8a5b80568a9cb66810e75b182018e9edb68e8ff"
-LINUX_VERSION = "4.15"
+SRCREV = "29dcea88779c856c7dc92040a0c01233263101d4"
+LINUX_VERSION = "4.17"
 
 inherit kernel
 require recipes-kernel/linux/linux-dtb.inc
@@ -19,7 +19,6 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/linux-mainline:"
 EXTRA_PATCHES = "\
 	file://0001-regulator-Add-ltc3562-voltage-regulator-driver.patch \
 	file://0001-Add-topic-miami-devicetrees.patch \
-	file://0001-usb-phy-generic-Use-gpiod_set_value_cansleep.patch \
 	"
 SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git \
 	file://defconfig \
