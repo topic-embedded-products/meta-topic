@@ -1,7 +1,7 @@
 From db392374968ecc28da8a2e2d25bd3e2075d66d34 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 23 Feb 2017 12:07:49 +0100
-Subject: [PATCH 06/13] ARM: zynq: Add support for the topic-miamilite
+Subject: [PATCH 06/14] ARM: zynq: Add support for the topic-miamilite
  system-on-module
 
 The topic-miamilite SoM contains a Zynq xc7z010 SoC, 1GB DDR3L RAM,

@@ -28,6 +28,7 @@ SRC_URI_append = "\
 	file://0011-topic_miamimp-Quietly-boot-kernel-and-skip-bootdelay.patch \
 	file://0012-board-topic_miamilite-Support-cost-reduced-version.patch \
 	file://0013-configs-topic_miami.h-Use-same-partitioning-for-USB-.patch \
+	file://0014-board-topic-miamiplus-Run-IO-PLL-at-1000-MHz.patch \
 	"
 
 do_compile_zynqmp[depends] += "zynqmp-pmu-pmu-firmware:do_deploy"

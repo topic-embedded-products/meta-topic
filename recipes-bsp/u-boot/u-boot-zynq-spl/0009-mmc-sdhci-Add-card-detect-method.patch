@@ -1,7 +1,7 @@
 From 88e008fec6cff09e4a6ae604f9da2cf062ad5c94 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 25 Aug 2017 14:37:20 +0200
-Subject: [PATCH 09/13] mmc/sdhci: Add card detect method
+Subject: [PATCH 09/14] mmc/sdhci: Add card detect method
 
 Detect whether a card is detected. This prevents probing problems
 when no card is in the reader. The board apparently reports "present"
