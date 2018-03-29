@@ -1,4 +1,4 @@
-From ac798e3725d1cb324966c412ed95c1d31fa1f855 Mon Sep 17 00:00:00 2001
+From 89a8ab0e0e52ab4a2e54cab15853b4fcfbc29a1c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 26 Sep 2017 13:51:21 +0200
 Subject: [PATCH 10/14] topic-miamimp: Support "final" silicon

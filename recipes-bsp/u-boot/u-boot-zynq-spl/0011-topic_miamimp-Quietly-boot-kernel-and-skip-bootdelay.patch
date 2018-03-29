@@ -1,4 +1,4 @@
-From 311d44847f2e2f3aee33590413f8bb313f206cb0 Mon Sep 17 00:00:00 2001
+From 5a93d9c2db0bcd07741c4e20aff128a91e95b28a Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 9 Oct 2017 08:27:59 +0200
 Subject: [PATCH 11/14] topic_miamimp: Quietly boot kernel and skip bootdelay

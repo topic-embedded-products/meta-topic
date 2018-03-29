@@ -1,4 +1,4 @@
-From 88e008fec6cff09e4a6ae604f9da2cf062ad5c94 Mon Sep 17 00:00:00 2001
+From 2ca361efaa7ad8735140676e2a7e1a3401347117 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 25 Aug 2017 14:37:20 +0200
 Subject: [PATCH 09/14] mmc/sdhci: Add card detect method
@@ -6,13 +6,16 @@ Subject: [PATCH 09/14] mmc/sdhci: Add card detect method
 Detect whether a card is detected. This prevents probing problems
 when no card is in the reader. The board apparently reports "present"
 for the non-removable device as well, so we can get away with that.
-Proper CD would look at the "non-removable" boolean in the devicetree.
+
+With "non-removable" in the devicetree there is no card detect. Pass
+this information on as a quirk and use it in the sdhci driver.
 ---
- drivers/mmc/sdhci.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ drivers/mmc/sdhci.c      | 13 +++++++++++++
+ drivers/mmc/zynq_sdhci.c |  3 +++
+ 2 files changed, 16 insertions(+)
 
 diff --git a/drivers/mmc/sdhci.c b/drivers/mmc/sdhci.c
-index a91a31d..4e62d28 100644
+index a91a31d..0218e5b 100644
 --- a/drivers/mmc/sdhci.c
 +++ b/drivers/mmc/sdhci.c
 @@ -687,6 +687,17 @@ static int sdhci_init(struct mmc *mmc)
@@ -21,13 +24,13 @@ index a91a31d..4e62d28 100644
  
 +static int sdhci_get_cd(struct udevice *dev)
 +{
-+	int ret;
 +	struct mmc *mmc = mmc_get_mmc_dev(dev);
 +	struct sdhci_host *host = mmc->priv;
 +
-+	ret = !!(sdhci_readl(host, SDHCI_PRESENT_STATE) & SDHCI_CARD_PRESENT);
++	if (host->quirks & SDHCI_QUIRK_NO_CD)
++		return -ENOSYS;
 +
-+	return ret;
++	return !!(sdhci_readl(host, SDHCI_PRESENT_STATE) & SDHCI_CARD_PRESENT);
 +}
 +
  #ifdef CONFIG_DM_MMC_OPS
@@ -49,6 +52,20 @@ index a91a31d..4e62d28 100644
  };
  #endif
  
+diff --git a/drivers/mmc/zynq_sdhci.c b/drivers/mmc/zynq_sdhci.c
+index 454d3cb..ffb28b5 100644
+--- a/drivers/mmc/zynq_sdhci.c
++++ b/drivers/mmc/zynq_sdhci.c
+@@ -184,6 +184,9 @@ static int arasan_sdhci_probe(struct udevice *dev)
+ 		       SDHCI_QUIRK_BROKEN_R1B |
+ 		       SDHCI_QUIRK_USE_ACMD12;
+ 
++	if (fdtdec_get_bool(gd->fdt_blob, dev->of_offset, "non-removable"))
++		host->quirks |= SDHCI_QUIRK_NO_CD;
++
+ #ifdef CONFIG_ZYNQ_HISPD_BROKEN
+ 	host->quirks |= SDHCI_QUIRK_NO_HISPD_BIT;
+ #endif
 -- 
 1.9.1
 

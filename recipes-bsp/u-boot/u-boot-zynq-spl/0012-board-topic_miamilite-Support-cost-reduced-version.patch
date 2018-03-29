@@ -1,4 +1,4 @@
-From 1e7e82a62e8a158b7dd6f38e8f00a28f75a26fc6 Mon Sep 17 00:00:00 2001
+From 7b051f837cfe468b10777b54150e467594adf805 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 18 Oct 2017 14:32:28 +0200
 Subject: [PATCH 12/14] board: topic_miamilite: Support cost-reduced version

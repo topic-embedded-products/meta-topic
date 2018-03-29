@@ -1,4 +1,4 @@
-From 048e4dd9589e9b503f36fb9ba04bbb6e342fdc87 Mon Sep 17 00:00:00 2001
+From 6c3813411860e60aced6e5db7fbc57c0b4ce8969 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 20 Oct 2017 13:01:54 +0200
 Subject: [PATCH 13/14] configs/topic_miami.h: Use same partitioning for USB
