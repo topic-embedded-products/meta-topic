@@ -15,7 +15,7 @@ KERNEL_IMAGETYPE = "uImage"
 MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
 
 # Specify machine features
-MACHINE_FEATURES = "vfat"
+MACHINE_FEATURES = "vfat fpgamgr"
 
 # Specify rootfs image filesystem types
 IMAGE_FSTYPES = "tar.gz"
