@@ -15,7 +15,6 @@ MY_THINGS = "\
 	${@bb.utils.contains('VIRTUAL-RUNTIME_dev_manager', 'busybox-mdev', 'modutils-loadscript', '', d)} \
 	${@bb.utils.contains("IMAGE_FSTYPES", "ubi", "mtd-utils-ubifs" , "", d)} \
 	alsa-utils-aplay alsa-utils-speakertest alsa-utils-amixer alsa-utils-alsactl \
-	i2c-tools \
 	udhcpd-iface-config \
 	"
 
