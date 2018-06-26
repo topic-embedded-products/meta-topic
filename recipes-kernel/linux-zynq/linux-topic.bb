@@ -58,7 +58,7 @@ KERNEL_IMAGEDEST = "tmp/boot"
 
 KERNEL_EXTRA_ARGS_topic-miamimp = ""
 
-FILES_kernel-image = "${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}*"
+FILES_${KERNEL_PACKAGE_NAME}-image = "${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}*"
 
 LINUX_VERSION_EXTENSION ?= "-topic"
 
@@ -68,7 +68,7 @@ COMPATIBLE_MACHINE = "topic-miami"
 
 KERNEL_FLASH_DEVICE = "/dev/mtd4"
 
-pkg_postinst_kernel-image () {
+pkg_postinst_${KERNEL_PACKAGE_NAME}-image () {
 	if [ "x$D" == "x" ]; then
 		if [ -f /${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ] ; then
 			if grep -q "ubi0:qspi-rootfs" /proc/mounts
