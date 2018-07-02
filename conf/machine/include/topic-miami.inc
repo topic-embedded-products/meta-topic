@@ -12,7 +12,6 @@ SOM_FAMILY = "topic-miami"
 # All software packages run on the ARM part, hence strip of the FPGA type from
 # the machine same in order to create the MACHINE_ARCH.
 MACHINE_BOARD := "${@'-'.join(d.getVar('MACHINE', True).split('-')[:-1])}"
-MACHINE_ARCH = "${@d.getVar('MACHINE_BOARD', True).replace('-','_')}"
 # The kernel also only depends on the board, not the FPGA
 KMACHINE = "${MACHINE_BOARD}"
 
