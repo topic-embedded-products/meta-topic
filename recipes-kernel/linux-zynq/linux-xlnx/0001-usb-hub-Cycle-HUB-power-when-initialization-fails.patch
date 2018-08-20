@@ -1,7 +1,7 @@
 From ef4845058717a28804c8a79d7c947cddd40e9255 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 9 Nov 2017 13:16:46 +0100
-Subject: [PATCH 01/11] usb: hub: Cycle HUB power when initialization fails
+Subject: [PATCH 01/15] usb: hub: Cycle HUB power when initialization fails
 
 Sometimes the USB device gets confused about the state of the initialization and
 the connection fails. In particular, the device thinks that it's already set up

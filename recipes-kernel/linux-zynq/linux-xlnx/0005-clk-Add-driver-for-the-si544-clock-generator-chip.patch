@@ -1,7 +1,7 @@
 From c31e6b4008d6246fb4c9fa92a24533156d417a3a Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 20 Mar 2018 09:15:41 +0100
-Subject: [PATCH 05/11] clk: Add driver for the si544 clock generator chip
+Subject: [PATCH 05/15] clk: Add driver for the si544 clock generator chip
 
 This patch adds the driver and devicetree documentation for the
 Silicon Labs SI544 clock generator chip. This is an I2C controlled

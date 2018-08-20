@@ -1,7 +1,7 @@
 From 5f2059fa8c3bfdb7b386d119b564a479d36d3fbf Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 14 Jun 2018 12:58:38 +0200
-Subject: [PATCH 09/11] Add ltc3562 voltage regulator driver
+Subject: [PATCH 09/15] Add ltc3562 voltage regulator driver
 
 The ltc3562 is an I2C controlled regulator supporting 4 independent
 outputs.

@@ -1,7 +1,7 @@
-From 28f1d926947a4cb992c18ef0376c24dde847410d Mon Sep 17 00:00:00 2001
+From e996ad56d10352e0032545ad603a5caea1787529 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 14 Jun 2018 13:19:00 +0200
-Subject: [PATCH 11/11] Add topic-miami devicetrees
+Subject: [PATCH 15/15] Add topic-miami devicetrees
 
 Just a copy from the topic-miami branch contents, not actually added to Makefile
 
