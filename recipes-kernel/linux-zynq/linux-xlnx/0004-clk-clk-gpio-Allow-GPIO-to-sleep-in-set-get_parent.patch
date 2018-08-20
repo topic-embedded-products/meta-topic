@@ -1,7 +1,7 @@
 From f33cde9e26bd9c8e5537364159c564bc61ec756f Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 13 Mar 2018 09:54:03 +0100
-Subject: [PATCH 04/11] clk: clk-gpio: Allow GPIO to sleep in set/get_parent
+Subject: [PATCH 04/15] clk: clk-gpio: Allow GPIO to sleep in set/get_parent
 
 When changing or retrieving clock parents, the caller is in a sleepable
 state (like prepare) so the GPIO operation need not be atomic. Replace

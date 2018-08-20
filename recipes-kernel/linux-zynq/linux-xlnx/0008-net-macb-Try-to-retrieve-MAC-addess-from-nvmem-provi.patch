@@ -1,7 +1,7 @@
 From 0cc580a7b4ffb026c13538b10e3ae919e7cfb131 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 29 Mar 2018 07:29:49 +0200
-Subject: [PATCH 08/11] net: macb: Try to retrieve MAC addess from nvmem
+Subject: [PATCH 08/15] net: macb: Try to retrieve MAC addess from nvmem
  provider
 
 Call of_get_nvmem_mac_address() to fetch the MAC address from an nvmem

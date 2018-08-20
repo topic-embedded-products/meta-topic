@@ -1,7 +1,7 @@
 From 00a635053969ae1d2dbed1de056b0bb799191dec Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 29 Mar 2018 07:29:48 +0200
-Subject: [PATCH 07/11] of_net: Implement of_get_nvmem_mac_address helper
+Subject: [PATCH 07/15] of_net: Implement of_get_nvmem_mac_address helper
 
 It's common practice to store MAC addresses for network interfaces into
 nvmem devices. However the code to actually do this in the kernel lacks,

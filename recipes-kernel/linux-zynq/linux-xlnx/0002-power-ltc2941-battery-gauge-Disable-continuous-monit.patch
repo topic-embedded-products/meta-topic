@@ -1,7 +1,7 @@
 From 05dae694f52e80e4e28c9386728fc326db316104 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 23 Nov 2017 15:41:05 +0100
-Subject: [PATCH 02/11] power: ltc2941-battery-gauge: Disable continuous
+Subject: [PATCH 02/15] power: ltc2941-battery-gauge: Disable continuous
  monitoring on shutdown
 
 The driver sets the fuel gauge to continuous monitoring on startup, for

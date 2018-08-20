@@ -1,7 +1,7 @@
 From 99af8ccc9e83fb104617f99378015a515f42140c Mon Sep 17 00:00:00 2001
 From: John Greb <h3x4m3r0n@gmail.com>
 Date: Sun, 6 May 2018 20:01:57 +0000
-Subject: [PATCH 10/11] USB: Gadget Ethernet: Re-enable Jumbo frames.
+Subject: [PATCH 10/15] USB: Gadget Ethernet: Re-enable Jumbo frames.
 
 Fixes: <b3e3893e1253> ("net: use core MTU range checking")
 which patched only one of two functions used to setup the
