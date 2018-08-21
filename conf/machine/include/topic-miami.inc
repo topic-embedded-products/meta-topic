@@ -28,7 +28,15 @@ PACKAGE_EXTRA_ARCHS_append = " ${FPGA_FAMILY_ARCH}"
 
 PREFERRED_PROVIDER_virtual/xilinx-sdk = "miami-xilinx-sdk"
 
+# u-boot configuration
 UBOOT_MACHINE = "topic_miami_config"
+UBOOT_SUFFIX = "img"
+SPL_BINARY = "spl/boot.bin"
+SPL_SYMLINK = "BOOT.bin"
+HAS_PLATFORM_INIT_append = "\
+	topic_miami_config \
+	topic_miamilite_config \
+	topic_miamiplus_config"
 
 KERNEL_MODULE_AUTOLOAD ?= ""
 KERNEL_MODULE_AUTOLOAD += "macb g_ether spi-cadence"

@@ -1,7 +1,3 @@
-# We need the v2017.3 version of the PMU firmware. Silently "upgrade".
-LIC_FILES_CHKSUM = "file://../../../../license.txt;md5=530190e8d7ebcdfeddbe396f3f20417f"
-XILINX_RELEASE_VERSION = "v2017.3"
-SRCREV = "45c989dc5b56a0449d5102fdefbabca626860e19"
 
 # build the "config" object into the PMU binary
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
