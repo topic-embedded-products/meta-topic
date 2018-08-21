@@ -9,6 +9,7 @@ SRC_URI_append = "\
 	file://0006-board-topic_miamilite-Support-cost-reduced-version.patch \
 	file://0007-configs-topic_miami.h-Use-same-partitioning-for-USB-.patch \
 	file://0008-board-topic-miamiplus-Run-IO-PLL-at-1000-MHz.patch \
+	file://0009-miamimp-Load-FPGA-bitstream-at-boot.patch \
 	"
 
 # Build the PMU firmware into boot.bin

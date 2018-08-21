@@ -1,7 +1,7 @@
-From 67f228ac8c97956dbbe33976e2c0d0623b52b37a Mon Sep 17 00:00:00 2001
+From 755d343f897339508ae833938db9e223c115d8a4 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 9 Mar 2018 07:51:12 +0100
-Subject: [PATCH 8/8] board: topic-miamiplus: Run IO PLL at 1000 MHz
+Subject: [PATCH 8/9] board: topic-miamiplus: Run IO PLL at 1000 MHz
 
 The miamiplus can use GEM0 through MIO pins, which requires a 125 MHz TX
 clock to be generated. With the IO PLL at 1200 MHz this isn't possible, so

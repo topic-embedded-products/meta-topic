@@ -1,7 +1,7 @@
-From 9c1050672785a3d889e0b6889bb8b26ae7de24f6 Mon Sep 17 00:00:00 2001
+From 637f8efecd20f82cc121b920ae09190814c9c172 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 23 Feb 2017 12:07:49 +0100
-Subject: [PATCH 6/8] board: topic_miamilite: Support cost-reduced version
+Subject: [PATCH 6/9] board: topic_miamilite: Support cost-reduced version
 
 To reduce board cost, the topic-miamilite board hardware was adapted. It now
 only has single QSPI NOR flash and a single DDR RAM chip. This reduces the

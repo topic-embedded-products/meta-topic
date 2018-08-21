@@ -1,7 +1,7 @@
 From f0d5f91d82de8b49e1f345505214960289fd85d8 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 25 Jul 2016 13:25:30 +0200
-Subject: [PATCH 1/8] zynqmp: Boot from SD card if SPI is not supported
+Subject: [PATCH 1/9] zynqmp: Boot from SD card if SPI is not supported
 
 QSPI support for all Zynq devices in SPL is still broken. Fall through to
 SD card booting to at least speed up the boot a bit.

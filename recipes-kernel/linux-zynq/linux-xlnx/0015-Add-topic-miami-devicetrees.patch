@@ -1,4 +1,4 @@
-From e996ad56d10352e0032545ad603a5caea1787529 Mon Sep 17 00:00:00 2001
+From 216f46d4fec5d4b51d982b4d4b30dd8414f5f16b Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 14 Jun 2018 13:19:00 +0200
 Subject: [PATCH 15/15] Add topic-miami devicetrees
@@ -7,6 +7,9 @@ Just a copy from the topic-miami branch contents, not actually added to Makefile
 
 Changes:
 Add USB PHY
+MP: Rename "clkc" to "clk", fix pinmux for sdio0, disable FPGA load, USB PHY, USB otg, QSPI size
+
+Add topic_miamimp_defconfig (created using "bitbake -c savedefconfig virtual/kernel")
 ---
  arch/arm/boot/dts/topic-dyplo.dtsi                 |  12 +
  arch/arm/boot/dts/topic-miami-dyplo-acp.dts        |  11 +
@@ -35,9 +38,10 @@ Add USB PHY
  arch/arm/boot/dts/topic-miamiplus-florida-test.dts |  51 +++
  arch/arm/boot/dts/topic-miamiplus.dtsi             |  97 ++++
  .../xilinx/zynqmp-topic-miamimp-florida-gen.dts    | 487 +++++++++++++++++++++
- .../xilinx/zynqmp-topic-miamimp-florida-test.dts   | 191 ++++++++
- .../arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts | 356 +++++++++++++++
- 29 files changed, 2356 insertions(+)
+ .../xilinx/zynqmp-topic-miamimp-florida-test.dts   | 188 ++++++++
+ .../arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts | 382 ++++++++++++++++
+ arch/arm64/configs/topic_miamimp_defconfig         | 399 +++++++++++++++++
+ 30 files changed, 2778 insertions(+)
  create mode 100644 arch/arm/boot/dts/topic-dyplo.dtsi
  create mode 100644 arch/arm/boot/dts/topic-miami-dyplo-acp.dts
  create mode 100644 arch/arm/boot/dts/topic-miami-dyplo.dts
@@ -67,6 +71,7 @@ Add USB PHY
  create mode 100644 arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
  create mode 100644 arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-test.dts
  create mode 100644 arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
+ create mode 100644 arch/arm64/configs/topic_miamimp_defconfig
 
 diff --git a/arch/arm/boot/dts/topic-dyplo.dtsi b/arch/arm/boot/dts/topic-dyplo.dtsi
 new file mode 100644
@@ -1548,7 +1553,7 @@ index 0000000..c63b302
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
 new file mode 100644
-index 0000000..b0a312f
+index 0000000..762475e
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
 @@ -0,0 +1,487 @@
@@ -1566,8 +1571,6 @@ index 0000000..b0a312f
 +
 +#include "zynqmp-topic-miamimp.dts"
 +
-+/* Common components for MIO parts of Florida boards. These are
-+ * accessible even without programming any logic. */
 +/ {
 +	/* Regulator for the 5V USB VBUS power line. This is connected
 +	 * to the second output of the GPIO expander. */
@@ -1578,7 +1581,7 @@ index 0000000..b0a312f
 +		regulator-max-microvolt = <5000000>;
 +		gpio = <&gpioexf 1 0>;
 +		enable-active-high;
-+		regulator-always-on; /* USB host mode */
++		regulator-always-on; /* for USB host mode, "vbus" no longer works? */
 +	};
 +
 +	xtal_27Mhz: clock_xtal_27Mhz {
@@ -1664,12 +1667,6 @@ index 0000000..b0a312f
 +
 +&uart1 {
 +	status = "okay";
-+};
-+
-+&dwc3_0 {
-+	status = "okay";
-+	dr_mode = "host"; /* "host", "peripheral" or "otg" */
-+	maximum-speed = "high-speed"; /* super-speed not available on carrier */
 +};
 +
 +&sata {
@@ -1759,7 +1756,9 @@ index 0000000..b0a312f
 +			gpioexf: pca953x@20 {
 +				compatible = "nxp,pca9534";
 +				reg = <0x20>;
-+				/* 0=USB_OTG_OC_N 1=USB_OTG_EN_N 2=n.c. ...*/
++				vcc-supply = <&reg_3v3_miami>;
++				gpio-line-names = "USB_OTG_OC_N", "USB_OTG_EN_N", "POWER_BTN", "HDMI_IN_HPD",
++					"", "POWER_KILL_N", "MAIN_POWER", "";
 +				gpio-controller;
 +				#gpio-cells = <2>;
 +				interrupt-controller;
@@ -1841,11 +1840,9 @@ index 0000000..b0a312f
 +	status = "okay";
 +	phy-handle = <&gmiitorgmii>;
 +	phy-mode = "gmii";
-+	gmiitorgmii: gmiitorgmii@8 {
-+		compatible = "xlnx,gmii-to-rgmii-1.0";
-+		reg = <8>;
-+		phy-handle = <&phy3>;
-+	};
++	/* gem3 is the eth0 controller, hence we'll use the "0" mac for that */
++	nvmem-cells = <&gem0_mac>;
++	nvmem-cell-names = "mac-address";
 +	phy3: phy@3 {
 +		device_type = "ethernet-phy";
 +		reg = <3>;
@@ -1854,18 +1851,26 @@ index 0000000..b0a312f
 +		rxc-skew-ps = <1080>; /* Skew RX clock pad by 180 ps */
 +		txc-skew-ps = <840>;  /* Skew TX clock pad by -60 ps */
 +	};
++	gmiitorgmii: gmiitorgmii@8 {
++		compatible = "xlnx,gmii-to-rgmii-1.0";
++		reg = <8>;
++		phy-handle = <&phy3>;
++	};
 +};
 +
 +/* USB connected through MIO and GPIO expander */
 +&usb0 {
 +	status = "okay";
-+	vbus-supply = <&reg_usb0_vbus>;
-+	dr_mode = "host"; /* "host", "peripheral" or "otg" */
++	vbus-supply = <&reg_usb0_vbus>; /* This apparently no longer works */
++	dr_mode = "otg"; /* "host", "peripheral" or "otg" */
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_usb0_default>;
-+	/* USB reset connected to output 0 of expander */
-+	xlnx,phy-reset-gpio = <&gpioex 0 0>;
-+	xlnx,phy-reset-gpio-tristate;
++	usb-phy = <&usb_phy0>;
++};
++&dwc3_0 {
++	status = "okay";
++	dr_mode = "host"; /* "host", "peripheral" or "otg" */
++	maximum-speed = "high-speed"; /* super-speed not available on carrier */
 +};
 +
 +/* FPGA content (reference design) */
@@ -1878,7 +1883,7 @@ index 0000000..b0a312f
 +		#dma-cells = <1>;
 +		#dma-channels = <1>;
 +		clock-names = "s_axi_lite_aclk", "m_axi_mm2s_aclk", "m_axi_mm2s_aclk";
-+		clocks = <&clkc 71>, <&clkc 72>, <&clkc 72>; /* fclk0 and fclk1 */
++		clocks = <&clk 71>, <&clk 72>, <&clk 72>; /* fclk0 and fclk1 */
 +		interrupt-parent = <&gic>;
 +		interrupts = <0 89 4>;
 +		dma-ranges = <0x00000000 0x00000000 0x80000000>;
@@ -1913,7 +1918,7 @@ index 0000000..b0a312f
 +		reg = <0x0 0xa00f0000 0x0 0x1000>;
 +		/* TODO:  dmas = <&dmac_s 0>; */
 +		dma-names = "tx";
-+		clocks = <&clkc 71>, <&clockgen 1>, <&clockgen 1>;
++		clocks = <&clk 71>, <&clockgen 1>, <&clockgen 1>;
 +		clock-names = "axi", "ref", "spdif";
 +
 +		#sound-dai-cells = <0>;
@@ -1944,7 +1949,7 @@ index 0000000..b0a312f
 +		#dma-cells = <1>;
 +		interrupt-parent = <&gic>;
 +		interrupts = <0 90 4>; /* pl_ps_0[1] */
-+		clocks = <&clkc 71>; /* fclk0 */
++		clocks = <&clk 71>; /* fclk0 */
 +
 +		adi,channels {
 +			#size-cells = <0>;
@@ -2041,10 +2046,10 @@ index 0000000..b0a312f
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-test.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-test.dts
 new file mode 100644
-index 0000000..2c50145
+index 0000000..d8bcf37
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-test.dts
-@@ -0,0 +1,191 @@
+@@ -0,0 +1,188 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -2122,12 +2127,6 @@ index 0000000..2c50145
 +	status = "okay";
 +};
 +
-+&dwc3_0 {
-+	status = "okay";
-+	dr_mode = "host"; /* "host", "peripheral" or "otg" */
-+	maximum-speed = "high-speed"; /* super-speed not available on carrier */
-+};
-+
 +/* I2C bus layout */
 +&i2c0 {
 +	/* GPIO expander 3v3 */
@@ -2173,13 +2172,16 @@ index 0000000..2c50145
 +/* USB connected through MIO and GPIO expander */
 +&usb0 {
 +	status = "okay";
-+	vbus-supply = <&reg_usb0_vbus>;
-+	dr_mode = "host"; /* "host", "peripheral" or "otg" */
++	vbus-supply = <&reg_usb0_vbus>; /* This apparently no longer works */
++	dr_mode = "otg"; /* "host", "peripheral" or "otg" */
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_usb0_default>;
-+	/* USB reset connected to output 0 of expander */
-+	xlnx,phy-reset-gpio = <&gpioex 0 0>;
-+	xlnx,phy-reset-gpio-tristate;
++	usb-phy = <&usb_phy0>;
++};
++&dwc3_0 {
++	status = "okay";
++	dr_mode = "host"; /* "host", "peripheral" or "otg" */
++	maximum-speed = "high-speed"; /* super-speed not available on carrier */
 +};
 +
 +&pinctrl0 {
@@ -2238,10 +2240,10 @@ index 0000000..2c50145
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
 new file mode 100644
-index 0000000..f0226b4
+index 0000000..b60e749
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
-@@ -0,0 +1,356 @@
+@@ -0,0 +1,382 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -2258,6 +2260,7 @@ index 0000000..f0226b4
 +
 +#include "zynqmp.dtsi"
 +#include "zynqmp-clk-ccf.dtsi"
++#include <dt-bindings/input/input.h>
 +#include <dt-bindings/gpio/gpio.h>
 +#include <dt-bindings/pinctrl/pinctrl-zynqmp.h>
 +#include <dt-bindings/phy/phy.h>
@@ -2311,15 +2314,27 @@ index 0000000..f0226b4
 +		};
 +	};
 +
++	/* USB PHY reset IO pin. Carrier board's USB PHY can use this. */
++	usb_phy0: phy0 {
++		compatible = "usb-nop-xceiv";
++		#phy-cells = <0>;
++		reset-gpios = <&gpioex 0 0>;
++	};
++
 +	/* Full FPGA image */
-+        fpga_full: fpga-full {
-+                compatible = "fpga-region";
-+                fpga-mgr = <&pcap>;
-+                #address-cells = <1>;
-+                #size-cells = <1>;
-+                ranges;
-+                firmware-name = "fpga.bin";
-+        };
++	fpga_full: fpga-full {
++		compatible = "fpga-region";
++		fpga-mgr = <&pcap>;
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++		firmware-name = "fpga.bin";
++	};
++};
++
++&pcap {
++	/* It's broken and just hangs the board */
++	status = "disabled";
 +};
 +
 +&gpio {
@@ -2356,7 +2371,8 @@ index 0000000..f0226b4
 +	gpioex: pca953x@41 {
 +		compatible = "nxp,pca9536";
 +		reg = <0x41>;
-+		/* 0=USB_RESET 1=VTT_SHDWN_N 2=V_PRESENT 3=LED2 */
++		vcc-supply = <&reg_3v3_miami>;
++		gpio-line-names = "USB_RESET", "VTT_SHDWN_N", "V_PRESENT", "LED2";
 +		gpio-controller;
 +		#gpio-cells = <2>;
 +	};
@@ -2364,6 +2380,18 @@ index 0000000..f0226b4
 +	eeprom: eeprom@50 {
 +		compatible = "at24,24c04";
 +		reg = <0x50>;
++		gem0_mac: mac@0x1e8 {
++			reg = <0x1e8 6>;
++		};
++		gem1_mac: mac@1ee {
++			reg = <0x1ee 6>;
++		};
++		miamiserial: serial@1f4 {
++			reg = <0x1f4 4>;
++		};
++		dyplolicense: dyplolicense@1f8 {
++			reg = <0x1f8 8>;
++		};
 +	};
 +	/* Programmable clock (for logic) */
 +	si514s: si514@55 {
@@ -2411,12 +2439,12 @@ index 0000000..f0226b4
 +		};
 +		partition@qspi-rootfs {
 +			label = "qspi-rootfs";
-+			reg = <0x200000 0x1e00000>;
++			reg = <0x200000 0x7e00000>;
 +		};
 +		/* Everything */
 +		partition@qspi-all {
 +			label = "qspi-all";
-+			reg = <0x0 0x4000000>;
++			reg = <0x0 0x8000000>;
 +		};
 +	};
 +};
@@ -2555,13 +2583,13 @@ index 0000000..f0226b4
 +			bias-disable;
 +		};
 +
-+		mux-pc {
-+			groups = "sdio0_0_pc_grp";
-+			function = "sdio0_pc";
++		mux-cd {
++			groups = "sdio0_cd_0_grp";
++			function = "sdio0_cd";
 +		};
 +
-+		conf-pc {
-+			groups = "sdio0_0_pc_grp";
++		conf-cd {
++			groups = "sdio0_cd_0_grp";
 +			bias-high-impedance;
 +			bias-pull-up;
 +			slew-rate = <SLEW_RATE_SLOW>;
@@ -2598,6 +2626,411 @@ index 0000000..f0226b4
 +		};
 +	};
 +};
+diff --git a/arch/arm64/configs/topic_miamimp_defconfig b/arch/arm64/configs/topic_miamimp_defconfig
+new file mode 100644
+index 0000000..66d293c
+--- /dev/null
++++ b/arch/arm64/configs/topic_miamimp_defconfig
+@@ -0,0 +1,399 @@
++CONFIG_LOCALVERSION="-xilinx-v2018.1"
++CONFIG_SYSVIPC=y
++CONFIG_POSIX_MQUEUE=y
++CONFIG_AUDIT=y
++CONFIG_NO_HZ=y
++CONFIG_HIGH_RES_TIMERS=y
++CONFIG_BSD_PROCESS_ACCT=y
++CONFIG_TASKSTATS=y
++CONFIG_TASK_DELAY_ACCT=y
++CONFIG_TASK_XACCT=y
++CONFIG_TASK_IO_ACCOUNTING=y
++CONFIG_IKCONFIG=y
++CONFIG_IKCONFIG_PROC=y
++CONFIG_LOG_BUF_SHIFT=16
++CONFIG_CGROUPS=y
++CONFIG_BLK_DEV_INITRD=y
++# CONFIG_RD_BZIP2 is not set
++# CONFIG_RD_LZMA is not set
++CONFIG_EMBEDDED=y
++# CONFIG_COMPAT_BRK is not set
++CONFIG_SLAB=y
++CONFIG_PROFILING=y
++CONFIG_MODULES=y
++CONFIG_MODULE_UNLOAD=y
++CONFIG_ARCH_ZYNQMP=y
++CONFIG_NR_CPUS=8
++CONFIG_DEFAULT_MMAP_MIN_ADDR=32768
++CONFIG_TRANSPARENT_HUGEPAGE=y
++CONFIG_TRANSPARENT_HUGEPAGE_MADVISE=y
++CONFIG_CMA=y
++# CONFIG_DMI is not set
++CONFIG_COMPAT=y
++CONFIG_CPU_IDLE=y
++CONFIG_ARM_CPUIDLE=y
++CONFIG_CPU_FREQ=y
++CONFIG_CPU_FREQ_STAT=y
++CONFIG_CPU_FREQ_DEFAULT_GOV_ONDEMAND=y
++CONFIG_CPU_FREQ_GOV_USERSPACE=y
++CONFIG_CPUFREQ_DT=y
++CONFIG_NET=y
++CONFIG_PACKET=y
++CONFIG_UNIX=y
++CONFIG_XFRM_USER=y
++CONFIG_NET_KEY=y
++CONFIG_NET_KEY_MIGRATE=y
++CONFIG_INET=y
++CONFIG_IP_MULTICAST=y
++CONFIG_IP_PNP=y
++CONFIG_IP_PNP_DHCP=y
++CONFIG_IP_PNP_BOOTP=y
++CONFIG_IP_PNP_RARP=y
++CONFIG_SYN_COOKIES=y
++CONFIG_NETWORK_SECMARK=y
++CONFIG_NETFILTER=y
++CONFIG_NETFILTER_NETLINK_LOG=y
++CONFIG_NF_CONNTRACK=m
++CONFIG_NF_CT_NETLINK=m
++CONFIG_NETFILTER_XT_MARK=y
++CONFIG_NETFILTER_XT_TARGET_CHECKSUM=y
++CONFIG_NETFILTER_XT_TARGET_LOG=y
++CONFIG_NETFILTER_XT_TARGET_REDIRECT=m
++CONFIG_NETFILTER_XT_MATCH_CONNMARK=m
++CONFIG_NETFILTER_XT_MATCH_CONNTRACK=m
++CONFIG_NETFILTER_XT_MATCH_LIMIT=y
++CONFIG_NETFILTER_XT_MATCH_MAC=y
++CONFIG_NETFILTER_XT_MATCH_MULTIPORT=y
++CONFIG_NETFILTER_XT_MATCH_STATE=m
++CONFIG_NF_CONNTRACK_IPV4=m
++CONFIG_NF_NAT_IPV4=m
++CONFIG_IP_NF_IPTABLES=y
++CONFIG_IP_NF_FILTER=y
++CONFIG_IP_NF_TARGET_REJECT=y
++CONFIG_IP_NF_MANGLE=y
++CONFIG_NF_CONNTRACK_IPV6=m
++CONFIG_NF_NAT_IPV6=m
++CONFIG_IP6_NF_IPTABLES=y
++CONFIG_IP6_NF_FILTER=y
++CONFIG_IP6_NF_TARGET_REJECT=y
++CONFIG_IP6_NF_MANGLE=y
++CONFIG_BRIDGE_NF_EBTABLES=y
++CONFIG_BRIDGE_EBT_T_FILTER=y
++CONFIG_BRIDGE_EBT_T_NAT=y
++CONFIG_BRIDGE_EBT_MARK_T=y
++CONFIG_BRIDGE=y
++CONFIG_DNS_RESOLVER=y
++CONFIG_NET_PKTGEN=y
++CONFIG_CAN=m
++CONFIG_CAN_XILINXCAN=m
++CONFIG_BT=m
++CONFIG_BT_RFCOMM=y
++CONFIG_BT_RFCOMM_TTY=y
++CONFIG_BT_BNEP=y
++CONFIG_BT_BNEP_MC_FILTER=y
++CONFIG_BT_BNEP_PROTO_FILTER=y
++CONFIG_BT_HIDP=y
++CONFIG_BT_LEDS=y
++CONFIG_BT_HCIBTUSB=m
++CONFIG_BT_HCIBTSDIO=m
++CONFIG_BT_HCIUART=m
++CONFIG_BT_HCIUART_BCSP=y
++CONFIG_BT_HCIUART_ATH3K=y
++CONFIG_BT_HCIUART_LL=y
++CONFIG_BT_HCIUART_3WIRE=y
++CONFIG_BT_HCIUART_INTEL=y
++CONFIG_BT_HCIUART_QCA=y
++CONFIG_BT_HCIBCM203X=m
++CONFIG_BT_HCIBPA10X=m
++CONFIG_BT_HCIBFUSB=m
++CONFIG_BT_HCIVHCI=m
++CONFIG_BT_MRVL=m
++CONFIG_BT_MRVL_SDIO=m
++CONFIG_BT_ATH3K=m
++CONFIG_BT_WILINK=m
++CONFIG_CFG80211=m
++CONFIG_NL80211_TESTMODE=y
++CONFIG_CFG80211_CERTIFICATION_ONUS=y
++CONFIG_CFG80211_REG_CELLULAR_HINTS=y
++CONFIG_CFG80211_REG_RELAX_NO_IR=y
++CONFIG_CFG80211_WEXT=y
++CONFIG_MAC80211=m
++CONFIG_MAC80211_LEDS=y
++CONFIG_MAC80211_MESSAGE_TRACING=y
++CONFIG_MAC80211_DEBUG_MENU=y
++CONFIG_RFKILL=y
++CONFIG_RFKILL_INPUT=y
++CONFIG_RFKILL_GPIO=y
++CONFIG_UEVENT_HELPER_PATH="/sbin/hotplug"
++CONFIG_DEVTMPFS=y
++CONFIG_DEVTMPFS_MOUNT=y
++CONFIG_DMA_CMA=y
++CONFIG_CMA_SIZE_MBYTES=256
++CONFIG_ARM_CCI400_PMU=y
++CONFIG_CONNECTOR=y
++CONFIG_MTD=y
++CONFIG_MTD_CMDLINE_PARTS=y
++CONFIG_MTD_BLOCK=y
++CONFIG_MTD_CFI=y
++CONFIG_MTD_CFI_INTELEXT=y
++CONFIG_MTD_M25P80=y
++CONFIG_MTD_SPI_NOR=y
++# CONFIG_MTD_SPI_NOR_USE_4K_SECTORS is not set
++CONFIG_MTD_UBI=y
++CONFIG_MTD_UBI_FASTMAP=y
++CONFIG_MTD_UBI_BLOCK=y
++CONFIG_OF_OVERLAY=y
++CONFIG_OF_CONFIGFS=y
++CONFIG_BLK_DEV_LOOP=y
++CONFIG_BLK_DEV_LOOP_MIN_COUNT=4
++CONFIG_BLK_DEV_RAM=y
++CONFIG_BLK_DEV_RAM_COUNT=4
++CONFIG_BLK_DEV_RAM_SIZE=65536
++CONFIG_XILINX_JESD204B=m
++CONFIG_XILINX_JESD204B_PHY=m
++CONFIG_EEPROM_AT24=y
++CONFIG_EEPROM_AT25=m
++CONFIG_TI_ST=y
++CONFIG_BLK_DEV_SD=y
++CONFIG_BLK_DEV_SR=m
++CONFIG_ATA=y
++CONFIG_SATA_AHCI_PLATFORM=y
++CONFIG_AHCI_CEVA=m
++# CONFIG_ATA_SFF is not set
++CONFIG_NETDEVICES=y
++CONFIG_TUN=y
++# CONFIG_NET_VENDOR_ALACRITECH is not set
++# CONFIG_NET_VENDOR_AMAZON is not set
++# CONFIG_NET_VENDOR_AMD is not set
++# CONFIG_NET_VENDOR_AQUANTIA is not set
++# CONFIG_NET_VENDOR_ARC is not set
++CONFIG_MACB=m
++# CONFIG_NET_VENDOR_BROADCOM is not set
++# CONFIG_NET_VENDOR_EZCHIP is not set
++# CONFIG_NET_VENDOR_HISILICON is not set
++# CONFIG_NET_VENDOR_HUAWEI is not set
++# CONFIG_NET_VENDOR_INTEL is not set
++# CONFIG_NET_VENDOR_MARVELL is not set
++# CONFIG_NET_VENDOR_MELLANOX is not set
++# CONFIG_NET_VENDOR_MICREL is not set
++# CONFIG_NET_VENDOR_MICROCHIP is not set
++# CONFIG_NET_VENDOR_NATSEMI is not set
++# CONFIG_NET_VENDOR_NETRONOME is not set
++# CONFIG_NET_VENDOR_QUALCOMM is not set
++# CONFIG_NET_VENDOR_RENESAS is not set
++# CONFIG_NET_VENDOR_ROCKER is not set
++# CONFIG_NET_VENDOR_SAMSUNG is not set
++# CONFIG_NET_VENDOR_SEEQ is not set
++# CONFIG_NET_VENDOR_SOLARFLARE is not set
++# CONFIG_NET_VENDOR_SMSC is not set
++# CONFIG_NET_VENDOR_STMICRO is not set
++# CONFIG_NET_VENDOR_VIA is not set
++# CONFIG_NET_VENDOR_WIZNET is not set
++# CONFIG_NET_VENDOR_XILINX is not set
++# CONFIG_NET_VENDOR_SYNOPSYS is not set
++CONFIG_MICREL_PHY=y
++CONFIG_XILINX_GMII2RGMII=m
++CONFIG_USB_USBNET=y
++# CONFIG_WLAN_VENDOR_ADMTEK is not set
++# CONFIG_WLAN_VENDOR_ATH is not set
++# CONFIG_WLAN_VENDOR_ATMEL is not set
++CONFIG_BRCMFMAC=m
++# CONFIG_WLAN_VENDOR_CISCO is not set
++# CONFIG_WLAN_VENDOR_INTEL is not set
++# CONFIG_WLAN_VENDOR_INTERSIL is not set
++# CONFIG_WLAN_VENDOR_MARVELL is not set
++# CONFIG_WLAN_VENDOR_MEDIATEK is not set
++# CONFIG_WLAN_VENDOR_RALINK is not set
++CONFIG_RTL8192CU=m
++# CONFIG_RTLWIFI_DEBUG is not set
++# CONFIG_WLAN_VENDOR_RSI is not set
++# CONFIG_WLAN_VENDOR_ST is not set
++# CONFIG_WLAN_VENDOR_TI is not set
++# CONFIG_WLAN_VENDOR_ZYDAS is not set
++# CONFIG_WLAN_VENDOR_QUANTENNA is not set
++CONFIG_INPUT_EVDEV=y
++CONFIG_KEYBOARD_GPIO=y
++# CONFIG_MOUSE_PS2 is not set
++CONFIG_VT_HW_CONSOLE_BINDING=y
++CONFIG_SERIAL_8250=m
++CONFIG_SERIAL_8250_RUNTIME_UARTS=2
++CONFIG_SERIAL_OF_PLATFORM=m
++CONFIG_SERIAL_UARTLITE=m
++CONFIG_SERIAL_XILINX_PS_UART=y
++CONFIG_SERIAL_XILINX_PS_UART_CONSOLE=y
++CONFIG_SERIAL_DEV_BUS=y
++CONFIG_SERIAL_DEV_CTRL_TTYPORT=y
++# CONFIG_HW_RANDOM is not set
++CONFIG_I2C_CHARDEV=y
++CONFIG_I2C_MUX=y
++CONFIG_I2C_MUX_PCA9541=y
++CONFIG_I2C_MUX_PCA954x=y
++CONFIG_I2C_CADENCE=y
++CONFIG_I2C_XILINX=m
++CONFIG_SPI=y
++CONFIG_SPI_BITBANG=y
++CONFIG_SPI_CADENCE=m
++CONFIG_SPI_ZYNQMP_GQSPI=y
++CONFIG_PTP_1588_CLOCK=y
++CONFIG_GPIOLIB=y
++CONFIG_GPIO_SYSFS=y
++CONFIG_GPIO_XILINX=y
++CONFIG_GPIO_ZYNQ=y
++CONFIG_GPIO_PCA953X=y
++CONFIG_GPIO_PCA953X_IRQ=y
++CONFIG_GPIO_PCF857X=y
++CONFIG_POWER_RESET_GPIO=y
++CONFIG_POWER_RESET_LTC2952=y
++CONFIG_CHARGER_GPIO=y
++CONFIG_BATTERY_GAUGE_LTC2941=m
++CONFIG_SENSORS_IIO_HWMON=y
++CONFIG_PMBUS=y
++CONFIG_SENSORS_MAX20751=y
++CONFIG_WATCHDOG=y
++CONFIG_CADENCE_WATCHDOG=y
++CONFIG_MFD_TPS65086=y
++CONFIG_REGULATOR=y
++CONFIG_REGULATOR_FIXED_VOLTAGE=y
++CONFIG_REGULATOR_GPIO=y
++# CONFIG_RC_CORE is not set
++CONFIG_DRM=y
++CONFIG_DRM_ADI_AXI_HDMI=m
++CONFIG_DRM_PANEL_SIMPLE=y
++CONFIG_DRM_I2C_ADV7511=y
++CONFIG_DRM_I2C_ADV7511_AUDIO=y
++# CONFIG_DRM_I2C_ADV7533 is not set
++CONFIG_BACKLIGHT_LCD_SUPPORT=y
++CONFIG_BACKLIGHT_CLASS_DEVICE=y
++CONFIG_SOUND=y
++CONFIG_SND=y
++# CONFIG_SND_DRIVERS is not set
++# CONFIG_SND_SPI is not set
++CONFIG_SND_USB_AUDIO=m
++CONFIG_SND_SOC=y
++CONFIG_SND_SOC_XILINX_DP=m
++CONFIG_USB=y
++CONFIG_USB_ANNOUNCE_NEW_DEVICES=y
++# CONFIG_USB_DEFAULT_PERSIST is not set
++CONFIG_USB_OTG=y
++CONFIG_USB_OTG_FSM=y
++CONFIG_USB_XHCI_HCD=y
++CONFIG_USB_STORAGE=y
++CONFIG_USB_UAS=y
++CONFIG_USB_DWC3=y
++CONFIG_USB_DWC3_ULPI=y
++CONFIG_NOP_USB_XCEIV=y
++CONFIG_USB_ULPI=y
++CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET_XILINX=y
++CONFIG_USB_CONFIGFS=y
++CONFIG_USB_CONFIGFS_EEM=y
++CONFIG_USB_CONFIGFS_MASS_STORAGE=y
++CONFIG_USB_ETH=m
++CONFIG_USB_ETH_EEM=y
++CONFIG_USB_MASS_STORAGE=m
++CONFIG_USB_ULPI_BUS=y
++CONFIG_MMC=y
++CONFIG_MMC_SDHCI=y
++CONFIG_MMC_SDHCI_PLTFM=y
++CONFIG_MMC_SDHCI_OF_ARASAN=y
++CONFIG_NEW_LEDS=y
++CONFIG_LEDS_CLASS=y
++CONFIG_LEDS_GPIO=y
++CONFIG_LEDS_TRIGGER_TIMER=y
++CONFIG_LEDS_TRIGGER_ONESHOT=y
++CONFIG_LEDS_TRIGGER_DISK=y
++CONFIG_LEDS_TRIGGER_MTD=y
++CONFIG_LEDS_TRIGGER_HEARTBEAT=y
++CONFIG_LEDS_TRIGGER_BACKLIGHT=y
++CONFIG_LEDS_TRIGGER_CPU=y
++CONFIG_LEDS_TRIGGER_GPIO=y
++CONFIG_LEDS_TRIGGER_DEFAULT_ON=y
++CONFIG_LEDS_TRIGGER_TRANSIENT=y
++CONFIG_LEDS_TRIGGER_CAMERA=y
++CONFIG_LEDS_TRIGGER_PANIC=y
++CONFIG_EDAC=y
++CONFIG_EDAC_SYNOPSYS=y
++CONFIG_EDAC_ZYNQMP_OCM=y
++CONFIG_RTC_CLASS=y
++CONFIG_RTC_DRV_ZYNQMP=y
++CONFIG_DMADEVICES=y
++CONFIG_XILINX_DMA_ENGINES=y
++CONFIG_XILINX_DPDMA=m
++CONFIG_XILINX_FRMBUF=m
++CONFIG_XILINX_DMA=m
++CONFIG_XILINX_ZYNQMP_DMA=y
++CONFIG_DMATEST=m
++CONFIG_UIO=y
++CONFIG_UIO_PDRV_GENIRQ=m
++CONFIG_UIO_DMEM_GENIRQ=m
++CONFIG_UIO_XILINX_APM=m
++CONFIG_STAGING=y
++CONFIG_COMMON_CLK_XLNX_CLKWZRD=m
++CONFIG_XILINX_FCLK=y
++CONFIG_COMMON_CLK_SI514=y
++CONFIG_COMMON_CLK_SI544=y
++CONFIG_COMMON_CLK_SI570=y
++CONFIG_COMMON_CLK_CDCE925=y
++# CONFIG_COMMON_CLK_XGENE is not set
++CONFIG_COMMON_CLK_ZYNQMP=y
++CONFIG_ARM_SMMU=y
++CONFIG_REMOTEPROC=y
++CONFIG_ZYNQMP_R5_REMOTEPROC=m
++CONFIG_XILINX_VCU=m
++CONFIG_IIO=y
++CONFIG_AD799X=y
++CONFIG_XILINX_XADC=y
++CONFIG_XILINX_AMS=y
++CONFIG_RESET_CONTROLLER=y
++CONFIG_ZYNQMP_RESET_CONTROLLER=y
++CONFIG_PHY_XILINX_ZYNQMP=y
++CONFIG_RAS=y
++CONFIG_NVMEM_ZYNQMP=y
++CONFIG_FPGA=y
++CONFIG_ZYNQMP_FIRMWARE_DEBUG=y
++CONFIG_EXT4_FS=y
++CONFIG_EXT4_FS_POSIX_ACL=y
++CONFIG_EXT4_FS_SECURITY=y
++CONFIG_AUTOFS4_FS=y
++CONFIG_ISO9660_FS=m
++CONFIG_JOLIET=y
++CONFIG_UDF_FS=m
++CONFIG_MSDOS_FS=y
++CONFIG_VFAT_FS=y
++CONFIG_TMPFS=y
++CONFIG_TMPFS_POSIX_ACL=y
++CONFIG_HUGETLBFS=y
++CONFIG_JFFS2_FS=y
++CONFIG_JFFS2_SUMMARY=y
++CONFIG_JFFS2_FS_XATTR=y
++CONFIG_JFFS2_COMPRESSION_OPTIONS=y
++CONFIG_JFFS2_LZO=y
++CONFIG_JFFS2_RUBIN=y
++CONFIG_UBIFS_FS=m
++CONFIG_UBIFS_FS_ADVANCED_COMPR=y
++CONFIG_UBIFS_FS_ENCRYPTION=y
++CONFIG_SQUASHFS=y
++CONFIG_SQUASHFS_FILE_DIRECT=y
++CONFIG_SQUASHFS_DECOMP_MULTI=y
++CONFIG_SQUASHFS_LZO=y
++CONFIG_SQUASHFS_XZ=y
++# CONFIG_NETWORK_FILESYSTEMS is not set
++CONFIG_NLS_CODEPAGE_437=y
++CONFIG_NLS_ISO8859_1=y
++CONFIG_DEBUG_INFO=y
++CONFIG_DEBUG_FS=y
++CONFIG_MAGIC_SYSRQ=y
++# CONFIG_SCHED_DEBUG is not set
++# CONFIG_FTRACE is not set
++CONFIG_CRYPTO_ECDH=y
++# CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
++CONFIG_CRYPTO_CCM=y
++CONFIG_CRYPTO_GCM=y
++CONFIG_CRYPTO_CBC=y
++CONFIG_CRYPTO_ECB=y
++CONFIG_CRYPTO_CMAC=y
++CONFIG_CRYPTO_CRCT10DIF=y
++CONFIG_CRYPTO_MD5=y
++CONFIG_CRYPTO_ARC4=y
++# CONFIG_CRYPTO_HW is not set
++CONFIG_CRC7=y
 -- 
 1.9.1
 
