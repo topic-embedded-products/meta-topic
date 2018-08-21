@@ -65,7 +65,7 @@ SERIAL_CONSOLE = "115200 ttyPS0"
 
 KERNEL_DEVICETREE = "xilinx/zynqmp-topic-miamimp.dtb"
 
-PREFERRED_PROVIDER_virtual/kernel = "linux-topic"
+PREFERRED_PROVIDER_virtual/kernel = "linux-xlnx"
 PREFERRED_PROVIDER_virtual/bootloader = "u-boot-xlnx"
 
 EXTRA_IMAGEDEPENDS += " \
@@ -76,8 +76,8 @@ EXTRA_IMAGEDEPENDS += " \
 # fpga-image-load does not work on MPSoC
 BAD_RECOMMENDATIONS += "fpga-image-load"
 
-# Use QSPI flash with 128k sector size
-MKUBIFS_ARGS = "-m 1 -e 130944 -c 952"
+# Use QSPI flash with 128k sector size, 128MB total size
+MKUBIFS_ARGS = "-m 1 -e 130944 -c 1008"
 UBINIZE_ARGS = "-m 1 -p 128KiB"
 UBI_VOLNAME = "qspi-rootfs"
 

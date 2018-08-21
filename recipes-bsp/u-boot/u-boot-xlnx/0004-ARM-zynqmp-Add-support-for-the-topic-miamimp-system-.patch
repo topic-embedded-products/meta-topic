@@ -1,11 +1,11 @@
-From a8c76b12bd93d397a97d4a79cf04be77a1cb2c79 Mon Sep 17 00:00:00 2001
+From fbc2ef5dc880de10fbdca69987d70c5b1081ec50 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Jan 2017 15:35:41 +0100
-Subject: [PATCH 4/8] ARM: zynqmp: Add support for the topic-miamimp
+Subject: [PATCH 4/9] ARM: zynqmp: Add support for the topic-miamimp
  system-on-module
 
 The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
-32GB eMMC and 64MB Dual-parallel QSPI flash.
+32GB eMMC and 128MB Dual-parallel QSPI flash.
 ---
  arch/arm/dts/Makefile                              |     1 +
  arch/arm/dts/zynqmp-topic-miamimp.dts              |   170 +
@@ -18,9 +18,9 @@ The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
  .../zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c     | 19101 ++++++++++
  .../zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h     | 34806 +++++++++++++++++++
  board/topic/zynqmp/zynqmp.c                        |     6 +
- configs/topic_miamimp_defconfig                    |    96 +
- include/configs/topic_miamimp.h                    |   103 +
- 13 files changed, 54359 insertions(+)
+ configs/topic_miamimp_defconfig                    |    99 +
+ include/configs/topic_miamimp.h                    |   105 +
+ 13 files changed, 54364 insertions(+)
  create mode 100644 arch/arm/dts/zynqmp-topic-miamimp.dts
  create mode 100644 board/topic/zynqmp/MAINTAINERS
  create mode 100644 board/topic/zynqmp/Makefile
@@ -54266,10 +54266,10 @@ index 0000000..d9e0cec
 +#include "../../xilinx/zynqmp/zynqmp.c"
 diff --git a/configs/topic_miamimp_defconfig b/configs/topic_miamimp_defconfig
 new file mode 100644
-index 0000000..d9c837b
+index 0000000..819bde1
 --- /dev/null
 +++ b/configs/topic_miamimp_defconfig
-@@ -0,0 +1,96 @@
+@@ -0,0 +1,99 @@
 +CONFIG_ARM=y
 +CONFIG_SYS_VENDOR="topic"
 +CONFIG_SYS_CONFIG_NAME="topic_miamimp"
@@ -54346,6 +54346,9 @@ index 0000000..d9c837b
 +CONFIG_SPI_FLASH_SPANSION=y
 +CONFIG_SPI_FLASH_STMICRO=y
 +# CONFIG_SPI_FLASH_USE_4K_SECTORS is not set
++CONFIG_CMD_MTDPARTS=y
++CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
++CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x60000(qspi-boot-bin),0x20000(qspi-atf-spi-ub),0xc0000(qspi-u-boot-bin),0xc0000(qspi-u-boot-img),-(qspi-rootfs)"
 +CONFIG_DEBUG_UART_ZYNQ=y
 +CONFIG_DEBUG_UART_BASE=0xff000000
 +CONFIG_DEBUG_UART_CLOCK=100000000
@@ -54368,10 +54371,10 @@ index 0000000..d9c837b
 +CONFIG_EFI_LOADER_BOUNCE_BUFFER=y
 diff --git a/include/configs/topic_miamimp.h b/include/configs/topic_miamimp.h
 new file mode 100644
-index 0000000..fd9af74
+index 0000000..f749c8b
 --- /dev/null
 +++ b/include/configs/topic_miamimp.h
-@@ -0,0 +1,103 @@
+@@ -0,0 +1,105 @@
 +/*
 + * Configuration for Topic Miami MPSoC
 + *
@@ -54413,6 +54416,8 @@ index 0000000..fd9af74
 +	"fdt_size=0x80000\0" \
 +	"bootenv=uEnv.txt\0" \
 +	"bootargs=quiet clk_ignore_unused\0" \
++	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0" \
++	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0" \
 +	"loadbootenv=load mmc $sdbootdev:$partid ${loadbootenv_addr} ${bootenv}\0" \
 +	"importbootenv=echo Importing environment from SD ...; " \
 +		"env import -t ${loadbootenv_addr} $filesize\0" \

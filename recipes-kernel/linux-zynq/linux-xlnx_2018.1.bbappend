@@ -5,9 +5,13 @@
 #
 # TODO:
 #  HDMI in and HDMI audio
-#
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
+
+# There's quite a few bugs in the Xilinx kernel '2018.1' state which were fixed
+# later on in the brach, and they were causing nasty crashes. Grab the newer
+# version to get the fixes.
+SRCREV = "ad4cd988ba86ab0fb306d57f244b7eaa6cce79a4"
 
 COMPATIBLE_MACHINE_topic-miami = "topic-miami"
 
@@ -29,7 +33,11 @@ SRC_URI_append = " \
 	file://0015-Add-topic-miami-devicetrees.patch \
 	"
 
+# Using a defconfig from the kernel tree does not work when using patches, and
+# the Xilinx provided zynqmp config contains way too much bloat, so we just use
+# a full defconfig for our boards until this is mainlined.
 SRC_URI_append_topic-miami = "file://defconfig"
+SRC_URI_append_topic-miamimp = "file://defconfig"
 
 KERNEL_DEVICETREE_topic-miami = "\
 	topic-miami-dyplo.dtb \
