@@ -1,4 +1,4 @@
-From 8aff396030a52870525e83f0e526eb989c30f2ad Mon Sep 17 00:00:00 2001
+From 1735d285195c4ad9b7b76ae79044f1895ecc58d2 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 5 Oct 2017 15:11:45 +0200
 Subject: [PATCH 2/2] pm_cfg_obj.c: Allow access to SD0 node
@@ -10,7 +10,7 @@ for the SPI nodes.
  1 file changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/lib/sw_apps/zynqmp_fsbl/misc/pm_cfg_obj.c b/lib/sw_apps/zynqmp_fsbl/misc/pm_cfg_obj.c
-index 6e29334..2aea73a 100644
+index 90d9a03..3d3864f 100644
 --- a/lib/sw_apps/zynqmp_fsbl/misc/pm_cfg_obj.c
 +++ b/lib/sw_apps/zynqmp_fsbl/misc/pm_cfg_obj.c
 @@ -162,15 +162,15 @@ const u32 XPm_ConfigObject[] __attribute__((used, section(".sys_cfg_data"))) = {

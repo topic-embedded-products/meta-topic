@@ -1,0 +1,85 @@
+From d74a43bad0adb8e5d9e58cb4046123359481bca0 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 25 Aug 2017 14:37:20 +0200
+Subject: [PATCH 5/8] mmc/sdhci: Add card detect method
+
+Detect whether a card is detected. This prevents probing problems
+when no card is in the reader. The board apparently reports "present"
+for the non-removable device as well, so we can get away with that.
+
+With "non-removable" in the devicetree there is no card detect. Pass
+this information on as a quirk (SDHCI_QUIRK_NO_CD) and use it in the
+sdhci driver.
+---
+ drivers/mmc/sdhci.c      | 13 +++++++++++++
+ drivers/mmc/zynq_sdhci.c |  3 +++
+ include/sdhci.h          |  1 +
+ 3 files changed, 17 insertions(+)
+
+diff --git a/drivers/mmc/sdhci.c b/drivers/mmc/sdhci.c
+index cbc4333..0db345b 100644
+--- a/drivers/mmc/sdhci.c
++++ b/drivers/mmc/sdhci.c
+@@ -682,6 +682,17 @@ static int sdhci_init(struct mmc *mmc)
+ 	return 0;
+ }
+ 
++static int sdhci_get_cd(struct udevice *dev)
++{
++	struct mmc *mmc = mmc_get_mmc_dev(dev);
++	struct sdhci_host *host = mmc->priv;
++
++	if (host->quirks & SDHCI_QUIRK_NO_CD)
++		return -ENOSYS;
++
++	return !!(sdhci_readl(host, SDHCI_PRESENT_STATE) & SDHCI_CARD_PRESENT);
++}
++
+ #ifdef CONFIG_DM_MMC
+ int sdhci_probe(struct udevice *dev)
+ {
+@@ -696,6 +707,7 @@ const struct dm_mmc_ops sdhci_ops = {
+ 	.set_voltage	= sdhci_set_voltage,
+ 	.set_uhs	= sdhci_set_uhs,
+ 	.execute_tuning	= sdhci_execute_tuning,
++	.get_cd         = sdhci_get_cd,
+ };
+ #else
+ static const struct mmc_ops sdhci_ops = {
+@@ -705,6 +717,7 @@ static const struct mmc_ops sdhci_ops = {
+ 	.set_voltage	= sdhci_set_voltage,
+ 	.set_uhs	= sdhci_set_uhs,
+ 	.execute_tuning	= sdhci_execute_tuning,
++	.get_cd         = sdhci_get_cd,
+ };
+ #endif
+ 
+diff --git a/drivers/mmc/zynq_sdhci.c b/drivers/mmc/zynq_sdhci.c
+index 5a6765a..0cef559 100644
+--- a/drivers/mmc/zynq_sdhci.c
++++ b/drivers/mmc/zynq_sdhci.c
+@@ -207,6 +207,9 @@ static int arasan_sdhci_probe(struct udevice *dev)
+ 		       SDHCI_QUIRK_BROKEN_R1B |
+ 		       SDHCI_QUIRK_USE_ACMD12;
+ 
++	if (fdtdec_get_bool(gd->fdt_blob, dev_of_offset(dev), "non-removable"))
++		host->quirks |= SDHCI_QUIRK_NO_CD;
++
+ #ifdef CONFIG_ZYNQ_HISPD_BROKEN
+ 	host->quirks |= SDHCI_QUIRK_BROKEN_HISPD_MODE;
+ #endif
+diff --git a/include/sdhci.h b/include/sdhci.h
+index f1f14a6..8a37059 100644
+--- a/include/sdhci.h
++++ b/include/sdhci.h
+@@ -237,6 +237,7 @@
+ #define SDHCI_QUIRK_USE_WIDE8		(1 << 8)
+ #define SDHCI_QUIRK_NO_1_8_V		(1 << 9)
+ #define SDHCI_QUIRK_USE_ACMD12		(1 << 10)
++#define SDHCI_QUIRK_NO_CD		(1 << 11)
+ 
+ /* to make gcc happy */
+ struct sdhci_host;
+-- 
+1.9.1
+

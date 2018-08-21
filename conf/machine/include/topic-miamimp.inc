@@ -39,7 +39,10 @@ XILINX_LM_LICENSE_FILE ?= "${XILINX_VIVADO_PATH}/data/ip/core_licenses/Xilinx.li
 
 KERNEL_MODULE_AUTOLOAD ?= ""
 
+SOC_VARIANT ?= "eg"
+
 require conf/machine/include/tune-zynqmp.inc
+require conf/machine/include/machine-xilinx-overrides.inc
 require conf/machine/include/machine-xilinx-default.inc
 require conf/machine/include/machine-xilinx-board.inc
 require conf/machine/include/zynqmp-pmu-config.inc
@@ -56,15 +59,19 @@ SPL_SYMLINK = "BOOT.bin"
 UBOOT_SUFFIX = "img"
 UBOOT_LOADADDRESS = "0x8000000"
 UBOOT_ENTRYPOINT = "0x8000000"
+HAS_PLATFORM_INIT_append = " topic_miamimp_config"
 
 SERIAL_CONSOLE = "115200 ttyPS0"
 
 KERNEL_DEVICETREE = "xilinx/zynqmp-topic-miamimp.dtb"
 
 PREFERRED_PROVIDER_virtual/kernel = "linux-topic"
-PREFERRED_PROVIDER_virtual/bootloader = "u-boot-zynq-spl"
+PREFERRED_PROVIDER_virtual/bootloader = "u-boot-xlnx"
 
-EXTRA_IMAGEDEPENDS += "arm-trusted-firmware"
+EXTRA_IMAGEDEPENDS += " \
+		arm-trusted-firmware \
+		virtual/pmu-firmware \
+		"
 
 # fpga-image-load does not work on MPSoC
 BAD_RECOMMENDATIONS += "fpga-image-load"
