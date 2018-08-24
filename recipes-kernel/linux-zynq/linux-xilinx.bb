@@ -1,14 +1,28 @@
-# Kernel patch based approach. This takes a standard kernel and adds patches
-# to add support for the Miami modules. Most patches are backports from newer
-# kernels, so they're in mainline but not yet in Xilinx' tree. The exceptions
-# to that are the ltc3562 driver, HDMI drivers and the devicetrees.
-#
-# TODO:
-#  HDMI in and HDMI audio
+# The meta-xilinx provided linux-xlnx kernel recipe adds things that we want
+# to reverse, which is rather impossible to do. So this recipe just shadows
+# the Xilinx one and offers similar functionality as linux-topic did.
+SUMMARY = "Xilinx/Topic Kernel"
 
+# We'll share the patches
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 
-COMPATIBLE_MACHINE_topic-miami = "topic-miami"
+LINUX_VERSION = "4.14"
+LINUX_VERSION_EXTENSION ?= ""
+KBRANCH = "xlnx_rebase_v4.14"
+PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
+
+# There's quite a few bugs in the Xilinx kernel '2018.1' state which were fixed
+# later on in the branch, and they were causing nasty crashes. Grab the newer
+# version to get the fixes.
+SRCREV = "ad4cd988ba86ab0fb306d57f244b7eaa6cce79a4"
+
+COMPATIBLE_MACHINE = "topic-miami"
+
+KERNELURI ?= "git://github.com/Xilinx/linux-xlnx.git;protocol=https"
+SRC_URI = "${KERNELURI};branch=${KBRANCH}"
+SRCREV_machine ?= "${SRCREV}"
+
+require recipes-kernel/linux/linux-yocto.inc
 
 SRC_URI_append = " \
 	file://0001-usb-hub-Cycle-HUB-power-when-initialization-fails.patch \
@@ -26,14 +40,10 @@ SRC_URI_append = " \
 	file://0013-drm-axi_hdmi_crtc.c-Skip-DMA_INTERLEAVE-check.patch \
 	file://0014-drm-axi_hdmi_encoder-Expand-colorspace-range-for-RGB.patch \
 	file://0015-Add-topic-miami-devicetrees.patch \
+	file://defconfig \
 	"
 
-# Using a defconfig from the kernel tree does not work when using patches, and
-# the Xilinx provided zynqmp config contains way too much bloat, so we just use
-# a full defconfig for our boards until this is mainlined.
-SRC_URI_append_topic-miami = "file://defconfig"
-SRC_URI_append_topic-miamimp = "file://defconfig"
-
+KERNEL_DEVICETREE ?= ""
 KERNEL_DEVICETREE_topic-miami = "\
 	topic-miami-dyplo.dtb \
 	topic-miami-dyplo-acp.dtb \
@@ -55,3 +65,4 @@ KERNEL_DEVICETREE_topic-miamimp = "\
 	xilinx/zynqmp-topic-miamimp-florida-gen.dtb \
 	xilinx/zynqmp-topic-miamimp-florida-test.dtb \
 	"
+
