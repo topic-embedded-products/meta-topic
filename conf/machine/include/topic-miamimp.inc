@@ -65,7 +65,7 @@ SERIAL_CONSOLE = "115200 ttyPS0"
 
 KERNEL_DEVICETREE = "xilinx/zynqmp-topic-miamimp.dtb"
 
-PREFERRED_PROVIDER_virtual/kernel = "linux-xilinx"
+PREFERRED_PROVIDER_virtual/kernel = "linux-xlnx"
 PREFERRED_PROVIDER_virtual/bootloader = "u-boot-xlnx"
 
 EXTRA_IMAGEDEPENDS += " \

@@ -13,6 +13,7 @@ SRC_URI_append = "\
 	"
 
 # Build the PMU firmware into boot.bin
+DEPENDS_append_zynqmp = " zynqmp-pmu-pmu-firmware"
 do_compile_zynqmp[depends] += "zynqmp-pmu-pmu-firmware:do_deploy"
 do_compile_prepend_zynqmp() {
 	cp ${DEPLOY_DIR_IMAGE}/pmu-${MACHINE}.bin ${S}/board/topic/zynqmp/pmufw.bin
