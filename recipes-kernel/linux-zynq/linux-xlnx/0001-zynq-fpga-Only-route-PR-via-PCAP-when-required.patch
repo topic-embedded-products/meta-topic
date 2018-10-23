@@ -1,0 +1,36 @@
+From 475def699c094981243afc7b74e45cf1422d74e1 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 23 Oct 2018 08:01:03 +0200
+Subject: [PATCH] zynq-fpga: Only route PR via PCAP when required
+
+The Xilinx Zynq FPGA driver takes ownership of the PR interface, making
+it impossible to use the ICAP interface for partial reconfiguration.
+
+This patch changes the driver to only activate PR over PCAP while the
+device is actively being accessed by the driver for programming.
+
+This allows both PCAP and ICAP interfaces to be used for PR.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/fpga/zynq-fpga.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/fpga/zynq-fpga.c b/drivers/fpga/zynq-fpga.c
+index 70b15b3..6f557ba 100644
+--- a/drivers/fpga/zynq-fpga.c
++++ b/drivers/fpga/zynq-fpga.c
+@@ -497,6 +497,10 @@ static int zynq_fpga_ops_write_complete(struct fpga_manager *mgr,
+ 	int err;
+ 	u32 intr_status;
+ 
++	/* Release 'PR' control back to the ICAP */
++	zynq_fpga_write(priv, CTRL_OFFSET,
++		zynq_fpga_read(priv, CTRL_OFFSET) & ~CTRL_PCAP_PR_MASK);
++
+ 	err = clk_enable(priv->clk);
+ 	if (err)
+ 		return err;
+-- 
+1.9.1
+
