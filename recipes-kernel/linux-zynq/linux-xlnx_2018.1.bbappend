@@ -26,6 +26,7 @@ SRC_URI_append = " \
 	file://0013-drm-axi_hdmi_crtc.c-Skip-DMA_INTERLEAVE-check.patch \
 	file://0014-drm-axi_hdmi_encoder-Expand-colorspace-range-for-RGB.patch \
 	file://0015-Add-topic-miami-devicetrees.patch \
+	file://0001-zynq-fpga-Only-route-PR-via-PCAP-when-required.patch \
 	"
 
 # Using a defconfig from the kernel tree does not work when using patches, and
