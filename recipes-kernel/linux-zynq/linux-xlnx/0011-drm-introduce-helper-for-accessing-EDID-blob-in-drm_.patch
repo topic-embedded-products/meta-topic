@@ -1,7 +1,7 @@
 From c4acf2a2c333dba9292bada7073f02599330be49 Mon Sep 17 00:00:00 2001
 From: Andrea Merello <andrea.merello@gmail.com>
 Date: Wed, 25 Nov 2015 09:27:47 +0100
-Subject: [PATCH 11/15] drm: introduce helper for accessing EDID blob in
+Subject: [PATCH 11/17] drm: introduce helper for accessing EDID blob in
  drm_connector structure
 
 There is a bunch of drivers that directly access edid_blob_ptr in

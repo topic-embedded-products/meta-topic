@@ -1,7 +1,7 @@
-From 216f46d4fec5d4b51d982b4d4b30dd8414f5f16b Mon Sep 17 00:00:00 2001
+From bd3d69ca27574b2e2baf2e224ac826433be0b0f2 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 14 Jun 2018 13:19:00 +0200
-Subject: [PATCH 15/15] Add topic-miami devicetrees
+Subject: [PATCH 15/17] Add topic-miami devicetrees
 
 Just a copy from the topic-miami branch contents, not actually added to Makefile
 
@@ -37,11 +37,11 @@ Add topic_miamimp_defconfig (created using "bitbake -c savedefconfig virtual/ker
  arch/arm/boot/dts/topic-miamilite.dtsi             |  51 +++
  arch/arm/boot/dts/topic-miamiplus-florida-test.dts |  51 +++
  arch/arm/boot/dts/topic-miamiplus.dtsi             |  97 ++++
- .../xilinx/zynqmp-topic-miamimp-florida-gen.dts    | 487 +++++++++++++++++++++
+ .../xilinx/zynqmp-topic-miamimp-florida-gen.dts    | 497 +++++++++++++++++++++
  .../xilinx/zynqmp-topic-miamimp-florida-test.dts   | 188 ++++++++
- .../arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts | 382 ++++++++++++++++
+ .../arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts | 384 ++++++++++++++++
  arch/arm64/configs/topic_miamimp_defconfig         | 399 +++++++++++++++++
- 30 files changed, 2778 insertions(+)
+ 30 files changed, 2790 insertions(+)
  create mode 100644 arch/arm/boot/dts/topic-dyplo.dtsi
  create mode 100644 arch/arm/boot/dts/topic-miami-dyplo-acp.dts
  create mode 100644 arch/arm/boot/dts/topic-miami-dyplo.dts
@@ -1553,10 +1553,10 @@ index 0000000..c63b302
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
 new file mode 100644
-index 0000000..762475e
+index 0000000..e67323a
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
-@@ -0,0 +1,487 @@
+@@ -0,0 +1,497 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -1862,15 +1862,25 @@ index 0000000..762475e
 +&usb0 {
 +	status = "okay";
 +	vbus-supply = <&reg_usb0_vbus>; /* This apparently no longer works */
-+	dr_mode = "otg"; /* "host", "peripheral" or "otg" */
++	dr_mode = "host"; /* "host", "peripheral" or "otg", apparently no effect */
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_usb0_default>;
 +	usb-phy = <&usb_phy0>;
++	/* see: https://forums.xilinx.com/t5/Embedded-Linux/Zynqmp-USB2-0/td-p/790522/page/2 */
++	/delete-property/ clocks;
++	/delete-property/ clock-names;
++	clocks = <&clk 32>;
++	clock-names = "bus_clk";
 +};
 +&dwc3_0 {
 +	status = "okay";
 +	dr_mode = "host"; /* "host", "peripheral" or "otg" */
 +	maximum-speed = "high-speed"; /* super-speed not available on carrier */
++	/* see: https://forums.xilinx.com/t5/Embedded-Linux/Zynqmp-USB2-0/td-p/790522/page/2 */
++	snps,dis_u2_susphy_quirk;
++	snps,dis_u3_susphy_quirk;
++	/delete-property/ phy-names;
++	/delete-property/ phys;
 +};
 +
 +/* FPGA content (reference design) */
@@ -2240,10 +2250,10 @@ index 0000000..d8bcf37
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
 new file mode 100644
-index 0000000..b60e749
+index 0000000..911a09d
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
-@@ -0,0 +1,382 @@
+@@ -0,0 +1,384 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -2380,6 +2390,8 @@ index 0000000..b60e749
 +	eeprom: eeprom@50 {
 +		compatible = "at24,24c04";
 +		reg = <0x50>;
++		#address-cells = <1>;
++		#size-cells = <1>;
 +		gem0_mac: mac@0x1e8 {
 +			reg = <0x1e8 6>;
 +		};

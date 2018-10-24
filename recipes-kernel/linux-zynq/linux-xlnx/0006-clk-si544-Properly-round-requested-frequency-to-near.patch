@@ -1,7 +1,7 @@
 From 25d243b293bc7a4e4d15c856029229edf6bb357f Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 31 May 2018 16:03:55 +0200
-Subject: [PATCH 06/15] clk-si544: Properly round requested frequency to
+Subject: [PATCH 06/17] clk-si544: Properly round requested frequency to
  nearest match
 
 The si544 driver had a rounding problem that using the result of clk_round_rate
