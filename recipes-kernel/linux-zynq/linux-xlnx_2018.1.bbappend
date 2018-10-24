@@ -26,7 +26,8 @@ SRC_URI_append = " \
 	file://0013-drm-axi_hdmi_crtc.c-Skip-DMA_INTERLEAVE-check.patch \
 	file://0014-drm-axi_hdmi_encoder-Expand-colorspace-range-for-RGB.patch \
 	file://0015-Add-topic-miami-devicetrees.patch \
-	file://0001-zynq-fpga-Only-route-PR-via-PCAP-when-required.patch \
+	file://0016-sound-soc-adi-axi-spdif.c-Support-programmable-maste.patch \
+	file://0017-zynq-fpga-Only-route-PR-via-PCAP-when-required.patch \
 	"
 
 # Using a defconfig from the kernel tree does not work when using patches, and
@@ -34,6 +35,10 @@ SRC_URI_append = " \
 # a full defconfig for our boards until this is mainlined.
 SRC_URI_append_topic-miami = "file://defconfig"
 SRC_URI_append_topic-miamimp = "file://defconfig"
+
+# The configcheck doesn't do anything useful for us and takes several minutes
+do_kernel_configcheck_topic-miamimp[noexec] = "1"
+do_kernel_configcheck_topic-miami[noexec] = "1"
 
 KERNEL_DEVICETREE_topic-miami = "\
 	topic-miami-dyplo.dtb \

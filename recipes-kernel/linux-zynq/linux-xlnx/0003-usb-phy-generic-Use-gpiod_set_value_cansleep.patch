@@ -1,7 +1,7 @@
 From 012bf81facd91b50d71eff3cae89830c126437a8 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 21 Feb 2018 16:04:01 +0100
-Subject: [PATCH 03/15] usb: phy-generic: Use gpiod_set_value_cansleep
+Subject: [PATCH 03/17] usb: phy-generic: Use gpiod_set_value_cansleep
 
 The nop_reset and shutdown methods are called in a context that can sleep,
 so use gpiod_set_value_cansleep instead of gpiod_set_value.
