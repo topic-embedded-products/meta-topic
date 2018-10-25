@@ -73,8 +73,10 @@ EXTRA_IMAGEDEPENDS += " \
 		virtual/pmu-firmware \
 		"
 
-# fpga-image-load does not work on MPSoC
-BAD_RECOMMENDATIONS += "fpga-image-load"
+# fpga-image-load / fpga-firmware-load does not work on MPSoC
+BAD_RECOMMENDATIONS += "fpga-image-load \
+			fpga-firmware-load \
+			"
 
 # Use QSPI flash with 128k sector size, 128MB total size
 MKUBIFS_ARGS = "-m 1 -e 130944 -c 1008"
