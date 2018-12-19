@@ -1,4 +1,4 @@
-From 694042722e44ce4fbcd5bb9dd465ae40cf02f453 Mon Sep 17 00:00:00 2001
+From 2e5d187daaa0dbc98ec73ec4e22ad4da62c8d519 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 25 Aug 2017 14:37:20 +0200
 Subject: [PATCH 5/9] mmc/sdhci: Add card detect method
@@ -17,10 +17,10 @@ sdhci driver.
  3 files changed, 17 insertions(+)
 
 diff --git a/drivers/mmc/sdhci.c b/drivers/mmc/sdhci.c
-index cbc4333..0db345b 100644
+index 513bb56..a52a81d 100644
 --- a/drivers/mmc/sdhci.c
 +++ b/drivers/mmc/sdhci.c
-@@ -682,6 +682,17 @@ static int sdhci_init(struct mmc *mmc)
+@@ -676,6 +676,17 @@ static int sdhci_init(struct mmc *mmc)
  	return 0;
  }
  
@@ -38,7 +38,7 @@ index cbc4333..0db345b 100644
  #ifdef CONFIG_DM_MMC
  int sdhci_probe(struct udevice *dev)
  {
-@@ -696,6 +707,7 @@ const struct dm_mmc_ops sdhci_ops = {
+@@ -690,6 +701,7 @@ const struct dm_mmc_ops sdhci_ops = {
  	.set_voltage	= sdhci_set_voltage,
  	.set_uhs	= sdhci_set_uhs,
  	.execute_tuning	= sdhci_execute_tuning,
@@ -46,7 +46,7 @@ index cbc4333..0db345b 100644
  };
  #else
  static const struct mmc_ops sdhci_ops = {
-@@ -705,6 +717,7 @@ static const struct mmc_ops sdhci_ops = {
+@@ -699,6 +711,7 @@ static const struct mmc_ops sdhci_ops = {
  	.set_voltage	= sdhci_set_voltage,
  	.set_uhs	= sdhci_set_uhs,
  	.execute_tuning	= sdhci_execute_tuning,
@@ -55,7 +55,7 @@ index cbc4333..0db345b 100644
  #endif
  
 diff --git a/drivers/mmc/zynq_sdhci.c b/drivers/mmc/zynq_sdhci.c
-index 5a6765a..0cef559 100644
+index eadb2f6..a097861 100644
 --- a/drivers/mmc/zynq_sdhci.c
 +++ b/drivers/mmc/zynq_sdhci.c
 @@ -207,6 +207,9 @@ static int arasan_sdhci_probe(struct udevice *dev)
@@ -66,13 +66,13 @@ index 5a6765a..0cef559 100644
 +		host->quirks |= SDHCI_QUIRK_NO_CD;
 +
  #ifdef CONFIG_ZYNQ_HISPD_BROKEN
- 	host->quirks |= SDHCI_QUIRK_BROKEN_HISPD_MODE;
+ 	host->quirks |= SDHCI_QUIRK_NO_HISPD_BIT;
  #endif
 diff --git a/include/sdhci.h b/include/sdhci.h
-index f1f14a6..8a37059 100644
+index 4476c06..3e00fd1 100644
 --- a/include/sdhci.h
 +++ b/include/sdhci.h
-@@ -237,6 +237,7 @@
+@@ -231,6 +231,7 @@
  #define SDHCI_QUIRK_USE_WIDE8		(1 << 8)
  #define SDHCI_QUIRK_NO_1_8_V		(1 << 9)
  #define SDHCI_QUIRK_USE_ACMD12		(1 << 10)
