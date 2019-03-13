@@ -1,35 +1,29 @@
-From b5493cafd2d138699e3f698e6a01e3a2b1ea7c5a Mon Sep 17 00:00:00 2001
+From cda493b023da779f9a6fe0abd938b0f2480175d1 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 3 Oct 2017 10:09:07 +0200
-Subject: [PATCH 1/2] Load XPm_ConfigObject at boot
+Subject: [PATCH] Load XPm_ConfigObject at boot
 
 This appears to be something that the FSBL does, but not the SPL loader, so
 do it here.
 ---
- lib/sw_apps/zynqmp_pmufw/src/pm_binding.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ lib/sw_apps/zynqmp_pmufw/src/pm_binding.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/lib/sw_apps/zynqmp_pmufw/src/pm_binding.c b/lib/sw_apps/zynqmp_pmufw/src/pm_binding.c
-index 90b7cc2..a328914 100644
+index cb617e5cb..1dc1ea4d7 100644
 --- a/lib/sw_apps/zynqmp_pmufw/src/pm_binding.c
 +++ b/lib/sw_apps/zynqmp_pmufw/src/pm_binding.c
-@@ -49,6 +49,9 @@
+@@ -48,6 +48,9 @@
+ #include "pm_extern.h"
  #include "pm_usb.h"
  #include "pm_hooks.h"
- 
 +#include "pm_config.h"
-+extern u32 XPm_ConfigObject[]; /* pm_cfg_obj.c */
 +
++extern u32 XPm_ConfigObject[]; /* pm_cfg_obj.c */
+ 
  /* All GIC wakes in GPI1 */
  #define PMU_IOMODULE_GPI1_GIC_WAKES_ALL_MASK \
- 		(PMU_IOMODULE_GPI1_ACPU_0_WAKE_MASK | \
-@@ -73,12 +76,12 @@ void XPfw_PmInit(void)
- #else
- 	u32 bootType = PM_COLD_BOOT;
- #endif
--
- 	PmDbg(DEBUG_DETAILED,"Power Management Init\r\n");
- 
+@@ -87,6 +91,7 @@ void XPfw_PmInit(void)
  	if (bootType == PM_COLD_BOOT) {
  		PmMasterDefaultConfig();
  		PmNodeConstruct();
@@ -38,5 +32,5 @@ index 90b7cc2..a328914 100644
  }
  
 -- 
-1.9.1
+2.11.0
 

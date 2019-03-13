@@ -1,4 +1,4 @@
-From 755d343f897339508ae833938db9e223c115d8a4 Mon Sep 17 00:00:00 2001
+From 7333fc2e8eb87d9515661b93853d064310974426 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 9 Mar 2018 07:51:12 +0100
 Subject: [PATCH 8/9] board: topic-miamiplus: Run IO PLL at 1000 MHz

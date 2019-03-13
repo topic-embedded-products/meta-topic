@@ -10,7 +10,6 @@ SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git"
 S = "${WORKDIR}/git"
 
 DEPENDS += "dtc-native"
-DEPENDS_append_zynqmp = " zynqmp-pmu-pmu-firmware"
 
 SRCREV = "078231750fcf486e9fca79b4ca6a30424846b8e8"
 
@@ -31,10 +30,10 @@ SRC_URI_append = "\
 	file://0014-board-topic-miamiplus-Run-IO-PLL-at-1000-MHz.patch \
 	"
 
-do_compile_zynqmp[depends] += "zynqmp-pmu-pmu-firmware:do_deploy"
-do_compile_prepend_zynqmp() {
-	cp ${DEPLOY_DIR_IMAGE}/pmu-${MACHINE}.bin ${S}/board/topic/zynqmp/pmufw.bin
-}
+#do_compile_zynqmp[depends] += "zynqmp-pmu-pmu-firmware:do_deploy"
+#do_compile_prepend_zynqmp() {
+#	cp ${DEPLOY_DIR_IMAGE}/pmu-${MACHINE}.bin ${S}/board/topic/zynqmp/pmufw.bin
+#}
 
 PV = "v2017.01+git${SRCPV}"
 

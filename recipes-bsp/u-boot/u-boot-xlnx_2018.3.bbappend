@@ -1,6 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI_append = "\
+	file://pmu-firmware-zynqmp-pmu.bin.xz \
 	file://0001-zynqmp-Boot-from-SD-card-if-SPI-is-not-supported.patch \
 	file://0002-board-topic-Detect-RAM-size-at-boot.patch \
 	file://0003-topic-miamiplus-Run-CPU-at-800MHz-for-speedgrade-2.patch \
@@ -13,8 +14,6 @@ SRC_URI_append = "\
 	"
 
 # Build the PMU firmware into boot.bin
-DEPENDS_append_zynqmp = " zynqmp-pmu-pmu-firmware"
-do_compile_zynqmp[depends] += "zynqmp-pmu-pmu-firmware:do_deploy"
 do_compile_prepend_zynqmp() {
-	cp ${DEPLOY_DIR_IMAGE}/pmu-${MACHINE}.bin ${S}/board/topic/zynqmp/pmufw.bin
+	cp ${WORKDIR}/pmu-firmware-zynqmp-pmu.bin ${S}/board/topic/zynqmp/pmufw.bin
 }

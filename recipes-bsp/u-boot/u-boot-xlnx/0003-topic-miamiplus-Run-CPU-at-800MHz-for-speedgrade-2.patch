@@ -1,4 +1,4 @@
-From 025f2b4ca41e230d23a521f647b0832c43660b93 Mon Sep 17 00:00:00 2001
+From 7bd25b473025cb5a11c3e3e8e3730b1593a4753b Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 22 May 2017 09:33:52 +0200
 Subject: [PATCH 3/9] topic-miamiplus: Run CPU at 800MHz for speedgrade-2
