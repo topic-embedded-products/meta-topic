@@ -44,8 +44,6 @@ SOC_VARIANT ?= "eg"
 require conf/machine/include/tune-zynqmp.inc
 require conf/machine/include/machine-xilinx-overrides.inc
 require conf/machine/include/machine-xilinx-default.inc
-require conf/machine/include/machine-xilinx-board.inc
-require conf/machine/include/zynqmp-pmu-config.inc
 
 # The SOM_FAMILY is more specific than the SOC_FAMILY (=zynqmp) in the MACHINEOVERRIDES
 SOC_FAMILY .= ":${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}"
@@ -70,7 +68,6 @@ PREFERRED_PROVIDER_virtual/bootloader = "u-boot-xlnx"
 
 EXTRA_IMAGEDEPENDS += " \
 		arm-trusted-firmware \
-		virtual/pmu-firmware \
 		"
 
 # fpga-image-load / fpga-firmware-load does not work on MPSoC

@@ -1,4 +1,4 @@
-From 526fcefb4aa8fd36a41a433eaf430b7cfdfb45f6 Mon Sep 17 00:00:00 2001
+From e887b657331cbfd50aff24c4b882011fc51f3c35 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 22 Aug 2018 10:12:31 +0200
 Subject: [PATCH 9/9] miamimp: Load FPGA bitstream at boot
