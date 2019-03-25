@@ -22,4 +22,4 @@ BOARD_FPGA_PACKAGES ?= "\
 
 MACHINE_FEATURES += "usbhost usbgadget"
 
-DEVICETREE = "uImage-topic-miamiplus-florida-test.dtb"
+DEVICETREE = "topic-miamiplus-florida-test.dtb"
