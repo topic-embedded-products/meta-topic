@@ -1,7 +1,7 @@
 #!/bin/sh
 # Script to create a tar file with the boot partition contents. Set DTB and
 # MACHINE environments first, e.g.:
-# MACHINE=topic-miami-florida-gen-xc7z015 DTB=uImage-topic-miami-florida-gen.dtb create-boot-archive.sh
+# MACHINE=topic-miami-florida-gen-xc7z015 DTB=topic-miami-florida-gen.dtb create-boot-archive.sh
 if [ -z "${SD_BOOTSCRIPT}" ]
 then
 	SD_BOOTSCRIPT=autorun.scr

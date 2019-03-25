@@ -30,4 +30,4 @@ BOARD_FPGA_PACKAGES ?= "\
 
 MACHINE_FEATURES += "usbhost usbgadget ethernet"
 
-DEVICETREE = "uImage-topic-miami-florida-pci.dtb"
+DEVICETREE = "topic-miami-florida-pci.dtb"
