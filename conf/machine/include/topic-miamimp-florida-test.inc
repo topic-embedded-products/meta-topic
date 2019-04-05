@@ -13,4 +13,4 @@ BOARD_FPGA_PACKAGES ?= "\
 
 MACHINE_FEATURES += "usbhost usbgadget"
 
-DEVICETREE ?= "Image-zynqmp-topic-miamimp-florida-test.dtb"
+DEVICETREE ?= "zynqmp-topic-miamimp-florida-test.dtb"

@@ -34,4 +34,4 @@ module_autoload_axi-hdmi-rx = "adv7604 dma-axi-dmac axi-hdmi-rx"
 
 MACHINE_FEATURES += "usbhost usbgadget"
 
-DEVICETREE ?= "Image-zynqmp-topic-miamimp-florida-gen.dtb"
+DEVICETREE ?= "zynqmp-topic-miamimp-florida-gen.dtb"
