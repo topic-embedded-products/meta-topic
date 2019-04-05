@@ -68,7 +68,12 @@ do
 done
 if [ -z "${DTB}" ]
 then
-	DTB="uImage-*-adv7511.dtb"
+	DTB="${DEVICETREE}"
+fi
+if [ -z "${DTB}" ]
+then
+	echo "Devicetree is not set, please provide DTB environment"
+	exit 1
 fi
 set -e
 if [ -z "${SD_BOOTSCRIPT}" ]
