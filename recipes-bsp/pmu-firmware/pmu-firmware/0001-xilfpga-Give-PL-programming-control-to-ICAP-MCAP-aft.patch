@@ -1,0 +1,36 @@
+From 8b6f430e17cfae2d697aee4d5a9de93f3e2c7e4f Mon Sep 17 00:00:00 2001
+From: Niek van Agt <niek.van.agt@topic.nl>
+Date: Tue, 25 Jun 2019 11:18:17 +0200
+Subject: [PATCH] xilfpga: Give PL programming control to ICAP/MCAP after
+ programming it via PCAP
+
+---
+ lib/sw_services/xilfpga/src/xilfpga_pcap.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/lib/sw_services/xilfpga/src/xilfpga_pcap.c b/lib/sw_services/xilfpga/src/xilfpga_pcap.c
+index 464d021ae..9f2ce446a 100644
+--- a/lib/sw_services/xilfpga/src/xilfpga_pcap.c
++++ b/lib/sw_services/xilfpga/src/xilfpga_pcap.c
+@@ -448,6 +448,10 @@ u32 XFpga_PL_BitSream_Load (UINTPTR WrAddr, UINTPTR AddrPtr, u32 flags)
+ 	/* PS-PL reset */
+ 	XFpga_PsPlGpioReset(FPGA_NUM_FABRIC_RESETS);
+ END:
++
++	/* Give PL control to ICAP / MCAP */
++	Xil_Out32(CSU_PCAP_CTRL, 0x0);
++
+ 	/* Disable the PCAP clk */
+ 	RegVal = Xil_In32(PCAP_CLK_CTRL);
+ 	Xil_Out32(PCAP_CLK_CTRL, RegVal & ~(PCAP_CLK_EN_MASK) );
+@@ -455,6 +459,7 @@ END:
+ 	if ((u8 *)AddrPtr != NULL)
+ 		memset((u8 *)AddrPtr, 0, KEY_LEN);
+ #endif
++
+ 	return Status;
+ }
+ 
+-- 
+2.17.1
+
