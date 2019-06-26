@@ -38,6 +38,7 @@ KERNEL_DEVICETREE_topic-miami = "\
 	"
 KERNEL_DEVICETREE_topic-miamimp = "\
 	xilinx/zynqmp-topic-miamimp.dtb \
+	xilinx/zynqmp-topic-miamimp-dyplo.dtb \
 	xilinx/zynqmp-topic-miamimp-florida-gen.dtb \
 	xilinx/zynqmp-topic-miamimp-florida-test.dtb \
 	"

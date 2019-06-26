@@ -18,4 +18,5 @@ SRC_URI_append = " \
 	file://0015-Add-topic-miami-devicetrees.patch \
 	file://0016-sound-soc-adi-axi-spdif.c-Support-programmable-maste.patch \
 	file://0017-zynq-fpga-Only-route-PR-via-PCAP-when-required.patch \
+	file://0018-Add-devicetree-for-miamimp-florida-test-with-Dyplo.patch \
 	"
