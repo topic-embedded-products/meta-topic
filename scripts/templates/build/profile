@@ -1,7 +1,7 @@
 # The MACHINE environment variable can be used to pick a
 # machine, look in meta-topic/conf/machine for a list of values.
 # export MACHINE=pick-a-valid-machine-name
-
 export BB_ENV_EXTRAWHITE=MACHINE
+export BUILDDIR="${PWD}"
 TOPDIR=`dirname ${PWD}`
 export PATH=${TOPDIR}/oe-core/scripts:${TOPDIR}/bitbake/bin:$PATH
