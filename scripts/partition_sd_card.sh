@@ -25,9 +25,3 @@ mkfs.ext4 -m 0 -L "rootfs" -b 2048 -N 24000 -O sparse_super,dir_index  ${DEV}2
 # Format the Linux data part, optimize for large files
 mkfs.ext4 -m 0 -L "data" -O large_file,sparse_super,dir_index,bigalloc -C 262144 ${DEV}3
 
-mkdir /media/boot
-mount ${DEV}1 /media/boot
-mkdir /media/rootfs
-mount ${DEV}2 /media/rootfs
-mkdir /media/data
-mount ${DEV}3 /media/data
