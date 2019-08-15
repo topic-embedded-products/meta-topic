@@ -9,9 +9,9 @@ fi
 set -e
 
 # Partition the disk, as 64M FAT16, 400MB root and the rest data
-sfdisk -uM $1 << EOF
-0 62 6
-,400
+sfdisk $1 << EOF
+1M 62M 6
+,800M
 ,
 
 EOF
