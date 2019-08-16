@@ -1,4 +1,4 @@
-From bd3d69ca27574b2e2baf2e224ac826433be0b0f2 Mon Sep 17 00:00:00 2001
+From d3953a63372b08ac2e5bae68f4ba5aac1756b758 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 14 Jun 2018 13:19:00 +0200
 Subject: [PATCH 15/17] Add topic-miami devicetrees
@@ -11,37 +11,37 @@ MP: Rename "clkc" to "clk", fix pinmux for sdio0, disable FPGA load, USB PHY, US
 
 Add topic_miamimp_defconfig (created using "bitbake -c savedefconfig virtual/kernel")
 ---
- arch/arm/boot/dts/topic-dyplo.dtsi                 |  12 +
- arch/arm/boot/dts/topic-miami-dyplo-acp.dts        |  11 +
- arch/arm/boot/dts/topic-miami-dyplo.dts            |   3 +
- arch/arm/boot/dts/topic-miami-florida-gen-amp.dts  |  34 ++
- arch/arm/boot/dts/topic-miami-florida-gen-mio.dtsi |  18 +
- arch/arm/boot/dts/topic-miami-florida-gen-nand.dts |   3 +
- arch/arm/boot/dts/topic-miami-florida-gen-pt.dts   |   4 +
- arch/arm/boot/dts/topic-miami-florida-gen.dts      |   2 +
- arch/arm/boot/dts/topic-miami-florida-gen.dtsi     | 266 +++++++++++
- .../arm/boot/dts/topic-miami-florida-mio-dyplo.dts |   4 +
- .../dts/topic-miami-florida-mio-nand-dyplo.dts     |   5 +
- arch/arm/boot/dts/topic-miami-florida-mio.dts      |   2 +
- arch/arm/boot/dts/topic-miami-florida-mio.dtsi     | 144 ++++++
- arch/arm/boot/dts/topic-miami-florida-pci-pt.dts   |   3 +
- arch/arm/boot/dts/topic-miami-florida-pci.dts      |  12 +
- arch/arm/boot/dts/topic-miami-florida-test.dts     |  52 +++
- arch/arm/boot/dts/topic-miami-florida-test.dtsi    | 125 ++++++
- .../boot/dts/topic-miami-florida-xadc-test.dtsi    |  15 +
- arch/arm/boot/dts/topic-miami-florida.dtsi         |  27 ++
- arch/arm/boot/dts/topic-miami-nand.dtsi            |  13 +
- arch/arm/boot/dts/topic-miami-vice.dts             |   2 +
- arch/arm/boot/dts/topic-miami.dtsi                 | 334 ++++++++++++++
- arch/arm/boot/dts/topic-miamilite-florida-test.dts |  32 ++
- arch/arm/boot/dts/topic-miamilite.dtsi             |  51 +++
- arch/arm/boot/dts/topic-miamiplus-florida-test.dts |  51 +++
- arch/arm/boot/dts/topic-miamiplus.dtsi             |  97 ++++
- .../xilinx/zynqmp-topic-miamimp-florida-gen.dts    | 497 +++++++++++++++++++++
- .../xilinx/zynqmp-topic-miamimp-florida-test.dts   | 188 ++++++++
- .../arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts | 384 ++++++++++++++++
- arch/arm64/configs/topic_miamimp_defconfig         | 399 +++++++++++++++++
- 30 files changed, 2790 insertions(+)
+ arch/arm/boot/dts/topic-dyplo.dtsi            |  12 +
+ arch/arm/boot/dts/topic-miami-dyplo-acp.dts   |  11 +
+ arch/arm/boot/dts/topic-miami-dyplo.dts       |   3 +
+ .../boot/dts/topic-miami-florida-gen-amp.dts  |  34 ++
+ .../boot/dts/topic-miami-florida-gen-mio.dtsi |  18 +
+ .../boot/dts/topic-miami-florida-gen-nand.dts |   3 +
+ .../boot/dts/topic-miami-florida-gen-pt.dts   |   4 +
+ arch/arm/boot/dts/topic-miami-florida-gen.dts |   2 +
+ .../arm/boot/dts/topic-miami-florida-gen.dtsi | 266 ++++++++++
+ .../dts/topic-miami-florida-mio-dyplo.dts     |   4 +
+ .../topic-miami-florida-mio-nand-dyplo.dts    |   5 +
+ arch/arm/boot/dts/topic-miami-florida-mio.dts |   2 +
+ .../arm/boot/dts/topic-miami-florida-mio.dtsi | 142 +++++
+ .../boot/dts/topic-miami-florida-pci-pt.dts   |   3 +
+ arch/arm/boot/dts/topic-miami-florida-pci.dts |  12 +
+ .../arm/boot/dts/topic-miami-florida-test.dts |  52 ++
+ .../boot/dts/topic-miami-florida-test.dtsi    | 125 +++++
+ .../dts/topic-miami-florida-xadc-test.dtsi    |  15 +
+ arch/arm/boot/dts/topic-miami-florida.dtsi    |  27 +
+ arch/arm/boot/dts/topic-miami-nand.dtsi       |  13 +
+ arch/arm/boot/dts/topic-miami-vice.dts        |   2 +
+ arch/arm/boot/dts/topic-miami.dtsi            | 334 ++++++++++++
+ .../boot/dts/topic-miamilite-florida-test.dts |  32 ++
+ arch/arm/boot/dts/topic-miamilite.dtsi        |  51 ++
+ .../boot/dts/topic-miamiplus-florida-test.dts |  51 ++
+ arch/arm/boot/dts/topic-miamiplus.dtsi        |  97 ++++
+ .../zynqmp-topic-miamimp-florida-gen.dts      | 497 ++++++++++++++++++
+ .../zynqmp-topic-miamimp-florida-test.dts     | 188 +++++++
+ .../boot/dts/xilinx/zynqmp-topic-miamimp.dts  | 384 ++++++++++++++
+ arch/arm64/configs/topic_miamimp_defconfig    | 399 ++++++++++++++
+ 30 files changed, 2788 insertions(+)
  create mode 100644 arch/arm/boot/dts/topic-dyplo.dtsi
  create mode 100644 arch/arm/boot/dts/topic-miami-dyplo-acp.dts
  create mode 100644 arch/arm/boot/dts/topic-miami-dyplo.dts
@@ -75,7 +75,7 @@ Add topic_miamimp_defconfig (created using "bitbake -c savedefconfig virtual/ker
 
 diff --git a/arch/arm/boot/dts/topic-dyplo.dtsi b/arch/arm/boot/dts/topic-dyplo.dtsi
 new file mode 100644
-index 0000000..c86e647
+index 000000000000..c86e647109f6
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-dyplo.dtsi
 @@ -0,0 +1,12 @@
@@ -93,7 +93,7 @@ index 0000000..c86e647
 +};
 diff --git a/arch/arm/boot/dts/topic-miami-dyplo-acp.dts b/arch/arm/boot/dts/topic-miami-dyplo-acp.dts
 new file mode 100644
-index 0000000..a71bb01
+index 000000000000..a71bb019cba9
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-dyplo-acp.dts
 @@ -0,0 +1,11 @@
@@ -110,7 +110,7 @@ index 0000000..a71bb01
 +};
 diff --git a/arch/arm/boot/dts/topic-miami-dyplo.dts b/arch/arm/boot/dts/topic-miami-dyplo.dts
 new file mode 100644
-index 0000000..f6e3de1
+index 000000000000..f6e3de15f13f
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-dyplo.dts
 @@ -0,0 +1,3 @@
@@ -119,7 +119,7 @@ index 0000000..f6e3de1
 +/include/ "topic-dyplo.dtsi"
 diff --git a/arch/arm/boot/dts/topic-miami-florida-gen-amp.dts b/arch/arm/boot/dts/topic-miami-florida-gen-amp.dts
 new file mode 100644
-index 0000000..43d6db5
+index 000000000000..43d6db58047b
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-gen-amp.dts
 @@ -0,0 +1,34 @@
@@ -159,7 +159,7 @@ index 0000000..43d6db5
 +};
 diff --git a/arch/arm/boot/dts/topic-miami-florida-gen-mio.dtsi b/arch/arm/boot/dts/topic-miami-florida-gen-mio.dtsi
 new file mode 100644
-index 0000000..af36d08
+index 000000000000..af36d0889f75
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-gen-mio.dtsi
 @@ -0,0 +1,18 @@
@@ -183,7 +183,7 @@ index 0000000..af36d08
 +};
 diff --git a/arch/arm/boot/dts/topic-miami-florida-gen-nand.dts b/arch/arm/boot/dts/topic-miami-florida-gen-nand.dts
 new file mode 100644
-index 0000000..a4f4a58
+index 000000000000..a4f4a580f364
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-gen-nand.dts
 @@ -0,0 +1,3 @@
@@ -192,7 +192,7 @@ index 0000000..a4f4a58
 +/include/ "topic-miami-nand.dtsi"
 diff --git a/arch/arm/boot/dts/topic-miami-florida-gen-pt.dts b/arch/arm/boot/dts/topic-miami-florida-gen-pt.dts
 new file mode 100644
-index 0000000..846d460
+index 000000000000..846d46090cb3
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-gen-pt.dts
 @@ -0,0 +1,4 @@
@@ -202,7 +202,7 @@ index 0000000..846d460
 +/include/ "topic-dyplo.dtsi"
 diff --git a/arch/arm/boot/dts/topic-miami-florida-gen.dts b/arch/arm/boot/dts/topic-miami-florida-gen.dts
 new file mode 100644
-index 0000000..4fbfd8f
+index 000000000000..4fbfd8f196d8
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-gen.dts
 @@ -0,0 +1,2 @@
@@ -210,7 +210,7 @@ index 0000000..4fbfd8f
 +/include/ "topic-miami-florida-gen.dtsi"
 diff --git a/arch/arm/boot/dts/topic-miami-florida-gen.dtsi b/arch/arm/boot/dts/topic-miami-florida-gen.dtsi
 new file mode 100644
-index 0000000..06dcd59
+index 000000000000..06dcd5964093
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-gen.dtsi
 @@ -0,0 +1,266 @@
@@ -482,7 +482,7 @@ index 0000000..06dcd59
 +};
 diff --git a/arch/arm/boot/dts/topic-miami-florida-mio-dyplo.dts b/arch/arm/boot/dts/topic-miami-florida-mio-dyplo.dts
 new file mode 100644
-index 0000000..a94df26
+index 000000000000..a94df2657f42
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-mio-dyplo.dts
 @@ -0,0 +1,4 @@
@@ -492,7 +492,7 @@ index 0000000..a94df26
 +/include/ "topic-dyplo.dtsi"
 diff --git a/arch/arm/boot/dts/topic-miami-florida-mio-nand-dyplo.dts b/arch/arm/boot/dts/topic-miami-florida-mio-nand-dyplo.dts
 new file mode 100644
-index 0000000..d718394
+index 000000000000..d7183946320f
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-mio-nand-dyplo.dts
 @@ -0,0 +1,5 @@
@@ -503,7 +503,7 @@ index 0000000..d718394
 +/include/ "topic-dyplo.dtsi"
 diff --git a/arch/arm/boot/dts/topic-miami-florida-mio.dts b/arch/arm/boot/dts/topic-miami-florida-mio.dts
 new file mode 100644
-index 0000000..5cf840f
+index 000000000000..5cf840f0ccfd
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-mio.dts
 @@ -0,0 +1,2 @@
@@ -511,10 +511,10 @@ index 0000000..5cf840f
 +/include/ "topic-miami-florida-mio.dtsi"
 diff --git a/arch/arm/boot/dts/topic-miami-florida-mio.dtsi b/arch/arm/boot/dts/topic-miami-florida-mio.dtsi
 new file mode 100644
-index 0000000..2b0117d
+index 000000000000..e1e9c0f56a64
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-mio.dtsi
-@@ -0,0 +1,144 @@
+@@ -0,0 +1,142 @@
 +/include/ "topic-miami.dtsi"
 +
 +/* Common components for MIO parts of Florida boards. These are
@@ -547,8 +547,6 @@ index 0000000..2b0117d
 +
 +	gpio_keys: gpio-keys {
 +		compatible = "gpio-keys";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
 +		power {
 +			label = "power";
 +			gpios = <&gpioexf 2 1>; /* Input 2, active low */
@@ -661,7 +659,7 @@ index 0000000..2b0117d
 +};
 diff --git a/arch/arm/boot/dts/topic-miami-florida-pci-pt.dts b/arch/arm/boot/dts/topic-miami-florida-pci-pt.dts
 new file mode 100644
-index 0000000..84f13a4
+index 000000000000..84f13a4c3a5a
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-pci-pt.dts
 @@ -0,0 +1,3 @@
@@ -670,7 +668,7 @@ index 0000000..84f13a4
 +/include/ "topic-dyplo.dtsi"
 diff --git a/arch/arm/boot/dts/topic-miami-florida-pci.dts b/arch/arm/boot/dts/topic-miami-florida-pci.dts
 new file mode 100644
-index 0000000..897b155
+index 000000000000..897b15517475
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-pci.dts
 @@ -0,0 +1,12 @@
@@ -688,7 +686,7 @@ index 0000000..897b155
 +};
 diff --git a/arch/arm/boot/dts/topic-miami-florida-test.dts b/arch/arm/boot/dts/topic-miami-florida-test.dts
 new file mode 100644
-index 0000000..ba887a3
+index 000000000000..ba887a306d78
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-test.dts
 @@ -0,0 +1,52 @@
@@ -746,7 +744,7 @@ index 0000000..ba887a3
 +
 diff --git a/arch/arm/boot/dts/topic-miami-florida-test.dtsi b/arch/arm/boot/dts/topic-miami-florida-test.dtsi
 new file mode 100644
-index 0000000..447005c
+index 000000000000..447005ca5070
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-test.dtsi
 @@ -0,0 +1,125 @@
@@ -877,7 +875,7 @@ index 0000000..447005c
 +};
 diff --git a/arch/arm/boot/dts/topic-miami-florida-xadc-test.dtsi b/arch/arm/boot/dts/topic-miami-florida-xadc-test.dtsi
 new file mode 100644
-index 0000000..aa78879
+index 000000000000..aa78879ada72
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-xadc-test.dtsi
 @@ -0,0 +1,15 @@
@@ -898,7 +896,7 @@ index 0000000..aa78879
 +};
 diff --git a/arch/arm/boot/dts/topic-miami-florida.dtsi b/arch/arm/boot/dts/topic-miami-florida.dtsi
 new file mode 100644
-index 0000000..1b79b5f
+index 000000000000..1b79b5fc2c9a
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida.dtsi
 @@ -0,0 +1,27 @@
@@ -931,7 +929,7 @@ index 0000000..1b79b5f
 +};
 diff --git a/arch/arm/boot/dts/topic-miami-nand.dtsi b/arch/arm/boot/dts/topic-miami-nand.dtsi
 new file mode 100644
-index 0000000..a6ae708
+index 000000000000..a6ae7082ea8f
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-nand.dtsi
 @@ -0,0 +1,13 @@
@@ -950,7 +948,7 @@ index 0000000..a6ae708
 +};
 diff --git a/arch/arm/boot/dts/topic-miami-vice.dts b/arch/arm/boot/dts/topic-miami-vice.dts
 new file mode 100644
-index 0000000..e4cf68d
+index 000000000000..e4cf68de9723
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-vice.dts
 @@ -0,0 +1,2 @@
@@ -958,7 +956,7 @@ index 0000000..e4cf68d
 +/include/ "topic-miami.dtsi"
 diff --git a/arch/arm/boot/dts/topic-miami.dtsi b/arch/arm/boot/dts/topic-miami.dtsi
 new file mode 100644
-index 0000000..2c8b5c5
+index 000000000000..0d66e46d4c10
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami.dtsi
 @@ -0,0 +1,334 @@
@@ -1091,7 +1089,7 @@ index 0000000..2c8b5c5
 +		#address-cells = <1>;
 +		#size-cells = <1>;
 +		/* NVMEM entries */
-+		gem0_mac: mac@0x1e8 {
++		gem0_mac: mac@1e8 {
 +			reg = <0x1e8 6>;
 +		};
 +		gem1_mac: mac@1ee {
@@ -1298,7 +1296,7 @@ index 0000000..2c8b5c5
 +};
 diff --git a/arch/arm/boot/dts/topic-miamilite-florida-test.dts b/arch/arm/boot/dts/topic-miamilite-florida-test.dts
 new file mode 100644
-index 0000000..fe1e733
+index 000000000000..fe1e7339e2c0
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miamilite-florida-test.dts
 @@ -0,0 +1,32 @@
@@ -1336,7 +1334,7 @@ index 0000000..fe1e733
 +
 diff --git a/arch/arm/boot/dts/topic-miamilite.dtsi b/arch/arm/boot/dts/topic-miamilite.dtsi
 new file mode 100644
-index 0000000..8b352dd
+index 000000000000..8b352dda67bc
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miamilite.dtsi
 @@ -0,0 +1,51 @@
@@ -1393,7 +1391,7 @@ index 0000000..8b352dd
 +};
 diff --git a/arch/arm/boot/dts/topic-miamiplus-florida-test.dts b/arch/arm/boot/dts/topic-miamiplus-florida-test.dts
 new file mode 100644
-index 0000000..43b9177
+index 000000000000..43b917712308
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miamiplus-florida-test.dts
 @@ -0,0 +1,51 @@
@@ -1450,7 +1448,7 @@ index 0000000..43b9177
 +
 diff --git a/arch/arm/boot/dts/topic-miamiplus.dtsi b/arch/arm/boot/dts/topic-miamiplus.dtsi
 new file mode 100644
-index 0000000..c63b302
+index 000000000000..c63b30266fa3
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miamiplus.dtsi
 @@ -0,0 +1,97 @@
@@ -1553,7 +1551,7 @@ index 0000000..c63b302
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
 new file mode 100644
-index 0000000..e67323a
+index 000000000000..e67323a15b2b
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
 @@ -0,0 +1,497 @@
@@ -2056,7 +2054,7 @@ index 0000000..e67323a
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-test.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-test.dts
 new file mode 100644
-index 0000000..d8bcf37
+index 000000000000..d8bcf375ab71
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-test.dts
 @@ -0,0 +1,188 @@
@@ -2250,7 +2248,7 @@ index 0000000..d8bcf37
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
 new file mode 100644
-index 0000000..911a09d
+index 000000000000..911a09d82751
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
 @@ -0,0 +1,384 @@
@@ -2640,7 +2638,7 @@ index 0000000..911a09d
 +};
 diff --git a/arch/arm64/configs/topic_miamimp_defconfig b/arch/arm64/configs/topic_miamimp_defconfig
 new file mode 100644
-index 0000000..66d293c
+index 000000000000..66d293c764ad
 --- /dev/null
 +++ b/arch/arm64/configs/topic_miamimp_defconfig
 @@ -0,0 +1,399 @@
@@ -3044,5 +3042,5 @@ index 0000000..66d293c
 +# CONFIG_CRYPTO_HW is not set
 +CONFIG_CRC7=y
 -- 
-1.9.1
+2.17.1
 
