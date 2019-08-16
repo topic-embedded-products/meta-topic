@@ -19,3 +19,6 @@ SRC_URI_append = " \
 	file://0016-sound-soc-adi-axi-spdif.c-Support-programmable-maste.patch \
 	file://0017-zynq-fpga-Only-route-PR-via-PCAP-when-required.patch \
 	"
+
+# Compile overlay-capable devicetrees
+EXTRA_OEMAKE_append = " DTC_FLAGS="-p 1024 -@""

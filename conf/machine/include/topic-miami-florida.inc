@@ -1,7 +1,7 @@
 # Florida board common components
 require conf/machine/include/topic-miami.inc
 
-MACHINE_FPGA_BITSTREAM ?= "fpga-image-miami-florida-gen-reference"
+MACHINE_FPGA_BITSTREAM ?= "dtb-miami-florida-gen-reference"
 
 # Extra packages to install for the board
 BOARD_FPGA_PACKAGES ?= "\
@@ -32,4 +32,4 @@ module_autoload_axi-hdmi-rx = "adv7604 dma-axi-dmac axi-hdmi-rx"
 
 MACHINE_FEATURES += "usbhost usbgadget screen touchscreen wifi alsa ethernet"
 
-DEVICETREE = "topic-miami-florida-gen.dtb"
+DEVICETREE = "topic-miami-florida-mio.dtb"
