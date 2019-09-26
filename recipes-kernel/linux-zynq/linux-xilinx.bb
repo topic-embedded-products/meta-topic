@@ -2,16 +2,15 @@
 # to reverse, which is rather impossible to do. So this recipe just shadows
 # the Xilinx one and offers similar functionality as linux-topic did.
 SUMMARY = "Xilinx/Topic Kernel"
+LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
-LINUX_VERSION = "4.14"
-LINUX_VERSION_EXTENSION ?= ""
-KBRANCH = "xlnx_rebase_v4.14"
+LINUX_VERSION = "4.19"
+XILINX_RELEASE_VERSION = "v2019.1"
+LINUX_VERSION_EXTENSION = "-${XILINX_RELEASE_VERSION}"
+KBRANCH = "xlnx_rebase_v4.19"
+SRCREV = "9811303824b66a8db9a8ec61b570879336a9fde5"
+
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
-
-# There's quite a few bugs in the Xilinx kernel '2018.1' state which were fixed
-# later on in the branch, and they were causing nasty crashes. Grab the newer
-# version to get the fixes.
-SRCREV = "ad4cd988ba86ab0fb306d57f244b7eaa6cce79a4"
 
 COMPATIBLE_MACHINE = "topic-miami"
 

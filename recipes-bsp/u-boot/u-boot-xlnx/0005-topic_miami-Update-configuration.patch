@@ -1,0 +1,45 @@
+From a0c0e76cbd4d60a9671eb8f0a96053395d3ea1b4 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Wed, 9 Oct 2019 10:26:37 +0200
+Subject: [PATCH 5/7] topic_miami: Update configuration
+
+Remove unused "NET" support and make a slightly smaller SPL
+---
+ configs/topic_miami_defconfig | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
+index 64ebfaed35..f41235d8d3 100644
+--- a/configs/topic_miami_defconfig
++++ b/configs/topic_miami_defconfig
+@@ -12,6 +12,8 @@ CONFIG_DEBUG_UART=y
+ CONFIG_DISTRO_DEFAULTS=y
+ CONFIG_BOOTDELAY=0
+ CONFIG_SPL_STACK_R=y
++# CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR is not set
++# CONFIG_SPL_RAM_SUPPORT is not set
+ CONFIG_SPL_SPI_LOAD=y
+ CONFIG_SYS_PROMPT="zynq-uboot> "
+ CONFIG_CMD_THOR_DOWNLOAD=y
+@@ -24,10 +26,12 @@ CONFIG_CMD_MMC=y
+ CONFIG_CMD_SF=y
+ CONFIG_CMD_USB=y
+ # CONFIG_CMD_SETEXPR is not set
+-# CONFIG_CMD_NET is not set
+ CONFIG_CMD_CACHE=y
++# CONFIG_ISO_PARTITION is not set
++# CONFIG_SPL_PARTITION_UUIDS is not set
+ CONFIG_OF_EMBED=y
+ CONFIG_DEFAULT_DEVICE_TREE="zynq-topic-miami"
++# CONFIG_NET is not set
+ CONFIG_SPL_DM_SEQ_ALIAS=y
+ CONFIG_DFU_RAM=y
+ CONFIG_FPGA_XILINX=y
+@@ -55,4 +59,3 @@ CONFIG_USB_GADGET_PRODUCT_NUM=0x0300
+ CONFIG_CI_UDC=y
+ CONFIG_USB_GADGET_DOWNLOAD=y
+ CONFIG_USB_FUNCTION_THOR=y
+-# CONFIG_REGEX is not set
+-- 
+2.17.1
+

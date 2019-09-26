@@ -1,6 +1,6 @@
 require conf/machine/include/topic-miamimp.inc
 
-MACHINE_FPGA_BITSTREAM ?= "fpga-image-miamimp-florida-gen-reference"
+MACHINE_FPGA_BITSTREAM ?= "dtb-miami-florida-gen-reference"
 
 KERNEL_MODULE_AUTOLOAD += "macb g_ether spi-cadence mali"
 

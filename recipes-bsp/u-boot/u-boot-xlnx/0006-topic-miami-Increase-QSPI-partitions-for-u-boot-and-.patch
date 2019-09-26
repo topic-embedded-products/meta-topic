@@ -1,0 +1,88 @@
+From b536609c14463314a7d39a6230e02ab556a94e66 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 30 Sep 2019 10:35:03 +0200
+Subject: [PATCH 6/7] topic-miami: Increase QSPI partitions for u-boot and
+ kernel
+
+Since 2019.1 u-boot needs more space in QSPI flash to fit, so increase the
+u-boot.img partition by 128k. This moves the environment and other parts
+up as well. Make the partition table in the devicetree match this.
+Also increase the kernel size, so the rootfs aligns on 512k.
+---
+ arch/arm/dts/zynq-topic-miami.dts | 14 +++++++++-----
+ include/configs/topic_miami.h     |  8 ++++----
+ 2 files changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/arch/arm/dts/zynq-topic-miami.dts b/arch/arm/dts/zynq-topic-miami.dts
+index f6f10fe1a1..58a10e11aa 100644
+--- a/arch/arm/dts/zynq-topic-miami.dts
++++ b/arch/arm/dts/zynq-topic-miami.dts
+@@ -46,23 +46,27 @@
+ 		#size-cells = <1>;
+ 		partition@qspi-u-boot-spl {
+ 			label = "qspi-u-boot-spl";
+-			reg = <0x00000 0x10000>;
++			reg = <0x00000 0x20000>;
+ 		};
+ 		partition@qspi-u-boot-img {
+ 			label = "qspi-u-boot-img";
+-			reg = <0x10000 0x60000>;
++			reg = <0x20000 0x80000>;
++		};
++		partition@qspi-u-boot-env {
++			label = "qspi-u-boot-env";
++			reg = <0xA0000 0x20000>;
+ 		};
+ 		partition@qspi-device-tree {
+ 			label = "qspi-device-tree";
+-			reg = <0x70000 0x10000>;
++			reg = <0xC0000 0x20000>;
+ 		};
+ 		partition@qspi-linux {
+ 			label = "qspi-linux";
+-			reg = <0x80000 0x400000>;
++			reg = <0x100000 0x480000>;
+ 		};
+ 		partition@qspi-rootfs {
+ 			label = "qspi-rootfs";
+-			reg = <0x480000 0x1b80000>;
++			reg = <0x580000 0x1A80000>;
+ 		};
+ 	};
+ };
+diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
+index 6f8f2b4ede..e9524b7fc9 100644
+--- a/include/configs/topic_miami.h
++++ b/include/configs/topic_miami.h
+@@ -18,7 +18,7 @@
+ #undef CONFIG_ENV_SIZE
+ #define CONFIG_ENV_SIZE			0x8000
+ #undef CONFIG_ENV_OFFSET
+-#define CONFIG_ENV_OFFSET		0x80000
++#define CONFIG_ENV_OFFSET		0xA0000
+ 
+ /* SPL settings */
+ #undef CONFIG_SPL_ETH_SUPPORT
+@@ -100,7 +100,7 @@
+ 	"bootscript=autorun.scr\0" \
+ 	"loadbit_addr=0x100000\0"	\
+ 	"loadbootenv_addr=0x2000000\0" \
+-	"kernel_size=0x440000\0"	\
++	"kernel_size=0x480000\0"	\
+ 	"devicetree_size=0x10000\0"	\
+ 	"boot_size=0xF00000\0"	\
+ 	"fdt_high=0x20000000\0"	\
+@@ -111,8 +111,8 @@
+ 		"fpga load 0 ${loadbit_addr} ${filesize}\0" \
+ 	"qspiboot=echo Booting from QSPI flash... && " \
+ 		"sf probe && " \
+-		"sf read ${devicetree_addr} 0xA0000 ${devicetree_size} && " \
+-		"sf read ${kernel_addr} 0xC0000 ${kernel_size} && " \
++		"sf read ${devicetree_addr} 0xC0000 ${devicetree_size} && " \
++		"sf read ${kernel_addr} 0x100000 ${kernel_size} && " \
+ 		"bootm ${kernel_addr} - ${devicetree_addr}\0" \
+ 	"sdboot=if mmcinfo; then " \
+ 			"setenv bootargs console=ttyPS0,115200 " \
+-- 
+2.17.1
+

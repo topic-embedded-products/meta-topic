@@ -130,7 +130,7 @@ fi
 if [ -e ${IMAGE_ROOT}/${BOOT_BIN} ]
 then
 	cp ${IMAGE_ROOT}/${BOOT_BIN} ${MEDIA_BOOT}/BOOT.BIN
-	for fn in u-boot.img u-boot.bin atf-uboot.ub atf-spi.ub Image uImage
+	for fn in u-boot.img u-boot.bin u-boot.itb Image uImage
 	do
 		if [ -e ${IMAGE_ROOT}/${fn} ]
 		then
