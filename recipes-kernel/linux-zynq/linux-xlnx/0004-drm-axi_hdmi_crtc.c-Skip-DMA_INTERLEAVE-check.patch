@@ -1,0 +1,34 @@
+From f4339a6642e617e694921e925b7a6e09933d5234 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 16 Oct 2017 10:18:31 +0200
+Subject: [PATCH 04/13] drm: axi_hdmi_crtc.c: Skip DMA_INTERLEAVE check
+
+The mainline and xilinx versions of the xilinx_dma driver do not report
+the DMA_INTERLEAVE capability, but are compatible with this driver.
+Remove the explicit check on the capability to make the driver work with
+both Xilinx' and ADI's fork of the xilinx_dma driver.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_crtc.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_crtc.c b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_crtc.c
+index e46dd7725f0a..7a82192f8a9a 100644
+--- a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_crtc.c
++++ b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_crtc.c
+@@ -196,11 +196,6 @@ struct drm_crtc *axi_hdmi_crtc_create(struct drm_device *dev)
+ 	struct drm_plane *plane;
+ 	int ret;
+ 
+-	if (!dma_has_cap(DMA_INTERLEAVE, p->dma->device->cap_mask)) {
+-		DRM_ERROR("DMA needs to support interleaved transfers\n");
+-		return ERR_PTR(-EINVAL);
+-	}
+-
+ 	axi_hdmi_crtc = kzalloc(sizeof(*axi_hdmi_crtc), GFP_KERNEL);
+ 	if (!axi_hdmi_crtc)
+ 		return ERR_PTR(-ENOMEM);
+-- 
+2.17.1
+

@@ -1,0 +1,302 @@
+/* Overlay devicetree for the programmable logic part of the florida-gen board */
+/dts-v1/;
+/plugin/;
+  
+/ {
+	/* This fragment causes the FPGA image to load */
+	fragment@0 {
+		target = <&fpga_full>;
+		__overlay__ {
+			firmware-name = "fpga.bin.fpga-image-miami-florida-gen-reference";
+		};
+	};
+
+	fragment@1 {
+		/* On-board push buttons connected to EMIO GPIO 4 and 5 in reference design */
+		target-path = "/";
+		__overlay__ {
+			gpio-keys-emio {
+				compatible = "gpio-keys";
+				s2 {
+					label = "s2";
+					gpios = <&gpio0 58 1>; /* EMIO 4, active low */
+					linux,code = <60>; /* KEY_F2 */
+					gpio-key,wakeup;
+				};
+				s3 {
+					label = "s3";
+					gpios = <&gpio0 59 1>; /* EMIO 5, active low */
+					linux,code = <61>; /* KEY_F3 */
+					gpio-key,wakeup;
+				};
+			};
+
+			adv7511_hdmi_snd {
+				compatible = "simple-audio-card";
+				simple-audio-card,name = "HDMI monitor";
+				simple-audio-card,widgets =
+					"Speaker", "Speaker";
+				simple-audio-card,routing =
+					"Speaker", "TX";
+
+				simple-audio-card,dai-link@0 {
+					format = "spdif";
+					cpu {
+						sound-dai = <&axi_spdif_tx_0>;
+						frame-master;
+						bitclock-master;
+					};
+					codec {
+						sound-dai = <&adv7511>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@2 {
+		target = <&i2cmux_0>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			adv7511: adv7511@39 {
+				compatible = "adi,adv7511";
+				reg = <0x39>, <0x3f>;
+				reg-names = "primary", "edid";
+				adi,input-depth = <8>;
+				adi,input-colorspace = "rgb";
+				adi,input-clock = "1x";
+				adi,input-style = <1>;
+				adi,input-justification = "right";
+				adi,clock-delay = <0>;
+				#sound-dai-cells = <0>;
+
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					port@0 {
+						reg = <0>;
+						adv7511_in: endpoint {
+							remote-endpoint = <&axi_hdmi_out>;
+						};
+					};
+					port@1 {
+						reg = <1>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@3 {
+		target = <&i2cmux>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			i2c@1 {
+				/* HDMI O - Connects directly to HDMI connector */
+				#address-cells = <1>;
+				#size-cells = <0>;
+				reg = <1>;
+			};
+			i2c@3 {
+				/* HDMI IN */
+				#address-cells = <1>;
+				#size-cells = <0>;
+				reg = <3>;
+				/* copied from zynq-zed-imageon.dts */
+				adv7611@4c {
+					compatible = "adi,adv7611";
+					reg = <0x4c>;
+					#address-cells = <0x1>;
+					#size-cells = <0x0>;
+					bus-width = <24>;
+					hsync-active = <0>; /* Parallel bus */
+					vsync-active = <0>;
+					interrupt-parent = <&gpio0>;
+					interrupts = <57 4>; /* EMIO GPIO 3 */
+					adi,int1-config = <1>; /* ADV76XX_INT1_CONFIG_ACTIVE_LOW */
+					reset-gpios = <&gpio0 55 0>; /* EMIO GPIO 1 */
+					port@0 {
+						reg = <0x0>;
+					};
+					port@1 {
+						reg = <0x1>;
+						adv7611: endpoint {
+							bus-width = <16>;
+							remote-endpoint = <&axi_hdmi_rx>;
+						};
+					};
+				};
+			};
+		};
+	};
+
+	fragment@4 {
+		target = <&amba>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <1>;
+			interrupt-parent = <&intc>;
+			axi_vdma_0: axivdma@43000000 {
+				compatible = "xlnx,axi-vdma-1.00.a";
+				#address-cells = <1>;
+				#size-cells = <1>;
+				#dma-cells = <1>;
+				#dma-channels = <1>;
+				reg = <0x43000000 0x1000>;
+				dma-ranges = <0x00000000 0x00000000 0x40000000>;
+				xlnx,num-fstores = <3>;
+				xlnx,flush-fsync = <1>;
+				xlnx,addrwidth = <32>;
+				clocks = <&clkc 15>; /* FCLK0 */
+				clock-names = "s_axi_lite_aclk";
+				dma-channel@43000000 {
+					compatible = "xlnx,axi-vdma-mm2s-channel";
+					interrupts = <0 59 0x4>;
+					xlnx,datawidth = <64>;
+					xlnx,genlock-mode = <0x0>;
+					xlnx,include-dre = <0x0>;
+				};
+			};
+
+			axi_hdmi_0: axi_hdmi@70e00000 {
+				compatible = "adi,axi-hdmi-tx-1.00.a";
+				reg = <0x70e00000 0x10000>;
+				adi,is-rgb;
+				dmas = <&axi_vdma_0 0>;
+				dma-names = "video";
+				clocks = <&clockgen 3>;
+				port {
+					axi_hdmi_out: endpoint {
+						remote-endpoint = <&adv7511_in>;
+					};
+				};
+			};
+
+			axi_spdif_tx_0: axi-spdif-tx@75c00000 {
+				compatible = "adi,axi-spdif-tx-1.00.a";
+				reg = <0x75c00000 0x1000>;
+				dmas = <&dmac_s 0>;
+				dma-names = "tx";
+				clocks = <&clkc 15>, <&clockgen 1>, <&clockgen 1>;
+				clock-names = "axi", "ref", "spdif";
+				#sound-dai-cells = <0>;
+			};
+
+			axi_hdmi_rx_core: axi-hdmi-rx@43c10000 {
+				compatible = "adi,axi-hdmi-rx-1.00.a";
+				reg = <0x43c10000 0x10000>;
+				dmas = <&axi_dmac 0>;
+				dma-names = "rx";
+				gpios = <&gpioexf 3 0>; /* HPD, hotplug control (?) */
+
+				port {
+					#address-cells = <0>;
+					#size-cells = <0>;
+
+					axi_hdmi_rx: endpoint {
+						remote-endpoint = <&adv7611>;
+						bus-width = <24>;
+					};
+				};
+			};
+
+			axi_dmac: dmac@43c00000 {
+				compatible = "adi,axi-dmac-1.00.a";
+				reg = <0x43c00000 0x10000>;
+				#dma-cells = <1>;
+				interrupts = <0 58 4>;
+				clocks = <&clkc 16>;
+
+				adi,channels {
+					#size-cells = <0>;
+					#address-cells = <1>;
+					dma-channel@0 {
+						reg = <0>;
+						adi,length-width = <14>;
+						adi,source-bus-width = <64>;
+						adi,source-bus-type = <2>;
+						adi,destination-bus-width = <64>;
+						adi,destination-bus-type = <0>;
+						adi,2d;
+					};
+				};
+			};
+
+			axi_vdma_1: axivdma@43010000 {
+				compatible = "xlnx,axi-vdma-1.00.a";
+				#address-cells = <1>;
+				#size-cells = <1>;
+				#dma-cells = <1>;
+				#dma-channels = <1>;
+				reg = <0x43010000 0x1000>;
+				dma-ranges = <0x00000000 0x00000000 0x40000000>;
+				xlnx,num-fstores = <3>;
+				xlnx,flush-fsync = <1>;
+				xlnx,addrwidth = <32>;
+				clocks = <&clkc 15>; /* FCLK0 */
+				clock-names = "s_axi_lite_aclk";
+				dma-channel@43000000 {
+					compatible = "xlnx,axi-vdma-mm2s-channel";
+					interrupts = <0 55 0x4>;
+					xlnx,datawidth = <64>;
+					xlnx,genlock-mode = <0x0>;
+					xlnx,include-dre = <0x0>;
+				};
+			};
+
+			axi_vdma_vga: axi_vdma_vga@7e000000 {
+				compatible = "topic,vdma-fb";
+				reg = <0x7e000000 0x10000>;
+				dmas = <&axi_vdma_1 0>;
+				dma-names = "video";
+				num-fstores = <3>;
+				width = <1024>;
+				height = <600>;
+				horizontal-sync = <136>;
+				horizontal-front-porch = <24>;
+				horizontal-back-porch = <160>;
+				horizontal-polarity = <0>;
+				vertical-sync = <8>;
+				vertical-front-porch = <4>;
+				vertical-back-porch = <23>;
+				vertical-polarity = <0>;
+			};
+		};
+	};
+
+	/* Ethernet PHY via EMIO. Logic contains a GMII to RGMII conversion, so
+	 * the emac should see a GMII interface */
+	fragment@5 {
+		target = <&gem0>;
+		__overlay__ {
+			status = "okay";
+			phy-handle = <&phy3>;
+			phy-mode = "gmii";
+
+			mdio {
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				gmiitorgmii: gmiitorgmii@8 {
+					compatible = "xlnx,gmii-to-rgmii-1.0";
+					reg = <0x8>;
+					phy-handle = <&phy3>;
+				};
+
+				phy3: ethernet-phy@3 {
+					/* PHY on the board */
+					device_type = "ethernet-phy";
+					reg = <0x3>;
+					interrupt-parent = <&gpio0>;
+					interrupts = <65 0x8>; /* GPIO 65 (EMIO 11), IRQ_TYPE_LEVEL_LOW */
+					rxc-skew-ps = <1080>; /* Skew RX clock pad by 180 ps */
+					txc-skew-ps = <840>;  /* Skew TX clock pad by -60 ps */
+				};
+
+			};
+		};
+	};
+
+};

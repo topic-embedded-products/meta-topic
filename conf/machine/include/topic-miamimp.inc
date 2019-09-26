@@ -54,7 +54,9 @@ MACHINE_FEATURES = "rtc ext2 ext3 vfat usbhost mali fpgamgr"
 UBOOT_MACHINE = "topic_miamimp_config"
 SPL_BINARY = "spl/boot.bin"
 SPL_SYMLINK = "BOOT.bin"
-UBOOT_SUFFIX = "img"
+UBOOT_SUFFIX = "itb"
+# Since Xilinx defines UBOOT_SUFFIX_zynqmp somewhere, fix that here
+UBOOT_SUFFIX_zynqmp = "itb"
 UBOOT_LOADADDRESS = "0x8000000"
 UBOOT_ENTRYPOINT = "0x8000000"
 HAS_PLATFORM_INIT_append = " topic_miamimp_config"
@@ -69,12 +71,8 @@ PREFERRED_PROVIDER_virtual/bootloader = "u-boot-xlnx"
 EXTRA_IMAGEDEPENDS += " \
 		virtual/bootloader \
 		arm-trusted-firmware \
+		sd-bootscript \
 		"
-
-# fpga-image-load / fpga-firmware-load does not work on MPSoC
-BAD_RECOMMENDATIONS += "fpga-image-load \
-			fpga-firmware-load \
-			"
 
 # Use QSPI flash with 128k sector size, 128MB total size
 MKUBIFS_ARGS = "-m 1 -e 130944 -c 1008"
@@ -84,5 +82,5 @@ UBI_VOLNAME = "qspi-rootfs"
 # WIC image support.
 DEVICETREE ??= "zynqmp-topic-miamimp.dtb"
 WKS_FILE = "sdimage-bootpart.wks"
-IMAGE_BOOT_FILES = "boot.bin u-boot.bin Image atf-uboot.ub ${DEVICETREE};system.dtb"
+IMAGE_BOOT_FILES = "boot.bin u-boot.itb autorun.scr;boot.scr Image ${DEVICETREE};system.dtb"
 do_image_wic[depends] += "mtools-native:do_populate_sysroot dosfstools-native:do_populate_sysroot virtual/bootloader:do_deploy"

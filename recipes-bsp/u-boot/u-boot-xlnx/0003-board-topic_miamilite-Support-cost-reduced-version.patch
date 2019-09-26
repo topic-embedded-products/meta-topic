@@ -1,0 +1,155 @@
+From 800b6710fe65841b2b295efb6bc2a17bccdc4407 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 23 Feb 2017 12:07:49 +0100
+Subject: [PATCH 3/7] board: topic_miamilite: Support cost-reduced version
+
+To reduce board cost, the topic-miamilite board hardware was adapted. It now
+only has single QSPI NOR flash and a single DDR RAM chip. This reduces the
+memory interface to 16-bit and halves the available RAM and flash.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ arch/arm/dts/zynq-topic-miamilite.dts              |  7 ++++---
+ .../topic/zynq/zynq-topic-miamilite/ps7_init_gpl.c | 14 +++++++-------
+ board/topic/zynq/zynq-topic-miamilite/ps7_regs.txt | 14 +++++++-------
+ include/configs/topic_miami.h                      |  7 +++++--
+ include/configs/topic_miamilite.h                  | 11 +++++++++++
+ 5 files changed, 34 insertions(+), 19 deletions(-)
+ create mode 100644 include/configs/topic_miamilite.h
+
+diff --git a/arch/arm/dts/zynq-topic-miamilite.dts b/arch/arm/dts/zynq-topic-miamilite.dts
+index 366fd5bbb1..c06549c076 100644
+--- a/arch/arm/dts/zynq-topic-miamilite.dts
++++ b/arch/arm/dts/zynq-topic-miamilite.dts
+@@ -9,8 +9,9 @@
+ / {
+ 	model = "Topic Miami Lite Zynq Board";
+ 	compatible = "topic,miamilite", "xlnx,zynq-7000";
+-};
+ 
+-&qspi {
+-	is-dual = <1>;
++	memory@0 {
++		device_type = "memory";
++		reg = <0x0 0x20000000>;
++	};
+ };
+diff --git a/board/topic/zynq/zynq-topic-miamilite/ps7_init_gpl.c b/board/topic/zynq/zynq-topic-miamilite/ps7_init_gpl.c
+index afec4038d3..28670bd962 100644
+--- a/board/topic/zynq/zynq-topic-miamilite/ps7_init_gpl.c
++++ b/board/topic/zynq/zynq-topic-miamilite/ps7_init_gpl.c
+@@ -59,7 +59,7 @@ static unsigned long ps7_clock_init_data_3_0[] = {
+ };
+ 
+ static unsigned long ps7_ddr_init_data_3_0[] = {
+-	EMIT_MASKWRITE(0xF8006000, 0x0001FFFFU, 0x00000080U),
++	EMIT_MASKWRITE(0xF8006000, 0x0001FFFFU, 0x00000084U),
+ 	EMIT_MASKWRITE(0xF8006004, 0x0007FFFFU, 0x00001081U),
+ 	EMIT_MASKWRITE(0xF8006008, 0x03FFFFFFU, 0x03C0780FU),
+ 	EMIT_MASKWRITE(0xF800600C, 0x03FFFFFFU, 0x02001001U),
+@@ -74,9 +74,9 @@ static unsigned long ps7_ddr_init_data_3_0[] = {
+ 	EMIT_MASKWRITE(0xF8006030, 0xFFFFFFFFU, 0x00040930U),
+ 	EMIT_MASKWRITE(0xF8006034, 0x13FF3FFFU, 0x000116D4U),
+ 	EMIT_MASKWRITE(0xF8006038, 0x00000003U, 0x00000000U),
+-	EMIT_MASKWRITE(0xF800603C, 0x000FFFFFU, 0x00000777U),
+-	EMIT_MASKWRITE(0xF8006040, 0xFFFFFFFFU, 0xFFF00000U),
+-	EMIT_MASKWRITE(0xF8006044, 0x0FFFFFFFU, 0x0F666666U),
++	EMIT_MASKWRITE(0xF800603C, 0x000FFFFFU, 0x00000666U),
++	EMIT_MASKWRITE(0xF8006040, 0xFFFFFFFFU, 0xFFFF0000U),
++	EMIT_MASKWRITE(0xF8006044, 0x0FFFFFFFU, 0x0F555555U),
+ 	EMIT_MASKWRITE(0xF8006048, 0x0003F03FU, 0x0003C008U),
+ 	EMIT_MASKWRITE(0xF8006050, 0xFF0F8FFFU, 0x77010800U),
+ 	EMIT_MASKWRITE(0xF8006058, 0x00010000U, 0x00000000U),
+@@ -102,8 +102,8 @@ static unsigned long ps7_ddr_init_data_3_0[] = {
+ 	EMIT_MASKWRITE(0xF8006114, 0x000000FFU, 0x00000000U),
+ 	EMIT_MASKWRITE(0xF8006118, 0x7FFFFFCFU, 0x40000001U),
+ 	EMIT_MASKWRITE(0xF800611C, 0x7FFFFFCFU, 0x40000001U),
+-	EMIT_MASKWRITE(0xF8006120, 0x7FFFFFCFU, 0x40000001U),
+-	EMIT_MASKWRITE(0xF8006124, 0x7FFFFFCFU, 0x40000001U),
++	EMIT_MASKWRITE(0xF8006120, 0x7FFFFFCFU, 0x40000000U),
++	EMIT_MASKWRITE(0xF8006124, 0x7FFFFFCFU, 0x40000000U),
+ 	EMIT_MASKWRITE(0xF800612C, 0x000FFFFFU, 0x0003482CU),
+ 	EMIT_MASKWRITE(0xF8006130, 0x000FFFFFU, 0x00033032U),
+ 	EMIT_MASKWRITE(0xF8006134, 0x000FFFFFU, 0x0002E81FU),
+@@ -140,7 +140,7 @@ static unsigned long ps7_ddr_init_data_3_0[] = {
+ 	EMIT_MASKWRITE(0xF80062B0, 0x003FFFFFU, 0x00005125U),
+ 	EMIT_MASKWRITE(0xF80062B4, 0x0003FFFFU, 0x000012A8U),
+ 	EMIT_MASKPOLL(0xF8000B74, 0x00002000U),
+-	EMIT_MASKWRITE(0xF8006000, 0x0001FFFFU, 0x00000081U),
++	EMIT_MASKWRITE(0xF8006000, 0x0001FFFFU, 0x00000085U),
+ 	EMIT_MASKPOLL(0xF8006054, 0x00000007U),
+ 	EMIT_EXIT(),
+ };
+diff --git a/board/topic/zynq/zynq-topic-miamilite/ps7_regs.txt b/board/topic/zynq/zynq-topic-miamilite/ps7_regs.txt
+index db6e642890..08d5344125 100644
+--- a/board/topic/zynq/zynq-topic-miamilite/ps7_regs.txt
++++ b/board/topic/zynq/zynq-topic-miamilite/ps7_regs.txt
+@@ -1,5 +1,5 @@
+ 0xF8000120 0x1F000200 // ARM_CLK_CTRL - divisor = 2 433 MHz (?)
+-0xf8000700 0x202
++0xf8000700 0x200
+ 0xf8000704 0x202
+ 0xf8000708 0x202
+ 0xf800070c 0x202
+@@ -8,11 +8,11 @@
+ 0xf8000718 0x202
+ 0xf800071c 0x200
+ 0xf8000720 0x202
+-0xf8000724 0x202
+-0xf8000728 0x202
+-0xf800072c 0x202
+-0xf8000730 0x202
+-0xf8000734 0x202
++0xf8000724 0x200
++0xf8000728 0x200
++0xf800072c 0x200
++0xf8000730 0x200
++0xf8000734 0x200
+ 0xf8000738 0x12e1
+ 0xf800073c 0x12e0
+ 0xf8000740 0x1200
+@@ -58,4 +58,4 @@
+ 0xF800014C 0x00000621 // LQSPI_CLK_CTRL - ARMPLL/6 (200 MHz)
+ 0xE000D000 0x800238C1 // QSPI config - divide-by-2
+ 0xE000D038 0x00000020 // QSPI loopback - internal, 0 delay
+-0xE000D0A0 0xE2FF06EB // LQSPI_CFG - Quad read, dual flash
++0xE000D0A0 0x82FF04EB // LQSPI_CFG - QIOREAD mode, Numonyx/Micron
+diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
+index f14c4ee3a8..c32c63ced6 100644
+--- a/include/configs/topic_miami.h
++++ b/include/configs/topic_miami.h
+@@ -57,9 +57,12 @@
+ /* Setup proper boot sequences for Miami boards */
+ 
+ #if defined(CONFIG_USB)
++# ifndef ENV_USB_RESET
++#  define ENV_USB_RESET "i2c dev 1 && i2c mw 41 1 ff && i2c mw 41 3 fe && "\
++		"i2c mw 41 1 fe && i2c mw 41 1 ff"
++# endif
+ # define EXTRA_ENV_USB \
+-	"usbreset=i2c dev 1 && i2c mw 41 1 ff && i2c mw 41 3 fe && "\
+-		"i2c mw 41 1 fe && i2c mw 41 1 ff\0" \
++	"usbreset=" ENV_USB_RESET "\0" \
+ 	"usbboot=run usbreset && if usb start; then " \
+ 		"echo Booting from USB... && " \
+ 		"if load usb 0 0x1900000 ${bootscript}; then "\
+diff --git a/include/configs/topic_miamilite.h b/include/configs/topic_miamilite.h
+new file mode 100644
+index 0000000000..7ec48d4343
+--- /dev/null
++++ b/include/configs/topic_miamilite.h
+@@ -0,0 +1,11 @@
++/*
++ * (C) Copyright 2017 Topic Embedded Products
++ *
++ * Configuration for Miami Lite Zynq Evaluation and Development Board
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++/* USB reset is on GPIO signal instead of expander */
++#define ENV_USB_RESET "gpio clear 0 && gpio set 0"
++#include "topic_miami.h"
+-- 
+2.17.1
+

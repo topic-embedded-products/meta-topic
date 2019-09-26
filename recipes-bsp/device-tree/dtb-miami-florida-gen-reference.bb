@@ -8,9 +8,13 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425
 inherit devicetree
 
 RRECOMMENDS_${PN} = "fpga-firmware-load"
-RDEPENDS_${PN} += "fpga-image-miami-florida-gen-reference"
 
-COMPATIBLE_MACHINE = "^topic-miami-florida-gen"
+BITSTREAM = "Unsupported-board-for-overlay"
+BITSTREAM_topic-miami = "fpga-image-miami-florida-gen-reference"
+BITSTREAM_topic-miamimp = "fpga-image-miamimp-florida-gen-reference"
+RDEPENDS_${PN} += "${BITSTREAM}"
+
+COMPATIBLE_MACHINE = "^topic-miami-florida-gen|^topic-miamimp-florida-gen"
 SRC_URI = "file://pl.dts"
 
 # devicetree.bbclass installs into /boot/devicetree while we want to install
