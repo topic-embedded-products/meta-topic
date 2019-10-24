@@ -101,7 +101,19 @@ EOF
 # bitstream to be loaded at board startup, and optionally there can be
 # partial bitstreams in a bitstreams directory.
 do_convert_bitstreams() {
-	fpga-bit-to-bin.py --flip fpga.bit ${WORKDIR}/fpga.bin
+	# Convert static bitfile
+   fpga-bit-to-bin.py --flip fpga.bit ${WORKDIR}/fpga.bin
+   
+   # Create symbolic link to build/bitstreams 
+   if [ ! -d bitstreams ]
+   then
+      if [ -d build/bitstreams ]
+      then
+         ln -s build/bitstreams bitstreams
+      fi
+   fi
+   
+   # Convert all partial bitfiles present in (build/)bitstreams
 	if [ -d bitstreams ]
 	then
 		for path in bitstreams/*
