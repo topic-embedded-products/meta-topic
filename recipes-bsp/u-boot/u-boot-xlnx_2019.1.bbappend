@@ -1,4 +1,8 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+# Reduce the length of the version number, otherwise builds will fail because
+# of sstate-cache signatures over 255 characters long, see:
+#   https://bugzilla.yoctoproject.org/show_bug.cgi?id=13177
+UBOOT_VERSION_EXTENSION = "-x2019.1"
 
 SRC_URI_append = "\
 	file://pmu-firmware-zynqmp-pmu.bin.xz \
