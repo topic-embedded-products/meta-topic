@@ -13,9 +13,10 @@ BOARD_DESIGN_URI = ""
 S = "${WORKDIR}"
 PV = "v3r0.1"
 
-BITSTREAM_FILENAME = "${MACHINE}-${PV}.bit"
+PLNAME = "topic-miami-florida-gen-${FPGA_FAMILY}"
+BITSTREAM_FILENAME = "${PLNAME}-${PV}.bit"
 TOPICEMBEDDED_URIBASE ?= "http://www.topicembeddedproducts.com/support/download/public/reference-images/"
-SRC_URI = "${TOPICEMBEDDED_URIBASE}/${BITSTREAM_FILENAME};name=${MACHINE}"
+SRC_URI = "${TOPICEMBEDDED_URIBASE}/${BITSTREAM_FILENAME};name=${PLNAME}"
 
 # Copy static bitstream to the source dir.
 do_compile() {
