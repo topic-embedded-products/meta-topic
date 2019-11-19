@@ -1,23 +1,17 @@
 #@TYPE: Machine
 #@DESCRIPTION: Machine configuration for the Topic Miami SOM.
 #
-# Machine names are expected to have this form:
-#  topic-miami-<carrier>-<fpga>
-# For example, "topic-miami-florida-gen-xc7z015"
+# Machine config is expected to set MACHINE_BOARD and FPGA_FAMILY
 
 # The system-on-module contains flash, CPU+FPGA, RAM and various power supply
 # and clock sources.
 SOM_FAMILY = "topic-miami"
 
-# All software packages run on the ARM part, hence strip of the FPGA type from
-# the machine same in order to create the MACHINE_ARCH.
-MACHINE_BOARD := "${@'-'.join(d.getVar('MACHINE', True).split('-')[:-1])}"
-# The kernel also only depends on the board, not the FPGA
+# The kernel only depends on the board, not the FPGA
 KMACHINE = "${MACHINE_BOARD}"
 
 # The FPGA bitstreams will use FPGA_FAMILY as their package-arch, because they
 # are compatible with any FPGA of the same type, regardless of the board.
-FPGA_FAMILY := "${@d.getVar('MACHINE', True).split('-')[-1:][0]}"
 FPGA_FAMILY_ARCH = "${@d.getVar('FPGA_FAMILY', True).replace('-','_')}"
 
 include conf/machine/include/zynq-base.inc

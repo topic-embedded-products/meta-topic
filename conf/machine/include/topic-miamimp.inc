@@ -1,22 +1,17 @@
 #@TYPE: Machine
 #@DESCRIPTION: Machine support for Topic Miami MPSoC.
 #
-# Machine names are expected to have this form:
-#  topic-miamimp-<carrier>-<fpga>
+# Machine config is expected to set MACHINE_BOARD and FPGA_FAMILY
 
 # The system-on-module contains flash, CPU+FPGA, RAM and various power supply
 # and clock sources.
 SOM_FAMILY = "topic-miamimp"
 
-# All software packages run on the ARM part, hence strip of the FPGA type from
-# the machine same in order to create the MACHINE_ARCH.
-MACHINE_BOARD := "${@'-'.join(d.getVar('MACHINE', True).split('-')[:-1])}"
 # The kernel also only depends on the board, not the FPGA
 KMACHINE = "${MACHINE_BOARD}"
 
 # The FPGA bitstreams will use FPGA_FAMILY as their package-arch, because they
 # are compatible with any FPGA of the same type, regardless of the board.
-FPGA_FAMILY := "${@d.getVar('MACHINE', True).split('-')[-1:][0]}"
 FPGA_FAMILY_ARCH = "${@d.getVar('FPGA_FAMILY', True).replace('-','_')}"
 # Default is not to have a bitstream, but machines will recommend their own,
 # or images may choose to use another application-specific bitstream provider.
@@ -32,7 +27,7 @@ MACHINE_EXTRA_RRECOMMENDS = "${MACHINE_FPGA_BITSTREAM} ${BOARD_FPGA_PACKAGES}"
 # Use the "32" or "64" toolchain
 XILINX_TOOL_ARCH ?= "64"
 # The base install directory for Vivado
-XILINX_VIVADO_VERSION ??= "2017.2"
+XILINX_VIVADO_VERSION ??= "2019.1"
 XILINX_VIVADO_PATH ?= "/opt/Xilinx/Vivado/${XILINX_VIVADO_VERSION}"
 # Your LM_LICENSE_FILE is usually removed by Bitbake
 XILINX_LM_LICENSE_FILE ?= "${XILINX_VIVADO_PATH}/data/ip/core_licenses/Xilinx.lic"
