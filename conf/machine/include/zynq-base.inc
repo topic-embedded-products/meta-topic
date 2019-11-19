@@ -25,7 +25,6 @@ SERIAL_CONSOLE = "115200 ttyPS0"
 
 # Default FGPA architecture is the machine
 FPGA_FAMILY ??= "${MACHINE}"
-FPGA_FAMILY_ARCH ??= "${MACHINE_ARCH}"
 
 # Default is not to have a bitstream, but machines will recommend their own,
 # or images may choose to use another application-specific bitstream provider.

@@ -4,8 +4,8 @@ Vivado or XPS on the build host to build."
 INHIBIT_DEFAULT_DEPS = "1"
 # Need the bitstream converter on the build machine
 DEPENDS = "fpga-bit-to-bin-native ${FPGA_STATIC_PN}"
-# Package is FPGA logic specific, usually not related to the machine.
-PACKAGE_ARCH = "${FPGA_FAMILY_ARCH}"
+# Package is machine specific
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 # Tool paths and versions may differ, the output should be the same, so
 # do not take these into account.
