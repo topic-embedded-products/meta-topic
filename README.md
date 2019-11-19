@@ -28,8 +28,8 @@ cd build
 # Edit local.conf to match your setup.
 vi conf/local.conf
 
-# The default machine is "topic-miami-florida-gen-xc7z015", change it in the
-# "profile" script or just export the MACHINE environment before building.
+# The default machine is "tdkz5", change it in the "profile" script or just
+# export the MACHINE environment before building.
 
 # Then build your first image and relax a bit:
 . ./profile
@@ -54,10 +54,9 @@ BBLAYERS ?= " \
   "
 ````
 
-Change your MACHINE to, for example, "topic-miami-florida-gen-xc7z015" or
-"topic-miami-florida-gen-xc7z030", depending on the board you have, and
-bitbake core-image-minimal. See also the Yocto Quick start for more
-information:
+Change your MACHINE to, for example, "tdkz15" or "tdkzu6", depending on
+the board you have, and bitbake core-image-minimal. See also the Yocto
+Quick start for more information:
 http://www.yoctoproject.org/docs/1.6.1/yocto-project-qs/yocto-project-qs.html
 
 A few recipes still require the "gitpkgv" class from meta-openembedded.
@@ -78,6 +77,13 @@ To boot a Miami-Florida board, insert the SD card into the slot, set the
 jumpers on the miami to boot from SD (01010110) and switch on the power
 supply.
 
+# MPSoC PMU firmware
+
+The MPSoC machines, named "tdkzu*", need a PMU firmware "blob" for the embedded
+microblaze power management unit. This repo holds the source code for generating
+this binary using OpenEmbedded recipes, but since it generates a single
+identical firmware that can be used on any MPSoC, a pre-built binary is already
+included and injected into the u-boot SPL image.
 
 # Additional information
 
