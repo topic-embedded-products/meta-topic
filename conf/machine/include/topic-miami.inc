@@ -10,15 +10,10 @@ SOM_FAMILY = "topic-miami"
 # The kernel only depends on the board, not the FPGA
 KMACHINE = "${MACHINE_BOARD}"
 
-# The FPGA bitstreams will use FPGA_FAMILY as their package-arch, because they
-# are compatible with any FPGA of the same type, regardless of the board.
-FPGA_FAMILY_ARCH = "${@d.getVar('FPGA_FAMILY', True).replace('-','_')}"
-
 include conf/machine/include/zynq-base.inc
 include conf/machine/include/tune-zynq.inc
 
 MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
-PACKAGE_EXTRA_ARCHS_append = " ${FPGA_FAMILY_ARCH}"
 
 PREFERRED_PROVIDER_virtual/xilinx-sdk = "miami-xilinx-sdk"
 

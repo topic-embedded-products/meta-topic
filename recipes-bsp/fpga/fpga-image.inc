@@ -6,8 +6,8 @@ INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS = "fpga-bit-to-bin-native"
 # Recommend bitstream to be loaded at boot
 RRECOMMENDS_${PN} = "${@bb.utils.contains("MACHINE_FEATURES", "fpgamgr", "fpga-firmware-load", "fpga-image-load", d)}"
-# Package is FPGA logic specific, usually not related to the machine.
-PACKAGE_ARCH = "${FPGA_FAMILY_ARCH}"
+# Package is machine specific
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 # Workaround: XPS fails to build when there's a "+" in the path.
 SRCPV = "${@bb.fetch2.get_srcrev(d).replace('+','-')}"
 

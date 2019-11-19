@@ -10,9 +10,6 @@ SOM_FAMILY = "topic-miamimp"
 # The kernel also only depends on the board, not the FPGA
 KMACHINE = "${MACHINE_BOARD}"
 
-# The FPGA bitstreams will use FPGA_FAMILY as their package-arch, because they
-# are compatible with any FPGA of the same type, regardless of the board.
-FPGA_FAMILY_ARCH = "${@d.getVar('FPGA_FAMILY', True).replace('-','_')}"
 # Default is not to have a bitstream, but machines will recommend their own,
 # or images may choose to use another application-specific bitstream provider.
 MACHINE_FPGA_BITSTREAM ??= ""
@@ -42,7 +39,6 @@ require conf/machine/include/machine-xilinx-default.inc
 
 # The SOM_FAMILY is more specific than the SOC_FAMILY (=zynqmp) in the MACHINEOVERRIDES
 SOC_FAMILY .= ":${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}"
-PACKAGE_EXTRA_ARCHS_append = " ${FPGA_FAMILY_ARCH}"
 
 MACHINE_FEATURES = "rtc ext2 ext3 vfat usbhost mali fpgamgr"
 
