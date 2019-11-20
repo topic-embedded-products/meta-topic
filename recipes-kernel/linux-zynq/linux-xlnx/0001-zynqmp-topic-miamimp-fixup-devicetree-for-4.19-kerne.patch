@@ -1,4 +1,4 @@
-From 662906c385f08cb71be96a36d357eb62205f8cef Mon Sep 17 00:00:00 2001
+From c88aa62894ef2d0bdedbdefe870adc528533bd3e Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 30 Sep 2019 14:44:23 +0200
 Subject: [PATCH] zynqmp-topic-miamimp: fixup devicetree for 4.19 kernel
@@ -9,15 +9,15 @@ Fix dtc warnings
 Enable pcap
 Move PL components to overlay
 ---
- .../zynqmp-topic-miamimp-florida-gen.dts      | 243 +-----------------
+ .../zynqmp-topic-miamimp-florida-gen.dts      | 244 +-----------------
  .../boot/dts/xilinx/zynqmp-topic-miamimp.dts  |  33 +--
- 2 files changed, 15 insertions(+), 261 deletions(-)
+ 2 files changed, 16 insertions(+), 261 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
-index e67323a15b2b..939152a97528 100644
+index e67323a15b2b..347f1d9b8acd 100644
 --- a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
-@@ -41,19 +41,6 @@
+@@ -41,25 +41,13 @@
  			linux,code = <116>; /* KEY_POWER */
  			gpio-key,wakeup;
  		};
@@ -37,7 +37,14 @@ index e67323a15b2b..939152a97528 100644
  	};
  
  	gpio-poweroff {
-@@ -97,40 +84,18 @@
+ 		compatible = "gpio-poweroff";
+ 		gpios = <&gpioexf 5 1>; /* Output 5, active low */
+ 		input;
++		force-pm-power-off; /* Replace the PSCI power-off callback */
+ 	};
+ 
+ 	charger: battery-charger {
+@@ -97,40 +85,18 @@
  /* SD card with level shifter */
  &sdhci1 {
  	status = "okay";
@@ -81,7 +88,7 @@ index e67323a15b2b..939152a97528 100644
  };
  
  /* I2C bus layout */
-@@ -160,33 +125,6 @@
+@@ -160,33 +126,6 @@
  				 *};
  				 */
  			};
@@ -115,7 +122,7 @@ index e67323a15b2b..939152a97528 100644
  		};
  		i2cmux_2: i2c@2 {
  			/* GEN */
-@@ -235,7 +173,7 @@
+@@ -235,7 +174,7 @@
  				compatible = "silabs,si514";
  			};
  			/* Battery gauge */
@@ -124,7 +131,7 @@ index e67323a15b2b..939152a97528 100644
  				compatible = "ltc2943";
  				reg = <0x64>;
  				lltc,resistor-sense = <15>; /* 15 mOhm */
-@@ -243,59 +181,6 @@
+@@ -243,59 +182,6 @@
  				power-supplies = <&charger>;
  			};
  		};
@@ -184,7 +191,7 @@ index e67323a15b2b..939152a97528 100644
  	};
  };
  
-@@ -310,9 +195,10 @@
+@@ -310,9 +196,10 @@
  	/* see: https://forums.xilinx.com/t5/Embedded-Linux/Zynqmp-USB2-0/td-p/790522/page/2 */
  	/delete-property/ clocks;
  	/delete-property/ clock-names;
@@ -196,7 +203,7 @@ index e67323a15b2b..939152a97528 100644
  &dwc3_0 {
  	status = "okay";
  	dr_mode = "host"; /* "host", "peripheral" or "otg" */
-@@ -324,123 +210,6 @@
+@@ -324,123 +211,6 @@
  	/delete-property/ phys;
  };
  
