@@ -1,4 +1,4 @@
-From a23fdd5aae5a8adc94c48e547dfb621e7d67bbb7 Mon Sep 17 00:00:00 2001
+From 0918728d45b0b0f736c2a9044b28d6413495611e Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Jan 2017 15:35:41 +0100
 Subject: [PATCH 7/7] ARM: zynqmp: Add support for the topic-miamimp
@@ -16,12 +16,12 @@ The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
  board/topic/zynqmp/sleep.h                    |     0
  board/topic/zynqmp/tap_delays.c               |     1 +
  board/topic/zynqmp/xil_io.h                   |    41 +
- .../zynqmp-topic-miamimp/psu_init_gpl.c       | 19101 +++++++++
+ .../zynqmp-topic-miamimp/psu_init_gpl.c       | 19125 +++++++++
  .../zynqmp-topic-miamimp/psu_init_gpl.h       | 34806 ++++++++++++++++
  board/topic/zynqmp/zynqmp.c                   |     6 +
  configs/topic_miamimp_defconfig               |   114 +
  include/configs/topic_miamimp.h               |    78 +
- 14 files changed, 54407 insertions(+)
+ 14 files changed, 54431 insertions(+)
  create mode 100644 arch/arm/dts/zynqmp-topic-miamimp.dts
  create mode 100644 board/topic/zynqmp/MAINTAINERS
  create mode 100644 board/topic/zynqmp/Makefile
@@ -398,10 +398,10 @@ index 0000000000..5340280e5d
 +#endif /* XIL_IO_H */
 diff --git a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
 new file mode 100644
-index 0000000000..c050742496
+index 0000000000..6e8b592d0a
 --- /dev/null
 +++ b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
-@@ -0,0 +1,19101 @@
+@@ -0,0 +1,19125 @@
 +/******************************************************************************
 +*
 +* Copyright (C) 2015 Xilinx, Inc.  All rights reserved.
@@ -15432,6 +15432,9 @@ index 0000000000..c050742496
 +    /*
 +    * Register : RST_FPD_TOP @ 0XFD1A0100
 +
++    * FPD WDT reset
++    *  PSU_CRF_APB_RST_FPD_TOP_SWDT_RESET                          0
++
 +    * GDMA block level reset
 +    *  PSU_CRF_APB_RST_FPD_TOP_GDMA_RESET                          0
 +
@@ -15451,9 +15454,9 @@ index 0000000000..c050742496
 +    *  PSU_CRF_APB_RST_FPD_TOP_SATA_RESET                          0
 +
 +    * FPD Block level software controlled reset
-+    * (OFFSET, MASK, VALUE)      (0XFD1A0100, 0x0000007EU ,0x00000000U)
++    * (OFFSET, MASK, VALUE)      (0XFD1A0100, 0x0000807EU ,0x00000000U)
 +    */
-+	PSU_Mask_Write(CRF_APB_RST_FPD_TOP_OFFSET, 0x0000007EU, 0x00000000U);
++	PSU_Mask_Write(CRF_APB_RST_FPD_TOP_OFFSET, 0x0000807EU, 0x00000000U);
 +/*##################################################################### */
 +
 +    /*
@@ -15636,6 +15639,14 @@ index 0000000000..c050742496
 +    *  01 - Embedded Slot for One Device 10 - Shared Bus Slot 11 - Reserved
 +    *  PSU_IOU_SLCR_SD_CONFIG_REG2_SD1_SLOTTYPE                    0
 +
++    * 8-bit Support for Embedded Device 1: The Core supports 8-bit Interface 0
++    * : Supports only 4-bit SD Interface
++    *  PSU_IOU_SLCR_SD_CONFIG_REG2_SD1_8BIT                        0
++
++    * 8-bit Support for Embedded Device 1: The Core supports 8-bit Interface 0
++    * : Supports only 4-bit SD Interface
++    *  PSU_IOU_SLCR_SD_CONFIG_REG2_SD0_8BIT                        1
++
 +    * 1.8V Support 1: 1.8V supported 0: 1.8V not supported support
 +    *  PSU_IOU_SLCR_SD_CONFIG_REG2_SD0_1P8V                        1
 +
@@ -15655,10 +15666,10 @@ index 0000000000..c050742496
 +    *  PSU_IOU_SLCR_SD_CONFIG_REG2_SD1_3P3V                        1
 +
 +    * SD Config Register 2
-+    * (OFFSET, MASK, VALUE)      (0XFF180320, 0x33803380U ,0x00801280U)
++    * (OFFSET, MASK, VALUE)      (0XFF180320, 0x33843384U ,0x00801284U)
 +    */
 +	PSU_Mask_Write(IOU_SLCR_SD_CONFIG_REG2_OFFSET,
-+		0x33803380U, 0x00801280U);
++		0x33843384U, 0x00801284U);
 +/*##################################################################### */
 +
 +    /*
@@ -15791,6 +15802,19 @@ index 0000000000..c050742496
 +    /*
 +    * SWDT
 +    */
++    /*
++    * Register : RST_LPD_IOU2 @ 0XFF5E0238
++
++    * Block level reset
++    *  PSU_CRL_APB_RST_LPD_IOU2_SWDT_RESET                         0
++
++    * Software control register for the IOU block. Each bit will cause a singl
++    * erperipheral or part of the peripheral to be reset.
++    * (OFFSET, MASK, VALUE)      (0XFF5E0238, 0x00008000U ,0x00000000U)
++    */
++	PSU_Mask_Write(CRL_APB_RST_LPD_IOU2_OFFSET,
++		0x00008000U, 0x00000000U);
++/*##################################################################### */
 +    /*
 +    * SPI
 +    */
