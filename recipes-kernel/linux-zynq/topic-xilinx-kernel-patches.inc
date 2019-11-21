@@ -16,6 +16,7 @@ SRC_URI_append = " \
 	file://0012-dt-bindings-Add-silabs-si5341.patch \
 	file://0013-clk-Add-Si5341-Si5340-driver.patch \
 	file://0001-zynqmp-topic-miamimp-fixup-devicetree-for-4.19-kerne.patch \
+	file://0001-topic-miami.dtsi-Fix-ltc2990-settings.patch \
 	file://0001-gpio-poweroff-Implement-force-pm-power-off-flag.patch \
 	"
 
