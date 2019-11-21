@@ -20,9 +20,6 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-videobuf2-vmalloc \
 	kernel-module-virt-dma \
 	kernel-module-xilinx-dma \
-	kernel-module-macb \
-	kernel-module-pps-core \
-	kernel-module-ptp \
 	"
 
 KERNEL_MODULE_AUTOLOAD += "adi_axi_hdmi"

@@ -2,7 +2,7 @@ require conf/machine/include/topic-miamimp.inc
 
 MACHINE_FPGA_BITSTREAM ?= "dtb-miami-florida-gen-reference"
 
-KERNEL_MODULE_AUTOLOAD += "macb g_ether spi-cadence mali"
+KERNEL_MODULE_AUTOLOAD += "g_ether spi-cadence mali"
 
 # Extra packages to install for the board
 BOARD_FPGA_PACKAGES ?= "\
@@ -13,7 +13,6 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-dma-axi-dmac \
 	kernel-module-g-ether \
 	kernel-module-g-mass-storage \
-	kernel-module-macb \
 	kernel-module-u-ether \
 	kernel-module-usb-f-ecm \
 	kernel-module-usb-f-ecm-subset \

@@ -17,6 +17,9 @@ MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 
 PREFERRED_PROVIDER_virtual/xilinx-sdk = "miami-xilinx-sdk"
 
+# Workaround for broken check on IMAGE_FEATURES in kernel recipe
+FPGA_MNGR_RECONFIG_ENABLE = "1"
+
 # u-boot configuration
 UBOOT_MACHINE = "topic_miami_config"
 UBOOT_SUFFIX = "img"

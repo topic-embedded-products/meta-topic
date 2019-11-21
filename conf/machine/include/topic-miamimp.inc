@@ -59,6 +59,9 @@ KERNEL_DEVICETREE = "xilinx/zynqmp-topic-miamimp.dtb"
 PREFERRED_PROVIDER_virtual/kernel = "linux-xlnx"
 PREFERRED_PROVIDER_virtual/bootloader = "u-boot-xlnx"
 
+# Workaround for broken check on IMAGE_FEATURES in kernel recipe
+FPGA_MNGR_RECONFIG_ENABLE = "1"
+
 EXTRA_IMAGEDEPENDS += " \
 		virtual/bootloader \
 		arm-trusted-firmware \
