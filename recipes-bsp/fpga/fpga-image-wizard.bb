@@ -9,8 +9,6 @@ require fpga-image.inc
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-PROVIDES = "virtual/xilinx-sdk"
-
 # These should be provided by wizard, supplying a default here that is
 # convenient for testing.
 PATH_TO_BITSTREAMS ??= "/tmp/bitstreams"

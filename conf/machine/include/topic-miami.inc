@@ -15,8 +15,6 @@ include conf/machine/include/tune-zynq.inc
 
 MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 
-PREFERRED_PROVIDER_virtual/xilinx-sdk = "miami-xilinx-sdk"
-
 # Workaround for broken check on IMAGE_FEATURES in kernel recipe
 FPGA_MNGR_RECONFIG_ENABLE = "1"
 
@@ -31,7 +29,7 @@ HAS_PLATFORM_INIT_append = "\
 	topic_miamiplus_config"
 
 KERNEL_MODULE_AUTOLOAD ?= ""
-KERNEL_MODULE_AUTOLOAD += "macb g_ether spi-cadence"
+KERNEL_MODULE_AUTOLOAD += "g_ether spi-cadence"
 
 MACHINE_EXTRA_RRECOMMENDS += "\
 	topic-miami-monitor-lib \

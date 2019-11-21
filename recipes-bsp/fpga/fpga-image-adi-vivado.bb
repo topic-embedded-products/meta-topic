@@ -36,8 +36,6 @@ do_compile() {
 	test -f fpga.bit
 }
 
-# Support for u-boot-spl
-PROVIDES = "virtual/xilinx-sdk"
 # Store the SDK files into the sysroot for other packages
 SYSROOT_PREPROCESS_FUNCS += "fpga_sysroot_preprocess"
 fpga_sysroot_preprocess() {
