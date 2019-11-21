@@ -10,14 +10,14 @@ SOM_FAMILY = "topic-miamimp"
 # The kernel also only depends on the board, not the FPGA
 KMACHINE = "${MACHINE_BOARD}"
 
-# Default is not to have a bitstream, but machines will recommend their own,
-# or images may choose to use another application-specific bitstream provider.
-MACHINE_FPGA_BITSTREAM ??= ""
-# The board adds extra packages, usually kernel modules, that depend on the
-# FPGA to function properly. Changing the bitstream usually alters this list
-# too.
-BOARD_FPGA_PACKAGES ??= ""
-MACHINE_EXTRA_RRECOMMENDS = "${MACHINE_FPGA_BITSTREAM} ${BOARD_FPGA_PACKAGES}"
+# Most boards will have a reference design for the machine. This is usually a
+# single package that RDEPENDS on the FPGA image and other needful things.
+BOARD_PL_REFERENCE ??= ""
+
+# IMAGE_INSTALL_MACHINE_EXTRAS is used in my-image.bb and will thus by default
+# install the reference design package. If you don't want the reference design,
+# just set BOARD_PL_REFERENCE="" in your my-image derived image recipe.
+IMAGE_INSTALL_MACHINE_EXTRAS = "packagegroup-machine-base ${BOARD_PL_REFERENCE}"
 
 # XILINX tool locations (for in your site.conf) and input files
 # Override them in local.conf to suit your system
