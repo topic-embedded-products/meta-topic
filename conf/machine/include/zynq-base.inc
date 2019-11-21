@@ -8,6 +8,15 @@ MACHINE_CLASS = "zynq"
 # Add u-boot image to rootfs
 EXTRA_IMAGEDEPENDS = "virtual/bootloader sd-bootscript"
 
+# Most boards will have a reference design for the machine. This is usually a
+# single package that RDEPENDS on the FPGA image and other needful things.
+BOARD_PL_REFERENCE ??= ""
+
+# IMAGE_INSTALL_MACHINE_EXTRAS is used in my-image.bb and will thus by default
+# install the reference design package. If you don't want the reference design,
+# just set BOARD_PL_REFERENCE="" in your my-image derived image recipe.
+IMAGE_INSTALL_MACHINE_EXTRAS = "packagegroup-machine-base ${BOARD_PL_REFERENCE}"
+
 # Specify kernel image type
 KERNEL_IMAGETYPE = "uImage"
 
@@ -26,31 +35,16 @@ SERIAL_CONSOLE = "115200 ttyPS0"
 # Default FGPA architecture is the machine
 FPGA_FAMILY ??= "${MACHINE}"
 
-# Default is not to have a bitstream, but machines will recommend their own,
-# or images may choose to use another application-specific bitstream provider.
-MACHINE_FPGA_BITSTREAM ??= ""
-# The board adds extra packages, usually kernel modules, that depend on the
-# FPGA to function properly. Changing the bitstream usually alters this list
-# too.
-BOARD_FPGA_PACKAGES ??= ""
-MACHINE_EXTRA_RRECOMMENDS = "${MACHINE_FPGA_BITSTREAM} ${BOARD_FPGA_PACKAGES}"
-
 # XILINX tool locations (for in your site.conf) and input files
 # Override them in local.conf to suit your system
 
 # Use the "32" or "64" toolchain
 XILINX_TOOL_ARCH ?= "64"
-# The base install directory for XPS and other tools
-XILINX_TOOL_PATH ?= "/opt/Xilinx/14.6"
 # The base install directory for Vivado
-XILINX_VIVADO_PATH ?= "/opt/Xilinx/Vivado/2013.4"
+XILINX_VIVADO_VERSION ??= "2019.1"
+XILINX_VIVADO_PATH ?= "/opt/Xilinx/Vivado/${XILINX_VIVADO_VERSION}"
 # Your LM_LICENSE_FILE is usually removed by Bitbake
-XILINX_LM_LICENSE_FILE ?= "${XILINX_TOOL_PATH}/ISE_DS/ISE/coregen/core_licenses/Xilinx.lic"
-# The bootgen program is usually here
-ZYNQ_BOOTGEN ?= "${XILINX_TOOL_PATH}/ISE_DS/ISE/bin/lin64/bootgen"
-# The logic is usually placed in the rootfs, but if you insist you can put a
-# binary bitfile into the BOOT.bin and waste time and space.
-ZYNQ_BITFILE ?= ""
+XILINX_LM_LICENSE_FILE ?= "${XILINX_VIVADO_PATH}/data/ip/core_licenses/Xilinx.lic"
 
 # WIC image support.
 DEVICETREE ??= "zynq-7000.dtb"

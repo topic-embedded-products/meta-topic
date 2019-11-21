@@ -1,10 +1,10 @@
 # Florida board common components
 require conf/machine/include/topic-miami.inc
 
-MACHINE_FPGA_BITSTREAM ?= "dtb-miami-florida-gen-reference"
+BOARD_PL_REFERENCE = "dtb-miami-florida-gen-reference"
 
 # Extra packages to install for the board
-BOARD_FPGA_PACKAGES ?= "\
+MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-adi-axi-hdmi \
 	kernel-module-adv7604 \
 	kernel-module-axi-hdmi-rx \
