@@ -1,0 +1,280 @@
+/*
+ * dts overlay file for XDP (Xilinx Drone Platform) board
+ *
+ * (C) Copyright 2019, Topic Embedded Products BV
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ */
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/phy/phy.h>
+#include <dt-bindings/clock/xlnx-zynqmp-clk.h>
+#include <dt-bindings/media/xilinx-vip.h>
+
+/ {
+	/* This fragment causes the FPGA image to load */
+	fragment@0 {
+		target = <&fpga_full>;
+		__overlay__ {
+			firmware-name = "fpga.bin.fpga-image-xdp-reference";
+		};
+	};
+
+	/* root */
+	fragment@1 {
+		target-path = "/";
+		__overlay__ {
+			sdio_wifi_pwrseq: sdio_wifi_pwrseq {
+				compatible = "mmc-pwrseq-simple";
+				reset-gpios = <&gpio 100 GPIO_ACTIVE_HIGH>; /* EMIO 22 = WIFI_ENABLE */
+				post-power-on-delay-ms = <1>; /* 100 us according to datasheet */
+			};
+
+			/* Enable for Bluetooth */
+			reg_ble: regulator_ble {
+				compatible = "regulator-fixed";
+				regulator-name = "pwr-ble";
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <1800000>;
+				enable-active-high;
+				gpio = <&gpio 84 0>; /* EMIO 6 */
+				startup-delay-us = <100>;
+				/* No power control (yet), just turn it on please */
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			/* VCU clock */
+			misc_clk_5: misc_clk_5 {
+				#clock-cells = <0>;
+				clock-frequency = <33002765>;
+				compatible = "fixed-clock";
+			};
+		};
+	};
+
+	/* uart0 for EMIO (GPS module) */
+	fragment@2 {
+		target = <&uart0>;
+		__overlay__ {
+			status = "okay";
+			current-speed = <9600>; /* GPS module */
+		};
+	};
+
+	fragment@3 {
+		target = <&spi0>;
+		__overlay__ {
+			status = "okay";
+			num-cs = <2>;
+
+			/* Gyro Sensor */
+			bmi088_gyro: bmi088_gyro@0 {
+				compatible = "bmi088_gyro";
+				reg = <0>;
+				spi-max-frequency = <10000000>;
+				interrupt-parent = <&gpio>;
+				interrupts = <92 IRQ_TYPE_EDGE_RISING>; /* INT0 at EMIO 14, INT1 is at 15 */
+			};
+
+			/* Accelero sensor */
+			bmi088_accel: bmi088_accel@1 {
+				compatible = "bmi088_accel";
+				reg = <1>;
+				spi-max-frequency = <10000000>;
+				interrupt-parent = <&gpio>;
+				interrupts = <90 IRQ_TYPE_EDGE_RISING>; /* INT0 at EMIO 12, INT1 is at 13 */
+			};
+		};
+	};
+
+	fragment@4 {
+		target = <&spi1>;
+		__overlay__ {
+			status = "okay";
+			num-cs = <2>;
+
+			/* Environmental Sensor */
+			bme680_env: bme680_env@0 {
+				compatible = "bme680";
+				reg = <0>;
+				spi-max-frequency = <10000000>;
+			};
+
+			/* Magneto Sensor */
+			bmm150_magn: bmm150_magn@1 {
+				compatible = "bmm150_magn";
+				reg = <1>;
+				spi-max-frequency = <10000000>;
+				interrupt-parent = <&gpio>;
+				interrupts = <94 IRQ_TYPE_EDGE_RISING>; /* DRDY at EMIO 16, INT is at 17 */
+			};
+		};
+	};
+
+	/* FPGA AXI memory map */
+	fragment@5 {
+		target = <&amba>;
+		__overlay__ {
+			/* FAN controller */
+			pl_fan_controller: fan-controller@a0012000 {
+				compatible = "topic,axi-pwm-fan-controller";
+				reg = <0x0 0xa0012000 0x0 0x1000>;
+				nr-fans = <1>;
+				clocks = <&zynqmp_clk PL0_REF>;
+				topic,initial-pwm = <0x80>; /* Run at 50% */
+			};
+
+			/* UART 16550 controller for BT */
+			axi_uart16550_0: serial@a0010000 {
+				clock-names = "ref_clk";
+				clocks = <&zynqmp_clk PL0_REF>;
+				compatible = "xlnx,xps-uart16550-2.00.a", "ns16550a";
+				current-speed = <115200>;
+				device_type = "serial";
+				interrupt-parent = <&gic>;
+				interrupts = <0 89 4>; /* pl_ps_0[0] */
+				reg = <0x0 0xA0010000 0x0 0x2000>;
+				reg-offset = <0x1000>;
+				reg-shift = <2>;
+				/* These properties aren't actually used anywhere by the driver */
+				xlnx,use-modem-ports = <0x1>;
+				xlnx,use-user-ports = <0x1>;
+			};
+
+			/* HDMI output */
+
+			/* UART 16550 controller for uBlaze_hdmi */
+			axi_uart16550_ublaze_hdmi: serial@a0040000 {
+				clock-names = "ref_clk";
+				clocks = <&zynqmp_clk PL0_REF>;
+				compatible = "xlnx,xps-uart16550-2.00.a", "ns16550a";
+				current-speed = <115200>;
+				device_type = "serial";
+				interrupt-parent = <&gic>;
+				interrupts = <0 109 4>; /* pl_ps_1[5] */
+				reg = <0x0 0xA0040000 0x0 0x2000>;
+				reg-offset = <0x1000>;
+				reg-shift = <2>;
+			};
+
+			/* UART 16550 controller for uBlaze_mipi0 */
+			axi_uart16550_ublaze_mipi0: serial@a0042000 {
+				clock-names = "ref_clk";
+				clocks = <&zynqmp_clk PL0_REF>;
+				compatible = "xlnx,xps-uart16550-2.00.a", "ns16550a";
+				current-speed = <115200>;
+				device_type = "serial";
+				interrupt-parent = <&gic>;
+				interrupts = <0 91 4>; /* pl_ps_0[2] */
+				reg = <0x0 0xA0042000 0x0 0x2000>;
+				reg-offset = <0x1000>;
+				reg-shift = <2>;
+			};
+
+			axi_vdma_0: axivdma@a0000000 {
+				compatible = "xlnx,axi-vdma-1.00.a";
+				#address-cells = <1>;
+				#size-cells = <1>;
+				#dma-cells = <1>;
+				#dma-channels = <1>;
+				reg = <0x0 0xa0000000 0x0 0x1000>;
+				dma-ranges = <0x00000000 0x00000000 0x40000000>;
+				xlnx,num-fstores = <3>;
+				xlnx,flush-fsync = <1>;
+				xlnx,addrwidth = <64>;
+				clocks = <&zynqmp_clk PL0_REF>;
+				clock-names = "s_axi_lite_aclk";
+				dma-channel@a0000000 {
+					compatible = "xlnx,axi-vdma-mm2s-channel";
+					interrupt-parent = <&gic>;
+					interrupts = <0 104 4>; /* pl_ps_1[0] */
+					xlnx,datawidth = <64>;
+					xlnx,genlock-mode = <0x0>;
+					xlnx,include-dre = <0x1>;
+				};
+			};
+
+			hdmi_out: hdmi_tx@a0001000 {
+				compatible = "topic,vdma-fb";
+				reg = <0x0 0xa0001000 0x0 0x1000>;
+				dmas = <&axi_vdma_0 0>;
+				dma-names = "video";
+				num-fstores = <3>;
+				width = <1920>;
+				height = <1080>;
+			};
+
+			/* VCU */
+			vcu_0: vcu@a0240000 {
+				#address-cells = <2>;
+				#clock-cells = <1>;
+				#size-cells = <2>;
+				clock-names = "pll_ref", "aclk", "vcu_core_enc", "vcu_core_dec", "vcu_mcu_enc", "vcu_mcu_dec";
+				clocks = <&misc_clk_5>, <&zynqmp_clk PL0_REF>, <&vcu_0 1>, <&vcu_0 2>, <&vcu_0 3>, <&vcu_0 4>;
+				compatible = "xlnx,vcu-1.2", "xlnx,vcu";
+				interrupt-names = "vcu_host_interrupt";
+				interrupt-parent = <&gic>;
+				interrupts = <0 105 4>;
+				ranges ;
+				reg = <0x0 0xa0240000 0x0 0x1000>, <0x0 0xa0241000 0x0 0x1000>;
+				reg-names = "vcu_slcr", "logicore";
+				reset-gpios = <&gpio 106 GPIO_ACTIVE_HIGH>; /* EMIO 28, actually active low but VCU driver inverts it */
+				encoder: al5e@a0200000 {
+					compatible = "al,al5e-1.2", "al,al5e";
+					interrupt-parent = <&gic>;
+					interrupts = <0 105 4>;
+					reg = <0x0 0xa0200000 0x0 0x10000>;
+				};
+				decoder: al5d@a0220000 {
+					compatible = "al,al5d-1.2", "al,al5d";
+					interrupt-parent = <&gic>;
+					interrupts = <0 105 4>;
+					reg = <0x0 0xa0220000 0x0 0x10000>;
+				};
+			};
+
+			/* GPS IIC */
+			sens_gps_axi_iic: i2c@a000d000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				compatible = "xlnx,xps-iic-2.00.a";
+				interrupt-parent = <&gic>;
+				interrupts = <0 106 IRQ_TYPE_LEVEL_HIGH>; /* pl_ps_1[2] */
+				reg = <0x0 0xa000d000 0x0 0x1000>;
+				clocks = <&zynqmp_clk PL0_REF>;
+				gps_i2c: gps@42 {
+					reg = <0x42>;
+					compatible = "ublox,zoe-m8b-0"; /* No actual driver */
+				};
+			};
+
+			/* EIO board */
+			eioboard_axi_iic: i2c@a0004000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				compatible = "xlnx,xps-iic-2.00.a";
+				interrupt-parent = <&gic>;
+				interrupts = <0 90 IRQ_TYPE_LEVEL_HIGH>; /* pl_ps_0[1] */
+				reg = <0x0 0xa0004000 0x0 0x1000>;
+				clocks = <&zynqmp_clk PL0_REF>;
+			};
+
+			dyplo: dyplo@a0400000 {
+				compatible = "topic,dyplo-1.00.a";
+				reg = <0x0 0xA0400000 0x0 0x200000>;
+				interrupt-parent = <&gic>;
+				interrupts = <0 111 4>; /* pl_ps_irq1[7] */
+				nvmem-cells = <&dyplolicense>;
+				nvmem-cell-names = "license";
+			};
+		};
+	};
+};

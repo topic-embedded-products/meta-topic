@@ -1,0 +1,94 @@
+/*
+ * dts overlay file for XDP (Xilinx Drone Platform) board
+ *
+ * (C) Copyright 2019, Topic Embedded Products BV
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ */
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	/* This fragment enables PCIe (M2 connector) */
+	fragment@0 {
+		target = <&pcie>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	/* GPIO LEDs on the EIO board */
+	fragment@1 {
+		target-path = "/";
+		__overlay__ {
+			leds-eio {
+				compatible = "gpio-leds";
+				eio_led_1 {
+					label = "eio-h6:green";
+					gpios = <&gpio 98 GPIO_ACTIVE_LOW>; /* EMIO 20 */
+					linux,default-trigger = "disk-activity"; /* Blink when NVME disk is working */
+				};
+				eio_led_2 {
+					label = "eio-h7:green";
+					gpios = <&gpio 99 GPIO_ACTIVE_LOW>; /* EMIO 21 */
+				};
+			};
+		};
+	};
+
+	/* IIC components on the EIO board */
+	fragment@2 {
+		target = <&eioboard_axi_iic>;
+		__overlay__ {
+			tca6507: tca6507@45 {
+				compatible = "ti,tca6507";
+				#address-cells = <1>;
+				#size-cells = <0>;
+				reg = <0x45>;
+
+				eio_led1_r: eio-led@0 {
+					label = "eio-h3:red";
+					reg = <0x0>;
+				};
+				eio_led1_g: eio-led@1 {
+					label = "eio-h3:green";
+					reg = <0x1>;
+				};
+				eio_led1_b: eio-led@2 {
+					label = "eio-h3:blue";
+					reg = <0x2>;
+				};
+				eio_led2_r: eio-led@3 {
+					label = "eio-h4:red";
+					reg = <0x3>;
+				};
+				eio_led2_g: eio-led@4 {
+					label = "eio-h4:green";
+					reg = <0x4>;
+				};
+				eio_led2_b: eio-led@5 {
+					label = "eio-h4:blue";
+					reg = <0x5>;
+				};
+				eio_buzzer: eio-led@6 {
+					label = "eio-h2:beep";
+					reg = <0x6>;
+				};
+			};
+			/* SN65DP159 HDMI retimer on EIO board*/
+			hdmi_out_sn65dp159: hdmi-retimer@5e {
+				status = "okay";
+				compatible = "ti,dp159";
+				reg = <0x5e>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				#clock-cells = <0>;
+			};
+		};
+	};
+};

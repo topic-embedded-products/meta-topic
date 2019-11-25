@@ -1,0 +1,43 @@
+From c6ce3e45ba63634218e54295205ff8810b32d277 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 18 Oct 2019 07:34:13 +0200
+Subject: [PATCH] board, zynqmp: Fix for wrong AMS setting by ROM
+
+A bug in the ZynqMP bootrom sets the PS_SYSMON_ANALOG_BUS register
+at 0xFFA50914 to the wrong value 0x3201. This causes the AMS to
+exchange the PS supply voltages 0 and 1. On Xilinx boards this is
+not noticable since these are tied together, it's only really
+noticable if banks 500 and 501 have different supplies. Xilinx' tech
+support reported this undocumented register to be the cause, and
+this patch applies a fix for all boards by programming the correct
+value.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ board/xilinx/zynqmp/zynqmp.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/board/xilinx/zynqmp/zynqmp.c b/board/xilinx/zynqmp/zynqmp.c
+index 60f91ea618..a3a86cc871 100644
+--- a/board/xilinx/zynqmp/zynqmp.c
++++ b/board/xilinx/zynqmp/zynqmp.c
+@@ -286,10 +286,16 @@ int board_early_init_f(void)
+ 	return ret;
+ }
+ 
++#define PS_SYSMON_ANALOG_BUS_VAL	0x3210
++#define PS_SYSMON_ANALOG_BUS_REG	0xFFA50914
++
+ int board_init(void)
+ {
+ 	printf("EL Level:\tEL%d\n", current_el());
+ 
++	/* Bug in ROM sets wrong value in this register */
++	writel(PS_SYSMON_ANALOG_BUS_VAL, PS_SYSMON_ANALOG_BUS_REG);
++
+ #if defined(CONFIG_FPGA) && defined(CONFIG_FPGA_ZYNQMPPL) && \
+     !defined(CONFIG_SPL_BUILD) || (defined(CONFIG_SPL_FPGA_SUPPORT) && \
+     defined(CONFIG_SPL_BUILD))
+-- 
+2.17.1
+

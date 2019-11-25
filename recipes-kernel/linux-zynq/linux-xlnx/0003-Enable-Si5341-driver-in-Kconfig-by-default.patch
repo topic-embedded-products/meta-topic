@@ -1,0 +1,27 @@
+From 890f208dda27e79e55e7d155893d1f1d62b928b5 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Wed, 17 Apr 2019 07:26:51 +0200
+Subject: [PATCH 3/3] Enable Si5341 driver in Kconfig by default
+
+OE processes the config files before applying patches, and hence the
+SI5341 driver selection mysteriously disappears. Make the driver
+default to "y" in Kconfig to work around this issue.
+---
+ drivers/clk/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/clk/Kconfig b/drivers/clk/Kconfig
+index 282219d0a526..b667377844f4 100644
+--- a/drivers/clk/Kconfig
++++ b/drivers/clk/Kconfig
+@@ -75,6 +75,7 @@ config COMMON_CLK_SCPI
+ 
+ config COMMON_CLK_SI5341
+ 	tristate "Clock driver for SiLabs 5341 and 5340 A/B/C/D devices"
++	default y
+ 	depends on I2C
+ 	select REGMAP_I2C
+ 	help
+-- 
+2.17.1
+

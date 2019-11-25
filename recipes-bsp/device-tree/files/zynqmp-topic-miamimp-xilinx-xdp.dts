@@ -1,0 +1,650 @@
+/*
+ * dts file for XDP (Xilinx Drone Platform) board without PL
+ *
+ * (C) Copyright 2019, Topic Embedded Products BV
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ */
+
+/dts-v1/;
+
+#include "zynqmp.dtsi"
+#include "zynqmp-clk-ccf.dtsi"
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/pinctrl/pinctrl-zynqmp.h>
+#include <dt-bindings/phy/phy.h>
+
+/ {
+	model = "Topic Xilinx Drone Platform";
+	compatible = "topic,xdp", "topic,miamimp", "xlnx,zynqmp";
+
+	aliases {
+		gpio0 = &gpio;
+		i2c0 = &i2c0;
+		i2c1 = &i2c1;
+		mmc0 = &sdhci0;
+		mmc1 = &sdhci1;
+		rtc0 = &rtc;
+		serial0 = &uart1;
+		serial1 = &uart0;
+		spi0 = &qspi;
+		usb0 = &usb0;
+	};
+
+	chosen {
+		bootargs = "root=/dev/mmcblk1p2 rw rootfstype=ext4 rootwait";
+		stdout-path = "serial0:115200n8";
+	};
+
+	memory {
+		device_type = "memory";
+		/* 4GB */
+		reg = <0x0 0x0 0x0 0x80000000>, <0x8 0x00000000 0x0 0x80000000>;
+	};
+
+	/* Regulator for the 5V USB VBUS power line. */
+	reg_usb0_vbus: regulator_usb {
+		compatible = "regulator-fixed";
+		regulator-name = "usb0-vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpio 77 GPIO_ACTIVE_LOW>; /* MIO77 -> USB_OTG_EN */
+		enable-active-high;
+		/* regulator-always-on; */ /* for USB host mode, "vbus" no longer works? */
+	};
+
+	leds: leds {
+		compatible = "gpio-leds";
+		heartbeat_led {
+			label = "heartbeat:green";
+			gpios = <&gpio 26 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
+	/* USB PHY reset IO pin. */
+	usb_phy0: phy0 {
+		compatible = "usb-nop-xceiv";
+		#phy-cells = <0>;
+		reset-gpios = <&gpio 65 GPIO_ACTIVE_LOW>; /* MIO65 -> USB_RESET */
+	};
+
+	/* XTAL for Si5341 */
+	xtal48MHz: xtal_48_clock {
+		compatible = "fixed-clock";
+		#clock-cells = <0x0>;
+		clock-frequency = <48000000>;
+	};
+};
+
+&gpio {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio_default>;
+
+	sclb-pres-det {
+		gpio-hog;
+		gpios = <31 0>; /* MIO 31 */
+		input;
+		line-name = "SCLB_PRES_DET";
+	};
+	dipsw4 {
+		gpio-hog;
+		gpios = <37 0>; /* MIO 37 */
+		input;
+		line-name = "DIPSWITCH_4";
+	};
+	dipsw5 {
+		gpio-hog;
+		gpios = <36 0>; /* MIO 36 */
+		input;
+		line-name = "DIPSWITCH_5";
+	};
+	dipsw6 {
+		gpio-hog;
+		gpios = <80 0>; /* EMIO 2 */
+		input;
+		line-name = "DIPSWITCH_6";
+	};
+	gps-dsel {
+		gpio-hog;
+		gpios = <96 0>; /* EMIO 18 */
+		output-high;
+		line-name = "GPS-DSEL";
+	};
+};
+
+&gpu {
+	status = "okay";
+};
+
+&qspi {
+	status = "okay";
+	is-dual = <1>;
+	flash@0 {
+		compatible = "st,m25p80", "n25q256a";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0x0>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <4>;
+		spi-max-frequency = <166000000>;
+		is-dual = <1>;
+		partition@qspi-boot-bin {
+			label = "qspi-boot-bin";
+			reg = <0x00000 0x60000>;
+		};
+		partition@qspi-u-boot-itb {
+			label = "qspi-atf-spi-ub";
+			reg = <0x60000 0x100000>;
+		};
+		partition@qspi-u-boot-env {
+			label = "qspi-u-boot-bin";
+			reg = <0x160000 0x20000>;
+		};
+		partition@qspi-rootfs {
+			label = "qspi-rootfs";
+			reg = <0x180000 0x7e80000>;
+		};
+		/* Everything */
+		partition@qspi-all {
+			label = "qspi-all";
+			reg = <0x0 0x8000000>;
+		};
+	};
+};
+
+&rtc {
+	status = "okay";
+};
+
+&serdes {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart1_default>;
+};
+
+&watchdog0 {
+	status = "okay";
+};
+
+&xilinx_ams {
+	status = "okay";
+};
+
+&ams_ps {
+	status = "okay";
+};
+
+&ams_pl {
+	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+	clock-frequency = <400000>;
+	pinctrl-names = "default", "gpio";
+	pinctrl-0 = <&pinctrl_i2c0_default>;
+	pinctrl-1 = <&pinctrl_i2c0_gpio>;
+	scl-gpios = <&gpio 74 GPIO_ACTIVE_HIGH>;
+	sda-gpios = <&gpio 75 GPIO_ACTIVE_HIGH>;
+
+	/* EEPROM */
+	eeprom: eeprom@51 {
+		compatible = "atmel,24c32";
+		reg = <0x51>;
+		pagesize = <32>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		/* Last 8 bytes */
+		dyplolicense: dyplolicense@ff8 {
+			reg = <0xff8 8>;
+		};
+	};
+
+	/* Programmable clock (for logic) */
+	si5341: si5341@74 {
+		reg = <0x74>;
+		compatible = "silabs,si5341";
+		#clock-cells = <2>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		clocks = <&xtal48MHz>;
+		clock-names = "xtal";
+
+		silabs,pll-m-num = <13600>; /* PLL at 13.6 GHz */
+		silabs,pll-m-den = <48>;
+		silabs,reprogram; /* Chips are not programmed, always reset */
+
+		assigned-clocks = <&si5341 1 0>,
+				  <&si5341 1 1>,
+				  <&si5341 1 2>,
+				  <&si5341 1 3>,
+				  <&si5341 1 4>,
+				  <&si5341 0 0>,
+				  <&si5341 0 1>,
+				  <&si5341 0 2>,
+				  <&si5341 0 3>,
+				  <&si5341 0 4>,
+				  <&si5341 0 5>,
+				  <&si5341 0 6>,
+				  <&si5341 0 7>,
+				  <&si5341 0 8>,
+				  <&si5341 0 9>;
+		assigned-clock-parents = <0>, <0>, <0>, <0>, <0>,
+					<&si5341 1 3>,
+					<&si5341 1 2>,
+					<&si5341 1 4>,
+					<&si5341 1 1>,
+					<&si5341 1 1>,
+					<&si5341 1 0>,
+					<&si5341 1 0>,
+					<&si5341 1 0>,
+					<&si5341 1 3>,
+					<&si5341 1 0>;
+		assigned-clock-rates =	<400000000>, /* synth 0 */
+					<594000000>,
+					<104000000>,
+					<0>,
+					<594000000>,
+					<0>, /* out 0 */
+					<26000000>,
+					<148500000>,
+					<148500000>,
+					<148500000>,
+					<0>,
+					<200000000>,
+					<200000000>,
+					<0>,
+					<100000000>;
+
+		out@0 {
+			/* refclk0 for PS-GT, usually for SATA or PCIe */
+			reg = <0>;
+			silabs,format = <1>; /* LVDS 3v3 */
+			silabs,common-mode = <3>;
+			silabs,amplitude = <3>;
+			always-on; /* assigned-clocks does not enable, so do it here */
+		};
+
+		out@1 {
+			/* refclk2 for PS-GT, used for USB3 (26MHz) */
+			reg = <1>;
+			silabs,format = <1>; /* LVDS 3v3 */
+			silabs,common-mode = <3>;
+			silabs,amplitude = <3>;
+			silabs,synth-master;
+			always-on;
+		};
+
+		out@2 {
+			/* PL_MGT_REFCLK0 HDMI TX refclk (default 148.5 MHz) */
+			reg = <2>;
+			silabs,format = <1>; /* LVDS 3v3 */
+			silabs,common-mode = <3>;
+			silabs,amplitude = <3>;
+			silabs,synth-master;
+			always-on;
+		};
+
+		out@3 {
+			/* PL_MGT_REFCLK2 (148.5 MHz) */
+			reg = <3>;
+			silabs,format = <1>; /* LVDS 3v3 */
+			silabs,common-mode = <3>;
+			silabs,amplitude = <3>;
+			always-on;
+		};
+
+		out@4 {
+			/* PL_MGT_REFCLK4 (148.5 MHz) */
+			reg = <4>;
+			silabs,format = <1>; /* LVDS 3v3 */
+			silabs,common-mode = <3>;
+			silabs,amplitude = <3>;
+			always-on;
+		};
+
+
+		out@6 {
+			/* FPGA clock 200MHz (demosaic) */
+			reg = <6>;
+			silabs,format = <1>; /* LVDS 1v8 */
+			silabs,common-mode = <13>;
+			silabs,amplitude = <3>;
+			always-on;
+		};
+
+		out@7 {
+			/* FPGA clock (blinking LED) */
+			reg = <7>;
+			silabs,format = <1>; /* LVDS 1v8 */
+			silabs,common-mode = <13>;
+			silabs,amplitude = <3>;
+			always-on;
+		};
+
+		out@8 {
+			/* XDP_REFCLK0 100MHz (PCIe) */
+			reg = <8>;
+			silabs,format = <2>; /* HCSL 3v3 */
+			silabs,common-mode = <11>;
+			silabs,amplitude = <3>;
+			always-on;
+		};
+
+		out@9 {
+			/* XDP_REFCLK1 100MHz */
+			reg = <9>;
+			silabs,format = <1>; /* LVDS 3v3 */
+			silabs,common-mode = <3>;
+			silabs,amplitude = <3>;
+			always-on;
+		};
+	};
+};
+
+/* EMMC memory */
+&sdhci0 {
+	status = "okay";
+	xlnx,mio_bank = <0>;
+	disable-wp;
+	non-removable;
+	bus-width = <8>;
+	cap-power-off-card;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sdhci0_emmc_default>;
+};
+
+/* uSD card or wifi card */
+&sdhci1 {
+	status = "okay";
+	xlnx,mio_bank = <1>;
+	disable-wp;
+	bus-width = <4>;
+	non-removable; /* It is removable actually... */
+};
+
+/* USB connected through MIO and GPIO expander */
+&usb0 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usb0_default>;
+};
+
+&dwc3_0 {
+	status = "okay";
+	dr_mode = "peripheral"; /* One of host, peripheral, otg */
+	vbus-supply = <&reg_usb0_vbus>; /* Educated guess, does not work */
+
+	/* USB3 controller uses GTX lane "2" and refclk "2" at 26MHz */
+	phy-names = "usb3-phy";
+	phys = <&lane2 PHY_TYPE_USB3 0 2 26000000>;
+	maximum-speed = "super-speed";
+
+	/* refclk2 for USB3 from clock synth, use synth 2 to generate it */
+	assigned-clocks        = <&si5341 1 2>, <&si5341 0 1>;
+	assigned-clock-parents = <0>,           <&si5341 1 2>;
+	assigned-clock-rates   = <104000000>,   <26000000>;
+};
+
+&sata {
+	/* SATA OOB timing settings */
+	/* copied from zc1751 (reference clock at 150MHz) */
+	ceva,p0-cominit-params = /bits/ 8 <0x1B 0x4D 0x18 0x28>;
+	ceva,p0-comwake-params = /bits/ 8 <0x06 0x19 0x08 0x0E>;
+	ceva,p0-burst-params = /bits/ 8 <0x13 0x08 0x4A 0x06>;
+	ceva,p0-retry-params = /bits/ 16 <0x96A4 0x3FFC>;
+	ceva,p1-cominit-params = /bits/ 8 <0x1B 0x4D 0x18 0x28>;
+	ceva,p1-comwake-params = /bits/ 8 <0x06 0x19 0x08 0x0E>;
+	ceva,p1-burst-params = /bits/ 8 <0x13 0x08 0x4A 0x06>;
+	ceva,p1-retry-params = /bits/ 16 <0x96A4 0x3FFC>;
+
+	phy-names = "sata-phy", "sata-phy";
+	/* Use refclock 0 at 150MHz for both instances */
+	phys = <&lane0 PHY_TYPE_SATA 0 0 150000000>,
+	       <&lane1 PHY_TYPE_SATA 1 0 150000000>;
+	/* refclk0 from clock output 0 synth 3 */
+	assigned-clocks        = <&si5341 1 3>, <&si5341 0 0>;
+	assigned-clock-parents = <0>,           <&si5341 1 3>;
+	assigned-clock-rates   = <600000000>,   <150000000>;
+};
+
+&pcie {
+	/* refclk0 from clock synth and HCSL ref clock to connector */
+	assigned-clocks        = <&si5341 1 3>, <&si5341 0 0>, <&si5341 0 8>;
+	assigned-clock-parents = <0>,           <&si5341 1 3>, <&si5341 1 3>;
+	assigned-clock-rates   = <400000000>,   <100000000>,   <100000000>;
+
+	phys = <&lane0 PHY_TYPE_PCIE 0 0 100000000>,
+	       <&lane1 PHY_TYPE_PCIE 1 0 100000000>;
+};
+
+/* DMA stuff copied from petalinux */
+&lpd_dma_chan1 {
+	status = "okay";
+};
+&lpd_dma_chan2 {
+	status = "okay";
+};
+&lpd_dma_chan3 {
+	status = "okay";
+};
+&lpd_dma_chan4 {
+	status = "okay";
+};
+&lpd_dma_chan5 {
+	status = "okay";
+};
+&lpd_dma_chan6 {
+	status = "okay";
+};
+&lpd_dma_chan7 {
+	status = "okay";
+};
+&lpd_dma_chan8 {
+	status = "okay";
+};
+&perf_monitor_ocm {
+	xlnx,enable-32bit-filter-id = <0x1>;
+	xlnx,enable-advanced = <0x1>;
+	xlnx,enable-event-count = <0x1>;
+	xlnx,enable-event-log = <0x0>;
+	xlnx,enable-profile = <0x0>;
+	xlnx,enable-trace = <0x0>;
+	xlnx,fifo-axis-depth = <0x20>;
+	xlnx,fifo-axis-tdata-width = <0x38>;
+	xlnx,fifo-axis-tid-width = <0x1>;
+	xlnx,global-count-width = <0x20>;
+	xlnx,have-sampled-metric-cnt = <0x1>;
+	xlnx,metric-count-scale = <0x1>;
+	xlnx,metrics-sample-count-width = <0x20>;
+	xlnx,num-monitor-slots = <0x1>;
+	xlnx,num-of-counters = <0x3>;
+};
+&fpd_dma_chan1 {
+	status = "okay";
+};
+&fpd_dma_chan2 {
+	status = "okay";
+};
+&fpd_dma_chan3 {
+	status = "okay";
+};
+&fpd_dma_chan4 {
+	status = "okay";
+};
+&fpd_dma_chan5 {
+	status = "okay";
+};
+&fpd_dma_chan6 {
+	status = "okay";
+};
+&fpd_dma_chan7 {
+	status = "okay";
+};
+&fpd_dma_chan8 {
+	status = "okay";
+};
+
+/*
+ * For pincontrol, look at the source as it was moved to ATF:
+ *  https://github.com/Xilinx/arm-trusted-firmware/blob/master/plat/xilinx/zynqmp/pm_service/pm_api_pinctrl.c
+ * For pinmux information, there's
+ *  /sys/kernel/debug/pinctrl/pinctrl/pingroups
+ */
+&pinctrl0 {
+	status = "okay";
+
+	/* I2C on pins 74/75 */
+	pinctrl_i2c0_default: i2c0-default {
+		mux {
+			groups = "i2c0_18_grp";
+			function = "i2c0";
+		};
+
+		conf {
+			groups = "i2c0_18_grp";
+			bias-pull-up;
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+	};
+	pinctrl_i2c0_gpio: i2c0-gpio {
+		mux {
+			groups = "gpio0_74_grp", "gpio0_75_grp";
+			function = "gpio0";
+		};
+
+		conf {
+			groups = "gpio0_74_grp", "gpio0_75_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+	};
+
+	/* uart1 pins 24/25 */
+	pinctrl_uart1_default: uart1-default {
+		mux {
+			groups = "uart1_6_grp";
+			function = "uart1";
+		};
+
+		conf {
+			groups = "uart1_6_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+
+		conf-rx {
+			pins = "MIO25";
+			bias-high-impedance;
+		};
+
+		conf-tx {
+			pins = "MIO24";
+			bias-disable;
+		};
+	};
+
+	pinctrl_gpio_default: gpio-default {
+		mux-sw {
+			groups = "gpio0_36_grp", "gpio0_37_grp";
+			function = "gpio0";
+		};
+
+		/* SWITCH_ PS0/1 (can be read to get switch input) */
+		conf-sw {
+			groups = "gpio0_36_grp", "gpio0_37_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+			bias-pull-up;
+		};
+
+		/* Add pull-up to pins that go to connectors for electrical stability */
+		conf-pullup {
+			pins = "MIO33", "MIO34", "MIO35", "MIO68", "MIO69", "MIO70", "MIO71", "MIO72", "MIO73";
+			bias-pull-up;
+		};
+	};
+
+	pinctrl_sdhci0_emmc_default: sdhci0-emmc-default {
+		/* eMMC using pins 13 .. 22 in 8-bit mode */
+		mux {
+			groups = "sdio0_0_grp";
+			function = "sdio0";
+		};
+
+		mux-pc {
+			groups = "sdio0_pc_0_grp";
+			function = "sdio0_pc";
+		};
+
+		conf {
+			groups = "sdio0_0_grp", "sdio0_pc_0_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+			bias-disable;
+		};
+
+	};
+
+	pinctrl_sdhci1_sd_default: sdhci1-sd-default {
+		/* SD using pins 46 .. 51 in 4-bit mode */
+		mux {
+			groups = "sdio1_2_grp";
+			function = "sdio1";
+		};
+		conf {
+			groups = "sdio1_2_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+			bias-disable;
+		};
+
+		/* Card detect on pin 45 */
+		mux-cd {
+			groups = "sdio1_cd_0_grp";
+			function = "sdio1_cd";
+		};
+		conf-cd {
+			groups = "sdio1_cd_0_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+			bias-pull-up;
+		};
+	};
+
+	pinctrl_usb0_default: usb0-default {
+		mux {
+			groups = "usb0_0_grp";
+			function = "usb0";
+		};
+
+		conf {
+			groups = "usb0_0_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+
+		conf-rx {
+			pins = "MIO52", "MIO53", "MIO55";
+			bias-high-impedance;
+		};
+
+		conf-tx {
+			pins = "MIO54", "MIO56", "MIO57", "MIO58", "MIO59",
+			       "MIO60", "MIO61", "MIO62", "MIO63";
+			bias-disable;
+		};
+	};
+};

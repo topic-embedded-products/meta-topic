@@ -1,5 +1,9 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 
+# Extra patches for specifix machines
+KMACHINE_PATCHES ?= ""
+KMACHINE_PATCHES_xdpzu7 = "file://0003-Enable-Si5341-driver-in-Kconfig-by-default.patch"
+
 SRC_URI_append = " \
 	file://0001-Add-ltc3562-voltage-regulator-driver.patch \
 	file://0002-drm-introduce-helper-for-accessing-EDID-blob-in-drm_.patch \
@@ -18,6 +22,8 @@ SRC_URI_append = " \
 	file://0001-zynqmp-topic-miamimp-fixup-devicetree-for-4.19-kerne.patch \
 	file://0001-topic-miami.dtsi-Fix-ltc2990-settings.patch \
 	file://0001-gpio-poweroff-Implement-force-pm-power-off-flag.patch \
+	file://0001-iio-chemical-bme680-Fix-SPI-read-interface.patch \
+	${KMACHINE_PATCHES} \
 	"
 
 # Compile overlay-capable devicetrees
