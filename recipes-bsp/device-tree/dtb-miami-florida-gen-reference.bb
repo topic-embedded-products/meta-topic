@@ -7,6 +7,9 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425
 
 inherit devicetree
 
+# We do not provide virtual/dtb, there may be more overlays
+PROVIDES = ""
+
 RRECOMMENDS_${PN} = "fpga-firmware-load"
 
 BITSTREAM = "Unsupported-board-for-overlay"
