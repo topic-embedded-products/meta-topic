@@ -19,8 +19,11 @@ SRC_URI_append = "\
 	file://0001-board-zynqmp-Fix-for-wrong-AMS-setting-by-ROM.patch \
 	"
 
+EXTRACOMPILEDEPENDS = ""
+EXTRACOMPILEDEPENDS_zynqmp = "arm-trusted-firmware:do_deploy"
+
 # Add PMU and ATF
-do_compile_zynqmp[depends] += "arm-trusted-firmware:do_deploy"
+do_compile[depends] += "${EXTRACOMPILEDEPENDS}"
 do_compile_prepend_zynqmp() {
 	cp ${WORKDIR}/pmu-firmware-zynqmp-pmu.bin ${S}/board/topic/zynqmp/pmufw.bin
 	cp ${DEPLOY_DIR_IMAGE}/arm-trusted-firmware.bin ${B}/arm-trusted-firmware.bin
