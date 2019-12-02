@@ -1,7 +1,8 @@
 [Unit]
 Description=FPGA bitstream loader
 DefaultDependencies=no
-Before=systemd-modules-load.service
+Wants=sys-kernel-config.mount
+After=sys-kernel-config.mount
 
 [Service]
 Type=oneshot
