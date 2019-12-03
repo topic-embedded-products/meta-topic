@@ -43,19 +43,23 @@ myimage_rootfs_postprocess() {
 		echo "Running populate-volatile.sh"
 		${IMAGE_ROOTFS}/etc/init.d/populate-volatile.sh
 	fi
-	rm -rf ${IMAGE_ROOTFS}/boot
-	rm -rf ${IMAGE_ROOTFS}/media/* ${IMAGE_ROOTFS}/mnt
-	ln -f -s media ${IMAGE_ROOTFS}/mnt
-	rm -rf ${IMAGE_ROOTFS}/tmp
-	ln -s var/volatile/tmp ${IMAGE_ROOTFS}/tmp
-	rm -f ${IMAGE_ROOTFS}/etc/resolv.conf
-	ln -s ../var/run/resolv.conf ${IMAGE_ROOTFS}/etc/resolv.conf
-	rm -rf ${IMAGE_ROOTFS}/dev/*
-	# Make links relative
-	rm -f ${IMAGE_ROOTFS}/var/run ${IMAGE_ROOTFS}/var/tmp ${IMAGE_ROOTFS}/var/log
-	ln -s volatile/tmp ${IMAGE_ROOTFS}/var/tmp
-	ln -s volatile/log ${IMAGE_ROOTFS}/var/log
-	ln -s ../run ${IMAGE_ROOTFS}/var/run
+	# For sysvinit and similar, set up links. For systemd, no changes.
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}
+	then
+		rm -rf ${IMAGE_ROOTFS}/boot
+		rm -rf ${IMAGE_ROOTFS}/media/* ${IMAGE_ROOTFS}/mnt
+		ln -f -s media ${IMAGE_ROOTFS}/mnt
+		rm -rf ${IMAGE_ROOTFS}/tmp
+		ln -s var/volatile/tmp ${IMAGE_ROOTFS}/tmp
+		rm -f ${IMAGE_ROOTFS}/etc/resolv.conf
+		ln -s ../var/run/resolv.conf ${IMAGE_ROOTFS}/etc/resolv.conf
+		rm -rf ${IMAGE_ROOTFS}/dev/*
+		# Make links relative
+		rm -f ${IMAGE_ROOTFS}/var/run ${IMAGE_ROOTFS}/var/tmp ${IMAGE_ROOTFS}/var/log
+		ln -s volatile/tmp ${IMAGE_ROOTFS}/var/tmp
+		ln -s volatile/log ${IMAGE_ROOTFS}/var/log
+		ln -s ../run ${IMAGE_ROOTFS}/var/run
+	fi
 	echo 'DROPBEAR_RSAKEY_ARGS="-s ${DROPBEAR_RSAKEY_SIZE}"' >> ${IMAGE_ROOTFS}${sysconfdir}/default/dropbear
 }
 ROOTFS_POSTPROCESS_COMMAND += "myimage_rootfs_postprocess ; "
