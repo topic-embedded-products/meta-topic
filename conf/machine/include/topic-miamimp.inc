@@ -40,7 +40,9 @@ require conf/machine/include/machine-xilinx-default.inc
 # The SOM_FAMILY is more specific than the SOC_FAMILY (=zynqmp) in the MACHINEOVERRIDES
 SOC_FAMILY .= ":${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}"
 
-MACHINE_FEATURES = "rtc ext2 ext3 vfat usbhost mali fpgamgr"
+# The RTC only works if a battery is connected, which most boards do not have
+MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
+MACHINE_FEATURES = "ext2 ext3 vfat usbhost mali fpgamgr"
 
 UBOOT_MACHINE = "topic_miamimp_config"
 SPL_BINARY = "spl/boot.bin"
