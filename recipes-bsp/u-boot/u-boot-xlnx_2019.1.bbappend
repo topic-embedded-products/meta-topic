@@ -14,9 +14,10 @@ SRC_URI_append = "\
 	file://0005-topic_miami-Update-configuration.patch \
 	file://0006-topic-miami-Increase-QSPI-partitions-for-u-boot-and-.patch \
 	file://0007-ARM-zynqmp-Add-support-for-the-topic-miamimp-system-.patch \
-	file://0001-Add-support-for-zynqmp-xilinx-xdp-platform.patch \
-	file://0002-Pinmux-WIFI-or-SD-based-on-card-detect-GPIO-input-st.patch \
-	file://0001-board-zynqmp-Fix-for-wrong-AMS-setting-by-ROM.patch \
+	file://0008-Add-support-for-zynqmp-xilinx-xdp-platform.patch \
+	file://0009-Pinmux-WIFI-or-SD-based-on-card-detect-GPIO-input-st.patch \
+	file://0010-board-zynqmp-Fix-for-wrong-AMS-setting-by-ROM.patch \
+	file://0011-board-topic-zynqmp-Implement-SPL-boot-fallbacks.patch \
 	"
 
 EXTRACOMPILEDEPENDS = ""
@@ -33,3 +34,4 @@ do_compile_append_zynqmp() {
 	cp ${S}/board/topic/zynqmp/fit_spl_atf.its ${B}/fit_spl_atf.its
 	${B}/tools/mkimage -f ${B}/fit_spl_atf.its ${B}/u-boot.itb
 }
+

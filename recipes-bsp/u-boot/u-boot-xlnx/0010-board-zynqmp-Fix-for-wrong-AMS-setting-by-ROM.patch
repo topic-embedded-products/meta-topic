@@ -1,7 +1,7 @@
-From c6ce3e45ba63634218e54295205ff8810b32d277 Mon Sep 17 00:00:00 2001
+From fdc848a47a259bfdbb21da2c58d2f6fb895689fc Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 18 Oct 2019 07:34:13 +0200
-Subject: [PATCH] board, zynqmp: Fix for wrong AMS setting by ROM
+Subject: [PATCH 10/11] board, zynqmp: Fix for wrong AMS setting by ROM
 
 A bug in the ZynqMP bootrom sets the PS_SYSMON_ANALOG_BUS register
 at 0xFFA50914 to the wrong value 0x3201. This causes the AMS to
@@ -18,10 +18,10 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  1 file changed, 6 insertions(+)
 
 diff --git a/board/xilinx/zynqmp/zynqmp.c b/board/xilinx/zynqmp/zynqmp.c
-index 60f91ea618..a3a86cc871 100644
+index 58c1c0b4bf..0bce606a94 100644
 --- a/board/xilinx/zynqmp/zynqmp.c
 +++ b/board/xilinx/zynqmp/zynqmp.c
-@@ -286,10 +286,16 @@ int board_early_init_f(void)
+@@ -335,10 +335,16 @@ int board_early_init_f(void)
  	return ret;
  }
  
