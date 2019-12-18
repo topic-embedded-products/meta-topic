@@ -1,4 +1,4 @@
-From 061d1ad5334cca6d1380ed0f5b61e29651a3cdd6 Mon Sep 17 00:00:00 2001
+From ed5291a50f0bf01b3cf2a22bae329fb46ddf291c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 16 Dec 2019 16:25:02 +0100
 Subject: [PATCH 11/11] board/topic/zynqmp: Implement SPL boot fallbacks

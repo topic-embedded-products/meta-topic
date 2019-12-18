@@ -1,4 +1,4 @@
-From ed3766e0a52d15ab6ab3c54b835ca4c7fdba9f8a Mon Sep 17 00:00:00 2001
+From 7118084906287d792c346b624918062299773bf3 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Jan 2017 15:35:41 +0100
 Subject: [PATCH 07/11] ARM: zynqmp: Add support for the topic-miamimp
@@ -8,7 +8,7 @@ The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
 32GB eMMC and 128MB Dual-parallel QSPI flash.
 ---
  arch/arm/dts/Makefile                         |     1 +
- arch/arm/dts/zynqmp-topic-miamimp.dts         |   168 +
+ arch/arm/dts/zynqmp-topic-miamimp.dts         |   162 +
  board/topic/zynqmp/MAINTAINERS                |     6 +
  board/topic/zynqmp/Makefile                   |    27 +
  board/topic/zynqmp/cmds.c                     |     1 +
@@ -19,9 +19,9 @@ The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
  .../zynqmp-topic-miamimp/psu_init_gpl.c       | 21557 +++++++++
  .../zynqmp-topic-miamimp/psu_init_gpl.h       | 37056 ++++++++++++++++
  board/topic/zynqmp/zynqmp.c                   |     6 +
- configs/topic_miamimp_defconfig               |   114 +
+ configs/topic_miamimp_defconfig               |   113 +
  include/configs/topic_miamimp.h               |    82 +
- 14 files changed, 59117 insertions(+)
+ 14 files changed, 59110 insertions(+)
  create mode 100644 arch/arm/dts/zynqmp-topic-miamimp.dts
  create mode 100644 board/topic/zynqmp/MAINTAINERS
  create mode 100644 board/topic/zynqmp/Makefile
@@ -50,10 +50,10 @@ index 445ab1526b..21a7ffe4ad 100644
  	zynqmp-zcu102-revB.dtb			\
 diff --git a/arch/arm/dts/zynqmp-topic-miamimp.dts b/arch/arm/dts/zynqmp-topic-miamimp.dts
 new file mode 100644
-index 0000000000..eb615d1fb9
+index 0000000000..eb593c9048
 --- /dev/null
 +++ b/arch/arm/dts/zynqmp-topic-miamimp.dts
-@@ -0,0 +1,168 @@
+@@ -0,0 +1,162 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -137,41 +137,35 @@ index 0000000000..eb615d1fb9
 +&qspi {
 +	status = "okay";
 +	is-dual = <1>;
++	num-cs = <1>;
 +	flash@0 {
 +		compatible = "st,m25p80", "n25q256a";
-+		m25p,fast-read;
 +		reg = <0x0>;
 +		spi-tx-bus-width = <1>;
 +		spi-rx-bus-width = <4>;
 +		spi-max-frequency = <166000000>;
-+		#address-cells = <1>;
-+		#size-cells = <1>;
 +		is-dual = <1>;
++		partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
 +
-+		partition@qspi-boot-bin {
-+			label = "qspi-boot-bin";
-+			reg = <0x00000 0x60000>;
-+		};
-+		partition@qspi-atf-spi-ub {
-+			label = "qspi-atf-spi-ub";
-+			reg = <0x60000 0x20000>;
-+		};
-+		partition@qspi-u-boot-bin {
-+			label = "qspi-u-boot-bin";
-+			reg = <0x80000 0xc0000>;
-+		};
-+		partition@qspi-u-boot-img {
-+			label = "qspi-u-boot-img";
-+			reg = <0x140000 0xc0000>;
-+		};
-+		partition@qspi-rootfs {
-+			label = "qspi-rootfs";
-+			reg = <0x200000 0x1e00000>;
-+		};
-+		/* Everything */
-+		partition@qspi-all {
-+			label = "qspi-all";
-+			reg = <0x0 0x2000000>;
++			partition@0 {
++				label = "qspi-boot-bin";
++				reg = <0x00000 0x60000>;
++			};
++			partition@60000 {
++				label = "qspi-u-boot-itb";
++				reg = <0x60000 0x100000>;
++			};
++			partition@160000 {
++				label = "qspi-u-boot-env";
++				reg = <0x160000 0x20000>;
++			};
++			partition@180000 {
++				label = "qspi-rootfs";
++				reg = <0x180000 0x7e80000>;
++			};
 +		};
 +	};
 +};
@@ -59035,10 +59029,10 @@ index 0000000000..d9e0cece95
 +#include "../../xilinx/zynqmp/zynqmp.c"
 diff --git a/configs/topic_miamimp_defconfig b/configs/topic_miamimp_defconfig
 new file mode 100644
-index 0000000000..8a0c29dd96
+index 0000000000..853af48159
 --- /dev/null
 +++ b/configs/topic_miamimp_defconfig
-@@ -0,0 +1,114 @@
+@@ -0,0 +1,113 @@
 +CONFIG_ARM=y
 +CONFIG_SYS_VENDOR="topic"
 +CONFIG_SYS_CONFIG_NAME="topic_miamimp"
@@ -59055,7 +59049,6 @@ index 0000000000..8a0c29dd96
 +CONFIG_ZYNQMP_USB=y
 +CONFIG_SPL_ZYNQMP_TWO_SDHCI=y
 +CONFIG_DEBUG_UART=y
-+CONFIG_AHCI=y
 +CONFIG_DISTRO_DEFAULTS=y
 +CONFIG_NR_DRAM_BANKS=2
 +CONFIG_FIT=y
@@ -59091,7 +59084,7 @@ index 0000000000..8a0c29dd96
 +CONFIG_CMD_TIMER=y
 +CONFIG_CMD_MTDPARTS=y
 +CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
-+CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x60000(qspi-boot-bin),0x20000(qspi-atf-spi-ub),0xc0000(qspi-u-boot-bin),0xc0000(qspi-u-boot-img),-(qspi-rootfs)"
++CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x60000(qspi-boot-bin),0x100000(qspi-u-boot-itb),0x20000(qspi-u-boot-env),-(qspi-rootfs)"
 +CONFIG_CMD_UBI=y
 +CONFIG_SPL_OF_CONTROL=y
 +CONFIG_DEFAULT_DEVICE_TREE="zynqmp-topic-miamimp"

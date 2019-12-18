@@ -1,4 +1,4 @@
-From d5c9054fa132e60b7e852e56deb2e0b0d6812eab Mon Sep 17 00:00:00 2001
+From 31a6014321d5c04c5a5148b1c50c7385fffe0bf0 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 23 Sep 2019 12:13:41 +0200
 Subject: [PATCH 09/11] Pinmux WIFI or SD based on card detect GPIO input

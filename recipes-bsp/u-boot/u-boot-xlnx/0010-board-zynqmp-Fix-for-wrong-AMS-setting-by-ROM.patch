@@ -1,4 +1,4 @@
-From fdc848a47a259bfdbb21da2c58d2f6fb895689fc Mon Sep 17 00:00:00 2001
+From 17007b60eacbb4ae42875188d2fabcd8645b8643 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 18 Oct 2019 07:34:13 +0200
 Subject: [PATCH 10/11] board, zynqmp: Fix for wrong AMS setting by ROM
