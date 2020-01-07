@@ -21,9 +21,9 @@ index 7888490fe1..cd1608d4bf 100644
 -		"booti $kernel_addr - $fdt_addr\0"
 +		"booti $kernel_addr - $fdt_addr\0" \
 +	"usb_reset=gpio clear gpio@41_0 && gpio set gpio@41_0\0" \
-+	"usb_reset_boot=run usb_reset && run usb_boot\0" \
-+	"usb_reset_hostboot=run usb_reset && run usb_hostboot\0" \
-+	"usb_reset_dfu_ram=run usb_reset && run dfu_ram\0"
++	"usb_reset_boot=run usb_reset; run usb_boot\0" \
++	"usb_reset_hostboot=run usb_reset; run usb_hostboot\0" \
++	"usb_reset_dfu_ram=run usb_reset; run dfu_ram\0"
  
  #include "xilinx_zynqmp.h"
  
