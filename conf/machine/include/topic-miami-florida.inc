@@ -13,7 +13,6 @@ BOARD_FPGA_PACKAGES ?= "\
 	kernel-module-dma-axi-dmac \
 	kernel-module-snd-hwdep \
 	kernel-module-snd-soc-adi-axi-spdif \
-	kernel-module-snd-soc-adv7511-hdmi \
 	kernel-module-vdmafb \
 	kernel-module-videobuf2-core \
 	kernel-module-videobuf2-dma-contig \
