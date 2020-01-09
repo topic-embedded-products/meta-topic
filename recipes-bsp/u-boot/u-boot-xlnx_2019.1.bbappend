@@ -18,6 +18,7 @@ SRC_URI_append = "\
 	file://0009-Pinmux-WIFI-or-SD-based-on-card-detect-GPIO-input-st.patch \
 	file://0010-board-zynqmp-Fix-for-wrong-AMS-setting-by-ROM.patch \
 	file://0011-board-topic-zynqmp-Implement-SPL-boot-fallbacks.patch \
+	file://0012-Add-usb-reset-for-miamimp.patch \
 	"
 
 EXTRACOMPILEDEPENDS = ""
