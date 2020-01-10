@@ -1,14 +1,14 @@
-From 06ff6a2ee5983e5252e09b6f0d7b45184fd6569d Mon Sep 17 00:00:00 2001
+From 4592f636f644ec695be1e32245a01b10624cb727 Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Thu, 9 Jan 2020 11:20:08 +0100
-Subject: [PATCH] Add usb reset for miamimp
+Subject: [PATCH 12/13] Add usb reset for miamimp
 
 ---
  include/configs/topic_miamimp.h | 8 ++++++--
  1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/include/configs/topic_miamimp.h b/include/configs/topic_miamimp.h
-index 7888490fe1..cd1608d4bf 100644
+index 7888490fe1..ff9b892ee7 100644
 --- a/include/configs/topic_miamimp.h
 +++ b/include/configs/topic_miamimp.h
 @@ -57,9 +57,13 @@
@@ -27,3 +27,6 @@ index 7888490fe1..cd1608d4bf 100644
  
  #include "xilinx_zynqmp.h"
  
+-- 
+2.17.1
+
