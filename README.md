@@ -83,7 +83,31 @@ The MPSoC machines, named "tdkzu*", need a PMU firmware "blob" for the embedded
 microblaze power management unit. This repo holds the source code for generating
 this binary using OpenEmbedded recipes, but since it generates a single
 identical firmware that can be used on any MPSoC, a pre-built binary is already
-included and injected into the u-boot SPL image.
+included and injected into the u-boot SPL image. The procedure using multiconfig
+in meta-xilinx does not actually work, so to reproduce it, do as follows:
+
+Go to the `build` directory (use topic-platform to create one).
+
+Add these lines to `conf/local.conf`:
+```
+MACHINE="zynqmp-pmu"
+DISTRO="xilinx-standalone"
+TMPDIR="${TOPDIR}/pmutmp"
+```
+Now execute:
+```
+. ./profile
+MACHINE=zynqmp-pmu bitbake pmu-firmware
+```
+The PMU firmware binary will be created in `pmutmp/deploy/images/zynqmp-pmu/`.
+Compress this using `xz` and replace the `pmu-firmware.bin.xz` file in
+`u-boot-xlnx`:
+```
+xz < pmutmp/deploy/images/zynqmp-pmu/pmu-firmware-zynqmp-pmu.bin > ../meta-topic/recipes-bsp/u-boot/u-boot-xlnx/pmu-firmware-zynqmp-pmu.bin.xz
+```
+
+Don't forget to remove the three extra lines from your `local.conf` file afterwards...
+
 
 # Additional information
 
