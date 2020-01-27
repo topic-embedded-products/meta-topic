@@ -20,6 +20,8 @@ SRC_URI_append = "\
 	file://0011-board-topic-zynqmp-Implement-SPL-boot-fallbacks.patch \
 	file://0012-Add-usb-reset-for-miamimp.patch \
 	file://0013-topic-zynqmp-Enable-inner-shareable-transactions-to-.patch \
+	file://0014-dma_transfers_should_be_word_aligned.patch \
+	file://0015-do-not-round-immediate-data-field.patch \
 	"
 
 EXTRACOMPILEDEPENDS = ""

@@ -1,0 +1,41 @@
+From d7432d93b4a88a0c4adc6143932bb6a64f15a9f5 Mon Sep 17 00:00:00 2001
+From: Wojciech Tatarski <wtatarski@antmicro.com>
+Date: Fri, 26 Apr 2019 17:09:02 +0200
+Subject: spi: zynqmp_gqspi: DMA transfers should be world aligned
+
+According to Zynq US+ TRM all the data transfers are word aligned. So
+there is no reason to round up size of DMA transfer to ARCH_DMA_MINALIGN
+(0x40)
+
+Signed-off-by: Wojciech Tatarski <wtatarski@antmicro.com>
+Signed-off-by: Tomasz Gorochowik <tgorochowik@antmicro.com>
+Tested-by: Siva Durga Prasad Paladugu <siva.durga.paladugu@xilinx.com>
+Signed-off-by: Michal Simek <michal.simek@xilinx.com>
+
+diff --git a/drivers/spi/zynqmp_gqspi.c b/drivers/spi/zynqmp_gqspi.c
+index 9df149def5..a845455457 100644
+--- a/drivers/spi/zynqmp_gqspi.c
++++ b/drivers/spi/zynqmp_gqspi.c
+@@ -736,18 +736,18 @@ static int zynqmp_qspi_start_dma(struct zynqmp_qspi_priv *priv,
+ 	struct zynqmp_qspi_dma_regs *dma_regs = priv->dma_regs;
+ 
+ 	writel((unsigned long)buf, &dma_regs->dmadst);
+-	writel(roundup(priv->len, ARCH_DMA_MINALIGN), &dma_regs->dmasize);
++	writel(roundup(priv->len, GQSPI_DMA_ALIGN), &dma_regs->dmasize);
+ 	writel(GQSPI_DMA_DST_I_STS_MASK, &dma_regs->dmaier);
+ 	addr = (unsigned long)buf;
+-	size = roundup(priv->len, ARCH_DMA_MINALIGN);
++	size = roundup(priv->len, GQSPI_DMA_ALIGN);
+ 	flush_dcache_range(addr, addr + size);
+ 
+ 	while (priv->len) {
+ 		len = zynqmp_qspi_calc_exp(priv, &gen_fifo_cmd);
+ 		if (!(gen_fifo_cmd & GQSPI_GFIFO_EXP_MASK) &&
+-		    (len % ARCH_DMA_MINALIGN)) {
++		    (len % GQSPI_DMA_ALIGN)) {
+ 			gen_fifo_cmd &= ~GENMASK(7, 0);
+-			gen_fifo_cmd |= roundup(len, ARCH_DMA_MINALIGN);
++			gen_fifo_cmd |= roundup(len, GQSPI_DMA_ALIGN);
+ 		}
+ 		zynqmp_qspi_fill_gen_fifo(priv, gen_fifo_cmd);
+ 

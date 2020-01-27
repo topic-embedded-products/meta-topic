@@ -1,0 +1,44 @@
+From c379a08eb5211efa8defd7fa321c9cce91910b0e Mon Sep 17 00:00:00 2001
+From: Wojciech Tatarski <wtatarski@antmicro.com>
+Date: Fri, 26 Apr 2019 17:09:03 +0200
+Subject: spi: zynqmp_gqspi: do not round immediate_data field
+
+Immediate_data is 8 bit value in generic FIFO command. When fields
+data_xfer=1 and exponent=0 this field specifies the absolute number of data
+bytes to read into the RXFIFO. Values from range 0xfd to 0xff are rounded
+up to 0x100. It causes overwriting the next bit field which is data_xfer.
+According to Zynq US+ TRM only DMA transfers should be word aligned. So
+there is no reason to round up the immediate_data field.
+
+Signed-off-by: Wojciech Tatarski <wtatarski@antmicro.com>
+Signed-off-by: Tomasz Gorochowik <tgorochowik@antmicro.com>
+Tested-by: Siva Durga Prasad Paladugu <siva.durga.paladugu@xilinx.com>
+Signed-off-by: Michal Simek <michal.simek@xilinx.com>
+
+diff --git a/drivers/spi/zynqmp_gqspi.c b/drivers/spi/zynqmp_gqspi.c
+index a845455457..1890ed2d8a 100644
+--- a/drivers/spi/zynqmp_gqspi.c
++++ b/drivers/spi/zynqmp_gqspi.c
+@@ -730,7 +730,7 @@ static int zynqmp_qspi_start_dma(struct zynqmp_qspi_priv *priv,
+ 				 u32 gen_fifo_cmd, u32 *buf)
+ {
+ 	u32 addr;
+-	u32 size, len;
++	u32 size;
+ 	u32 actuallen = priv->len;
+ 	int ret = 0;
+ 	struct zynqmp_qspi_dma_regs *dma_regs = priv->dma_regs;
+@@ -743,12 +743,7 @@ static int zynqmp_qspi_start_dma(struct zynqmp_qspi_priv *priv,
+ 	flush_dcache_range(addr, addr + size);
+ 
+ 	while (priv->len) {
+-		len = zynqmp_qspi_calc_exp(priv, &gen_fifo_cmd);
+-		if (!(gen_fifo_cmd & GQSPI_GFIFO_EXP_MASK) &&
+-		    (len % GQSPI_DMA_ALIGN)) {
+-			gen_fifo_cmd &= ~GENMASK(7, 0);
+-			gen_fifo_cmd |= roundup(len, GQSPI_DMA_ALIGN);
+-		}
++		zynqmp_qspi_calc_exp(priv, &gen_fifo_cmd);
+ 		zynqmp_qspi_fill_gen_fifo(priv, gen_fifo_cmd);
+ 
+ 		debug("GFIFO_CMD_RX:0x%x\n", gen_fifo_cmd);
