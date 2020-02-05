@@ -22,6 +22,8 @@ SRC_URI_append = "\
 	file://0013-topic-zynqmp-Enable-inner-shareable-transactions-to-.patch \
 	file://0014-dma_transfers_should_be_word_aligned.patch \
 	file://0015-do-not-round-immediate-data-field.patch \
+	file://0016-Update-miamimp-defconfig.patch \
+	file://0017-Support-UBIFS.patch \
 	"
 
 EXTRACOMPILEDEPENDS = ""

@@ -10,10 +10,12 @@ IMAGE_FSTYPES = "tar.gz wic.gz"
 
 inherit core-image
 
+UBI_SUPPORT = "${@ 'true' if bb.utils.contains("IMAGE_FSTYPES", "ubi", True, False, d) or bb.utils.contains("IMAGE_FSTYPES", "ubifs", True, False, d) else 'false'}"
+
 MY_THINGS = "\
 	kernel-modules \
 	${@bb.utils.contains('VIRTUAL-RUNTIME_dev_manager', 'busybox-mdev', 'modutils-loadscript', '', d)} \
-	${@bb.utils.contains("IMAGE_FSTYPES", "ubi", "mtd-utils-ubifs" , "", d)} \
+	${@ 'mtd-utils-ubifs ubifs-bootscript' if d.getVar('UBI_SUPPORT') == 'true' else ''} \
 	${@bb.utils.contains("MACHINE_FEATURES", "alsa", "alsa-utils-aplay alsa-utils-speakertest alsa-utils-amixer alsa-utils-alsactl" , "", d)} \
 	udhcpd-iface-config \
 	"
@@ -46,7 +48,10 @@ myimage_rootfs_postprocess() {
 	# For sysvinit and similar, set up links. For systemd, no changes.
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}
 	then
-		rm -rf ${IMAGE_ROOTFS}/boot
+		if ! ${UBI_SUPPORT}
+		then
+			rm -rf ${IMAGE_ROOTFS}/boot
+		fi
 		rm -rf ${IMAGE_ROOTFS}/media/* ${IMAGE_ROOTFS}/mnt
 		ln -f -s media ${IMAGE_ROOTFS}/mnt
 		rm -rf ${IMAGE_ROOTFS}/tmp
@@ -60,6 +65,12 @@ myimage_rootfs_postprocess() {
 		ln -s volatile/log ${IMAGE_ROOTFS}/var/log
 		ln -s ../run ${IMAGE_ROOTFS}/var/run
 	fi
+
+	if ${UBI_SUPPORT}
+	then
+		ln -s ${DEVICETREE} ${IMAGE_ROOTFS}/boot/system.dtb
+	fi
+
 	echo 'DROPBEAR_RSAKEY_ARGS="-s ${DROPBEAR_RSAKEY_SIZE}"' >> ${IMAGE_ROOTFS}${sysconfdir}/default/dropbear
 }
 ROOTFS_POSTPROCESS_COMMAND += "myimage_rootfs_postprocess ; "
