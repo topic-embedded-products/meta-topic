@@ -10,15 +10,13 @@ require topic-xilinx-kernel-patches.inc
 
 COMPATIBLE_MACHINE_topic-miami = "topic-miami"
 
-# Using a defconfig from the kernel tree does not work when using patches, and
-# the Xilinx provided zynqmp config contains way too much bloat, so we just use
-# a full defconfig for our boards until this is mainlined.
-SRC_URI_append_topic-miami = "file://defconfig"
-SRC_URI_append_topic-miamimp = "file://defconfig"
+# Kernel configuration
+TOPICBSPCONFIG ?= ""
+TOPICBSPCONFIG_topic-miami = "file://topic-miami-standard.cfg"
+TOPICBSPCONFIG_topic-miamimp = "file://topic-miamimp-standard.cfg"
+TOPICBSPCONFIG_xdpzu7 = "file://topic-xdpzu7-standard.cfg"
 
-# The configcheck doesn't do anything useful for us and takes several minutes
-do_kernel_configcheck_topic-miamimp[noexec] = "1"
-do_kernel_configcheck_topic-miami[noexec] = "1"
+SRC_URI_append = " ${TOPICBSPCONFIG}"
 
 KERNEL_DEVICETREE_topic-miami = "\
 	topic-miami-dyplo.dtb \
