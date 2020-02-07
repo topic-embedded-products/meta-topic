@@ -31,14 +31,17 @@ XILINX_LM_LICENSE_FILE ?= "${XILINX_VIVADO_PATH}/data/ip/core_licenses/Xilinx.li
 
 KERNEL_MODULE_AUTOLOAD ?= ""
 
-SOC_VARIANT ?= "eg"
+# Default a platform without GPU/VCU because the MALI GPU support is broken in
+# Xilinx' warrior branch.
+# SOC_VARIANT = "eg" causes X11 programs to depend on libmali
+SOC_VARIANT ?= ""
+
+# The SOM_FAMILY is more specific than the SOC_FAMILY (=zynqmp) in the MACHINEOVERRIDES
+MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 
 require conf/machine/include/tune-zynqmp.inc
 require conf/machine/include/machine-xilinx-overrides.inc
 require conf/machine/include/machine-xilinx-default.inc
-
-# The SOM_FAMILY is more specific than the SOC_FAMILY (=zynqmp) in the MACHINEOVERRIDES
-SOC_FAMILY .= ":${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}"
 
 # The RTC only works if a battery is connected, which most boards do not have
 MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
@@ -53,6 +56,9 @@ UBOOT_SUFFIX_zynqmp = "itb"
 UBOOT_LOADADDRESS = "0x8000000"
 UBOOT_ENTRYPOINT = "0x8000000"
 HAS_PLATFORM_INIT_append = " topic_miamimp_config"
+# We provide the firmware through the URI, u-boot-xlnx overrides CONFIG_PMUFW_INIT_FILE
+PMU_FIRMWARE_DEPLOY_DIR = "${WORKDIR}"
+PMU_FIRMWARE_IMAGE_NAME = "pmu-firmware-zynqmp-pmu"
 
 SERIAL_CONSOLE = "115200 ttyPS0"
 
