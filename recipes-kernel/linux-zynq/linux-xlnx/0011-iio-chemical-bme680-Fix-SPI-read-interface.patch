@@ -1,7 +1,7 @@
-From e5c33ae5b718a9a48fbdba5ee9f0c745ae78cfb2 Mon Sep 17 00:00:00 2001
+From 9d819d8bd8880b176cf3b7ab5a914338f812f04e Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 6 Mar 2019 08:31:48 +0100
-Subject: [PATCH] iio:chemical:bme680: Fix SPI read interface
+Subject: [PATCH 11/16] iio:chemical:bme680: Fix SPI read interface
 
 The SPI interface implementation was completely broken.
 

@@ -1,4 +1,4 @@
-From 49d200a12c5dd5267161393a291aa22eaef2fb28 Mon Sep 17 00:00:00 2001
+From 55660927a28b9ce0874dd8848f3e50c688abfdb8 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Jan 2017 15:35:41 +0100
 Subject: [PATCH 07/13] ARM: zynqmp: Add support for the topic-miamimp
@@ -20,8 +20,8 @@ The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
  .../zynqmp-topic-miamimp/psu_init_gpl.h       | 37386 ++++++++++++++++
  board/topic/zynqmp/zynqmp.c                   |     6 +
  configs/topic_miamimp_defconfig               |   113 +
- include/configs/topic_miamimp.h               |    82 +
- 14 files changed, 59775 insertions(+)
+ include/configs/topic_miamimp.h               |    86 +
+ 14 files changed, 59779 insertions(+)
  create mode 100644 arch/arm/dts/zynqmp-topic-miamimp.dts
  create mode 100644 board/topic/zynqmp/MAINTAINERS
  create mode 100644 board/topic/zynqmp/Makefile
@@ -37,10 +37,10 @@ The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
  create mode 100644 include/configs/topic_miamimp.h
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index 445ab1526b..21a7ffe4ad 100644
+index f795fef5c9..fa14d0fda8 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -177,6 +177,7 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
+@@ -190,6 +190,7 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
  	zynqmp-mini-qspi-x1-stacked.dtb		\
  	zynqmp-mini-qspi-x2-single.dtb		\
  	zynqmp-mini-qspi-x2-stacked.dtb		\
@@ -59813,10 +59813,10 @@ index 0000000000..853af48159
 +CONFIG_EFI_LOADER_BOUNCE_BUFFER=y
 diff --git a/include/configs/topic_miamimp.h b/include/configs/topic_miamimp.h
 new file mode 100644
-index 0000000000..7888490fe1
+index 0000000000..ff9b892ee7
 --- /dev/null
 +++ b/include/configs/topic_miamimp.h
-@@ -0,0 +1,82 @@
+@@ -0,0 +1,86 @@
 +/*
 + * Configuration for Topic Miami MPSoC
 + *
@@ -59876,9 +59876,13 @@ index 0000000000..7888490fe1
 +	"sdroot0=setenv bootargs $bootargs root=/dev/mmcblk0p2 rw rootwait\0" \
 +	"sdroot1=setenv bootargs $bootargs root=/dev/mmcblk1p2 rw rootwait\0" \
 +	"usb_dfu_spl=booti $kernel_addr - $fdt_addr\0" \
-+	"usbhostboot=usb start && load usb 0 $fdt_addr system.dtb && " \
++	"usb_hostboot=usb start && load usb 0 $fdt_addr system.dtb && " \
 +		"load usb 0 $kernel_addr Image && " \
-+		"booti $kernel_addr - $fdt_addr\0"
++		"booti $kernel_addr - $fdt_addr\0" \
++	"usb_reset=gpio clear gpio@41_0 && gpio set gpio@41_0\0" \
++	"usb_reset_boot=run usb_reset; run usb_boot\0" \
++	"usb_reset_hostboot=run usb_reset; run usb_hostboot\0" \
++	"usb_reset_dfu_ram=run usb_reset; run dfu_ram\0"
 +
 +#include "xilinx_zynqmp.h"
 +

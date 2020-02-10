@@ -1,7 +1,7 @@
-From b536609c14463314a7d39a6230e02ab556a94e66 Mon Sep 17 00:00:00 2001
+From 4d581d5686862d50fe90e04346350b144931c94f Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 30 Sep 2019 10:35:03 +0200
-Subject: [PATCH 06/13] topic-miami: Increase QSPI partitions for u-boot and
+Subject: [PATCH 05/13] topic-miami: Increase QSPI partitions for u-boot and
  kernel
 
 Since 2019.1 u-boot needs more space in QSPI flash to fit, so increase the

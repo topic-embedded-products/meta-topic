@@ -19,20 +19,7 @@ TOPICBSPCONFIG_xdpzu7 = "file://topic-xdpzu7-standard.cfg"
 SRC_URI_append = " ${TOPICBSPCONFIG}"
 
 KERNEL_DEVICETREE_topic-miami = "\
-	topic-miami-dyplo.dtb \
-	topic-miami-dyplo-acp.dtb \
-	topic-miami-florida-gen.dtb \
-	topic-miami-florida-gen-pt.dtb \
-	topic-miami-florida-gen-nand.dtb \
-	topic-miami-florida-gen-amp.dtb \
 	topic-miami-florida-mio.dtb \
-	topic-miami-florida-mio-dyplo.dtb \
-	topic-miami-florida-mio-nand-dyplo.dtb \
-	topic-miami-florida-pci.dtb \
-	topic-miami-florida-pci-pt.dtb \
-	topic-miami-florida-test.dtb \
-	topic-miamilite-florida-test.dtb \
-	topic-miamiplus-florida-test.dtb \
 	"
 KERNEL_DEVICETREE_topic-miamimp = "\
 	xilinx/zynqmp-topic-miamimp.dtb \

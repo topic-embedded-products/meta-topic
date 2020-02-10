@@ -1,7 +1,7 @@
-From 46cfa79c171b37f4628f471d34777087d3bc935d Mon Sep 17 00:00:00 2001
+From 4265bb2aa31f3be1713bbdf51918f4fc09bf4b98 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 24 Apr 2019 10:53:33 +0200
-Subject: [PATCH 12/13] dt-bindings: Add silabs,si5341
+Subject: [PATCH 12/16] dt-bindings: Add silabs,si5341
 
 Adds the devicetree bindings for the si5341 driver that supports the
 Si5341 and Si5340 chips.

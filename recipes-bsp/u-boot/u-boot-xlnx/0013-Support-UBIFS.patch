@@ -1,7 +1,7 @@
-From bbda2ae676c69b202ce10b494baf3bcdbaed3e12 Mon Sep 17 00:00:00 2001
+From 77a26f44d085295a76003382db15006502176c5e Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Wed, 5 Feb 2020 10:05:39 +0100
-Subject: [PATCH] Support UBIFS
+Subject: [PATCH 13/13] Support UBIFS
 
 ---
  include/configs/topic_miamimp.h | 10 +++++++++-
@@ -30,10 +30,10 @@ index ff9b892ee7..0cfcf0c193 100644
  #include "xilinx_zynqmp.h"
  
 diff --git a/include/configs/xilinx_zynqmp.h b/include/configs/xilinx_zynqmp.h
-index 8e600f3019..0e1b2f3afa 100644
+index 1356314096..7894fe6eb5 100644
 --- a/include/configs/xilinx_zynqmp.h
 +++ b/include/configs/xilinx_zynqmp.h
-@@ -261,10 +261,12 @@
+@@ -259,10 +259,12 @@
  #define BOOTENV_DEV_NAME_XILINX(devtypeu, devtypel, instance) \
  	"xilinx "
  

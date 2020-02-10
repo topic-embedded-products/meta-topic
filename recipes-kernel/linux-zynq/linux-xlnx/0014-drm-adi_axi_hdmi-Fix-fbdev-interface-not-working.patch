@@ -1,7 +1,7 @@
-From 54ef9d08907da89fd1a33dd8ac994e195b18d0c2 Mon Sep 17 00:00:00 2001
+From 4dd157466508ffcf5ca111eef88e0758c93782f3 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 30 Sep 2019 09:52:33 +0200
-Subject: [PATCH] drm: adi_axi_hdmi: Fix fbdev interface not working
+Subject: [PATCH 14/16] drm: adi_axi_hdmi: Fix fbdev interface not working
 
 In axi_hdmi_drv.c provide the "gem_prime_vmap" and similar methods and
 point them to the generic CMA implementation.
@@ -11,7 +11,8 @@ This fixes the error at start:
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 ---
- drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c | 18 ++++++++++++++--
+ drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c
 index 2a87f32afd4f..6bfb2e62afb6 100644
@@ -43,3 +44,6 @@ index 2a87f32afd4f..6bfb2e62afb6 100644
  	.fops			= &axi_hdmi_driver_fops,
  	.name			= DRIVER_NAME,
  	.desc			= DRIVER_DESC,
+-- 
+2.17.1
+

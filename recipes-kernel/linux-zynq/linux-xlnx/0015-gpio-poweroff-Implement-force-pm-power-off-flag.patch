@@ -1,7 +1,7 @@
-From 5c97fd739435a206a2524e1db14278331ca66495 Mon Sep 17 00:00:00 2001
+From 6ac6eeeb6aa858277caf2080bd1a3128989d13ff Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 20 Nov 2019 14:56:47 +0100
-Subject: [PATCH] gpio-poweroff: Implement force-pm-power-off flag
+Subject: [PATCH 15/16] gpio-poweroff: Implement force-pm-power-off flag
 
 Implement a devicetree property to forcibly set the pm_power_off variable.
 

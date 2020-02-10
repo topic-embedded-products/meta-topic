@@ -1,7 +1,7 @@
-From 69e343fab66ab08c7bb418a8a44c3d78926e556f Mon Sep 17 00:00:00 2001
+From 04be1b593a24d8bf458ac0bcbe915fa134af0277 Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Fri, 7 Feb 2020 11:52:51 +0100
-Subject: [PATCH] Disable spi transfer breakable by CTRL C support
+Subject: [PATCH 12/13] Disable spi transfer breakable by CTRL C support
 
 The spi transfers during boot are consuming the serial port
 characters which prevent the bootloader to be entered when
@@ -11,10 +11,10 @@ bootdelay is set to 0
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/spi/zynqmp_gqspi.c b/drivers/spi/zynqmp_gqspi.c
-index 1890ed2d8a..56a0bfa728 100644
+index 9af702fa11..9a3632d998 100644
 --- a/drivers/spi/zynqmp_gqspi.c
 +++ b/drivers/spi/zynqmp_gqspi.c
-@@ -750,7 +750,7 @@ static int zynqmp_qspi_start_dma(struct zynqmp_qspi_priv *priv,
+@@ -774,7 +774,7 @@ static int zynqmp_qspi_start_dma(struct zynqmp_qspi_priv *priv,
  	}
  
  	ret = wait_for_bit_le32(&dma_regs->dmaisr, GQSPI_DMA_DST_I_STS_DONE,
