@@ -1,7 +1,7 @@
-From 962b21ea602a611ddcdeceff07857c4312e91c87 Mon Sep 17 00:00:00 2001
+From 37c79f8e2975110a40cc6679877019262c3d2b4e Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 25 Aug 2017 14:37:20 +0200
-Subject: [PATCH 01/13] mmc/sdhci: Add card detect method
+Subject: [PATCH 01/15] mmc/sdhci: Add card detect method
 
 Detect whether a card is detected. This prevents probing problems
 when no card is in the reader. The board apparently reports "present"
@@ -17,10 +17,10 @@ sdhci driver.
  3 files changed, 17 insertions(+)
 
 diff --git a/drivers/mmc/sdhci.c b/drivers/mmc/sdhci.c
-index cdeba914f9..5360fe6c27 100644
+index 628bd7a6da..6d2caf0ab5 100644
 --- a/drivers/mmc/sdhci.c
 +++ b/drivers/mmc/sdhci.c
-@@ -534,6 +534,17 @@ static int sdhci_init(struct mmc *mmc)
+@@ -565,6 +565,17 @@ static int sdhci_init(struct mmc *mmc)
  	return 0;
  }
  
@@ -38,7 +38,7 @@ index cdeba914f9..5360fe6c27 100644
  #ifdef CONFIG_DM_MMC
  int sdhci_probe(struct udevice *dev)
  {
-@@ -548,12 +559,14 @@ const struct dm_mmc_ops sdhci_ops = {
+@@ -610,12 +621,14 @@ const struct dm_mmc_ops sdhci_ops = {
  #ifdef MMC_SUPPORTS_TUNING
  	.execute_tuning	= sdhci_execute_tuning,
  #endif
@@ -54,10 +54,10 @@ index cdeba914f9..5360fe6c27 100644
  #endif
  
 diff --git a/drivers/mmc/zynq_sdhci.c b/drivers/mmc/zynq_sdhci.c
-index 3f74de9ee6..634a9fa84d 100644
+index 2293964b82..ca7bd2b647 100644
 --- a/drivers/mmc/zynq_sdhci.c
 +++ b/drivers/mmc/zynq_sdhci.c
-@@ -464,6 +464,9 @@ static int arasan_sdhci_probe(struct udevice *dev)
+@@ -408,6 +408,9 @@ static int arasan_sdhci_probe(struct udevice *dev)
  	host->quirks = SDHCI_QUIRK_WAIT_SEND_CMD |
  		       SDHCI_QUIRK_BROKEN_R1B;
  
@@ -68,17 +68,17 @@ index 3f74de9ee6..634a9fa84d 100644
  	host->quirks |= SDHCI_QUIRK_BROKEN_HISPD_MODE;
  #endif
 diff --git a/include/sdhci.h b/include/sdhci.h
-index bef37df982..1e8b35b871 100644
+index cc2a1fe76b..7581418ca0 100644
 --- a/include/sdhci.h
 +++ b/include/sdhci.h
-@@ -226,6 +226,7 @@
+@@ -244,6 +244,7 @@
  #define SDHCI_QUIRK_WAIT_SEND_CMD	(1 << 6)
  #define SDHCI_QUIRK_USE_WIDE8		(1 << 8)
  #define SDHCI_QUIRK_NO_1_8_V		(1 << 9)
 +#define SDHCI_QUIRK_NO_CD		(1 << 11)
  
- /* to make gcc happy */
- struct sdhci_host;
+ /*
+  * mmc host capabilities
 -- 
 2.17.1
 

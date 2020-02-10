@@ -1,7 +1,7 @@
-From 43ba3a05b49deb4de089bd035b98c4c0cb0bbff1 Mon Sep 17 00:00:00 2001
+From ceed6dde2d16efde505f071ced6a318ad189f104 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 23 Sep 2019 12:13:41 +0200
-Subject: [PATCH 09/13] Pinmux WIFI or SD based on card detect GPIO input
+Subject: [PATCH 09/15] Pinmux WIFI or SD based on card detect GPIO input
  status
 
 Pinmux the SD card by default, and if the SD card detect line is high (inactive)

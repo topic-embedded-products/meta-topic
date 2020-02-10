@@ -1,13 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
-# Reduce the length of the version number, otherwise builds will fail because
-# of sstate-cache signatures over 255 characters long, see:
-#   https://bugzilla.yoctoproject.org/show_bug.cgi?id=13177
-UBOOT_VERSION_EXTENSION = "-x2019.1"
 
 SRC_URI_append = "\
 	file://pmu-firmware-zynqmp-pmu.bin.xz \
-	file://0001-arm64-zynqmp-fix-preprocessor-check-for-SPL_ZYNQMP_T.patch \
-	file://0001-mmc-sdhci-Add-card-detect-method.patch \
 	file://0002-board-topic-Detect-RAM-size-at-boot.patch \
 	file://0003-board-topic_miamilite-Support-cost-reduced-version.patch \
 	file://0004-configs-topic_miami.h-Use-same-partitioning-for-USB-.patch \
@@ -20,10 +14,8 @@ SRC_URI_append = "\
 	file://0011-board-topic-zynqmp-Implement-SPL-boot-fallbacks.patch \
 	file://0012-Add-usb-reset-for-miamimp.patch \
 	file://0013-topic-zynqmp-Enable-inner-shareable-transactions-to-.patch \
-	file://0014-dma_transfers_should_be_word_aligned.patch \
-	file://0015-do-not-round-immediate-data-field.patch \
-	file://0016-Disable-spi-transfer-breakable-by-CTRL-C-support.patch \
-	file://0017-Support-UBIFS.patch \
+	file://0014-Disable-spi-transfer-breakable-by-CTRL-C-support.patch \
+	file://0015-Support-UBIFS.patch \
 	file://0001-env-in-eeprom.cfg \
 	"
 

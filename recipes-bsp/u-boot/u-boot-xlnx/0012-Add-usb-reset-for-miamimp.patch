@@ -1,7 +1,7 @@
-From 4592f636f644ec695be1e32245a01b10624cb727 Mon Sep 17 00:00:00 2001
+From ac556595151cca0f2f30d13330ba53177459d9a4 Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Thu, 9 Jan 2020 11:20:08 +0100
-Subject: [PATCH 12/13] Add usb reset for miamimp
+Subject: [PATCH 12/15] Add usb reset for miamimp
 
 ---
  include/configs/topic_miamimp.h | 8 ++++++--

@@ -1,7 +1,7 @@
-From 49d200a12c5dd5267161393a291aa22eaef2fb28 Mon Sep 17 00:00:00 2001
+From ac0ab8faf4a6d8daaac64f4e0d9e43b51c6f45de Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Jan 2017 15:35:41 +0100
-Subject: [PATCH 07/13] ARM: zynqmp: Add support for the topic-miamimp
+Subject: [PATCH 07/15] ARM: zynqmp: Add support for the topic-miamimp
  system-on-module
 
 The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
@@ -37,10 +37,10 @@ The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
  create mode 100644 include/configs/topic_miamimp.h
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index 445ab1526b..21a7ffe4ad 100644
+index f795fef5c9..fa14d0fda8 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -177,6 +177,7 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
+@@ -190,6 +190,7 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
  	zynqmp-mini-qspi-x1-stacked.dtb		\
  	zynqmp-mini-qspi-x2-single.dtb		\
  	zynqmp-mini-qspi-x2-stacked.dtb		\

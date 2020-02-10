@@ -1,7 +1,7 @@
-From 0752733d46a2a8ee58c6de3793b2f0753328b584 Mon Sep 17 00:00:00 2001
+From 82a3bddbfeabd1cd1126b2c7e77694f516f62599 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 17 Nov 2016 15:20:32 +0100
-Subject: [PATCH 02/13] board: topic: Detect RAM size at boot
+Subject: [PATCH 02/15] board: topic: Detect RAM size at boot
 
 Miami boards can have memory sizes of 256M, 512M or 1GB. To prevent requiring
 separate bootloaders for each variant, just detect the RAM size at boot time
