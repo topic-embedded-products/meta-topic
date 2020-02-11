@@ -1,7 +1,7 @@
-From b81c219678b839b8d905b868e330678a90805437 Mon Sep 17 00:00:00 2001
+From 77a26f44d085295a76003382db15006502176c5e Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Wed, 5 Feb 2020 10:05:39 +0100
-Subject: [PATCH 15/15] Support UBIFS
+Subject: [PATCH 13/13] Support UBIFS
 
 ---
  include/configs/topic_miamimp.h | 10 +++++++++-

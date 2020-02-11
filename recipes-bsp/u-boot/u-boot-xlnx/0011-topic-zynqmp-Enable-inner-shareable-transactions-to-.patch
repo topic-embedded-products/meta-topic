@@ -1,7 +1,7 @@
-From 40546c3047bbf7fc9e92b7d1a4dd3cec3a47f011 Mon Sep 17 00:00:00 2001
+From 57e11ae0cbe2282fedc880f264c465fb664d9fac Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 5 Nov 2019 10:50:27 +0100
-Subject: [PATCH 13/15] topic zynqmp: Enable inner shareable transactions to be
+Subject: [PATCH 11/13] topic zynqmp: Enable inner shareable transactions to be
  broadcast
 
 Allows the HPC (cache coherent) port to actually work. See:
