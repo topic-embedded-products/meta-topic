@@ -1,7 +1,7 @@
-From 5231f6dcf2a567ab769bd3a219caf1ecd964ad75 Mon Sep 17 00:00:00 2001
+From 8efa6f581c8c34718aea1ef8d7d20d858afcbcc2 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 12 Feb 2019 11:22:54 +0100
-Subject: [PATCH 10/13] iio/gyro/bmg160: Use millidegrees for temperature scale
+Subject: [PATCH 09/16] iio/gyro/bmg160: Use millidegrees for temperature scale
 
 Standard unit for temperature is millidegrees Celcius, whereas this driver
 was reporting in degrees. Fix the scale factor in the driver.

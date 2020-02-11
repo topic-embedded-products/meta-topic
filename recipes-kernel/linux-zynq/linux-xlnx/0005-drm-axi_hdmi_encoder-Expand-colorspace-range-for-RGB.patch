@@ -1,7 +1,7 @@
-From 969832d275fa83438602ff21debdf62b2a5f8ecd Mon Sep 17 00:00:00 2001
+From 3055d80d7310f2aab56fb7bbc0a5c312de682d56 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 16 Oct 2017 14:06:27 +0200
-Subject: [PATCH 05/13] drm: axi_hdmi_encoder: Expand colorspace range for RGB
+Subject: [PATCH 05/16] drm: axi_hdmi_encoder: Expand colorspace range for RGB
  mode
 
 Newer IP versions ignore the AXI_HDMI_CTRL_FULL_RANGE bit and implement
