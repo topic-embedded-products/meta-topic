@@ -56,7 +56,10 @@ UBOOT_SUFFIX_zynqmp = "itb"
 UBOOT_LOADADDRESS = "0x8000000"
 UBOOT_ENTRYPOINT = "0x8000000"
 HAS_PLATFORM_INIT_append = "\
-    topic_miamimp_config topic_miamimp_xilinx_xdp_config"
+    topic_miamimp_config \
+    topic_miamiplusmp_config \
+    topic_miamimp_xilinx_xdp_config\
+    "
 # We provide the firmware through the URI, u-boot-xlnx overrides CONFIG_PMUFW_INIT_FILE
 PMU_FIRMWARE_DEPLOY_DIR = "${WORKDIR}"
 PMU_FIRMWARE_IMAGE_NAME = "pmu-firmware-zynqmp-pmu"

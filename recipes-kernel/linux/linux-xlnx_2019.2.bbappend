@@ -14,6 +14,7 @@ COMPATIBLE_MACHINE_topic-miami = "topic-miami"
 TOPICBSPCONFIG ?= ""
 TOPICBSPCONFIG_topic-miami = "file://topic-miami-standard.cfg"
 TOPICBSPCONFIG_topic-miamimp = "file://topic-miamimp-standard.cfg"
+TOPICBSPCONFIG_tdpzu9 = "file://topic-miamimp-standard.cfg file://topic-miamiplusmp-extra.cfg"
 TOPICBSPCONFIG_xdpzu7 = "file://topic-xdpzu7-standard.cfg"
 
 SRC_URI_append = " ${TOPICBSPCONFIG}"
@@ -23,6 +24,7 @@ KERNEL_DEVICETREE_topic-miami = "\
 	"
 KERNEL_DEVICETREE_topic-miamimp = "\
 	xilinx/zynqmp-topic-miamimp.dtb \
+	xilinx/zynqmp-topic-miamiplusmp.dtb \
 	xilinx/zynqmp-topic-miamimp-florida-gen.dtb \
 	xilinx/zynqmp-topic-miamimp-florida-test.dtb \
 	"
