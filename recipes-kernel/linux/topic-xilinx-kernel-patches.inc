@@ -17,6 +17,8 @@ SRC_URI_append = " \
 	file://0014-drm-adi_axi_hdmi-Fix-fbdev-interface-not-working.patch \
 	file://0015-gpio-poweroff-Implement-force-pm-power-off-flag.patch \
 	file://0016-Add-topic-miami-devicetrees.patch \
+	file://0017-spi-nor-Fix-spi-nor-read-in-edge-cases.patch \
+	file://0018-zynqmp-topic-miamimp-Enable-multi-die-support-for-QS.patch \
 	"
 
 # Compile overlay-capable devicetrees
