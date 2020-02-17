@@ -1,0 +1,69 @@
+From 5f37d36c6d6ce3e60a14ac34ec2f4faf43922569 Mon Sep 17 00:00:00 2001
+From: Leon Leijssen <leon.leijssen@topic.nl>
+Date: Mon, 17 Feb 2020 10:59:27 +0100
+Subject: [PATCH] spi_flash do not write out of bounds when doing unaligned
+ reads
+
+---
+ drivers/mtd/spi/spi_flash.c | 30 ++++++++++++------------------
+ 1 file changed, 12 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/mtd/spi/spi_flash.c b/drivers/mtd/spi/spi_flash.c
+index a01465bade..2f2022d8d6 100644
+--- a/drivers/mtd/spi/spi_flash.c
++++ b/drivers/mtd/spi/spi_flash.c
+@@ -670,23 +670,26 @@ int spi_flash_cmd_read_ops(struct spi_flash *flash, u32 offset,
+ #endif
+ 
+ #ifdef CONFIG_SF_DUAL_FLASH
+-	u8 moveoffs = 0;
+-	void *tempbuf = NULL;
+-	size_t length = len;
++	u8 two[2];
+ #endif
+ 
+ #ifdef CONFIG_SF_DUAL_FLASH
+ 	/*
+ 	 * Incase of dual parallel, if odd offset is received
+-	 * decrease it by 1 and read extra byte, otherwise
+-	 * any read with odd offset fails
++	 * do a second read of 2 bytes and add the last byte to
++	 * the buffer
+ 	 */
+ 	if (flash->dual_flash == SF_DUAL_PARALLEL_FLASH) {
+ 		if (offset & 1) {
+-			offset -= 1;
+-			len += 1;
+-			moveoffs = 1;
+-			tempbuf = data;
++			ret = spi_flash_cmd_read_ops(flash, offset & ~1, 2, two);
++			if (ret < 0)
++				return ret;
++
++			memcpy(data, &two[1], 1);
++
++			++offset;
++			++data;
++			--len;
+ 		}
+ 	}
+ #endif
+@@ -796,15 +799,6 @@ int spi_flash_cmd_read_ops(struct spi_flash *flash, u32 offset,
+ 		data += read_len;
+ 	}
+ 
+-#ifdef CONFIG_SF_DUAL_FLASH
+-	if (flash->dual_flash == SF_DUAL_PARALLEL_FLASH) {
+-		if (moveoffs) {
+-			data = tempbuf + 1;
+-			memcpy(tempbuf, data, length);
+-		}
+-	}
+-#endif
+-
+ 	spi->dummy_bytes = 0;
+ 
+ 	if (flash->spi->bytemode != SPI_4BYTE_MODE) {
+-- 
+2.17.1
+

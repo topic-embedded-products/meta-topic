@@ -15,6 +15,7 @@ SRC_URI_append = "\
 	file://0011-topic-zynqmp-Enable-inner-shareable-transactions-to-.patch \
 	file://0012-Disable-spi-transfer-breakable-by-CTRL-C-support.patch \
 	file://0013-Support-UBIFS.patch \
+	file://0014-spi_flash-do-not-write-out-of-bounds-when-doing-unal.patch \
 	file://0001-env-in-eeprom.cfg \
 	"
 
