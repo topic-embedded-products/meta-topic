@@ -1,0 +1,62 @@
+From c34a70a3a7d9bc81c22e69c119a483fd9fe686ce Mon Sep 17 00:00:00 2001
+From: Alexandru Ardelean <alexandru.ardelean@analog.com>
+Date: Wed, 3 Oct 2018 11:07:30 +0300
+Subject: [PATCH 1/5] dmaengine: virt-dma: store result on dma descriptor
+
+This allows each virtual channel to store information about each transfer
+that completed, i.e. which transfer succeeded (or which failed) and if
+there was any residue data on each (completed) transfer.
+
+Signed-off-by: Alexandru Ardelean <alexandru.ardelean@analog.com>
+---
+ drivers/dma/virt-dma.c | 4 ++--
+ drivers/dma/virt-dma.h | 4 ++++
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/dma/virt-dma.c b/drivers/dma/virt-dma.c
+index 88ad8ed2a8d6..bf560a20c8a8 100644
+--- a/drivers/dma/virt-dma.c
++++ b/drivers/dma/virt-dma.c
+@@ -101,7 +101,7 @@ static void vchan_complete(unsigned long arg)
+ 	}
+ 	spin_unlock_irq(&vc->lock);
+ 
+-	dmaengine_desc_callback_invoke(&cb, NULL);
++	dmaengine_desc_callback_invoke(&cb, &vd->tx_result);
+ 
+ 	list_for_each_entry_safe(vd, _vd, &head, node) {
+ 		dmaengine_desc_get_callback(&vd->tx, &cb);
+@@ -109,7 +109,7 @@ static void vchan_complete(unsigned long arg)
+ 		list_del(&vd->node);
+ 		vchan_vdesc_fini(vd);
+ 
+-		dmaengine_desc_callback_invoke(&cb, NULL);
++		dmaengine_desc_callback_invoke(&cb, &vd->tx_result);
+ 	}
+ }
+ 
+diff --git a/drivers/dma/virt-dma.h b/drivers/dma/virt-dma.h
+index b09b75ab0751..eb767c583b7e 100644
+--- a/drivers/dma/virt-dma.h
++++ b/drivers/dma/virt-dma.h
+@@ -17,6 +17,7 @@
+ 
+ struct virt_dma_desc {
+ 	struct dma_async_tx_descriptor tx;
++	struct dmaengine_result tx_result;
+ 	/* protected by vc.lock */
+ 	struct list_head node;
+ };
+@@ -65,6 +66,9 @@ static inline struct dma_async_tx_descriptor *vchan_tx_prep(struct virt_dma_chan
+ 	vd->tx.tx_submit = vchan_tx_submit;
+ 	vd->tx.desc_free = vchan_tx_desc_free;
+ 
++	vd->tx_result.result = DMA_TRANS_NOERROR;
++	vd->tx_result.residue = 0;
++
+ 	spin_lock_irqsave(&vc->lock, flags);
+ 	list_add_tail(&vd->node, &vc->desc_allocated);
+ 	spin_unlock_irqrestore(&vc->lock, flags);
+-- 
+2.17.1
+

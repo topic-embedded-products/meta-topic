@@ -1,0 +1,34 @@
+From 0eaccfb3fa35a6b2d04af25f768be4eb7b35d723 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 17 Feb 2020 11:57:07 +0100
+Subject: [PATCH 5/5] media/platform/axi-hdmi-rx: Announce GPLv2 module license
+
+Add missing MODULE_LICENSE directive, otherwise you'll get this when
+you load the module:
+
+axi_hdmi_rx: module license 'unspecified' taints kernel.
+Disabling lock debugging due to kernel taint
+axi_hdmi_rx: Unknown symbol vb2_queue_init (err -2)
+axi_hdmi_rx: Unknown symbol vb2_streamoff (err -2)
+axi_hdmi_rx: Unknown symbol devm_kmalloc (err -2)
+...
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/media/platform/axi-hdmi-rx.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/media/platform/axi-hdmi-rx.c b/drivers/media/platform/axi-hdmi-rx.c
+index 51a9abdb0bf6..be3ef49e3499 100644
+--- a/drivers/media/platform/axi-hdmi-rx.c
++++ b/drivers/media/platform/axi-hdmi-rx.c
+@@ -975,3 +975,6 @@ static struct platform_driver axi_hdmi_rx_driver = {
+ 	.remove = axi_hdmi_rx_remove,
+ };
+ module_platform_driver(axi_hdmi_rx_driver);
++
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("ADI AXI HDMI RX driver");
+-- 
+2.17.1
+

@@ -24,6 +24,7 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-videobuf2-vmalloc \
 	kernel-module-xilinx-dma \
 	kernel-module-mali \
+	firmware-imageon-edid \
 	"
 
 KERNEL_MODULE_AUTOLOAD += "adi_axi_hdmi"
