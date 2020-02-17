@@ -152,20 +152,13 @@ else
 	echo "${IMAGE_ROOT}/${BOOT_BIN} not found, attempt to use boot.tar.gz"
 	tar xaf ${IMAGE_ROOT}/boot.tar.gz --no-same-owner -C ${MEDIA_BOOT}
 fi
-for FS in ubi squashfs-lzo squashfs-xz
-do
-	if [ -f ${IMAGE_ROOT}/${IMAGE}*-${MACHINE}.${FS} ]
-	then
-		cp ${IMAGE_ROOT}/${IMAGE}*-${MACHINE}.${FS} ${MEDIA_DATA}
-	fi
-done
 
 if $DO_ROOTFS
 then
 	if [ -d ${MEDIA}/data ]
 	then
 		echo "Writing data..."
-		for FS in ubi squashfs-lzo squashfs-xz cpio.gz wic.gz
+		for FS in ubi ubifs squashfs-lzo squashfs-xz cpio.gz wic.gz
 		do
 			if [ -f ${IMAGE_ROOT}/${IMAGE}*-${MACHINE}.${FS} ]
 			then
