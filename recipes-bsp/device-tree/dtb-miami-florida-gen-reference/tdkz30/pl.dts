@@ -38,7 +38,6 @@
 					"Speaker", "Speaker";
 				simple-audio-card,routing =
 					"Speaker", "TX";
-
 				simple-audio-card,dai-link@0 {
 					format = "spdif";
 					cpu {
@@ -66,8 +65,6 @@
 				adi,input-depth = <8>;
 				adi,input-colorspace = "rgb";
 				adi,input-clock = "1x";
-				adi,input-style = <1>;
-				adi,input-justification = "right";
 				adi,clock-delay = <0>;
 				#sound-dai-cells = <0>;
 
@@ -82,6 +79,11 @@
 					};
 					port@1 {
 						reg = <1>;
+						/* HDMI connector */
+					};
+					port@2 {
+						reg = <2>;
+						/* Audio link */
 					};
 				};
 			};
@@ -123,7 +125,7 @@
 					port@1 {
 						reg = <0x1>;
 						adv7611: endpoint {
-							bus-width = <16>;
+							bus-width = <24>;
 							remote-endpoint = <&axi_hdmi_rx>;
 						};
 					};
@@ -214,12 +216,10 @@
 					#address-cells = <1>;
 					dma-channel@0 {
 						reg = <0>;
-						adi,length-width = <14>;
 						adi,source-bus-width = <64>;
 						adi,source-bus-type = <2>;
 						adi,destination-bus-width = <64>;
 						adi,destination-bus-type = <0>;
-						adi,2d;
 					};
 				};
 			};

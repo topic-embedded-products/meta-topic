@@ -1,7 +1,7 @@
-From 0eaccfb3fa35a6b2d04af25f768be4eb7b35d723 Mon Sep 17 00:00:00 2001
+From 500a5786af9e2980805f5297389020feede037d9 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 17 Feb 2020 11:57:07 +0100
-Subject: [PATCH 5/5] media/platform/axi-hdmi-rx: Announce GPLv2 module license
+Subject: [PATCH 5/8] media/platform/axi-hdmi-rx: Announce GPLv2 module license
 
 Add missing MODULE_LICENSE directive, otherwise you'll get this when
 you load the module:

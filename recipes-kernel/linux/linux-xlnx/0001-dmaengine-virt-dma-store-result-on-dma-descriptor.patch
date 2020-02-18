@@ -1,7 +1,7 @@
 From c34a70a3a7d9bc81c22e69c119a483fd9fe686ce Mon Sep 17 00:00:00 2001
 From: Alexandru Ardelean <alexandru.ardelean@analog.com>
 Date: Wed, 3 Oct 2018 11:07:30 +0300
-Subject: [PATCH 1/5] dmaengine: virt-dma: store result on dma descriptor
+Subject: [PATCH 1/8] dmaengine: virt-dma: store result on dma descriptor
 
 This allows each virtual channel to store information about each transfer
 that completed, i.e. which transfer succeeded (or which failed) and if

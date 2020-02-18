@@ -67,7 +67,10 @@
 						};
 					};
 					port@1 {
-						reg = <1>;
+						reg = <1>; /* HDMI monitor */
+					};
+					port@2 {
+						reg = <2>; /* Audio link */
 					};
 				};
 			};
@@ -109,7 +112,7 @@
 					port@1 {
 						reg = <0x1>;
 						adv7611: endpoint {
-							bus-width = <16>;
+							bus-width = <24>;
 							remote-endpoint = <&axi_hdmi_rx>;
 						};
 					};
@@ -192,12 +195,10 @@
 					#address-cells = <1>;
 					dma-channel@0 {
 						reg = <0>;
-						adi,length-width = <14>;
 						adi,source-bus-width = <64>;
 						adi,source-bus-type = <2>;
 						adi,destination-bus-width = <64>;
 						adi,destination-bus-type = <0>;
-						adi,2d;
 					};
 				};
 			};

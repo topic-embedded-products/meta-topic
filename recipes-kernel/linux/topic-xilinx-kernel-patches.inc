@@ -1,11 +1,18 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 
-SRC_URI_append = " \
+ADIHDMIPATCHES = "\
 	file://0001-dmaengine-virt-dma-store-result-on-dma-descriptor.patch \
 	file://0002-Add-include-linux-fpga-adi-axi-common.h-header.patch \
 	file://0003-dma-axi-dmac-Update-to-adi-xcomm_zynq-version.patch \
 	file://0004-media-platform-Add-ADI-drivers.patch \
 	file://0005-media-platform-axi-hdmi-rx-Announce-GPLv2-module-lic.patch \
+	file://0006-sound-soc-dai.h-Add-SPDIF-format-constants.patch \
+	file://0007-ASoC-snd_soc_of_parse_daifmt-Handle-SND_SOC_DAIFMT_S.patch \
+	file://0008-drm-bridge-adv7511-Enable-SPDIF-support.patch \
+	"
+
+SRC_URI_append = "\
+	${ADIHDMIPATCHES}\
 	file://0001-Add-ltc3562-voltage-regulator-driver.patch \
 	file://0002-drm-introduce-helper-for-accessing-EDID-blob-in-drm_.patch \
 	file://0003-Add-ADI-AXI-HDMI-module-adi_axi_hdmi.patch \

@@ -1,7 +1,7 @@
 From 8ff91e257c1a8d3f17f3fda5d3aad84cd02d37e6 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 17 Feb 2020 08:55:37 +0100
-Subject: [PATCH 2/5] Add include/linux/fpga/adi-axi-common.h header
+Subject: [PATCH 2/8] Add include/linux/fpga/adi-axi-common.h header
 
 Required by several ADI drivers
 ---
