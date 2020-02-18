@@ -91,43 +91,31 @@
 	};
 
 	fragment@3 {
-		target = <&i2cmux>;
+		target = <&i2cmux_3>;
 		__overlay__ {
 			#address-cells = <1>;
 			#size-cells = <0>;
-			i2c@1 {
-				/* HDMI O - Connects directly to HDMI connector */
-				#address-cells = <1>;
-				#size-cells = <0>;
-				reg = <1>;
-			};
-			i2c@3 {
-				/* HDMI IN */
-				#address-cells = <1>;
-				#size-cells = <0>;
-				reg = <3>;
-				/* copied from zynq-zed-imageon.dts */
-				adv7611@4c {
-					compatible = "adi,adv7611";
-					reg = <0x4c>;
-					#address-cells = <0x1>;
-					#size-cells = <0x0>;
-					bus-width = <24>;
-					hsync-active = <0>; /* Parallel bus */
-					vsync-active = <0>;
-					interrupt-parent = <&gpio0>;
-					interrupts = <57 4>; /* EMIO GPIO 3 */
-					adi,int1-config = <1>; /* ADV76XX_INT1_CONFIG_ACTIVE_LOW */
-					reset-gpios = <&gpio0 55 0>; /* EMIO GPIO 1 */
-					port@0 {
-						reg = <0x0>;
-					};
-					port@1 {
-						reg = <0x1>;
-						adv7611: endpoint {
-							bus-width = <24>;
-							remote-endpoint = <&axi_hdmi_rx>;
-						};
+			/* HDMI IN */
+			adv7611@4c {
+				compatible = "adi,adv7611";
+				reg = <0x4c>;
+				#address-cells = <0x1>;
+				#size-cells = <0x0>;
+				bus-width = <24>;
+				hsync-active = <0>; /* Parallel bus */
+				vsync-active = <0>;
+				interrupt-parent = <&gpio0>;
+				interrupts = <57 4>; /* EMIO GPIO 3 */
+				adi,int1-config = <1>; /* ADV76XX_INT1_CONFIG_ACTIVE_LOW */
+				reset-gpios = <&gpio0 55 0>; /* EMIO GPIO 1 */
+				port@0 {
+					reg = <0x0>;
+				};
+				port@1 {
+					reg = <0x1>;
+					adv7611: endpoint {
+						bus-width = <16>;
+						remote-endpoint = <&axi_hdmi_rx>;
 					};
 				};
 			};
@@ -199,7 +187,7 @@
 
 					axi_hdmi_rx: endpoint {
 						remote-endpoint = <&adv7611>;
-						bus-width = <24>;
+						bus-width = <16>;
 					};
 				};
 			};

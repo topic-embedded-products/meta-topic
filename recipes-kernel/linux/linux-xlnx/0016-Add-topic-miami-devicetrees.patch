@@ -1,4 +1,4 @@
-From 587459be45889447828978ba1c95dd746cbe3087 Mon Sep 17 00:00:00 2001
+From 2907a4a32d783e5b31e2f837af690b2315da89a9 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 14 Jun 2018 13:19:00 +0200
 Subject: [PATCH 16/16] Add topic-miami devicetrees
@@ -7,17 +7,17 @@ Just a copy from the topic-miami branch contents, not actually added to Makefile
 Adapted to 4.19 kernel and removed a lot of old trees
 ---
  arch/arm/boot/dts/topic-miami-florida-mio.dts |   2 +
- .../arm/boot/dts/topic-miami-florida-mio.dtsi | 142 +++++++
+ .../arm/boot/dts/topic-miami-florida-mio.dtsi | 155 +++++++
  arch/arm/boot/dts/topic-miami-florida.dtsi    |  27 ++
  arch/arm/boot/dts/topic-miami.dtsi            | 335 +++++++++++++++
  arch/arm/boot/dts/topic-miamilite.dtsi        |  51 +++
  arch/arm/boot/dts/topic-miamiplus.dtsi        |  97 +++++
- .../zynqmp-topic-miamimp-florida-gen.dts      | 267 ++++++++++++
+ .../zynqmp-topic-miamimp-florida-gen.dts      | 279 ++++++++++++
  .../zynqmp-topic-miamimp-florida-test.dts     | 188 ++++++++
  .../boot/dts/xilinx/zynqmp-topic-miamimp.dts  | 369 ++++++++++++++++
  .../dts/xilinx/zynqmp-topic-miamiplusmp.dts   | 401 ++++++++++++++++++
  arch/arm64/configs/topic_miamimp_defconfig    | 399 +++++++++++++++++
- 11 files changed, 2278 insertions(+)
+ 11 files changed, 2303 insertions(+)
  create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dts
  create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dtsi
  create mode 100644 arch/arm/boot/dts/topic-miami-florida.dtsi
@@ -40,10 +40,10 @@ index 000000000000..5cf840f0ccfd
 +/include/ "topic-miami-florida-mio.dtsi"
 diff --git a/arch/arm/boot/dts/topic-miami-florida-mio.dtsi b/arch/arm/boot/dts/topic-miami-florida-mio.dtsi
 new file mode 100644
-index 000000000000..e1e9c0f56a64
+index 000000000000..94b8df584280
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami-florida-mio.dtsi
-@@ -0,0 +1,142 @@
+@@ -0,0 +1,155 @@
 +/include/ "topic-miami.dtsi"
 +
 +/* Common components for MIO parts of Florida boards. These are
@@ -119,6 +119,12 @@ index 000000000000..e1e9c0f56a64
 +				 */
 +			};
 +		};
++		i2cmux_1: i2c@1 {
++			/* HDMI O - Connects directly to HDMI connector */
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <1>;
++		};
 +		i2cmux_2: i2c@2 {
 +			/* GEN */
 +			#address-cells = <1>;
@@ -128,7 +134,8 @@ index 000000000000..e1e9c0f56a64
 +			gpioexf: pca953x@20 {
 +				compatible = "nxp,pca9534";
 +				reg = <0x20>;
-+				/* 0=USB_OTG_OC_N 1=USB_OTG_EN_N 2=n.c. ...*/
++				gpio-line-names = "USB_OTG_OC_N", "USB_OTG_EN_N", "POWER_BTN", "HDMI_IN_HPD",
++					"", "POWER_KILL_N", "MAIN_POWER", "";
 +				gpio-controller;
 +				#gpio-cells = <2>;
 +				interrupt-controller;
@@ -147,6 +154,12 @@ index 000000000000..e1e9c0f56a64
 +				#clock-cells = <0>;
 +				compatible = "silabs,si514";
 +			};
++		};
++		i2cmux_3: i2c@3 {
++			/* HDMI IN */
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <3>;
 +		};
 +	};
 +};
@@ -221,7 +234,7 @@ index 000000000000..1b79b5fc2c9a
 +};
 diff --git a/arch/arm/boot/dts/topic-miami.dtsi b/arch/arm/boot/dts/topic-miami.dtsi
 new file mode 100644
-index 000000000000..f1702997b0dd
+index 000000000000..4a50728a20fd
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami.dtsi
 @@ -0,0 +1,335 @@
@@ -338,7 +351,7 @@ index 000000000000..f1702997b0dd
 +	gpioex: pca953x@41 {
 +		compatible = "nxp,pca9536";
 +		reg = <0x41>;
-+		/* 0=USB_RESET 1=VTT_SHDWN_N 2=V_PRESENT 3=DEBUG_PRESENT */
++		gpio-line-names = "USB_RESET", "VTT_SHDWN_N", "V_PRESENT", "DEBUG_PRESENT";
 +		gpio-controller;
 +		#gpio-cells = <2>;
 +	};
@@ -722,10 +735,10 @@ index 000000000000..c63b30266fa3
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
 new file mode 100644
-index 000000000000..347f1d9b8acd
+index 000000000000..8e4aa9f00ca5
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
-@@ -0,0 +1,267 @@
+@@ -0,0 +1,279 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -855,6 +868,12 @@ index 000000000000..347f1d9b8acd
 +				 */
 +			};
 +		};
++		i2cmux_1: i2c@1 {
++			/* HDMI O - Connects directly to HDMI connector */
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <1>;
++		};
 +		i2cmux_2: i2c@2 {
 +			/* GEN */
 +			#address-cells = <1>;
@@ -909,6 +928,12 @@ index 000000000000..347f1d9b8acd
 +				lltc,prescaler-exponent = <5>; /* 2^(2*5) = 1024 */
 +				power-supplies = <&charger>;
 +			};
++		};
++		i2cmux_3: i2c@3 {
++			/* HDMI IN */
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <3>;
 +		};
 +	};
 +};
