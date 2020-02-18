@@ -1,25 +1,31 @@
-From 74eb246f950bd469f5e18e21c63f75888b4fb6ea Mon Sep 17 00:00:00 2001
+From ab45087c136adf324a570cd27f5246eb215d4f06 Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Fri, 14 Feb 2020 10:27:46 +0100
-Subject: [PATCH 1/2] spi-nor Fix spi-nor read in edge cases
+Subject: [PATCH 1/2] spi-nor Fix spi-nor read and write in edge cases
 
-spi_nor_read handle odd read requests by doing an
-additional small alignment read. This is already done
-by spi_nor_write and solves an out of bounds write to
-buf and a memcpy with overlapping regions
+spi_nor_read handle odd read requests by doing an additional
+small alignment read. This is already done by spi_nor_write
+and solves an out of bounds write to buf and a memcpy with
+overlapping regions
 
 spi_nor_read For chips with multi die support the spi controller
-has to split the read in chunks of 16MB. A multiply of 2 was missing in
-the remaining page length calculation which resulted in data corruption.
+has to split the read in chunks of 16MB. A multiply of 2 was
+missing in the remaining page length calculation which resulted
+in data corruption.
 
-spi_nor_write The remaining bank length used in case of addr_width 4 in
-stacked configuration was missing a multiply which is there in the read code
+spi_nor_write retlen is incorrect in case of an odd write offset
+
+spi_nor_write The remaining bank length used in case of
+addr_width 4 in stacked configuration was missing a multiply which
+is there in the read code
+
+Signed-off-by: Leon Leijssen <leon.leijssen@topic.nl>
 ---
- drivers/mtd/spi-nor/spi-nor.c | 164 ++++++++++++++++------------------
- 1 file changed, 77 insertions(+), 87 deletions(-)
+ drivers/mtd/spi-nor/spi-nor.c | 170 ++++++++++++++++------------------
+ 1 file changed, 81 insertions(+), 89 deletions(-)
 
 diff --git a/drivers/mtd/spi-nor/spi-nor.c b/drivers/mtd/spi-nor/spi-nor.c
-index a352c9070a8f..3585f8ce0ff7 100644
+index a352c9070a8f..09043045703b 100644
 --- a/drivers/mtd/spi-nor/spi-nor.c
 +++ b/drivers/mtd/spi-nor/spi-nor.c
 @@ -9,7 +9,6 @@
@@ -86,7 +92,7 @@ index a352c9070a8f..3585f8ce0ff7 100644
  	}
  
  	ret = spi_nor_lock_and_prep(nor, SPI_NOR_OPS_READ);
-@@ -1748,15 +1751,14 @@ static int spi_nor_read(struct mtd_info *mtd, loff_t from, size_t len,
+@@ -1748,15 +1751,15 @@ static int spi_nor_read(struct mtd_info *mtd, loff_t from, size_t len,
  		return ret;
  
  	while (len) {
@@ -97,16 +103,18 @@ index a352c9070a8f..3585f8ce0ff7 100644
 -		}
  		offset = from;
  
-+		/* Size and length is the actual bytes to read (logical)
-+		 * Addressing is physical */
- 		if (nor->isparallel == 1)
-+		{
+-		if (nor->isparallel == 1)
++		/*
++		 * Size and length is the actual bytes to read (logical)
++		 * Addressing is physical
++		 */
++		if (nor->isparallel == 1) {
  			offset /= 2;
 +		}
  
  		if (nor->isstacked == 1) {
  			stack_shift = 1;
-@@ -1768,53 +1770,39 @@ static int spi_nor_read(struct mtd_info *mtd, loff_t from, size_t len,
+@@ -1768,53 +1771,41 @@ static int spi_nor_read(struct mtd_info *mtd, loff_t from, size_t len,
  			}
  		}
  
@@ -138,7 +146,10 @@ index a352c9070a8f..3585f8ce0ff7 100644
 -							(offset << nor->shift);
 -			} else {
 -				rem_bank_len = (mtd->size >> stack_shift) -
-+		/* Fix crossing boundaries for multi die chips & 3 bit addressing modes */
++		/*
++		 * Fix crossing boundaries for multi die chips
++		 * and 3 bit addressing modes
++		 */
 +		if ((nor->spi && nor->spi->multi_die) || nor->addr_width == 3) {
 +			bank_size = (OFFSET_16_MB << nor->shift);
 +			cur_bank = offset / bank_size;
@@ -162,8 +173,7 @@ index a352c9070a8f..3585f8ce0ff7 100644
 +			rem_bank_len = (mtd->size >> stack_shift) -
 +					(offset << nor->shift);
 +
-+		if (nor->addr_width == 3)
-+		{
++		if (nor->addr_width == 3) {
 +			ret = write_ear(nor, offset);
 +			if (ret)
 +				goto read_err;
@@ -184,7 +194,7 @@ index a352c9070a8f..3585f8ce0ff7 100644
  		if (ret == 0) {
  			/* We shouldn't see 0-length reads */
  			ret = -EIO;
-@@ -1824,12 +1812,8 @@ static int spi_nor_read(struct mtd_info *mtd, loff_t from, size_t len,
+@@ -1824,12 +1815,8 @@ static int spi_nor_read(struct mtd_info *mtd, loff_t from, size_t len,
  			goto read_err;
  
  		WARN_ON(ret > len);
@@ -199,7 +209,7 @@ index a352c9070a8f..3585f8ce0ff7 100644
  		buf += ret;
  		from += ret;
  		len -= ret;
-@@ -1837,10 +1821,6 @@ static int spi_nor_read(struct mtd_info *mtd, loff_t from, size_t len,
+@@ -1837,10 +1824,6 @@ static int spi_nor_read(struct mtd_info *mtd, loff_t from, size_t len,
  	ret = 0;
  
  read_err:
@@ -210,7 +220,7 @@ index a352c9070a8f..3585f8ce0ff7 100644
  	spi_nor_unlock_and_unprep(nor, SPI_NOR_OPS_READ);
  	return ret;
  }
-@@ -1936,7 +1916,9 @@ static int spi_nor_write(struct mtd_info *mtd, loff_t to, size_t len,
+@@ -1936,7 +1919,9 @@ static int spi_nor_write(struct mtd_info *mtd, loff_t to, size_t len,
  	size_t page_offset, page_remain, i;
  	ssize_t ret;
  	u32 offset, stack_shift=0;
@@ -221,7 +231,7 @@ index a352c9070a8f..3585f8ce0ff7 100644
  	u32 rem_bank_len = 0;
  
  #define OFFSET_16_MB 0x1000000
-@@ -1950,12 +1932,14 @@ static int spi_nor_write(struct mtd_info *mtd, loff_t to, size_t len,
+@@ -1950,12 +1935,14 @@ static int spi_nor_write(struct mtd_info *mtd, loff_t to, size_t len,
  	if ((nor->isparallel) && (to & 1)) {
  
  		u8 two[2] = {0xff, buf[0]};
@@ -237,7 +247,7 @@ index a352c9070a8f..3585f8ce0ff7 100644
  		*retlen += 1; /* We've written only one actual byte */
  		++buf;
  		--len;
-@@ -1967,18 +1951,13 @@ static int spi_nor_write(struct mtd_info *mtd, loff_t to, size_t len,
+@@ -1967,18 +1954,15 @@ static int spi_nor_write(struct mtd_info *mtd, loff_t to, size_t len,
  		return ret;
  	for (i = 0; i < len; ) {
  		ssize_t written;
@@ -253,34 +263,34 @@ index a352c9070a8f..3585f8ce0ff7 100644
  
  		offset = (to + i);
  
-+		/* Size and length is the actual bytes to read (logical)
-+		 * Addressing is physical */
++		/*
++		 * Size and length is the actual bytes to read (logical)
++		 * Addressing is physical
++		 */
  		if (nor->isparallel == 1)
  			offset /= 2;
  
-@@ -1992,11 +1971,26 @@ static int spi_nor_write(struct mtd_info *mtd, loff_t to, size_t len,
+@@ -1992,11 +1976,23 @@ static int spi_nor_write(struct mtd_info *mtd, loff_t to, size_t len,
  			}
  		}
  
 -		/* Die cross over issue is not handled */
 -		if (nor->addr_width == 4)
 -			rem_bank_len = (mtd->size >> stack_shift) - offset;
+-		if (nor->addr_width == 3)
+-			write_ear(nor, offset);
 +		cur_bank = offset / bank_size;
 +		end_bank = (offset + len) / bank_size;
 +		if (cur_bank != end_bank)
-+		{
 +			rem_bank_len = ((bank_size *
 +					(cur_bank + 1)) -
 +					offset) << nor->shift;
-+		}
 +		else
 +			rem_bank_len = (mtd->size >>
 +					stack_shift) -
 +					(offset << nor->shift);
 +
- 		if (nor->addr_width == 3)
--			write_ear(nor, offset);
-+		{
++		if (nor->addr_width == 3) {
 +			ret = write_ear(nor, offset);
 +			if (ret)
 +				goto write_err;
@@ -289,7 +299,7 @@ index a352c9070a8f..3585f8ce0ff7 100644
  		if (nor->isstacked == 1) {
  			if (len <= rem_bank_len) {
  				page_remain = min_t(size_t,
-@@ -2016,11 +2010,7 @@ static int spi_nor_write(struct mtd_info *mtd, loff_t to, size_t len,
+@@ -2016,11 +2012,7 @@ static int spi_nor_write(struct mtd_info *mtd, loff_t to, size_t len,
  		if (ret)
  			goto write_err;
  
