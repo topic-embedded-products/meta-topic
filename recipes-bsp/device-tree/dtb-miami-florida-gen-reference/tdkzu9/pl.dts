@@ -164,7 +164,6 @@
 
 					axi_hdmi_rx: endpoint {
 						remote-endpoint = <&adv7611>;
-						bus-width = <24>;
 					};
 				};
 			};

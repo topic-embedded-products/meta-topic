@@ -114,7 +114,6 @@
 				port@1 {
 					reg = <0x1>;
 					adv7611: endpoint {
-						bus-width = <16>;
 						remote-endpoint = <&axi_hdmi_rx>;
 					};
 				};
@@ -187,7 +186,6 @@
 
 					axi_hdmi_rx: endpoint {
 						remote-endpoint = <&adv7611>;
-						bus-width = <16>;
 					};
 				};
 			};
