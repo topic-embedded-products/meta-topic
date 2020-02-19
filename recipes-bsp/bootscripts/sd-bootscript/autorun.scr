@@ -1,9 +1,0 @@
-echo "Loading kernel from SD card..."
-if load mmc 0 ${kernel_addr} ${kernel_image} && load mmc 0 ${devicetree_addr} ${devicetree_image}; then
-   echo "Load from SD card succeeded"
-   setenv bootargs "console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootfstype=ext4 rootwait"
-   echo "Booting..."
-   bootm ${kernel_addr} - ${devicetree_addr}
-else
-   echo "Load from SD card failed, aborting SD boot..."
-fi;

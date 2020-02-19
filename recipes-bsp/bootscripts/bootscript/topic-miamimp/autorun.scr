@@ -1,0 +1,19 @@
+if test "${devtype}" = "mmc"; then
+	echo "Loading kernel from mmc ${devnum}:${devplist}..."
+	if ext4load ${devtype} ${devnum}:${devplist} $fdt_addr /boot/system.dtb && ext4load ${devtype} ${devnum}:${devplist} $kernel_addr /boot/Image; then
+		setenv bootargs $bootargs root=/dev/mmcblk${devnum}p${devplist} rw rootwait
+		echo "Booting..."
+		booti $kernel_addr - $fdt_addr
+	else
+		echo "Load from mmc ${devnum}:${devplist} failed, aborting mmc boot..."
+	fi;
+elif test "${devtype}" = "ubi"; then
+	echo "Loading kernel from UBIFS..."
+	if ubifsload $fdt_addr /boot/system.dtb && ubifsload $kernel_addr /boot/Image; then
+		echo "Load from UBIFS succeeded"
+		setenv bootargs "console=ttyPS0,115200 ubi.mtd=3 root=ubi0:qspi-rootfs rootfstype=ubifs rw rootwait"
+		booti $kernel_addr - $fdt_addr
+	else
+		echo "Load from UBIFS failed, aborting UBIFS boot..."
+	fi;
+fi;

@@ -51,6 +51,8 @@ else
     fi
 fi
 
+ROOTFS=${MEDIA}/sd-rootfs-a
+
 if $DO_ROOTFS
 then
 	if [ -z "${IMAGE}" ]
@@ -61,9 +63,9 @@ then
 		exit 1
 	fi
 
-	if [ ! -w ${MEDIA}/rootfs ]
+	if [ ! -w ${ROOTFS} ]
 	then
-		echo "${MEDIA}/rootfs is not accesible. Are you root (sudo me),"
+		echo "${ROOTFS} is not accesible. Are you root (sudo me),"
 		echo "is the SD card inserted, and did you partition and"
 		echo "format it with partition_sd_card.sh?"
 		exit 1
@@ -105,11 +107,6 @@ then
 fi
 
 set -e
-if [ -z "${SD_BOOTSCRIPT}" ]
-then
-	SD_BOOTSCRIPT=autorun.scr
-fi
-
 if [ -d ${MEDIA}/data ]
 then
 	MEDIA_DATA=${MEDIA}/data
@@ -130,24 +127,13 @@ fi
 if [ -e ${IMAGE_ROOT}/${BOOT_BIN} ]
 then
 	cp ${IMAGE_ROOT}/${BOOT_BIN} ${MEDIA_BOOT}/BOOT.BIN
-	for fn in u-boot.img u-boot.bin u-boot.itb Image uImage
+	for fn in u-boot.img u-boot.bin u-boot.itb
 	do
 		if [ -e ${IMAGE_ROOT}/${fn} ]
 		then
 			cp ${IMAGE_ROOT}/${fn} ${MEDIA_BOOT}
 		fi
 	done
-	if [ -e ${IMAGE_ROOT}/${SD_BOOTSCRIPT} ]
-	then
-		cp ${IMAGE_ROOT}/${SD_BOOTSCRIPT} ${MEDIA_BOOT}/autorun.scr
-		cp ${IMAGE_ROOT}/${SD_BOOTSCRIPT} ${MEDIA_BOOT}/boot.scr
-	else
-		echo "Note: Did not install ${SD_BOOTSCRIPT}, removed from card"
-		rm -f ${MEDIA}/boot/autorun.scr ${MEDIA_BOOT}/boot.scr
-	fi
-	cp ${IMAGE_ROOT}/${DTB} ${MEDIA_BOOT}/devicetree.dtb
-	# MPSOC wants "system.dtb" and "boot.scr" instead, so make a copy
-	cp ${IMAGE_ROOT}/${DTB} ${MEDIA_BOOT}/system.dtb
 else
 	echo "${IMAGE_ROOT}/${BOOT_BIN} not found, attempt to use boot.tar.gz"
 	tar xaf ${IMAGE_ROOT}/boot.tar.gz --no-same-owner -C ${MEDIA_BOOT}
@@ -167,28 +153,28 @@ then
 		done
 	fi
 
-	echo "Writing rootfs..."
-	if [ ! -f dropbear_rsa_host_key -a -f ${MEDIA}/rootfs/etc/dropbear/dropbear_rsa_host_key ]
+	echo "Writing sd-rootfs-a..."
+	if [ ! -f dropbear_rsa_host_key -a -f ${ROOTFS}/etc/dropbear/dropbear_rsa_host_key ]
 	then
-		cp ${MEDIA}/rootfs/etc/dropbear/dropbear_rsa_host_key .
+		cp ${ROOTFS}/etc/dropbear/dropbear_rsa_host_key .
 		chmod 666 dropbear_rsa_host_key
 	fi
-	rm -rf ${MEDIA}/rootfs/*
-	tar xzf ${IMAGE_ROOT}/${IMAGE}-${MACHINE}.tar.gz -C ${MEDIA}/rootfs
+	rm -rf ${ROOTFS}/*
+	tar xzf ${IMAGE_ROOT}/${IMAGE}-${MACHINE}.tar.gz -C ${ROOTFS}
 	if [ -f dropbear_rsa_host_key ]
 	then
-		install -d ${MEDIA}/rootfs/etc/dropbear
-		install -m 600 dropbear_rsa_host_key ${MEDIA}/rootfs/etc/dropbear/dropbear_rsa_host_key
+		install -d ${ROOTFS}/etc/dropbear
+		install -m 600 dropbear_rsa_host_key ${ROOTFS}/etc/dropbear/dropbear_rsa_host_key
 	fi
 	if [ ! -z "${FPGA_BOOT_IMAGE}" ]
 	then
-		cp ${MEDIA}/rootfs/${FPGA_BOOT_IMAGE} ${MEDIA_BOOT}/fpga.bin
+		cp ${ROOTFS}/${FPGA_BOOT_IMAGE} ${MEDIA_BOOT}/fpga.bin
 	fi
 
 	if [ "${COPY_LOADABLE_MODULES}" = "1" ]
 	then
 		echo "Copying loadable modules directory to boot partition..."
-		cp -r ${MEDIA}/rootfs/usr/share/loadable_modules ${MEDIA_BOOT}
+		cp -r ${ROOTFS}/usr/share/loadable_modules ${MEDIA_BOOT}
 	fi
 fi
 
@@ -196,7 +182,7 @@ if $DO_UNMOUNT
 then
 	sleep 1
 	echo -n "Unmounting"
-	for p in ${MEDIA_BOOT} ${MEDIA}/rootfs ${MEDIA}/data
+	for p in ${MEDIA_BOOT} ${MEDIA}/sd-rootfs-a ${MEDIA}/sd-rootfs-b ${MEDIA}/data
 	do
 		if [ -d $p ]
 		then

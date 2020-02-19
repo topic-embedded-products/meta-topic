@@ -1,8 +1,0 @@
-echo "Loading kernel from UBIFS..."
-if ubifsload $fdt_addr /boot/system.dtb && ubifsload $kernel_addr /boot/Image; then
-   echo "Load from UBIFS succeeded"
-   setenv bootargs "ubi.mtd=3 root=ubi0:qspi-rootfs rootfstype=ubifs rw rootwait"
-   booti $kernel_addr - $fdt_addr
-else
-   echo "Load from UBIFS failed, aborting UBIFS boot..."
-fi;

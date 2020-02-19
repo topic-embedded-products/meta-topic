@@ -19,7 +19,7 @@ MY_THINGS = "\
 	kernel-modules \
 	kernel-devicetree \
 	${@bb.utils.contains('VIRTUAL-RUNTIME_dev_manager', 'busybox-mdev', 'modutils-loadscript', '', d)} \
-	${@ 'mtd-utils-ubifs ubifs-bootscript' if d.getVar('UBI_SUPPORT') == 'true' else ''} \
+	${@ 'mtd-utils-ubifs' if d.getVar('UBI_SUPPORT') == 'true' else ''} \
 	${@bb.utils.contains("IMAGE_FEATURES", "swupdate", d.getVar('SWUPDATE_THINGS'), "", d)} \
 	udhcpd-iface-config \
 	"
@@ -32,6 +32,7 @@ IMAGE_INSTALL = "\
 	packagegroup-core-boot \
 	packagegroup-core-ssh-dropbear \
 	packagegroup-distro-base \
+	bootscript \
 	${IMAGE_INSTALL_MACHINE_EXTRAS} \
 	${ROOTFS_PKGMANAGE} \
 	${MY_THINGS} \
@@ -52,10 +53,6 @@ myimage_rootfs_postprocess() {
 	# For sysvinit and similar, set up links. For systemd, no changes.
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}
 	then
-		if ! ${UBI_SUPPORT}
-		then
-			rm -rf ${IMAGE_ROOTFS}/boot
-		fi
 		rm -rf ${IMAGE_ROOTFS}/media/* ${IMAGE_ROOTFS}/mnt
 		ln -f -s media ${IMAGE_ROOTFS}/mnt
 		rm -rf ${IMAGE_ROOTFS}/tmp
@@ -70,10 +67,7 @@ myimage_rootfs_postprocess() {
 		ln -s ../run ${IMAGE_ROOTFS}/var/run
 	fi
 
-	if ${UBI_SUPPORT}
-	then
-		ln -s ${DEVICETREE} ${IMAGE_ROOTFS}/boot/system.dtb
-	fi
+	ln -s ${DEVICETREE} ${IMAGE_ROOTFS}/boot/system.dtb
 
 	echo 'DROPBEAR_RSAKEY_ARGS="-s ${DROPBEAR_RSAKEY_SIZE}"' >> ${IMAGE_ROOTFS}${sysconfdir}/default/dropbear
 }

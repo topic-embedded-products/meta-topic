@@ -77,7 +77,6 @@ FPGA_MNGR_RECONFIG_ENABLE = "1"
 EXTRA_IMAGEDEPENDS += " \
 		virtual/bootloader \
 		arm-trusted-firmware \
-		sd-bootscript \
 		"
 
 # Use QSPI flash with 128k sector size, 128MB total size

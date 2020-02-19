@@ -46,7 +46,9 @@ parted --align optimal --script ${DEV} -- \
 	mklabel msdos \
 	mkpart primary fat16 1MiB 64MiB \
 	mkpart primary ext4 64MiB 1024MiB \
-	mkpart primary ext4 1024MiB -1s
+	mkpart primary ext4 1024MiB 2048MiB \
+	mkpart primary ext4 2048MiB -1s \
+	set 2 boot on
 
 # Wait until kernel reloaded partition table
 # The system is removing & adding the devices several times, therefore sleep for 1 second
@@ -63,8 +65,9 @@ echo ""
 mkfs.vfat -n "boot" ${DEV}1
 
 # Format the Linux rootfs part
-mkfs.ext4 -m 0 -L "rootfs" -O sparse_super,dir_index  ${DEV}2
+mkfs.ext4 -m 0 -L "sd-rootfs-a" -O sparse_super,dir_index  ${DEV}2
+mkfs.ext4 -m 0 -L "sd-rootfs-b" -O sparse_super,dir_index  ${DEV}3
 
 # Format the Linux data part, optimize for large files
-mkfs.ext4 -m 0 -L "data" -O large_file,sparse_super,dir_index ${DEV}3
+mkfs.ext4 -m 0 -L "data" -O large_file,sparse_super,dir_index ${DEV}4
 

@@ -6,7 +6,7 @@ include conf/machine/include/zynq-default-providers.inc
 MACHINE_CLASS = "zynq"
 
 # Add u-boot image to rootfs
-EXTRA_IMAGEDEPENDS = "virtual/bootloader sd-bootscript"
+EXTRA_IMAGEDEPENDS = "virtual/bootloader"
 
 # Most boards will have a reference design for the machine. This is usually a
 # single package that RDEPENDS on the FPGA image and other needful things.

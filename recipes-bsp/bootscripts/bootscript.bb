@@ -1,4 +1,4 @@
-DESCRIPTION = "Bootscript for MMC/SD card"
+DESCRIPTION = "U-Boot Bootscript"
 SECTION = "bootloaders"
 PRIORITY = "optional"
 LICENSE = "GPLv2"
@@ -18,14 +18,14 @@ do_compile () {
 
 do_install () {
 	install -d ${D}/boot
-	install ${S}/autorun.uimage.scr ${D}/boot/autorun.scr
+	install ${S}/autorun.uimage.scr ${D}/boot/boot.scr
 }
 
 FILES_${PN} = "/boot"
 
 do_deploy () {
 	install -d ${DEPLOYDIR}
-	install ${S}/autorun.uimage.scr ${DEPLOYDIR}/autorun.scr
+	install ${S}/autorun.uimage.scr ${DEPLOYDIR}/boot.scr
 }
 do_deploy[dirs] = "${B}"
 addtask deploy before do_build after do_compile
