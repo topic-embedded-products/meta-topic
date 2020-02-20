@@ -1,7 +1,7 @@
-From 191c152eeab30fcd9c81a16abea54918896c8e82 Mon Sep 17 00:00:00 2001
+From 520bad6f391e745824cd2500628291a0d3344f1b Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
-Date: Wed, 10 Apr 2019 09:55:22 +0200
-Subject: [PATCH 13/16] clk: Add Si5341/Si5340 driver
+Date: Fri, 17 May 2019 15:23:52 +0200
+Subject: [PATCH 13/29] clk: Add Si5341/Si5340 driver
 
 Adds a driver for the Si5341 and Si5340 chips. The driver does not fully
 support all features of these chips, but allows the chip to be used
@@ -10,46 +10,41 @@ without any support from the "clockbuilder pro" software.
 If the chip is preprogrammed, that is, you bought one with some defaults
 burned in, or you programmed the NVM in some way, the driver will just
 take over the current settings and only change them on demand. Otherwise
-the input must a fixed XTAL in its most basic configuration (no
+the input must be a fixed XTAL in its most basic configuration (no
 predividers, no feedback, etc.).
 
 The driver supports dynamic changes of multisynth, output dividers and
 enabling or powering down outputs and multisynths.
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
-
-v2: Fix setting a Rx_DIV value of 2
-
-v3: Rework after maintainer review
-    Style changes (whitespace, brackets)
-    Use unaligned.h
-    Integrate assigned-clock(-parent)s support
-    Remove most dev_dbg calls
+[sboyd@kernel.org: Mark some things static, use BIT_ULL for big bits and
+ULL for big constants]
+Signed-off-by: Stephen Boyd <sboyd@kernel.org>
 ---
  drivers/clk/Kconfig      |   11 +
  drivers/clk/Makefile     |    1 +
- drivers/clk/clk-si5341.c | 1347 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 1359 insertions(+)
+ drivers/clk/clk-si5341.c | 1346 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 1358 insertions(+)
  create mode 100644 drivers/clk/clk-si5341.c
 
 diff --git a/drivers/clk/Kconfig b/drivers/clk/Kconfig
-index d993d53f5d39..c536a5e5d171 100644
+index d993d53f5d39..289548ba8730 100644
 --- a/drivers/clk/Kconfig
 +++ b/drivers/clk/Kconfig
 @@ -90,6 +90,17 @@ config COMMON_CLK_SCPI
  	  This driver uses SCPI Message Protocol to interact with the
  	  firmware providing all the clock controls.
  
-+
 +config COMMON_CLK_SI5341
 +	tristate "Clock driver for SiLabs 5341 and 5340 A/B/C/D devices"
 +	depends on I2C
 +	select REGMAP_I2C
 +	help
-+	  This driver supports Silicon Labs 5341 and 5340 programmable clock
-+	  generators. For proper operation, the device needs to be
-+	  pre-programmed either using NVM or a firmware "blob" with register
-+	  settings created by the silabs clock creator software.
++	  This driver supports Silicon Labs Si5341 and Si5340 programmable clock
++	  generators. Not all features of these chips are currently supported
++	  by the driver, in particular it only supports XTAL input. The chip can
++	  be pre-programmed to support other configurations and features not yet
++	  implemented in the driver.
 +
  config COMMON_CLK_SI5351
  	tristate "Clock driver for SiLabs 5351A/B/C"
@@ -68,10 +63,10 @@ index 1f564c3b32b5..23b7df9a50f1 100644
  obj-$(CONFIG_COMMON_CLK_SI544)		+= clk-si544.o
 diff --git a/drivers/clk/clk-si5341.c b/drivers/clk/clk-si5341.c
 new file mode 100644
-index 000000000000..fabbd2aec6f1
+index 000000000000..72424eb7e5f8
 --- /dev/null
 +++ b/drivers/clk/clk-si5341.c
-@@ -0,0 +1,1347 @@
+@@ -0,0 +1,1346 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Driver for Silicon Labs Si5341/Si5340 Clock generator
@@ -404,7 +399,7 @@ index 000000000000..fabbd2aec6f1
 +	u8 r[10];
 +
 +	/* Shift left as far as possible without overflowing */
-+	while (!(n_num & BIT(43)) && !(n_den & BIT(31))) {
++	while (!(n_num & BIT_ULL(43)) && !(n_den & BIT(31))) {
 +		n_num <<= 1;
 +		n_den <<= 1;
 +	}
@@ -448,7 +443,7 @@ index 000000000000..fabbd2aec6f1
 +	 */
 +	shift = 0;
 +	res = m_num;
-+	while (res & 0xffff00000000) {
++	while (res & 0xffff00000000ULL) {
 +		++shift;
 +		res >>= 1;
 +	}
@@ -995,7 +990,7 @@ index 000000000000..fabbd2aec6f1
 +	return 0;
 +}
 +
-+const struct si5341_reg_default si5341_preamble[] = {
++static const struct si5341_reg_default si5341_preamble[] = {
 +	{ 0x0B25, 0x00 },
 +	{ 0x0502, 0x01 },
 +	{ 0x0505, 0x03 },
@@ -1068,7 +1063,7 @@ index 000000000000..fabbd2aec6f1
 +	regmap_reg_range(SI5341_SYNTH_N_UPD(4), SI5341_SYNTH_N_UPD(4)),
 +};
 +
-+const struct regmap_access_table si5341_regmap_volatile = {
++static const struct regmap_access_table si5341_regmap_volatile = {
 +	.yes_ranges = si5341_regmap_volatile_range,
 +	.n_yes_ranges = ARRAY_SIZE(si5341_regmap_volatile_range),
 +};
@@ -1090,7 +1085,6 @@ index 000000000000..fabbd2aec6f1
 +	.reg_bits = 8,
 +	.val_bits = 8,
 +	.cache_type = REGCACHE_RBTREE,
-+	.max_register = 0,
 +	.ranges = si5341_regmap_ranges,
 +	.num_ranges = ARRAY_SIZE(si5341_regmap_ranges),
 +	.max_register = SI5341_REGISTER_MAX,
@@ -1402,7 +1396,7 @@ index 000000000000..fabbd2aec6f1
 +static const struct of_device_id clk_si5341_of_match[] = {
 +	{ .compatible = "silabs,si5340" },
 +	{ .compatible = "silabs,si5341" },
-+	{ },
++	{ }
 +};
 +MODULE_DEVICE_TABLE(of, clk_si5341_of_match);
 +

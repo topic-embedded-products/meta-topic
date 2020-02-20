@@ -1,0 +1,37 @@
+From 74eee9aade7f374d5805cccae682cc2bdf16d477 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 18 Feb 2020 08:49:16 +0100
+Subject: [PATCH 26/29] sound/soc-dai.h: Add SPDIF format constants
+
+---
+ include/sound/soc-dai.h   | 1 +
+ include/uapi/sound/asoc.h | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/include/sound/soc-dai.h b/include/sound/soc-dai.h
+index f5d70041108f..bf13bbc9385c 100644
+--- a/include/sound/soc-dai.h
++++ b/include/sound/soc-dai.h
+@@ -31,6 +31,7 @@ struct snd_compr_stream;
+ #define SND_SOC_DAIFMT_DSP_B		SND_SOC_DAI_FORMAT_DSP_B
+ #define SND_SOC_DAIFMT_AC97		SND_SOC_DAI_FORMAT_AC97
+ #define SND_SOC_DAIFMT_PDM		SND_SOC_DAI_FORMAT_PDM
++#define SND_SOC_DAIFMT_SPDIF		SND_SOC_DAI_FORMAT_SPDIF
+ 
+ /* left and right justified also known as MSB and LSB respectively */
+ #define SND_SOC_DAIFMT_MSB		SND_SOC_DAIFMT_LEFT_J
+diff --git a/include/uapi/sound/asoc.h b/include/uapi/sound/asoc.h
+index a74ca232f1fc..d0ab45823dc7 100644
+--- a/include/uapi/sound/asoc.h
++++ b/include/uapi/sound/asoc.h
+@@ -158,6 +158,7 @@
+ #define SND_SOC_DAI_FORMAT_DSP_B        5 /* L data MSB during FRM LRC */
+ #define SND_SOC_DAI_FORMAT_AC97         6 /* AC97 */
+ #define SND_SOC_DAI_FORMAT_PDM          7 /* Pulse density modulation */
++#define SND_SOC_DAI_FORMAT_SPDIF	8 /* SPDIF */
+ 
+ /* left and right justified also known as MSB and LSB respectively */
+ #define SND_SOC_DAI_FORMAT_MSB          SND_SOC_DAI_FORMAT_LEFT_J
+-- 
+2.17.1
+
