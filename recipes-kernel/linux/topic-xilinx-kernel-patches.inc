@@ -37,8 +37,9 @@ SRC_URI_append = "\
 	file://0015-clk-clk-si5341-Support-multiple-input-ports.patch \
 	file://0016-drm-adi_axi_hdmi-Fix-fbdev-interface-not-working.patch \
 	file://0017-gpio-poweroff-Implement-force-pm-power-off-flag.patch \
+	file://0017-spi-nor-Fix-spi-nor-read-in-edge-cases.patch \
 	file://0018-Add-topic-miami-devicetrees.patch \
-	file://0019-spi-nor-Fix-spi-nor-read-in-edge-cases.patch \
+	file://0019-topic-miami-update-partition-layout.patch \
 	file://0020-zynqmp-topic-miamimp-Enable-multi-die-support-for-QS.patch \
 	file://0021-dmaengine-virt-dma-store-result-on-dma-descriptor.patch \
 	file://0022-Add-include-linux-fpga-adi-axi-common.h-header.patch \

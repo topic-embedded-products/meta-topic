@@ -49,5 +49,5 @@ XILINX_LM_LICENSE_FILE ?= "${XILINX_VIVADO_PATH}/data/ip/core_licenses/Xilinx.li
 # WIC image support.
 DEVICETREE ??= "zynq-7000.dtb"
 WKS_FILE = "sdimage-bootpart.wks"
-IMAGE_BOOT_FILES = "boot.bin u-boot.img uImage autorun.scr ${DEVICETREE};devicetree.dtb"
+IMAGE_BOOT_FILES = "boot.bin u-boot.img uImage boot.scr ${DEVICETREE};devicetree.dtb"
 do_image_wic[depends] += "mtools-native:do_populate_sysroot dosfstools-native:do_populate_sysroot"

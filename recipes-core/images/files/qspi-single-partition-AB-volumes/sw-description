@@ -1,0 +1,27 @@
+software =
+{
+	version = "@@IMAGEVERSION@@";
+	description = "Firmware update for topic-platform";
+
+	@@SWU_BOARD@@ = {
+		hardware-compatibility: [ "@@SWU_HWREVISION@@" ];
+		scripts: (
+		{
+			filename = "update.sh";
+			sha256 = "@update.sh";
+			type = "shellscript";
+		}
+		);
+
+		images: (
+			{
+				filename = "@@ROOTFSNAME@@";
+				sha256 = "@@@ROOTFSNAME@@";
+				volume = "qspi-rootfs-r";
+				properties: {
+					replaces = "qspi-rootfs";
+				}
+			}
+		);
+	}
+}

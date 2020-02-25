@@ -13,6 +13,9 @@ KMACHINE = "${MACHINE_BOARD}"
 include conf/machine/include/zynq-base.inc
 include conf/machine/include/tune-zynq.inc
 
+# tune-zynq is adding an unused zImage
+KERNEL_IMAGETYPES_remove = "zImage"
+
 MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 
 # Workaround for broken check on IMAGE_FEATURES in kernel recipe

@@ -1,0 +1,38 @@
+software =
+{
+	version = "@@IMAGEVERSION@@";
+	description = "Firmware update for topic-platform";
+
+	@@SWU_BOARD@@ = {
+		hardware-compatibility: [ "@@SWU_HWREVISION@@" ];
+
+		stable: {
+			copy1: {
+				images: (
+					{
+						filename = "@@ROOTFSNAME@@.rootfs.squashfs-lzo";
+						device = "/dev/mtd5";
+						type = "flash";
+					},
+					{
+						filename = "@@SWUPDATE_KERNEL@@";
+						device = "/dev/mtd4";
+						type = "flash";
+					},
+					{
+						filename = "@@DEVICETREE@@";
+						device = "/dev/mtd3";
+						type = "flash";
+					}
+				);
+
+				uboot: (
+					{
+						name = "test";
+						value = "b";
+					}
+				);
+			}
+		}
+	}
+}

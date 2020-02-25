@@ -1,0 +1,69 @@
+#!/bin/sh -e
+if [ $# -ne 2 ] || [ ! -L $1 ]
+then
+	echo "Usage: $0 block_device mount_directory"
+	exit 1
+fi
+UPDATE_MOUNT=$2
+
+ACTUAL_DEVICE=$(readlink $1)
+if [ ! -b "$ACTUAL_DEVICE" ]
+then
+	echo "Invalid device"
+	exit 1
+fi
+
+if [ "$ACTUAL_DEVICE" = "$(readlink /dev/root)" ]
+then
+	echo "$ACTUAL_DEVICE is the currently active root partition!"
+	exit 1
+fi
+
+for m in $(sed -n "s@\($ACTUAL_DEVICE\|$1\) \([^[:space:]]\+\) .*@\2@p" /proc/mounts)
+do
+	umount $m
+done
+
+if grep -q ^$ACTUAL_DEVICE /proc/mounts
+then
+	echo "Mount already exists"
+	exit 1
+fi
+
+mkdir -p $UPDATE_MOUNT
+mount $1 $UPDATE_MOUNT || true
+
+if grep -q "^\($ACTUAL_DEVICE\|$1\)" /proc/mounts
+then
+	echo "Cleaning $UPDATE_MOUNT"
+	rm -rf $UPDATE_MOUNT/*
+else
+	NAME="$(blkid $ACTUAL_DEVICE | sed -n "s@.*LABEL=\"\(.*-rootfs-[ab]\)\".*@\1@p")"
+	if [ -z "$NAME" ]
+	then
+		# Try to make up a name
+		PREFIX="$(echo $1 | sed 's@/dev/\(.*\)-\(active\|inactive\).*@\1@')"
+		if [ ! -z "${PREFIX}" ]
+		then
+			for PROP in a b
+			do
+				PROPOSAL="${PREFIX}-rootfs-${PROP}"
+				if ! blkid | grep -q "LABEL=\"${PROPOSAL}\""
+				then
+					NAME=$PROPOSAL
+					break
+				fi
+			done
+		fi
+	fi
+
+	if [ -z "$NAME" ]
+	then
+		echo "Failed to construct a new filesystem name"
+		exit 1
+	fi
+
+	mkfs.ext4 -F -m 0 -L $NAME -O sparse_super,dir_index $1
+	mount $1 $UPDATE_MOUNT
+fi
+echo "Succeeded providing ${UPDATE_MOUNT}"

@@ -17,8 +17,10 @@ SRC_URI_append = "\
 	file://0013-Support-UBIFS.patch \
 	file://0014-spi_flash-do-not-write-out-of-bounds-when-doing-unal.patch \
 	file://0014-ARM-zynqmp-Add-support-for-the-topic-miamiplusmp-SoM.patch \
-	file://0001-env-in-eeprom.cfg \
+	file://0015-topic-miami-support-new-filesystem-structure.patch \
 	"
+
+SRC_URI_append_topic-miami += "file://0002-miami-qspi-ubifs.cfg "
 
 EXTRACOMPILEDEPENDS = ""
 EXTRACOMPILEDEPENDS_zynqmp = "arm-trusted-firmware:do_deploy"

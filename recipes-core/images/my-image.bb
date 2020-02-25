@@ -4,19 +4,23 @@ DISTRO_EXTRA_DEPENDS ?= ""
 MACHINE_EXTRA_DEPENDS ?= ""
 DEPENDS += "${DISTRO_EXTRA_DEPENDS} ${MACHINE_EXTRA_DEPENDS}"
 
-IMAGE_FEATURES += "package-management ssh-server-dropbear"
+IMAGE_FEATURES[validitems] += "swupdate"
+IMAGE_FEATURES += "package-management ssh-server-dropbear swupdate"
 
-IMAGE_FSTYPES = "tar.gz wic.gz"
+IMAGE_FSTYPES = "tar.gz wic.gz ubifs"
 
 inherit core-image
 
 UBI_SUPPORT = "${@ 'true' if bb.utils.contains("IMAGE_FSTYPES", "ubi", True, False, d) or bb.utils.contains("IMAGE_FSTYPES", "ubifs", True, False, d) else 'false'}"
 
+require ${@bb.utils.contains("IMAGE_FEATURES", "swupdate", "swu.inc", "", d)}
+
 MY_THINGS = "\
 	kernel-modules \
+	kernel-devicetree \
 	${@bb.utils.contains('VIRTUAL-RUNTIME_dev_manager', 'busybox-mdev', 'modutils-loadscript', '', d)} \
 	${@ 'mtd-utils-ubifs ubifs-bootscript' if d.getVar('UBI_SUPPORT') == 'true' else ''} \
-	${@bb.utils.contains("MACHINE_FEATURES", "alsa", "alsa-utils-aplay alsa-utils-speakertest alsa-utils-amixer alsa-utils-alsactl" , "", d)} \
+	${@bb.utils.contains("IMAGE_FEATURES", "swupdate", d.getVar('SWUPDATE_THINGS'), "", d)} \
 	udhcpd-iface-config \
 	"
 

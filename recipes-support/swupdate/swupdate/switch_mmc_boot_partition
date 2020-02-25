@@ -1,0 +1,16 @@
+#!/bin/sh -e
+if [ $# -ne 1 ] || [ ! -L $1 ]
+then
+	echo "Usage: $0 symlink_to_inactive_mmc_device"
+	exit 1
+fi
+
+block_partition=`readlink $1 | sed 's/.*\(mmcblk[0-9]\)p\([0-9]\)/\1|\2/'`
+
+if [ ${#block_partition} -ne 9 ]
+then
+	echo "Invalid block device"
+	exit 1
+fi
+
+get-bootable-mbr-partition /dev/${block_partition%|*} -s ${block_partition##*|}

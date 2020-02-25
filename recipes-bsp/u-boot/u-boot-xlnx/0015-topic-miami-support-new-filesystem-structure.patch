@@ -1,0 +1,126 @@
+From 54b54b2610aceb7e411eabe41d618d65822a98ae Mon Sep 17 00:00:00 2001
+From: Leon Leijssen <leon.leijssen@topic.nl>
+Date: Tue, 25 Feb 2020 17:25:24 +0100
+Subject: [PATCH] topic-miami: support new filesystem structure
+
+---
+ arch/arm/dts/zynq-topic-miami.dts | 14 ++++-----
+ include/configs/topic_miami.h     | 47 +++++++++++++++++++++----------
+ 2 files changed, 37 insertions(+), 24 deletions(-)
+
+diff --git a/arch/arm/dts/zynq-topic-miami.dts b/arch/arm/dts/zynq-topic-miami.dts
+index 58a10e11aa9..60282bbc715 100644
+--- a/arch/arm/dts/zynq-topic-miami.dts
++++ b/arch/arm/dts/zynq-topic-miami.dts
+@@ -56,17 +56,13 @@
+ 			label = "qspi-u-boot-env";
+ 			reg = <0xA0000 0x20000>;
+ 		};
+-		partition@qspi-device-tree {
+-			label = "qspi-device-tree";
+-			reg = <0xC0000 0x20000>;
+-		};
+-		partition@qspi-linux {
+-			label = "qspi-linux";
+-			reg = <0x100000 0x480000>;
+-		};
+ 		partition@qspi-rootfs {
+ 			label = "qspi-rootfs";
+-			reg = <0x580000 0x1A80000>;
++			reg = <0xC0000 0x1F40000>;
++		};
++		partition@qspi-all {
++			label = "qspi-all";
++			reg = <0x00000 0x2000000>;
+ 		};
+ 	};
+ };
+diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
+index e9524b7fc93..f8d7baf524b 100644
+--- a/include/configs/topic_miami.h
++++ b/include/configs/topic_miami.h
+@@ -78,7 +78,7 @@
+ # define DFU_ALT_INFO \
+ 	"dfu_alt_info=" \
+ 	"uImage ram 0x2080000 0x500000;" \
+-	"devicetree.dtb ram 0x2000000 0x20000;" \
++	"system.dtb ram 0x2000000 0x20000;" \
+ 	"uramdisk.image.gz ram 0x4000000 0x10000000\0" \
+ 	"dfu_ram=run usbreset && dfu 0 ram 0\0" \
+ 	"thor_ram=run usbreset && thordown 0 ram 0\0"
+@@ -90,19 +90,39 @@
+ 
+ #undef CONFIG_EXTRA_ENV_SETTINGS
+ #define CONFIG_EXTRA_ENV_SETTINGS	\
++	"boot_a_script=load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; source ${scriptaddr}\0" \
++	"boot_prefixes=/ /boot/\0" \
++	"boot_scripts=boot.scr\0" \
++	"boot_targets=jtag mmc0 qspi0 usb0 usb1\0" \
++	"bootcmd_jtag=source $scriptaddr; echo SCRIPT FAILED: continuing...;\0" \
++	"bootcmd_mmc0=setenv devnum 0; run mmc_boot\0" \
++	"bootcmd_mmc1=setenv devnum 1; run mmc_boot\0" \
++	"bootcmd_qspi0=sf probe 0 && run bootcmd_ubi\0" \
++	"bootcmd_ubi=run ubi_mount && ubifsload ${scriptaddr} /boot/boot.scr && source ${scriptaddr}\0" \
++	"bootcmd_usb0=setenv devnum 0; run usb_boot\0" \
++	"bootcmd_usb1=setenv devnum 1; run usb_boot\0" \
++	"distro_bootcmd=for target in ${boot_targets}; do run bootcmd_${target}; done\0" \
+ 	"kernel_image=uImage\0"	\
+ 	"kernel_addr=0x2080000\0" \
++	"mmc_boot=if mmc dev ${devnum}; then setenv devtype mmc; run scan_dev_for_boot_part; fi\0" \
+ 	"ramdisk_image=uramdisk.image.gz\0"	\
+ 	"ramdisk_load_address=0x4000000\0"	\
+-	"devicetree_image=devicetree.dtb\0"	\
++	"devicetree_image=system.dtb\0"	\
+ 	"devicetree_addr=0x2000000\0"	\
+ 	"bitstream_image=fpga.bin\0"	\
+-	"bootscript=autorun.scr\0" \
+-	"loadbit_addr=0x100000\0"	\
++	"bootscript=boot.scr\0" \
++	"scriptaddr=0x1900000\0" \
++	"loadbit_addr=0x100000\0" \
++	"scan_dev_for_boot=echo Scanning ${devtype} ${devnum}:${distro_bootpart}...; for prefix in ${boot_prefixes}; do run scan_dev_for_scripts; done\0" \
++	"scan_dev_for_boot_part=part list ${devtype} ${devnum} -bootable devplist; env exists devplist || setenv devplist 1; for distro_bootpart in ${devplist}; do if fstype ${devtype} ${devnum}:${distro_bootpart} bootfstype; then run scan_dev_for_boot; fi; done\0" \
++	"scan_dev_for_scripts=for script in ${boot_scripts}; do if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${script}; then echo Found U-Boot script ${prefix}${script}; run boot_a_script; echo SCRIPT FAILED: continuing...; fi; done\0" \
+ 	"loadbootenv_addr=0x2000000\0" \
++	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0" \
++	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0" \
+ 	"kernel_size=0x480000\0"	\
+ 	"devicetree_size=0x10000\0"	\
+ 	"boot_size=0xF00000\0"	\
++	"fdt_addr=4000000 \0" \
+ 	"fdt_high=0x20000000\0"	\
+ 	"initrd_high=0x20000000\0"	\
+ 	"mmc_loadbit=echo Loading bitstream from SD/MMC/eMMC to RAM.. && " \
+@@ -114,21 +134,18 @@
+ 		"sf read ${devicetree_addr} 0xC0000 ${devicetree_size} && " \
+ 		"sf read ${kernel_addr} 0x100000 ${kernel_size} && " \
+ 		"bootm ${kernel_addr} - ${devicetree_addr}\0" \
+-	"sdboot=if mmcinfo; then " \
+-			"setenv bootargs console=ttyPS0,115200 " \
+-				"root=/dev/mmcblk0p2 rw rootfstype=ext4 " \
+-				"rootwait quiet ; " \
+-			"load mmc 0 ${kernel_addr} ${kernel_image}&& " \
+-			"load mmc 0 ${devicetree_addr} ${devicetree_image}&& " \
+-			"bootm ${kernel_addr} - ${devicetree_addr}; " \
+-		"fi\0" \
++	"sdboot=mmc dev $sdbootdev && mmcinfo && if load mmc $sdbootdev:$partid ${scriptaddr} boot.scr; then source ${scriptaddr}; fi; run sdroot$sdbootdev; load mmc $sdbootdev:$partid $fdt_addr system.dtb && load mmc $sdbootdev:$partid $kernel_addr Image && booti $kernel_addr - $fdt_addr\0" \
++	"sdbootdev=0\0" \
++	"sdroot0=setenv bootargs $bootargs root=/dev/mmcblk0p2 rw rootwait\0" \
++	"sdroot1=setenv bootargs $bootargs root=/dev/mmcblk1p2 rw rootwait\0" \
++	"ubi_mount=sf probe && ubi part qspi-rootfs && ubifsmount ubi0:qspi-rootfs && setenv devtype ubi\0" \
++	"bootubipart=qspi-rootfs\0" \
++	"bootubivol=qspi-rootfs\0" \
+ 	EXTRA_ENV_USB \
+ 	DFU_ALT_INFO
+ 
+ #undef CONFIG_BOOTCOMMAND
+-#define CONFIG_BOOTCOMMAND	"if mmcinfo; then " \
+-	"if fatload mmc 0 0x1900000 ${bootscript}; then source 0x1900000; " \
+-	"fi; fi; run $modeboot"
++#define CONFIG_BOOTCOMMAND	"run distro_bootcmd"
+ #undef CONFIG_DISPLAY_BOARDINFO
+ 
+ #endif /* __CONFIG_TOPIC_MIAMI_H */
+-- 
+2.17.1
+
