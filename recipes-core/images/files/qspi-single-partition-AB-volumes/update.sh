@@ -8,7 +8,7 @@ fi
 
 if [ "$CMD" = "preinst" ]
 then
-	ubiattach -m 3 /dev/ubi_ctrl
+	ubiattach -m 3 /dev/ubi_ctrl || true
 elif [ "$CMD" = "postinst" ]
 then
 	reboot

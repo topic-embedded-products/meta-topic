@@ -5,11 +5,12 @@ RDEPENDS_${PN} += "get-bootable-mbr-partition"
 # To create ext4 filesystems:
 RDEPENDS_${PN} += "e2fsprogs-mke2fs"
 # To create ubi structures
+RDEPENDS_${PN} += "mtd-utils"
+# To create partition tables
 RDEPENDS_${PN} += "parted"
 
 SRC_URI += " \
 	file://20-swupdate-arguments \
-	file://0001-ubifs.cfg \
 	file://background.jpg \
 	file://swupdate.cfg \
 	file://switch_mmc_boot_partition \

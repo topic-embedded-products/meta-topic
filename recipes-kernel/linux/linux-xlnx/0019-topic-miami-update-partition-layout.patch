@@ -1,20 +1,27 @@
-From 90d428a8194ff094af900d7ce2bd081651995c4c Mon Sep 17 00:00:00 2001
+From 2b8026976eda24cb03d79a26b9183eddc4f3cd34 Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Tue, 25 Feb 2020 17:22:40 +0100
-Subject: [PATCH] topic-miami: update partition layout
+Subject: [PATCH 10/20] topic-miami: update partition layout
 
 ---
- arch/arm/boot/dts/topic-miami.dtsi | 10 +---------
- 1 file changed, 1 insertion(+), 9 deletions(-)
+ arch/arm/boot/dts/topic-miami.dtsi | 14 +++-----------
+ 1 file changed, 3 insertions(+), 11 deletions(-)
 
 diff --git a/arch/arm/boot/dts/topic-miami.dtsi b/arch/arm/boot/dts/topic-miami.dtsi
-index f1702997b0dd..8bb420b20065 100644
+index 4a50728a20fd..3661b5b9a68b 100644
 --- a/arch/arm/boot/dts/topic-miami.dtsi
 +++ b/arch/arm/boot/dts/topic-miami.dtsi
-@@ -235,17 +235,9 @@
- 			label = "qspi-u-boot-env";
- 			reg = <0xA0000 0x20000>;
+@@ -229,23 +229,15 @@
  		};
+ 		partition@qspi-u-boot-img {
+ 			label = "qspi-u-boot-img";
+-			reg = <0x20000 0x80000>;
++			reg = <0x20000 0xC0000>;
+ 		};
+ 		partition@qspi-u-boot-env {
+ 			label = "qspi-u-boot-env";
+-			reg = <0xA0000 0x20000>;
+-		};
 -		partition@qspi-device-tree {
 -			label = "qspi-device-tree";
 -			reg = <0xC0000 0x20000>;
@@ -22,11 +29,12 @@ index f1702997b0dd..8bb420b20065 100644
 -		partition@qspi-linux {
 -			label = "qspi-linux";
 -			reg = <0x100000 0x480000>;
--		};
++			reg = <0xE0000 0x20000>;
+ 		};
  		partition@qspi-rootfs {
  			label = "qspi-rootfs";
 -			reg = <0x580000 0x1A80000>;
-+			reg = <0xC0000 0x1F40000>;
++			reg = <0x100000 0x1F00000>;
  		};
  		/* Everything */
  		partition@qspi-all {

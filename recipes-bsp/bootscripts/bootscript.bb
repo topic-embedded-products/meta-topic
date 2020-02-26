@@ -8,12 +8,12 @@ PV = "1"
 inherit uboot_bootscript deploy
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-SRC_URI = "file://autorun.scr"
+SRC_URI = "file://boot.scr"
 
 S = "${WORKDIR}"
 
 do_compile () {
-	oe_mkimage_script -n "autorun" -d ${WORKDIR}/autorun.scr ${S}/autorun.uimage.scr
+	oe_mkimage_script -n "autorun" -d ${WORKDIR}/boot.scr ${S}/autorun.uimage.scr
 }
 
 do_install () {

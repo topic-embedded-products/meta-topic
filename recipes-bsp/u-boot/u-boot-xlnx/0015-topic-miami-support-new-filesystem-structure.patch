@@ -1,21 +1,28 @@
-From 54b54b2610aceb7e411eabe41d618d65822a98ae Mon Sep 17 00:00:00 2001
+From 5389c05b4f351e6ffc5152122f615dea4b3bf2c2 Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Tue, 25 Feb 2020 17:25:24 +0100
 Subject: [PATCH] topic-miami: support new filesystem structure
 
 ---
- arch/arm/dts/zynq-topic-miami.dts | 14 ++++-----
+ arch/arm/dts/zynq-topic-miami.dts | 18 +++++-------
  include/configs/topic_miami.h     | 47 +++++++++++++++++++++----------
- 2 files changed, 37 insertions(+), 24 deletions(-)
+ 2 files changed, 39 insertions(+), 26 deletions(-)
 
 diff --git a/arch/arm/dts/zynq-topic-miami.dts b/arch/arm/dts/zynq-topic-miami.dts
-index 58a10e11aa9..60282bbc715 100644
+index 58a10e11aa..63fbaf2e9f 100644
 --- a/arch/arm/dts/zynq-topic-miami.dts
 +++ b/arch/arm/dts/zynq-topic-miami.dts
-@@ -56,17 +56,13 @@
- 			label = "qspi-u-boot-env";
- 			reg = <0xA0000 0x20000>;
+@@ -50,23 +50,19 @@
  		};
+ 		partition@qspi-u-boot-img {
+ 			label = "qspi-u-boot-img";
+-			reg = <0x20000 0x80000>;
++			reg = <0x20000 0xC0000>;
+ 		};
+ 		partition@qspi-u-boot-env {
+ 			label = "qspi-u-boot-env";
+-			reg = <0xA0000 0x20000>;
+-		};
 -		partition@qspi-device-tree {
 -			label = "qspi-device-tree";
 -			reg = <0xC0000 0x20000>;
@@ -23,11 +30,12 @@ index 58a10e11aa9..60282bbc715 100644
 -		partition@qspi-linux {
 -			label = "qspi-linux";
 -			reg = <0x100000 0x480000>;
--		};
++			reg = <0xE0000 0x20000>;
+ 		};
  		partition@qspi-rootfs {
  			label = "qspi-rootfs";
 -			reg = <0x580000 0x1A80000>;
-+			reg = <0xC0000 0x1F40000>;
++			reg = <0x100000 0x1F00000>;
 +		};
 +		partition@qspi-all {
 +			label = "qspi-all";
@@ -36,7 +44,7 @@ index 58a10e11aa9..60282bbc715 100644
  	};
  };
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
-index e9524b7fc93..f8d7baf524b 100644
+index e9524b7fc9..66467319a0 100644
 --- a/include/configs/topic_miami.h
 +++ b/include/configs/topic_miami.h
 @@ -78,7 +78,7 @@
@@ -59,7 +67,7 @@ index e9524b7fc93..f8d7baf524b 100644
 +	"bootcmd_jtag=source $scriptaddr; echo SCRIPT FAILED: continuing...;\0" \
 +	"bootcmd_mmc0=setenv devnum 0; run mmc_boot\0" \
 +	"bootcmd_mmc1=setenv devnum 1; run mmc_boot\0" \
-+	"bootcmd_qspi0=sf probe 0 && run bootcmd_ubi\0" \
++	"bootcmd_qspi=sf probe 0 && run bootcmd_ubi\0" \
 +	"bootcmd_ubi=run ubi_mount && ubifsload ${scriptaddr} /boot/boot.scr && source ${scriptaddr}\0" \
 +	"bootcmd_usb0=setenv devnum 0; run usb_boot\0" \
 +	"bootcmd_usb1=setenv devnum 1; run usb_boot\0" \
