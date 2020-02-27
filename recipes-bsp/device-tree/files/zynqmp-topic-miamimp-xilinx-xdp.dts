@@ -126,6 +126,7 @@
 &qspi {
 	status = "okay";
 	is-dual = <1>;
+	multi-die = <1>;
 	flash@0 {
 		compatible = "st,m25p80", "n25q256a";
 		#address-cells = <1>;
@@ -135,16 +136,17 @@
 		spi-rx-bus-width = <4>;
 		spi-max-frequency = <166000000>;
 		is-dual = <1>;
+		multi-die = <1>;
 		partition@qspi-boot-bin {
 			label = "qspi-boot-bin";
 			reg = <0x00000 0x60000>;
 		};
 		partition@qspi-u-boot-itb {
-			label = "qspi-atf-spi-ub";
+			label = "qspi-u-boot-itb";
 			reg = <0x60000 0x100000>;
 		};
 		partition@qspi-u-boot-env {
-			label = "qspi-u-boot-bin";
+			label = "qspi-u-boot-env";
 			reg = <0x160000 0x20000>;
 		};
 		partition@qspi-rootfs {
@@ -372,6 +374,7 @@
 	disable-wp;
 	bus-width = <4>;
 	non-removable; /* It is removable actually... */
+	no-1-8-v; /* No high-speed capability */
 };
 
 /* USB connected through MIO and GPIO expander */
@@ -548,11 +551,14 @@
 		conf-rx {
 			pins = "MIO25";
 			bias-high-impedance;
+			bias-pull-up;
+			schmitt-cmos = <PIN_INPUT_TYPE_SCHMITT>;
 		};
 
 		conf-tx {
 			pins = "MIO24";
 			bias-disable;
+			schmitt-cmos = <PIN_INPUT_TYPE_CMOS>;
 		};
 	};
 
@@ -590,12 +596,18 @@
 		};
 
 		conf {
-			groups = "sdio0_0_grp", "sdio0_pc_0_grp";
-			slew-rate = <SLEW_RATE_SLOW>;
+			groups = "sdio0_0_grp";
+			slew-rate = <SLEW_RATE_FAST>;
 			io-standard = <IO_STANDARD_LVCMOS18>;
 			bias-disable;
 		};
 
+		conf-pc {
+			groups = "sdio0_pc_0_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+			bias-pull-up;
+		};
 	};
 
 	pinctrl_sdhci1_sd_default: sdhci1-sd-default {
@@ -606,8 +618,8 @@
 		};
 		conf {
 			groups = "sdio1_2_grp";
-			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			slew-rate = <SLEW_RATE_FAST>;
+			io-standard = <IO_STANDARD_LVCMOS33>;
 			bias-disable;
 		};
 
@@ -619,7 +631,7 @@
 		conf-cd {
 			groups = "sdio1_cd_0_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS33>;
 			bias-pull-up;
 		};
 	};
