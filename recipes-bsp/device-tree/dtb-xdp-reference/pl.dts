@@ -272,6 +272,7 @@
 				reg = <0x0 0xA0400000 0x0 0x200000>;
 				interrupt-parent = <&gic>;
 				interrupts = <0 111 4>; /* pl_ps_irq1[7] */
+				dma-coherent; /* Using HPC port */
 				nvmem-cells = <&dyplolicense>;
 				nvmem-cell-names = "license";
 			};
