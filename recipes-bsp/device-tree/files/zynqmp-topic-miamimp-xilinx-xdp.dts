@@ -67,8 +67,9 @@
 		};
 	};
 
-	/* USB PHY reset IO pin. */
+	/* USB PHY reset IO pin. Does not work this way, using hog instead. */
 	usb_phy0: phy0 {
+		status = "disabled";
 		compatible = "usb-nop-xceiv";
 		#phy-cells = <0>;
 		reset-gpios = <&gpio 65 GPIO_ACTIVE_LOW>; /* MIO65 -> USB_RESET */
@@ -116,6 +117,13 @@
 		gpios = <96 0>; /* EMIO 18 */
 		output-high;
 		line-name = "GPS-DSEL";
+	};
+
+	usb-reset {
+		gpio-hog;
+		gpios = <65 0>;
+		output-high;
+		line-name = "USB_RESET";
 	};
 };
 
@@ -579,6 +587,12 @@
 		/* Add pull-up to pins that go to connectors for electrical stability */
 		conf-pullup {
 			pins = "MIO33", "MIO34", "MIO35", "MIO68", "MIO69", "MIO70", "MIO71", "MIO72", "MIO73";
+			bias-pull-up;
+		};
+
+		/* Pull-up the USB reset pin, driver doesn't support reset */
+		conf-usbreset {
+			pins = "MIO66";
 			bias-pull-up;
 		};
 	};
