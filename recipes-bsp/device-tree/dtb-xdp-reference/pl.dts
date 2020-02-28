@@ -189,39 +189,6 @@
 				reg-shift = <2>;
 			};
 
-			axi_vdma_0: axivdma@a0000000 {
-				compatible = "xlnx,axi-vdma-1.00.a";
-				#address-cells = <1>;
-				#size-cells = <1>;
-				#dma-cells = <1>;
-				#dma-channels = <1>;
-				reg = <0x0 0xa0000000 0x0 0x1000>;
-				dma-ranges = <0x00000000 0x00000000 0x40000000>;
-				xlnx,num-fstores = <3>;
-				xlnx,flush-fsync = <1>;
-				xlnx,addrwidth = <64>;
-				clocks = <&zynqmp_clk PL0_REF>;
-				clock-names = "s_axi_lite_aclk";
-				dma-channel@a0000000 {
-					compatible = "xlnx,axi-vdma-mm2s-channel";
-					interrupt-parent = <&gic>;
-					interrupts = <0 104 4>; /* pl_ps_1[0] */
-					xlnx,datawidth = <64>;
-					xlnx,genlock-mode = <0x0>;
-					xlnx,include-dre = <0x1>;
-				};
-			};
-
-			hdmi_out: hdmi_tx@a0001000 {
-				compatible = "topic,vdma-fb";
-				reg = <0x0 0xa0001000 0x0 0x1000>;
-				dmas = <&axi_vdma_0 0>;
-				dma-names = "video";
-				num-fstores = <3>;
-				width = <1920>;
-				height = <1080>;
-			};
-
 			/* VCU */
 			vcu_0: vcu@a0240000 {
 				#address-cells = <2>;
