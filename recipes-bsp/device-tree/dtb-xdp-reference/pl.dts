@@ -84,6 +84,7 @@
 				interrupts = <92 IRQ_TYPE_EDGE_RISING>; /* INT0 at EMIO 14, INT1 is at 15 */
 			};
 
+
 			/* Accelero sensor */
 			bmi088_accel: bmi088_accel@1 {
 				compatible = "bmi088_accel";
@@ -130,6 +131,15 @@
 				nr-fans = <1>;
 				clocks = <&zynqmp_clk PL0_REF>;
 				topic,initial-pwm = <0x80>; /* Run at 50% */
+			};
+
+			/* MOTOR controller */
+			pl_motor_controller: motor-controller@a0013000 {
+				compatible = "topic,axi-pwm-motor-controller";
+				reg = <0x0 0xa0013000 0x0 0x1000>;
+				nr-motors = <4>;
+				clocks = <&zynqmp_clk PL0_REF>;
+				topic,initial-pwm = <0x0>; /* Off */
 			};
 
 			/* UART 16550 controller for BT */
