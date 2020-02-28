@@ -159,12 +159,12 @@
 		};
 		partition@qspi-rootfs {
 			label = "qspi-rootfs";
-			reg = <0x180000 0x7e80000>;
+			reg = <0x180000 0x3e80000>;
 		};
 		/* Everything */
 		partition@qspi-all {
 			label = "qspi-all";
-			reg = <0x0 0x8000000>;
+			reg = <0x0 0x4000000>;
 		};
 	};
 };
