@@ -1,7 +1,7 @@
 From 961bb8b17be3cd6d8ddcd04d5a0bd9a718b25fed Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 18 Oct 2019 07:34:13 +0200
-Subject: [PATCH 06/13] board, zynqmp: Fix for wrong AMS setting by ROM
+Subject: [PATCH 06/16] board, zynqmp: Fix for wrong AMS setting by ROM
 
 A bug in the ZynqMP bootrom sets the PS_SYSMON_ANALOG_BUS register
 at 0xFFA50914 to the wrong value 0x3201. This causes the AMS to

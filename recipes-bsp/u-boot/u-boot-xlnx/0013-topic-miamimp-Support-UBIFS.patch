@@ -1,9 +1,8 @@
-From 6a6308054ed6220cf85fc29d5862a23e61baf8d4 Mon Sep 17 00:00:00 2001
+From 582dea7a09e062bd897ba42c64835efc4e35bfdb Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Wed, 5 Feb 2020 10:05:39 +0100
-Subject: [PATCH 1/2] topic-miamimp: Support UBIFS
+Subject: [PATCH 13/16] topic-miamimp: Support UBIFS
 
-%% original patch: 0013-Support-UBIFS.patch
 ---
  include/configs/topic_miamimp.h | 10 +++++++++-
  include/configs/xilinx_zynqmp.h | 10 ++++++----

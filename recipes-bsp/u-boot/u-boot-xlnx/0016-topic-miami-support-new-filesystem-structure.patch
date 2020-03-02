@@ -1,12 +1,14 @@
-From 5389c05b4f351e6ffc5152122f615dea4b3bf2c2 Mon Sep 17 00:00:00 2001
+From a67850d09b2055b99a50e7ad6788ab61b8380d9b Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Tue, 25 Feb 2020 17:25:24 +0100
-Subject: [PATCH] topic-miami: support new filesystem structure
+Subject: [PATCH 16/16] topic-miami: support new filesystem structure
 
+Add MTD and UBI support and boot from QSPI using UBI filesystem
 ---
- arch/arm/dts/zynq-topic-miami.dts | 18 +++++-------
- include/configs/topic_miami.h     | 47 +++++++++++++++++++++----------
- 2 files changed, 39 insertions(+), 26 deletions(-)
+ arch/arm/dts/zynq-topic-miami.dts | 18 ++++------
+ configs/topic_miami_defconfig     | 14 ++++++++
+ include/configs/topic_miami.h     | 55 ++++++++++++++++++++++---------
+ 3 files changed, 61 insertions(+), 26 deletions(-)
 
 diff --git a/arch/arm/dts/zynq-topic-miami.dts b/arch/arm/dts/zynq-topic-miami.dts
 index 58a10e11aa..63fbaf2e9f 100644
@@ -43,11 +45,56 @@ index 58a10e11aa..63fbaf2e9f 100644
  		};
  	};
  };
+diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
+index f41235d8d3..077aa6746a 100644
+--- a/configs/topic_miami_defconfig
++++ b/configs/topic_miami_defconfig
+@@ -23,7 +23,12 @@ CONFIG_CMD_DFU=y
+ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_I2C=y
+ CONFIG_CMD_MMC=y
++CONFIG_CMD_MTD=y
++CONFIG_CMD_MTDPARTS=y
++# CONFIG_CMD_MTDPARTS_SPREAD is not set
+ CONFIG_CMD_SF=y
++CONFIG_CMD_UBI=y
++CONFIG_CMD_UBIFS=y
+ CONFIG_CMD_USB=y
+ # CONFIG_CMD_SETEXPR is not set
+ CONFIG_CMD_CACHE=y
+@@ -59,3 +64,12 @@ CONFIG_USB_GADGET_PRODUCT_NUM=0x0300
+ CONFIG_CI_UDC=y
+ CONFIG_USB_GADGET_DOWNLOAD=y
+ CONFIG_USB_FUNCTION_THOR=y
++CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
++CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x20000(qspi-u-boot-spl),0xC0000(qspi-u-boot-img),0x20000(qspi-u-boot-env),-(qspi-rootfs)"
++# CONFIG_DFU_NAND is not set
++# CONFIG_FDT_FIXUP_PARTITIONS is not set
++CONFIG_LZO=y
++CONFIG_MTD=y
++# CONFIG_CFI_FLASH is not set
++# CONFIG_ALTERA_QSPI is not set
++# CONFIG_MTD_SPI_NAND is not set
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
-index e9524b7fc9..66467319a0 100644
+index e9524b7fc9..e832a695de 100644
 --- a/include/configs/topic_miami.h
 +++ b/include/configs/topic_miami.h
-@@ -78,7 +78,7 @@
+@@ -54,6 +54,14 @@
+ #define CONFIG_ENV_SPI_MAX_HZ CONFIG_SF_DEFAULT_SPEED
+ #undef CONFIG_SPI_FLASH_WINBOND
+ 
++/* CONFIG_SPI_FLASH_MTD only works outside SPL */
++#if !defined(CONFIG_SPL_BUILD)
++# if defined(CONFIG_ZYNQ_QSPI)
++#  define CONFIG_SPI_FLASH_MTD
++# endif
++#endif
++
++
+ /* Setup proper boot sequences for Miami boards */
+ 
+ #if defined(CONFIG_USB)
+@@ -78,7 +86,7 @@
  # define DFU_ALT_INFO \
  	"dfu_alt_info=" \
  	"uImage ram 0x2080000 0x500000;" \
@@ -56,7 +103,7 @@ index e9524b7fc9..66467319a0 100644
  	"uramdisk.image.gz ram 0x4000000 0x10000000\0" \
  	"dfu_ram=run usbreset && dfu 0 ram 0\0" \
  	"thor_ram=run usbreset && thordown 0 ram 0\0"
-@@ -90,19 +90,39 @@
+@@ -90,19 +98,39 @@
  
  #undef CONFIG_EXTRA_ENV_SETTINGS
  #define CONFIG_EXTRA_ENV_SETTINGS	\
@@ -99,7 +146,7 @@ index e9524b7fc9..66467319a0 100644
  	"fdt_high=0x20000000\0"	\
  	"initrd_high=0x20000000\0"	\
  	"mmc_loadbit=echo Loading bitstream from SD/MMC/eMMC to RAM.. && " \
-@@ -114,21 +134,18 @@
+@@ -114,21 +142,18 @@
  		"sf read ${devicetree_addr} 0xC0000 ${devicetree_size} && " \
  		"sf read ${kernel_addr} 0x100000 ${kernel_size} && " \
  		"bootm ${kernel_addr} - ${devicetree_addr}\0" \

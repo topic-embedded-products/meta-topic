@@ -1,8 +1,8 @@
-From 5f37d36c6d6ce3e60a14ac34ec2f4faf43922569 Mon Sep 17 00:00:00 2001
+From 249b4ab1f47fe4de733565f4f917f5b7aebb09f6 Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Mon, 17 Feb 2020 10:59:27 +0100
-Subject: [PATCH] spi_flash do not write out of bounds when doing unaligned
- reads
+Subject: [PATCH 15/16] spi_flash do not write out of bounds when doing
+ unaligned reads
 
 ---
  drivers/mtd/spi/spi_flash.c | 30 ++++++++++++------------------
