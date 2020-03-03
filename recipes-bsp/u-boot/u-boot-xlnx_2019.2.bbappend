@@ -18,6 +18,7 @@ SRC_URI_append = "\
 	file://0014-ARM-zynqmp-Add-support-for-the-topic-miamiplusmp-SoM.patch \
 	file://0015-spi_flash-do-not-write-out-of-bounds-when-doing-unal.patch \
 	file://0016-topic-miami-support-new-filesystem-structure.patch \
+	file://0017-xdp-psu_init_gpl-Set-DDR-to-2133MHz.patch \
 	"
 
 EXTRACOMPILEDEPENDS = ""
