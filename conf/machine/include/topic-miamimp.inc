@@ -86,6 +86,6 @@ UBI_VOLNAME = "qspi-rootfs"
 
 # WIC image support.
 DEVICETREE ??= "zynqmp-topic-miamimp.dtb"
-WKS_FILE = "sdimage-bootpart.wks"
-IMAGE_BOOT_FILES = "boot.bin u-boot.itb boot.scr Image ${DEVICETREE};system.dtb"
+WKS_FILE = "sdimage-swu.wks"
+IMAGE_BOOT_FILES = "boot.bin u-boot.itb"
 do_image_wic[depends] += "mtools-native:do_populate_sysroot dosfstools-native:do_populate_sysroot virtual/bootloader:do_deploy"
