@@ -2,6 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI_append = "\
 	file://pmu-firmware-zynqmp-pmu.bin.xz \
+	file://0001-blk-Increase-cache-element-size.patch \
 	file://0001-board-topic-Detect-RAM-size-at-boot.patch \
 	file://0002-board-topic_miamilite-Support-cost-reduced-version.patch \
 	file://0003-configs-topic_miami.h-Use-same-partitioning-for-USB-.patch \
