@@ -1,15 +1,15 @@
-From 5f19dae45a86f282088b0981371995bbe678f3d1 Mon Sep 17 00:00:00 2001
+From 73125b2e50bb0fd3715974ea76f525e2f4e48381 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 6 Jun 2019 09:47:41 +0200
-Subject: [PATCH 08/16] Add support for zynqmp-xilinx-xdp platform
+Subject: [PATCH 08/17] Add support for zynqmp-xilinx-xdp platform
 
 ---
- .../dts/zynqmp-topic-miamimp-xilinx-xdp.dts   |   127 +
+ .../dts/zynqmp-topic-miamimp-xilinx-xdp.dts   |   117 +
  arch/arm/mach-zynqmp/spl.c                    |     2 +
  .../psu_init_gpl.c                            | 22385 +++++++++
  .../psu_init_gpl.h                            | 38107 ++++++++++++++++
- configs/topic_miamimp_xilinx_xdp_defconfig    |   112 +
- 5 files changed, 60733 insertions(+)
+ configs/topic_miamimp_xilinx_xdp_defconfig    |   111 +
+ 5 files changed, 60722 insertions(+)
  create mode 100644 arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
  create mode 100644 board/topic/zynqmp/zynqmp-topic-miamimp-xilinx-xdp/psu_init_gpl.c
  create mode 100644 board/topic/zynqmp/zynqmp-topic-miamimp-xilinx-xdp/psu_init_gpl.h
@@ -17,10 +17,10 @@ Subject: [PATCH 08/16] Add support for zynqmp-xilinx-xdp platform
 
 diff --git a/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts b/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
 new file mode 100644
-index 0000000000..6b0f30ffe2
+index 0000000000..78dc56cc25
 --- /dev/null
 +++ b/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
-@@ -0,0 +1,127 @@
+@@ -0,0 +1,117 @@
 +/*
 + * dts file for Topic XDP (Xilinx Drone Platform)
 + *
@@ -91,31 +91,21 @@ index 0000000000..6b0f30ffe2
 +		#address-cells = <1>;
 +		#size-cells = <1>;
 +		is-dual = <1>;
-+
-+		partition@qspi-boot-bin {
++		partition@0 {
 +			label = "qspi-boot-bin";
 +			reg = <0x00000 0x60000>;
 +		};
-+		partition@qspi-atf-spi-ub {
-+			label = "qspi-atf-spi-ub";
-+			reg = <0x60000 0x20000>;
++		partition@60000 {
++			label = "qspi-u-boot-itb";
++			reg = <0x60000 0x100000>;
 +		};
-+		partition@qspi-u-boot-bin {
-+			label = "qspi-u-boot-bin";
-+			reg = <0x80000 0xc0000>;
++		partition@160000 {
++			label = "qspi-u-boot-env";
++			reg = <0x160000 0x20000>;
 +		};
-+		partition@qspi-u-boot-img {
-+			label = "qspi-u-boot-img";
-+			reg = <0x140000 0xc0000>;
-+		};
-+		partition@qspi-rootfs {
++		partition@200000 {
 +			label = "qspi-rootfs";
 +			reg = <0x200000 0x1e00000>;
-+		};
-+		/* Everything */
-+		partition@qspi-all {
-+			label = "qspi-all";
-+			reg = <0x0 0x2000000>;
 +		};
 +	};
 +};
@@ -60667,10 +60657,10 @@ index 0000000000..37c5dc0316
 +#endif
 diff --git a/configs/topic_miamimp_xilinx_xdp_defconfig b/configs/topic_miamimp_xilinx_xdp_defconfig
 new file mode 100644
-index 0000000000..d803beefe6
+index 0000000000..c16fcdd9c0
 --- /dev/null
 +++ b/configs/topic_miamimp_xilinx_xdp_defconfig
-@@ -0,0 +1,112 @@
+@@ -0,0 +1,111 @@
 +CONFIG_ARM=y
 +CONFIG_SYS_VENDOR="topic"
 +CONFIG_SYS_CONFIG_NAME="topic_miamimp"
@@ -60687,7 +60677,6 @@ index 0000000000..d803beefe6
 +CONFIG_ZYNQMP_USB=y
 +CONFIG_SPL_ZYNQMP_TWO_SDHCI=y
 +CONFIG_DEBUG_UART=y
-+CONFIG_AHCI=y
 +CONFIG_DISTRO_DEFAULTS=y
 +CONFIG_NR_DRAM_BANKS=2
 +CONFIG_FIT=y
@@ -60723,7 +60712,7 @@ index 0000000000..d803beefe6
 +CONFIG_CMD_TIMER=y
 +CONFIG_CMD_MTDPARTS=y
 +CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
-+CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x60000(qspi-boot-bin),0x20000(qspi-atf-spi-ub),0xc0000(qspi-u-boot-bin),0xc0000(qspi-u-boot-img),-(qspi-rootfs)"
++CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x60000(qspi-boot-bin),0x100000(qspi-u-boot-itb),0x20000(qspi-u-boot-env),-(qspi-rootfs)"
 +CONFIG_CMD_UBI=y
 +CONFIG_SPL_OF_CONTROL=y
 +CONFIG_DEFAULT_DEVICE_TREE="zynqmp-topic-miamimp-xilinx-xdp"
