@@ -1,0 +1,9 @@
+#include "zynqmp-topic-miamimp-xilinx-xdp.dts"
+
+&reg_usb0_vbus {
+	regulator-always-on; /* for USB host mode, "vbus" no longer works? */
+};
+
+&dwc3_0 {
+	dr_mode = "host"; /* One of host, peripheral, otg */
+};

@@ -6,4 +6,5 @@ DTC_BFLAGS_append = " -@"
 COMPATIBLE_MACHINE_xdpzu7 = ".*"
 SRC_URI_append_xdpzu7 = " \
 		file://zynqmp-topic-miamimp-xilinx-xdp.dts \
+		file://zynqmp-topic-miamimp-xilinx-xdp-usbhost.dts \
 		"
