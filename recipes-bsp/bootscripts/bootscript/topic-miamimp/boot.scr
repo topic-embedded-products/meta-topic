@@ -1,3 +1,4 @@
+setenv bootargs $bootargs coherent_pool=512k
 if test "${devtype}" = "mmc"; then
 	echo "Loading kernel from mmc ${devnum}:${devplist}..."
 	if ext4load ${devtype} ${devnum}:${devplist} $fdt_addr /boot/system.dtb && ext4load ${devtype} ${devnum}:${devplist} $kernel_addr /boot/Image; then
