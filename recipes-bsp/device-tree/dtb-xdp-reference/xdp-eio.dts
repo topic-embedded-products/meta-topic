@@ -38,6 +38,7 @@
 				eio_led_2 {
 					label = "eio-h7:green";
 					gpios = <&gpio 99 GPIO_ACTIVE_LOW>; /* EMIO 21 */
+					linux,default-trigger = "mmc0";
 				};
 			};
 		};
