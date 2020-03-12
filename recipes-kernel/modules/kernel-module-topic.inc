@@ -1,7 +1,7 @@
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=9eef91148a9b14ec7f9df333daebc746"
 
-MODULE = "${@d.getVar('PN', True).split('-')[-1]}"
+MODULE = "${@d.getVar('PN', True).split('-', 2)[2]}"
 
 inherit module gitpkgv
 
