@@ -20,6 +20,7 @@ EXTRAPATCHES_zynqmp = "\
 
 SRC_URI_append = "\
 	${EXTRAPATCHES} \
+	file://0001-iio-accel-Add-support-for-the-Bosch-Sensortec-BMI088.patch \
 	file://0001-Add-ltc3562-voltage-regulator-driver.patch \
 	file://0002-drm-introduce-helper-for-accessing-EDID-blob-in-drm_.patch \
 	file://0003-Add-ADI-AXI-HDMI-module-adi_axi_hdmi.patch \
