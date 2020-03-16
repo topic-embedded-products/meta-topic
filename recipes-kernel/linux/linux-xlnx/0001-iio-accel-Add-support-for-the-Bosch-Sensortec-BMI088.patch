@@ -1,4 +1,4 @@
-From ea4b1f3c761567a2cfa5d9bb9de90993cb2278c1 Mon Sep 17 00:00:00 2001
+From a136e46401028ff9b989512a98e6edb5ca937bb9 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 13 Mar 2020 08:04:56 +0100
 Subject: [PATCH] iio: accel: Add support for the Bosch-Sensortec BMI088
@@ -11,19 +11,19 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 ---
  drivers/iio/accel/Kconfig             |  17 +
  drivers/iio/accel/Makefile            |   2 +
- drivers/iio/accel/bmi088-accel-core.c | 682 ++++++++++++++++++++++++++
+ drivers/iio/accel/bmi088-accel-core.c | 655 ++++++++++++++++++++++++++
  drivers/iio/accel/bmi088-accel-spi.c  | 100 ++++
- drivers/iio/accel/bmi088.h            |  10 +
- 5 files changed, 811 insertions(+)
+ drivers/iio/accel/bmi088-accel.h      |  11 +
+ 5 files changed, 785 insertions(+)
  create mode 100644 drivers/iio/accel/bmi088-accel-core.c
  create mode 100644 drivers/iio/accel/bmi088-accel-spi.c
- create mode 100644 drivers/iio/accel/bmi088.h
+ create mode 100644 drivers/iio/accel/bmi088-accel.h
 
 diff --git a/drivers/iio/accel/Kconfig b/drivers/iio/accel/Kconfig
-index 829dc96c9dd6..035bc81d8553 100644
+index 5d91a6dda894..7ed9c82b731b 100644
 --- a/drivers/iio/accel/Kconfig
 +++ b/drivers/iio/accel/Kconfig
-@@ -107,6 +107,23 @@ config BMC150_ACCEL_SPI
+@@ -151,6 +151,23 @@ config BMC150_ACCEL_SPI
  	tristate
  	select REGMAP_SPI
  
@@ -48,10 +48,10 @@ index 829dc96c9dd6..035bc81d8553 100644
  	tristate "MiraMEMS DA280 3-axis 14-bit digital accelerometer driver"
  	depends on I2C
 diff --git a/drivers/iio/accel/Makefile b/drivers/iio/accel/Makefile
-index 636d4d1b2990..e6b699c9a6b7 100644
+index 3a051cf37f40..f44613103ae5 100644
 --- a/drivers/iio/accel/Makefile
 +++ b/drivers/iio/accel/Makefile
-@@ -14,6 +14,8 @@ obj-$(CONFIG_BMA220) += bma220_spi.o
+@@ -19,6 +19,8 @@ obj-$(CONFIG_BMA400_I2C) += bma400_i2c.o
  obj-$(CONFIG_BMC150_ACCEL) += bmc150-accel-core.o
  obj-$(CONFIG_BMC150_ACCEL_I2C) += bmc150-accel-i2c.o
  obj-$(CONFIG_BMC150_ACCEL_SPI) += bmc150-accel-spi.o
@@ -62,10 +62,10 @@ index 636d4d1b2990..e6b699c9a6b7 100644
  obj-$(CONFIG_DMARD06)	+= dmard06.o
 diff --git a/drivers/iio/accel/bmi088-accel-core.c b/drivers/iio/accel/bmi088-accel-core.c
 new file mode 100644
-index 000000000000..4c69bebbb290
+index 000000000000..3acac15701c6
 --- /dev/null
 +++ b/drivers/iio/accel/bmi088-accel-core.c
-@@ -0,0 +1,682 @@
+@@ -0,0 +1,655 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * 3-axis accelerometer driver supporting following Bosch-Sensortec chips:
@@ -90,7 +90,7 @@ index 000000000000..4c69bebbb290
 +#include <linux/iio/triggered_buffer.h>
 +#include <linux/regmap.h>
 +
-+#include "bmi088.h"
++#include "bmi088-accel.h"
 +
 +#define BMI088_ACCEL_DRV_NAME	"bmi088_accel"
 +#define BMI088_ACCEL_IRQ_NAME	"bmi088_accel_event"
@@ -188,29 +188,9 @@ index 000000000000..4c69bebbb290
 +	const struct bmi088_scale_info scale_table[4];
 +};
 +
-+struct bmi088_accel_interrupt {
-+	const struct bmi088_accel_interrupt_info *info;
-+	atomic_t users;
-+};
-+
-+
-+enum bmi088_accel_interrupt_id {
-+	BMI088_ACCEL_INT_DATA_READY,
-+	BMI088_ACCEL_INT_FIFO_WATERMARK,
-+	BMI088_ACCEL_INTERRUPTS,
-+};
-+
 +struct bmi088_accel_data {
 +	struct regmap *regmap;
-+	int irq;
-+	struct bmi088_accel_interrupt interrupts[BMI088_ACCEL_INTERRUPTS];
-+	struct iio_trigger *dready_trig;
 +	struct mutex mutex;
-+	u8 fifo_mode, watermark;
-+	s16 buffer[8];
-+	u8 bw_bits;
-+	int ev_enable_state;
-+	int64_t timestamp, old_timestamp; /* Only used in hw fifo mode. */
 +	const struct bmi088_accel_chip_info *chip_info;
 +};
 +
@@ -499,14 +479,14 @@ index 000000000000..4c69bebbb290
 +};
 +
 +static const struct iio_info bmi088_accel_info = {
-+	.attrs			= &bmi088_accel_attrs_group,
-+	.read_raw		= bmi088_accel_read_raw,
-+	.write_raw		= bmi088_accel_write_raw,
++	.attrs		= &bmi088_accel_attrs_group,
++	.read_raw	= bmi088_accel_read_raw,
++	.write_raw	= bmi088_accel_write_raw,
 +};
 +
 +static const unsigned long bmi088_accel_scan_masks[] = {
-+					BIT(AXIS_X) | BIT(AXIS_Y) | BIT(AXIS_Z),
-+					0};
++				BIT(AXIS_X) | BIT(AXIS_Y) | BIT(AXIS_Z),
++				0};
 +
 +
 +
@@ -525,8 +505,7 @@ index 000000000000..4c69bebbb290
 +	}
 +
 +	if (ret < 0) {
-+		dev_err(dev,
-+			"Failed: bmi088_accel_set_power_state for %d\n", on);
++		dev_err(dev, "Failed: %s(%d)\n", __func__, on);
 +		if (on)
 +			pm_runtime_put_noidle(dev);
 +
@@ -626,7 +605,6 @@ index 000000000000..4c69bebbb290
 +
 +	data = iio_priv(indio_dev);
 +	dev_set_drvdata(dev, indio_dev);
-+	data->irq = irq;
 +
 +	data->regmap = regmap;
 +
@@ -644,15 +622,10 @@ index 000000000000..4c69bebbb290
 +	indio_dev->modes = INDIO_DIRECT_MODE;
 +	indio_dev->info = &bmi088_accel_info;
 +
-+	if (ret < 0) {
-+		dev_err(dev, "Failed: iio triggered buffer setup\n");
-+		return ret;
-+	}
-+
 +	ret = iio_device_register(indio_dev);
 +	if (ret < 0) {
 +		dev_err(dev, "Unable to register iio device\n");
-+		iio_trigger_unregister(data->dready_trig);
++		return ret;
 +	}
 +
 +	return 0;
@@ -750,7 +723,7 @@ index 000000000000..4c69bebbb290
 +MODULE_DESCRIPTION("BMI088 accelerometer driver (core)");
 diff --git a/drivers/iio/accel/bmi088-accel-spi.c b/drivers/iio/accel/bmi088-accel-spi.c
 new file mode 100644
-index 000000000000..961ce6fd07fa
+index 000000000000..920e146f07d3
 --- /dev/null
 +++ b/drivers/iio/accel/bmi088-accel-spi.c
 @@ -0,0 +1,100 @@
@@ -770,7 +743,7 @@ index 000000000000..961ce6fd07fa
 +#include <linux/spi/spi.h>
 +#include <linux/regmap.h>
 +
-+#include "bmi088.h"
++#include "bmi088-accel.h"
 +
 +int bmi088_regmap_spi_write(void *context, const void *data, size_t count)
 +{
@@ -854,14 +827,15 @@ index 000000000000..961ce6fd07fa
 +MODULE_AUTHOR("Niek van Agt <niek.van.agt@topicproducts.com>");
 +MODULE_LICENSE("GPL v2");
 +MODULE_DESCRIPTION("BMI088 accelerometer driver (SPI)");
-diff --git a/drivers/iio/accel/bmi088.h b/drivers/iio/accel/bmi088.h
+diff --git a/drivers/iio/accel/bmi088-accel.h b/drivers/iio/accel/bmi088-accel.h
 new file mode 100644
-index 000000000000..3d62b3b34166
+index 000000000000..540993647c75
 --- /dev/null
-+++ b/drivers/iio/accel/bmi088.h
-@@ -0,0 +1,10 @@
-+#ifndef BMI088_H
-+#define BMI088_H
++++ b/drivers/iio/accel/bmi088-accel.h
+@@ -0,0 +1,11 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef BMI088_ACCEL_H
++#define BMI088_ACCEL_H
 +
 +extern const struct regmap_config bmi088_regmap_conf;
 +
@@ -869,7 +843,7 @@ index 000000000000..3d62b3b34166
 +			    const char *name, bool block_supported);
 +int bmi088_accel_core_remove(struct device *dev);
 +
-+#endif /* BMI088_H */
++#endif /* BMI088_ACCEL_H */
 -- 
 2.17.1
 
