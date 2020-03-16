@@ -1,7 +1,7 @@
-From 44db9a2f46c82af87151f3c70bebc47460de8cf3 Mon Sep 17 00:00:00 2001
+From 2de28c5081f958072c4bc89ffcacf91432dd03fe Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 17 Feb 2020 10:56:38 +0100
-Subject: [PATCH 24/29] media/platform: Add ADI drivers
+Subject: [PATCH 25/30] media/platform: Add ADI drivers
 
 Add drivers from ADIs xcomm_zynq branch, in particular this adds the
 axi-hdmi-rx driver for the HDMI-IN on the florida boards. Added the

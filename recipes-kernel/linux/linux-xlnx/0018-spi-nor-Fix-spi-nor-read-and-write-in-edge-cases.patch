@@ -1,7 +1,7 @@
-From 2dbcb97e80fbeae4b0e3723c957f64dae974af02 Mon Sep 17 00:00:00 2001
+From c8cb5d11fead6305089734a590e15e9bb9b73c6d Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Fri, 14 Feb 2020 10:27:46 +0100
-Subject: [PATCH] spi-nor: Fix spi-nor read and write in edge cases
+Subject: [PATCH 18/30] spi-nor: Fix spi-nor read and write in edge cases
 
 spi_nor_read handle odd read requests by doing an additional
 small alignment read. spi_nor_write solves it the same way and

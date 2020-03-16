@@ -1,7 +1,7 @@
 From 18c6afa76c6348d514c99007811741e804833f21 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 23 Oct 2018 08:01:03 +0200
-Subject: [PATCH 07/29] zynq-fpga: Only route PR via PCAP when required
+Subject: [PATCH 07/30] zynq-fpga: Only route PR via PCAP when required
 
 The Xilinx Zynq FPGA driver takes ownership of the PR interface, making
 it impossible to use the ICAP interface for partial reconfiguration.

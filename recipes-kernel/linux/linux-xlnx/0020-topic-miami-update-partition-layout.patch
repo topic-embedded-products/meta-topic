@@ -1,7 +1,7 @@
-From 2b8026976eda24cb03d79a26b9183eddc4f3cd34 Mon Sep 17 00:00:00 2001
+From a3575c40b7fb015d5dff901f9f4d8d2dc5fc7b8b Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Tue, 25 Feb 2020 17:22:40 +0100
-Subject: [PATCH 10/20] topic-miami: update partition layout
+Subject: [PATCH 20/30] topic-miami: update partition layout
 
 ---
  arch/arm/boot/dts/topic-miami.dtsi | 14 +++-----------

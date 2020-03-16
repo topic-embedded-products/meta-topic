@@ -1,7 +1,7 @@
-From 96453ae107c042cbee9ee2fdeb8e98cb64acc2b0 Mon Sep 17 00:00:00 2001
+From 255bf3c61243ce22119e6fbe692e912dbc2a6bdb Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 14 Jun 2018 13:19:00 +0200
-Subject: [PATCH 18/29] Add topic-miami devicetrees
+Subject: [PATCH 19/30] Add topic-miami devicetrees
 
 Just a copy from the topic-miami branch contents, not actually added to Makefile
 Adapted to 4.19 kernel and removed a lot of old trees

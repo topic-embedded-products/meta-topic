@@ -1,7 +1,7 @@
-From 2ab230d74d4e9fa357298d25a7464c19c36b8849 Mon Sep 17 00:00:00 2001
+From 252cbde332166595415652b616d6915235b8a6b5 Mon Sep 17 00:00:00 2001
 From: Lars-Peter Clausen <lars@metafoo.de>
 Date: Fri, 1 Sep 2017 14:08:36 +0200
-Subject: [PATCH 28/29] drm/bridge: adv7511: Enable SPDIF support
+Subject: [PATCH 29/30] drm/bridge: adv7511: Enable SPDIF support
 
 This is work-in-progress. Breaks I2S support at the moment.
 

@@ -1,7 +1,7 @@
-From 7a05656aa01b8111d3398ac68e6fa54d6c62fac5 Mon Sep 17 00:00:00 2001
+From f463f2dc8b8e2d6c705fd558873874d0b4116f3f Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 19 Feb 2020 11:43:43 +0100
-Subject: [PATCH 29/29] devicetree: zynqmp.dtsi: Add bootmode selection support
+Subject: [PATCH 30/30] devicetree: zynqmp.dtsi: Add bootmode selection support
 
 Add bootmode override support for ZynqMP devices. Allows one to select
 a boot device by running "reboot qspi32" for example. Activate config

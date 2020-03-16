@@ -1,7 +1,7 @@
-From afaa6252919dd4a87da23e41aa8cd9c7d0e37be6 Mon Sep 17 00:00:00 2001
+From 2b623b083753ac632c0efed6e40329efa01b57e6 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 17 May 2019 15:20:20 +0200
-Subject: [PATCH 12/29] dt-bindings: clock: Add silabs,si5341
+Subject: [PATCH 12/30] dt-bindings: clock: Add silabs,si5341
 
 Adds the devicetree bindings for the Si5341 and Si5340 chips from
 Silicon Labs. These are multiple-input multiple-output clock

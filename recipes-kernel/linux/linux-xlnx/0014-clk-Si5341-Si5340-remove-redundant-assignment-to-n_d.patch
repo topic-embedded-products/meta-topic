@@ -1,7 +1,7 @@
-From 3b4c958676f1faf6364e377c66c51d19e7b2021a Mon Sep 17 00:00:00 2001
+From 962c4861f05a42a48a01e83f8f782c23b783ba4d Mon Sep 17 00:00:00 2001
 From: Colin Ian King <colin.king@canonical.com>
 Date: Mon, 1 Jul 2019 17:50:20 +0100
-Subject: [PATCH 14/29] clk: Si5341/Si5340: remove redundant assignment to
+Subject: [PATCH 14/30] clk: Si5341/Si5340: remove redundant assignment to
  n_den
 
 The variable n_den is initialized however that value is never read

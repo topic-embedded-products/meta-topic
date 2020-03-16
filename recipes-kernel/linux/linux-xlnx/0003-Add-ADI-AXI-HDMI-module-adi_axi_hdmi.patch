@@ -1,7 +1,7 @@
 From 739dd7f42d7d4c4ba3a3834a2643ab88643cb662 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 20 Aug 2018 09:50:56 +0200
-Subject: [PATCH 03/29] Add ADI AXI HDMI module (adi_axi_hdmi)
+Subject: [PATCH 03/30] Add ADI AXI HDMI module (adi_axi_hdmi)
 
 Copied from the ADI fork of linux (branch adi/adi-4.19)
 ---

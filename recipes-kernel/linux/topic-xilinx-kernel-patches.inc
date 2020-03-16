@@ -38,19 +38,19 @@ SRC_URI_append = "\
 	file://0015-clk-clk-si5341-Support-multiple-input-ports.patch \
 	file://0016-drm-adi_axi_hdmi-Fix-fbdev-interface-not-working.patch \
 	file://0017-gpio-poweroff-Implement-force-pm-power-off-flag.patch \
-	file://0017-spi-nor-Fix-spi-nor-read-in-edge-cases.patch \
-	file://0018-Add-topic-miami-devicetrees.patch \
-	file://0019-topic-miami-update-partition-layout.patch \
-	file://0020-zynqmp-topic-miamimp-Enable-multi-die-support-for-QS.patch \
-	file://0021-dmaengine-virt-dma-store-result-on-dma-descriptor.patch \
-	file://0022-Add-include-linux-fpga-adi-axi-common.h-header.patch \
-	file://0023-dma-axi-dmac-Update-to-adi-xcomm_zynq-version.patch \
-	file://0024-media-platform-Add-ADI-drivers.patch \
-	file://0025-media-platform-axi-hdmi-rx-Announce-GPLv2-module-lic.patch \
-	file://0026-sound-soc-dai.h-Add-SPDIF-format-constants.patch \
-	file://0027-ASoC-snd_soc_of_parse_daifmt-Handle-SND_SOC_DAIFMT_S.patch \
-	file://0028-drm-bridge-adv7511-Enable-SPDIF-support.patch \
-	file://0029-devicetree-zynqmp.dtsi-Add-bootmode-selection-suppor.patch \
+	file://0018-spi-nor-Fix-spi-nor-read-and-write-in-edge-cases.patch \
+	file://0019-Add-topic-miami-devicetrees.patch \
+	file://0020-topic-miami-update-partition-layout.patch \
+	file://0021-zynqmp-topic-miamimp-Enable-multi-die-support-for-QS.patch \
+	file://0022-dmaengine-virt-dma-store-result-on-dma-descriptor.patch \
+	file://0023-Add-include-linux-fpga-adi-axi-common.h-header.patch \
+	file://0024-dma-axi-dmac-Update-to-adi-xcomm_zynq-version.patch \
+	file://0025-media-platform-Add-ADI-drivers.patch \
+	file://0026-media-platform-axi-hdmi-rx-Announce-GPLv2-module-lic.patch \
+	file://0027-sound-soc-dai.h-Add-SPDIF-format-constants.patch \
+	file://0028-ASoC-snd_soc_of_parse_daifmt-Handle-SND_SOC_DAIFMT_S.patch \
+	file://0029-drm-bridge-adv7511-Enable-SPDIF-support.patch \
+	file://0030-devicetree-zynqmp.dtsi-Add-bootmode-selection-suppor.patch \
 	"
 
 # Compile overlay-capable devicetrees

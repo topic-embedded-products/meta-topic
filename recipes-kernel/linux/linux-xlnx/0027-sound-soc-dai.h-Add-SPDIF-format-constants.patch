@@ -1,7 +1,7 @@
-From 74eee9aade7f374d5805cccae682cc2bdf16d477 Mon Sep 17 00:00:00 2001
+From 1274d90907bb6374a753f16cd298b36fc0e64e39 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 18 Feb 2020 08:49:16 +0100
-Subject: [PATCH 26/29] sound/soc-dai.h: Add SPDIF format constants
+Subject: [PATCH 27/30] sound/soc-dai.h: Add SPDIF format constants
 
 ---
  include/sound/soc-dai.h   | 1 +

@@ -1,7 +1,7 @@
-From f10a064b8d0c869e13f13fb3a32e7b1ab00483ae Mon Sep 17 00:00:00 2001
+From 53a8ca7abf522acc1d282408e15f04dbff57e3a1 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 17 Feb 2020 08:54:47 +0100
-Subject: [PATCH 23/29] dma-axi-dmac: Update to adi/xcomm_zynq version
+Subject: [PATCH 24/30] dma-axi-dmac: Update to adi/xcomm_zynq version
 
 Closely resembles mainline
 ---

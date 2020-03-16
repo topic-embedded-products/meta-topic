@@ -1,7 +1,7 @@
-From 31556db1c047b4ca23cab80a5ccdae6618440a80 Mon Sep 17 00:00:00 2001
+From 507386b5774df4e76d24b189e3c8c3c79334086c Mon Sep 17 00:00:00 2001
 From: Lars-Peter Clausen <lars@metafoo.de>
 Date: Wed, 15 Jun 2016 14:20:16 +0200
-Subject: [PATCH 27/29] ASoC: snd_soc_of_parse_daifmt(): Handle
+Subject: [PATCH 28/30] ASoC: snd_soc_of_parse_daifmt(): Handle
  SND_SOC_DAIFMT_SPDIF
 
 Allow to specify that a link use SPDIF format by setting the format to

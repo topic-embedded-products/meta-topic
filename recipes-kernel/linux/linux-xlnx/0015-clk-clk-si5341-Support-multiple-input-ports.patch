@@ -1,7 +1,7 @@
-From c808278f9701679ebf806f61f217815651d05158 Mon Sep 17 00:00:00 2001
+From 579722f92bb92c994d7ac1b3d2af4881bb4d2d08 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 7 Jan 2020 08:53:40 +0100
-Subject: [PATCH 15/29] clk, clk-si5341: Support multiple input ports
+Subject: [PATCH 15/30] clk, clk-si5341: Support multiple input ports
 
 The Si5341 and Si5340 have multiple input clock options. So far, the driver
 only supported the XTAL input, this adds support for the three external

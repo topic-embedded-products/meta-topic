@@ -1,7 +1,7 @@
-From 56144c742a456ddf75f9cbe7d4b3f3096c3cbdc2 Mon Sep 17 00:00:00 2001
+From 8bb0114fbbb0fc6be5d715b4bd5fc3b12a2c60b8 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 15 Feb 2019 15:12:00 +0100
-Subject: [PATCH 10/29] iio/gyro/bmg160: Add support for BMI088 chip
+Subject: [PATCH 10/30] iio/gyro/bmg160: Add support for BMI088 chip
 
 The BMI088 is pin-compatible with the BMI055, and provides
 both gyro and accel functions. The gyro part is similar to

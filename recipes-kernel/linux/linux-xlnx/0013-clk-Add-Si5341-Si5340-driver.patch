@@ -1,7 +1,7 @@
-From 520bad6f391e745824cd2500628291a0d3344f1b Mon Sep 17 00:00:00 2001
+From b866687bc1c65b045031bc336f6ed7e6bd81a6e1 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 17 May 2019 15:23:52 +0200
-Subject: [PATCH 13/29] clk: Add Si5341/Si5340 driver
+Subject: [PATCH 13/30] clk: Add Si5341/Si5340 driver
 
 Adds a driver for the Si5341 and Si5340 chips. The driver does not fully
 support all features of these chips, but allows the chip to be used

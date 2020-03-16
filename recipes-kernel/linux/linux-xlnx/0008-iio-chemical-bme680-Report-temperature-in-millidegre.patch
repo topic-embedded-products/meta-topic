@@ -1,7 +1,7 @@
 From 20e57a0b051fc65334a1c6a906b71109af5abea5 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 6 Mar 2019 08:23:42 +0100
-Subject: [PATCH 08/29] iio/chemical/bme680: Report temperature in millidegrees
+Subject: [PATCH 08/30] iio/chemical/bme680: Report temperature in millidegrees
 
 The standard unit for temperature is millidegrees Celcius. Adapt the
 driver to report in millidegrees instead of degrees.
