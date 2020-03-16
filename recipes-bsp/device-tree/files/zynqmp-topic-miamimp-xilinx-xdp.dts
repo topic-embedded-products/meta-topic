@@ -81,6 +81,13 @@
 		#clock-cells = <0x0>;
 		clock-frequency = <48000000>;
 	};
+
+	/* Make temperature readouts show up in hwmon applications */
+	iio-hwmon-ams-temp {
+		compatible = "iio-hwmon";
+		io-channels = <&xilinx_ams 7>, <&xilinx_ams 8>, <&xilinx_ams 20>;
+		io-channel-names = "ps_temp", "remote_temp", "pl_temp";
+	};
 };
 
 &gpio {

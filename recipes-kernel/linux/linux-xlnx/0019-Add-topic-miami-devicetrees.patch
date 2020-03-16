@@ -1,4 +1,4 @@
-From 255bf3c61243ce22119e6fbe692e912dbc2a6bdb Mon Sep 17 00:00:00 2001
+From defd6b16736d1045c54e8410b1c9592d87d18393 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 14 Jun 2018 13:19:00 +0200
 Subject: [PATCH 19/30] Add topic-miami devicetrees
@@ -14,10 +14,10 @@ Adapted to 4.19 kernel and removed a lot of old trees
  arch/arm/boot/dts/topic-miamiplus.dtsi        |  97 +++++
  .../zynqmp-topic-miamimp-florida-gen.dts      | 279 ++++++++++++
  .../zynqmp-topic-miamimp-florida-test.dts     | 188 ++++++++
- .../boot/dts/xilinx/zynqmp-topic-miamimp.dts  | 369 ++++++++++++++++
+ .../boot/dts/xilinx/zynqmp-topic-miamimp.dts  | 376 ++++++++++++++++
  .../dts/xilinx/zynqmp-topic-miamiplusmp.dts   | 401 ++++++++++++++++++
  arch/arm64/configs/topic_miamimp_defconfig    | 399 +++++++++++++++++
- 11 files changed, 2303 insertions(+)
+ 11 files changed, 2310 insertions(+)
  create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dts
  create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dtsi
  create mode 100644 arch/arm/boot/dts/topic-miami-florida.dtsi
@@ -1214,10 +1214,10 @@ index 000000000000..d8bcf375ab71
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
 new file mode 100644
-index 000000000000..7ee4726a1ee7
+index 000000000000..2758c363a1e2
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
-@@ -0,0 +1,369 @@
+@@ -0,0 +1,376 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -1293,6 +1293,13 @@ index 000000000000..7ee4726a1ee7
 +		compatible = "usb-nop-xceiv";
 +		#phy-cells = <0>;
 +		reset-gpios = <&gpioex 0 0>;
++	};
++
++	/* Make temperature readouts show up in hwmon applications */
++	iio-hwmon-ams-temp {
++		compatible = "iio-hwmon";
++		io-channels = <&xilinx_ams 7>, <&xilinx_ams 8>, <&xilinx_ams 20>;
++		io-channel-names = "ps_temp", "remote_temp", "pl_temp";
 +	};
 +};
 +
