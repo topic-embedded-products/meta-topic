@@ -1,4 +1,4 @@
-From 9f53c896ebc56f5653886bc67980202ba7df9ca2 Mon Sep 17 00:00:00 2001
+From 56ff07b82c71596ef5fb1feac0e40fb18139ee64 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 13 Mar 2020 08:04:56 +0100
 Subject: [PATCH] iio: accel: Add support for the Bosch-Sensortec BMI088
@@ -11,10 +11,10 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 ---
  drivers/iio/accel/Kconfig             |  17 +
  drivers/iio/accel/Makefile            |   2 +
- drivers/iio/accel/bmi088-accel-core.c | 671 ++++++++++++++++++++++++++
+ drivers/iio/accel/bmi088-accel-core.c | 632 ++++++++++++++++++++++++++
  drivers/iio/accel/bmi088-accel-spi.c  |  85 ++++
  drivers/iio/accel/bmi088-accel.h      |  12 +
- 5 files changed, 787 insertions(+)
+ 5 files changed, 748 insertions(+)
  create mode 100644 drivers/iio/accel/bmi088-accel-core.c
  create mode 100644 drivers/iio/accel/bmi088-accel-spi.c
  create mode 100644 drivers/iio/accel/bmi088-accel.h
@@ -62,10 +62,10 @@ index 3a051cf37f40..f44613103ae5 100644
  obj-$(CONFIG_DMARD06)	+= dmard06.o
 diff --git a/drivers/iio/accel/bmi088-accel-core.c b/drivers/iio/accel/bmi088-accel-core.c
 new file mode 100644
-index 000000000000..b1e496f1389d
+index 000000000000..aa1436c0718f
 --- /dev/null
 +++ b/drivers/iio/accel/bmi088-accel-core.c
-@@ -0,0 +1,671 @@
+@@ -0,0 +1,632 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * 3-axis accelerometer driver supporting following Bosch-Sensortec chips:
@@ -83,18 +83,10 @@ index 000000000000..b1e496f1389d
 +#include <linux/pm_runtime.h>
 +#include <linux/iio/iio.h>
 +#include <linux/iio/sysfs.h>
-+#include <linux/iio/buffer.h>
-+#include <linux/iio/events.h>
-+#include <linux/iio/trigger.h>
-+#include <linux/iio/trigger_consumer.h>
-+#include <linux/iio/triggered_buffer.h>
 +#include <linux/regmap.h>
 +#include <asm/unaligned.h>
 +
 +#include "bmi088-accel.h"
-+
-+#define BMI088_ACCEL_DRV_NAME	"bmi088_accel"
-+#define BMI088_ACCEL_IRQ_NAME	"bmi088_accel_event"
 +
 +#define BMI088_ACCEL_REG_CHIP_ID			0x00
 +#define BMI088_ACCEL_REG_ERROR				0x02
@@ -205,8 +197,8 @@ index 000000000000..b1e496f1389d
 +};
 +
 +static const struct regmap_access_table bmi088_volatile_table = {
-+	.yes_ranges     = bmi088_volatile_ranges,
-+	.n_yes_ranges   = ARRAY_SIZE(bmi088_volatile_ranges),
++	.yes_ranges	= bmi088_volatile_ranges,
++	.n_yes_ranges	= ARRAY_SIZE(bmi088_volatile_ranges),
 +};
 +
 +const struct regmap_config bmi088_regmap_conf = {
@@ -218,10 +210,7 @@ index 000000000000..b1e496f1389d
 +};
 +EXPORT_SYMBOL_GPL(bmi088_regmap_conf);
 +
-+
-+#ifdef CONFIG_PM
-+static int bmi088_accel_set_power_state(struct bmi088_accel_data *data,
-+	bool on)
++static int bmi088_accel_set_power_state(struct bmi088_accel_data *data, bool on)
 +{
 +	struct device *dev = regmap_get_device(data->regmap);
 +	int ret;
@@ -243,23 +232,15 @@ index 000000000000..b1e496f1389d
 +
 +	return 0;
 +}
-+#else
-+static int bmi088_accel_set_power_state(struct bmi088_accel_data *data,
-+	bool on)
-+{
-+	return 0;
-+}
-+#endif
 +
-+static int bmi088_accel_enable(struct bmi088_accel_data *data,
-+				bool on_off)
++static int bmi088_accel_enable(struct bmi088_accel_data *data, bool on_off)
 +{
 +	struct device *dev = regmap_get_device(data->regmap);
 +	int ret;
 +
 +	ret = regmap_write(data->regmap, BMI088_ACCEL_REG_PWR_CTRL,
-+				on_off ? 0x4 : 0x0);
-+	if (ret < 0) {
++			   on_off ? 0x4 : 0x0);
++	if (ret) {
 +		dev_err(dev, "Error writing ACC_PWR_CTRL reg\n");
 +		return ret;
 +	}
@@ -278,7 +259,7 @@ index 000000000000..b1e496f1389d
 +
 +	ret = regmap_write(data->regmap, BMI088_ACCEL_REG_PWR_CONF,
 +			   mode == BMI088_ACCEL_MODE_SUSPEND ? 0x3 : 0x0);
-+	if (ret < 0) {
++	if (ret) {
 +		dev_err(dev, "Error writing ACCEL_PWR_CONF reg\n");
 +		return ret;
 +	}
@@ -295,7 +276,7 @@ index 000000000000..b1e496f1389d
 +	u8 value = (osr_mode << 4) | (odr_mode & 0xF);
 +
 +	ret = regmap_write(data->regmap, BMI088_ACCEL_REG_ACC_CONF, value);
-+	if (ret < 0) {
++	if (ret) {
 +		dev_err(dev, "Error writing ACCEL_PWR_CONF reg\n");
 +		return ret;
 +	}
@@ -311,7 +292,7 @@ index 000000000000..b1e496f1389d
 +
 +	ret = regmap_read(data->regmap, BMI088_ACCEL_REG_ACC_CONF,
 +			  &value);
-+	if (ret < 0)
++	if (ret)
 +		return ret;
 +
 +	value &= 0xf; /* ODR in lower 4 bits */
@@ -331,29 +312,20 @@ index 000000000000..b1e496f1389d
 +static int bmi088_accel_set_sample_freq(struct bmi088_accel_data *data, int val)
 +{
 +	unsigned int value = BMI088_ACCEL_MODE_ODR_1600;
-+	unsigned int freq = 1600;
-+	int ret;
 +
 +	if (val < 12 || val > 1600)
 +		return -EINVAL;
 +
-+	while (freq > val && value > BMI088_ACCEL_MODE_ODR_12_5) {
-+		--value;
-+		freq >>= 1;
-+	}
++	value = fls(val) + (BMI088_ACCEL_MODE_ODR_12_5 - 4);
 +
-+	ret = regmap_update_bits(data->regmap, BMI088_ACCEL_REG_ACC_CONF,
-+				 0x0f, value);
-+	if (ret < 0)
-+		return ret;
-+
-+	return 0;
++	return regmap_update_bits(data->regmap, BMI088_ACCEL_REG_ACC_CONF,
++				  0x0f, value);
 +}
 +
 +static int bmi088_accel_get_temp(struct bmi088_accel_data *data, int *val)
 +{
 +	int ret;
-+	__s16 temp;
++	s16 temp;
 +
 +	mutex_lock(&data->mutex);
 +
@@ -363,7 +335,7 @@ index 000000000000..b1e496f1389d
 +
 +	mutex_unlock(&data->mutex);
 +
-+	if (ret < 0)
++	if (ret)
 +		return ret;
 +
 +	*val = temp >> 5;
@@ -376,12 +348,12 @@ index 000000000000..b1e496f1389d
 +				 int *val)
 +{
 +	int ret;
-+	__s16 raw_val;
++	s16 raw_val;
 +
 +	mutex_lock(&data->mutex);
 +
 +	ret = bmi088_accel_set_power_state(data, true);
-+	if (ret < 0)
++	if (ret)
 +		return ret;
 +
 +	ret = regmap_bulk_read(data->regmap,
@@ -393,7 +365,7 @@ index 000000000000..b1e496f1389d
 +
 +	mutex_unlock(&data->mutex);
 +
-+	if (ret < 0)
++	if (ret)
 +		return ret;
 +
 +	*val = raw_val;
@@ -415,12 +387,12 @@ index 000000000000..b1e496f1389d
 +			return bmi088_accel_get_temp(data, val);
 +		case IIO_ACCEL:
 +			ret = iio_device_claim_direct_mode(indio_dev);
-+			if (ret < 0)
++			if (ret)
 +				return ret;
 +
 +			ret = bmi088_accel_get_axis(data, chan, val);
 +			iio_device_release_direct_mode(indio_dev);
-+			if (ret < 0)
++			if (ret)
 +				return ret;
 +
 +			return IIO_VAL_INT;
@@ -447,7 +419,7 @@ index 000000000000..b1e496f1389d
 +		{
 +			ret = regmap_read(data->regmap,
 +					  BMI088_ACCEL_REG_ACC_RANGE, val);
-+			if (ret < 0)
++			if (ret)
 +				return ret;
 +
 +			*val2 =  15 - (*val & 0x3);
@@ -480,19 +452,17 @@ index 000000000000..b1e496f1389d
 +		mutex_lock(&data->mutex);
 +		ret = bmi088_accel_set_sample_freq(data, val);
 +		mutex_unlock(&data->mutex);
-+		break;
++		return ret;
 +	default:
-+		ret = -EINVAL;
++		return -EINVAL;
 +	}
-+
-+	return ret;
 +}
 +
 +static IIO_CONST_ATTR_SAMP_FREQ_AVAIL("12.5 25 50 100 200 400 800 1600");
 +
 +static struct attribute *bmi088_accel_attributes[] = {
 +	&iio_const_attr_sampling_frequency_available.dev_attr.attr,
-+	NULL,
++	NULL
 +};
 +
 +static const struct attribute_group bmi088_accel_attrs_group = {
@@ -539,9 +509,9 @@ index 000000000000..b1e496f1389d
 +};
 +
 +static const unsigned long bmi088_accel_scan_masks[] = {
-+				BIT(AXIS_X) | BIT(AXIS_Y) | BIT(AXIS_Z),
-+				0};
-+
++	BIT(AXIS_X) | BIT(AXIS_Y) | BIT(AXIS_Z),
++	0
++};
 +
 +static int bmi088_accel_chip_init(struct bmi088_accel_data *data)
 +{
@@ -556,8 +526,11 @@ index 000000000000..b1e496f1389d
 +	 * Reset chip to get it in a known good state. A delay of 1ms after
 +	 * reset is required according to the data sheet
 +	 */
-+	regmap_write(data->regmap, BMI088_ACCEL_REG_RESET,
-+		     BMI088_ACCEL_RESET_VAL);
++	ret = regmap_write(data->regmap, BMI088_ACCEL_REG_RESET,
++			   BMI088_ACCEL_RESET_VAL);
++	if (ret)
++		return ret;
++
 +	usleep_range(1000, 2000);
 +
 +	/* Do a dummy read again after a reset to enable the SPI interface */
@@ -565,7 +538,7 @@ index 000000000000..b1e496f1389d
 +
 +	/* Read chip ID */
 +	ret = regmap_read(data->regmap, BMI088_ACCEL_REG_CHIP_ID, &val);
-+	if (ret < 0) {
++	if (ret) {
 +		dev_err(dev, "Error: Reading chip id\n");
 +		return ret;
 +	}
@@ -577,30 +550,25 @@ index 000000000000..b1e496f1389d
 +			break;
 +		}
 +	}
-+
-+	if (!data->chip_info) {
++	if (i == ARRAY_SIZE(bmi088_accel_chip_info_tbl)) {
 +		dev_err(dev, "Invalid chip %x\n", val);
 +		return -ENODEV;
 +	}
 +
 +	/* Enable accelerometer after reset */
 +	ret = bmi088_accel_enable(data, true);
-+	if (ret < 0)
++	if (ret)
 +		return ret;
 +
 +	/* Set sampling frequency and bandwidth defaults */
 +	ret = bmi088_accel_set_bw(data, BMI088_ACCEL_MODE_ODR_25,
 +				  BMI088_ACCEL_MODE_OSR_NORMAL);
-+	if (ret < 0)
++	if (ret)
 +		return ret;
 +
 +	/* Set Default Range */
-+	ret = regmap_write(data->regmap, BMI088_ACCEL_REG_ACC_RANGE,
-+			   BMI088_ACCEL_RANGE_6G);
-+	if (ret < 0)
-+		return ret;
-+
-+	return 0;
++	return regmap_write(data->regmap, BMI088_ACCEL_REG_ACC_RANGE,
++			    BMI088_ACCEL_RANGE_6G);
 +}
 +
 +int bmi088_accel_core_probe(struct device *dev, struct regmap *regmap,
@@ -620,7 +588,7 @@ index 000000000000..b1e496f1389d
 +	data->regmap = regmap;
 +
 +	ret = bmi088_accel_chip_init(data);
-+	if (ret < 0)
++	if (ret)
 +		return ret;
 +
 +	mutex_init(&data->mutex);
@@ -642,12 +610,10 @@ index 000000000000..b1e496f1389d
 +	pm_runtime_use_autosuspend(dev);
 +
 +	ret = iio_device_register(indio_dev);
-+	if (ret < 0) {
++	if (ret)
 +		dev_err(dev, "Unable to register iio device\n");
-+		return ret;
-+	}
 +
-+	return 0;
++	return ret;
 +}
 +EXPORT_SYMBOL_GPL(bmi088_accel_core_probe);
 +
@@ -702,13 +668,8 @@ index 000000000000..b1e496f1389d
 +{
 +	struct iio_dev *indio_dev = dev_get_drvdata(dev);
 +	struct bmi088_accel_data *data = iio_priv(indio_dev);
-+	int ret;
 +
-+	ret = bmi088_accel_set_mode(data, BMI088_ACCEL_MODE_SUSPEND);
-+	if (ret < 0)
-+		return -EAGAIN;
-+
-+	return 0;
++	return bmi088_accel_set_mode(data, BMI088_ACCEL_MODE_SUSPEND);
 +}
 +
 +static int __maybe_unused bmi088_accel_runtime_resume(struct device *dev)
@@ -718,7 +679,7 @@ index 000000000000..b1e496f1389d
 +	int ret;
 +
 +	ret = bmi088_accel_set_mode(data, BMI088_ACCEL_MODE_ACTIVE);
-+	if (ret < 0)
++	if (ret)
 +		return ret;
 +
 +	usleep_range(BMI088_ACCEL_MAX_STARTUP_TIME_MS * 1000,
