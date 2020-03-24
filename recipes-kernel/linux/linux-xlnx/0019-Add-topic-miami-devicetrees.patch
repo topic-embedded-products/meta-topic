@@ -1,4 +1,4 @@
-From defd6b16736d1045c54e8410b1c9592d87d18393 Mon Sep 17 00:00:00 2001
+From 9f51dcedf1566a1a20fee3048593df782c614702 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 14 Jun 2018 13:19:00 +0200
 Subject: [PATCH 19/30] Add topic-miami devicetrees
@@ -9,6 +9,7 @@ Adapted to 4.19 kernel and removed a lot of old trees
  arch/arm/boot/dts/topic-miami-florida-mio.dts |   2 +
  .../arm/boot/dts/topic-miami-florida-mio.dtsi | 155 +++++++
  arch/arm/boot/dts/topic-miami-florida.dtsi    |  27 ++
+ arch/arm/boot/dts/topic-miami.dts             |   2 +
  arch/arm/boot/dts/topic-miami.dtsi            | 335 +++++++++++++++
  arch/arm/boot/dts/topic-miamilite.dtsi        |  51 +++
  arch/arm/boot/dts/topic-miamiplus.dtsi        |  97 +++++
@@ -17,10 +18,11 @@ Adapted to 4.19 kernel and removed a lot of old trees
  .../boot/dts/xilinx/zynqmp-topic-miamimp.dts  | 376 ++++++++++++++++
  .../dts/xilinx/zynqmp-topic-miamiplusmp.dts   | 401 ++++++++++++++++++
  arch/arm64/configs/topic_miamimp_defconfig    | 399 +++++++++++++++++
- 11 files changed, 2310 insertions(+)
+ 12 files changed, 2312 insertions(+)
  create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dts
  create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dtsi
  create mode 100644 arch/arm/boot/dts/topic-miami-florida.dtsi
+ create mode 100644 arch/arm/boot/dts/topic-miami.dts
  create mode 100644 arch/arm/boot/dts/topic-miami.dtsi
  create mode 100644 arch/arm/boot/dts/topic-miamilite.dtsi
  create mode 100644 arch/arm/boot/dts/topic-miamiplus.dtsi
@@ -232,6 +234,14 @@ index 000000000000..1b79b5fc2c9a
 +		phy-handle = <&phy3>;
 +	};
 +};
+diff --git a/arch/arm/boot/dts/topic-miami.dts b/arch/arm/boot/dts/topic-miami.dts
+new file mode 100644
+index 000000000000..e4cf68de9723
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami.dts
+@@ -0,0 +1,2 @@
++/dts-v1/;
++/include/ "topic-miami.dtsi"
 diff --git a/arch/arm/boot/dts/topic-miami.dtsi b/arch/arm/boot/dts/topic-miami.dtsi
 new file mode 100644
 index 000000000000..4a50728a20fd

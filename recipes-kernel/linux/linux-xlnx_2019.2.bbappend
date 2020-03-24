@@ -20,6 +20,7 @@ TOPICBSPCONFIG_xdpzu7 = "file://topic-xdpzu7-standard.cfg"
 SRC_URI_append = " ${TOPICBSPCONFIG}"
 
 KERNEL_DEVICETREE_topic-miami = "\
+	topic-miami.dtb \
 	topic-miami-florida-mio.dtb \
 	"
 KERNEL_DEVICETREE_topic-miamimp = "\
