@@ -38,7 +38,6 @@
 					"Speaker", "Speaker";
 				simple-audio-card,routing =
 					"Speaker", "TX";
-
 				simple-audio-card,dai-link@0 {
 					format = "spdif";
 					cpu {
@@ -82,6 +81,11 @@
 					};
 					port@1 {
 						reg = <1>;
+						/* HDMI connector */
+					};
+					port@2 {
+						reg = <2>;
+						/* Audio link */
 					};
 				};
 			};
@@ -99,9 +103,6 @@
 				reg = <0x4c>;
 				#address-cells = <0x1>;
 				#size-cells = <0x0>;
-				bus-width = <24>;
-				hsync-active = <0>; /* Parallel bus */
-				vsync-active = <0>;
 				interrupt-parent = <&gpio0>;
 				interrupts = <57 4>; /* EMIO GPIO 3 */
 				adi,int1-config = <1>; /* ADV76XX_INT1_CONFIG_ACTIVE_LOW */
@@ -113,6 +114,9 @@
 					reg = <0x1>;
 					adv7611: endpoint {
 						remote-endpoint = <&axi_hdmi_rx>;
+						bus-width = <24>;
+						hsync-active = <0>; /* Parallel bus */
+						vsync-active = <0>;
 					};
 				};
 			};
@@ -184,6 +188,7 @@
 
 					axi_hdmi_rx: endpoint {
 						remote-endpoint = <&adv7611>;
+						bus-width = <24>;
 					};
 				};
 			};
