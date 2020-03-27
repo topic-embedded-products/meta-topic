@@ -151,24 +151,6 @@
 				};
 			};
 
-			axi_hdmi_rx_core: axi-hdmi-rx@a0020000 {
-				compatible = "adi,axi-hdmi-rx-1.00.a";
-				reg = <0x0 0xa0020000 0x0 0x10000>;
-				dmas = <&axi_dmac 0>;
-				dma-names = "rx";
-				gpios = <&gpioexf 3 0>; /* HPD, hotplug control (?) */
-
-				port {
-					#address-cells = <0>;
-					#size-cells = <0>;
-
-					axi_hdmi_rx: endpoint {
-						remote-endpoint = <&adv7611>;
-						bus-width = <24>;
-					};
-				};
-			};
-
 			axi_dmac: dmac@a0000000 {
 				compatible = "adi,axi-dmac-1.00.a";
 				reg = <0x0 0xa0000000 0x0 0x10000>;
@@ -186,6 +168,24 @@
 						adi,source-bus-type = <2>;
 						adi,destination-bus-width = <64>;
 						adi,destination-bus-type = <0>;
+					};
+				};
+			};
+
+			axi_hdmi_rx_core: axi-hdmi-rx@a0020000 {
+				compatible = "adi,axi-hdmi-rx-1.00.a";
+				reg = <0x0 0xa0020000 0x0 0x10000>;
+				dmas = <&axi_dmac 0>;
+				dma-names = "rx";
+				gpios = <&gpioexf 3 0>; /* HPD, hotplug control (?) */
+
+				port {
+					#address-cells = <0>;
+					#size-cells = <0>;
+
+					axi_hdmi_rx: endpoint {
+						remote-endpoint = <&adv7611>;
+						bus-width = <24>;
 					};
 				};
 			};

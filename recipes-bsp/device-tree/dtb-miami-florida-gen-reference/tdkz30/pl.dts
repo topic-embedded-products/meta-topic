@@ -175,6 +175,26 @@
 				#sound-dai-cells = <0>;
 			};
 
+			axi_dmac: dmac@43c00000 {
+				compatible = "adi,axi-dmac-1.00.a";
+				reg = <0x43c00000 0x10000>;
+				#dma-cells = <1>;
+				interrupts = <0 58 4>;
+				clocks = <&clkc 16>;
+
+				adi,channels {
+					#size-cells = <0>;
+					#address-cells = <1>;
+					dma-channel@0 {
+						reg = <0>;
+						adi,source-bus-width = <64>;
+						adi,source-bus-type = <2>;
+						adi,destination-bus-width = <64>;
+						adi,destination-bus-type = <0>;
+					};
+				};
+			};
+
 			axi_hdmi_rx_core: axi-hdmi-rx@43c10000 {
 				compatible = "adi,axi-hdmi-rx-1.00.a";
 				reg = <0x43c10000 0x10000>;
@@ -191,28 +211,6 @@
 						bus-width = <24>;
 						hsync-active = <0>; /* Parallel bus */
 						vsync-active = <0>;
-					};
-				};
-			};
-
-			axi_dmac: dmac@43c00000 {
-				compatible = "adi,axi-dmac-1.00.a";
-				reg = <0x43c00000 0x10000>;
-				#dma-cells = <1>;
-				interrupts = <0 58 4>;
-				clocks = <&clkc 16>;
-
-				adi,channels {
-					#size-cells = <0>;
-					#address-cells = <1>;
-					dma-channel@0 {
-						reg = <0>;
-						adi,length-width = <14>;
-						adi,source-bus-width = <64>;
-						adi,source-bus-type = <2>;
-						adi,destination-bus-width = <64>;
-						adi,destination-bus-type = <0>;
-						adi,2d;
 					};
 				};
 			};
