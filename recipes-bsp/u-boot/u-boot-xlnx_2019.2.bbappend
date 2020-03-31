@@ -22,6 +22,10 @@ SRC_URI_append = "\
 	file://0017-xdp-psu_init_gpl-Set-DDR-to-2133MHz.patch \
 	"
 
+# Glitches on serial input interrupt the boot sequence on some boards, use
+# a particular key (space) to stop autoboot instead of any key.
+SRC_URI_append_topic-miamimp = " file://must-press-space-to-stop-autoboot.cfg"
+
 EXTRACOMPILEDEPENDS = ""
 EXTRACOMPILEDEPENDS_zynqmp = "arm-trusted-firmware:do_deploy"
 
