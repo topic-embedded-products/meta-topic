@@ -39,7 +39,7 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	"
 
 # Use QSPI flash with 64k sector size
-MKUBIFS_ARGS = "-m 1 -e 65408 -c 440"
+MKUBIFS_ARGS = "-m 1 -e 65408 -c 440 -x zlib"
 UBINIZE_ARGS = "-m 1 -p 64KiB"
 UBI_VOLNAME = "qspi-rootfs"
 

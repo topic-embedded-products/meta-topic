@@ -80,7 +80,7 @@ EXTRA_IMAGEDEPENDS += " \
 		"
 
 # Use QSPI flash with 128k sector size, 128MB total size
-MKUBIFS_ARGS = "-m 1 -e 130944 -c 1008"
+MKUBIFS_ARGS = "-m 1 -e 130944 -c 1008 -x zlib"
 UBINIZE_ARGS = "-m 1 -p 128KiB"
 UBI_VOLNAME = "qspi-rootfs"
 

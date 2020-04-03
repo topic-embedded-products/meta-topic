@@ -11,7 +11,7 @@ MACHINEOVERRIDES =. "topic-miami:"
 UBOOT_MACHINE = "topic_miamiplus_config"
 
 # Use QSPI flash with 128k sector size (dual parallel qspi flash)
-MKUBIFS_ARGS = "-m 1 -e 130944 -c 472"
+MKUBIFS_ARGS = "-m 1 -e 130944 -c 472 -x zlib"
 UBINIZE_ARGS = "-m 1 -p 128KiB"
 UBI_VOLNAME = "qspi-rootfs"
 
