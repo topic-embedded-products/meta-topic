@@ -51,6 +51,7 @@ SRC_URI_append = "\
 	file://0028-ASoC-snd_soc_of_parse_daifmt-Handle-SND_SOC_DAIFMT_S.patch \
 	file://0029-drm-bridge-adv7511-Enable-SPDIF-support.patch \
 	file://0030-devicetree-zynqmp.dtsi-Add-bootmode-selection-suppor.patch \
+	file://0031-media-axi-hdmi-rx-Honor-pclk-sample-from-devicetree.patch \
 	"
 
 # Compile overlay-capable devicetrees

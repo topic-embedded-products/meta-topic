@@ -183,6 +183,9 @@
 					axi_hdmi_rx: endpoint {
 						remote-endpoint = <&adv7611>;
 						bus-width = <24>;
+						hsync-active = <0>; /* Parallel bus */
+						vsync-active = <0>;
+						pclk-sample = <1>; /* Sample on rising edge */
 					};
 				};
 			};
