@@ -100,37 +100,110 @@
 	fragment@3 {
 		target = <&amba>;
 		__overlay__ {
-			axi_vdma_0: axivdma@a0000000 {
-				compatible = "xlnx,axi-vdma-1.00.a";
-				#address-cells = <1>;
-				#size-cells = <1>;
+
+ 			hdmi_out_v_frmbuf_rd_0: v_frmbuf_rd@a0040000 {
 				#dma-cells = <1>;
-				#dma-channels = <1>;
-				reg = <0x0 0xa0000000 0x0 0x1000>;
-				dma-ranges = <0x00000000 0x00000000 0x40000000>;
-				xlnx,num-fstores = <3>;
-				xlnx,flush-fsync = <1>;
-				xlnx,addrwidth = <64>;
-				clocks = <&zynqmp_clk PL0_REF>;
-				clock-names = "s_axi_lite_aclk";
-				dma-channel@a0000000 {
-					compatible = "xlnx,axi-vdma-mm2s-channel";
-					interrupt-parent = <&gic>;
-					interrupts = <0 104 4>; /* pl_ps_1[0] */
-					xlnx,datawidth = <64>;
-					xlnx,genlock-mode = <0x0>;
-					xlnx,include-dre = <0x1>;
+				clock-names = "ap_clk";
+				clocks = <&zynqmp_clk PL1_REF>;
+				compatible = "xlnx,v-frmbuf-rd-2.1", "xlnx,axi-frmbuf-rd-v2.1";
+				interrupt-names = "interrupt";
+				interrupt-parent = <&gic>;
+				interrupts = <0 110 4>;
+				reg = <0x0 0xa0040000 0x0 0x10000>;
+				reset-gpios = <&gpio 107 GPIO_ACTIVE_LOW>;
+				xlnx,dma-addr-width = <32>;
+				xlnx,dma-align = <16>;
+				xlnx,max-height = <2160>;
+				xlnx,max-width = <3840>;
+				xlnx,pixels-per-clock = <2>;
+				xlnx,s-axi-ctrl-addr-width = <0x7>;
+				xlnx,s-axi-ctrl-data-width = <0x20>;
+				xlnx,vid-formats = "bgr888","rgb888","xbgr8888","xrgb8888","vuy888","xvuy8888","y8","yuyv","uyvy","nv16","nv12";
+				xlnx,video-width = <8>;
+			};
+
+			hdmi_out_v_hdmi_tx_ss_0: v_hdmi_tx_ss@a0060000 {
+				compatible = "xlnx,v-hdmi-tx-ss-3.1";
+				reg = <0x0 0xa0060000 0x0 0x20000>;
+
+				clock-names = "s_axi_cpu_aclk", "s_axis_video_aclk", "txref-clk", "retimer-clk";
+				clocks = <&zynqmp_clk PL0_REF>, <&zynqmp_clk PL1_REF>, <&si5341 0 3>, <&hdmi_out_sn65dp159>;
+
+				tx-refclk-rdy-gpios = <&gpio 85 0>;
+				phy-names = "hdmi-phy0", "hdmi-phy1", "hdmi-phy2";
+				phys = <&vphy_lane0 0 1 1 1>, <&vphy_lane1 0 1 1 1>, <&vphy_lane2 0 1 1 1>;
+				interrupt-names = "hdmitx";
+				interrupt-parent = <&gic>;
+				interrupts = <0 109 4>;
+
+				xlnx,input-pixels-per-clock = <2>;
+				xlnx,max-bits-per-component = <8>;
+
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					encoder_hdmi_port: port@0 {
+						reg = <0>;
+						hdmi_encoder: endpoint {
+							remote-endpoint = <&dmaengine_crtc>;
+						};
+					};
 				};
 			};
 
-			hdmi_out: hdmi_tx@a0001000 {
-				compatible = "topic,vdma-fb";
-				reg = <0x0 0xa0001000 0x0 0x1000>;
-				dmas = <&axi_vdma_0 0>;
-				dma-names = "video";
-				num-fstores = <3>;
-				width = <1920>;
-				height = <1080>;
+			v_drm_dmaengine_drv: drm-dmaengine-drv {
+				compatible = "xlnx,pl-disp";
+				dmas = <&hdmi_out_v_frmbuf_rd_0 0>;
+				dma-names = "dma0";
+				xlnx,vformat = "BG24";
+				#address-cells = <1>;
+				#size-cells = <0>;
+				dmaengine_port: port@0 {
+					reg = <0>;
+					dmaengine_crtc: endpoint {
+						remote-endpoint = <&hdmi_encoder>;
+					};
+				};
+			};
+
+			hdmi_out_vid_phy_controller_0: vid_phy_controller@a0080000 {
+				compatible = "xlnx,vid-phy-controller-2.2", "xlnx,vid-phy-controller-2.1";
+				interrupt-names = "irq";
+				interrupt-parent = <&gic>;
+				interrupts = <0 104 4>;
+				reg = <0x0 0xa0080000 0x0 0x10000>;
+
+				clock-names = "vid_phy_axi4lite_aclk";
+				clocks = <&zynqmp_clk PL0_REF>;
+
+				xlnx,hdmi-fast-switch = <1>;
+				xlnx,input-pixels-per-clock = <2>;
+				xlnx,nidru = <0>;
+				xlnx,nidru-refclk-sel = <0>;
+				xlnx,rx-no-of-channels = <3>;
+				xlnx,rx-pll-selection = <0>;
+				xlnx,rx-protocol = <3>;
+				xlnx,rx-refclk-sel = <1>;
+				xlnx,transceiver-type = <5>;
+				xlnx,transceiver-width = <2>;
+				xlnx,tx-buffer-bypass = <1>;
+				xlnx,tx-no-of-channels = <4>;
+				xlnx,tx-pll-selection = <6>;
+				xlnx,tx-protocol = <1>;
+				xlnx,tx-refclk-sel = <0>;
+				xlnx,use-gt-ch4-hdmi = <1>;
+				vphy_lane0: vphy_lane0 {
+					#phy-cells = <4>;
+				};
+				vphy_lane1: vphy_lane1 {
+					#phy-cells = <4>;
+				};
+				vphy_lane2: vphy_lane2 {
+					#phy-cells = <4>;
+				};
+				vphy_lane3: vphy_lane3 {
+					#phy-cells = <4>;
+				};
 			};
 		};
 	};

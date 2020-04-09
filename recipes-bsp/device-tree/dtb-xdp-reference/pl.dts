@@ -159,22 +159,6 @@
 				xlnx,use-user-ports = <0x1>;
 			};
 
-			/* HDMI output */
-
-			/* UART 16550 controller for uBlaze_hdmi */
-			axi_uart16550_ublaze_hdmi: serial@a0040000 {
-				clock-names = "ref_clk";
-				clocks = <&zynqmp_clk PL0_REF>;
-				compatible = "xlnx,xps-uart16550-2.00.a", "ns16550a";
-				current-speed = <115200>;
-				device_type = "serial";
-				interrupt-parent = <&gic>;
-				interrupts = <0 109 4>; /* pl_ps_1[5] */
-				reg = <0x0 0xA0040000 0x0 0x2000>;
-				reg-offset = <0x1000>;
-				reg-shift = <2>;
-			};
-
 			/* UART 16550 controller for uBlaze_mipi0 */
 			axi_uart16550_ublaze_mipi0: serial@a0042000 {
 				clock-names = "ref_clk";
