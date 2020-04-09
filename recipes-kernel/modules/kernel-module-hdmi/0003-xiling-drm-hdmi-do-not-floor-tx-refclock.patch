@@ -1,0 +1,29 @@
+From a68b5663716204c7132a3a88103f2f489d6d0730 Mon Sep 17 00:00:00 2001
+From: Leon Leijssen <leon.leijssen@topic.nl>
+Date: Thu, 9 Apr 2020 18:42:40 +0200
+Subject: [PATCH] xiling-drm-hdmi: do not floor tx-refclock
+
+---
+ hdmi/xilinx_drm_hdmi.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hdmi/xilinx_drm_hdmi.c b/hdmi/xilinx_drm_hdmi.c
+index 434c87b..51378bb 100644
+--- a/hdmi/xilinx_drm_hdmi.c
++++ b/hdmi/xilinx_drm_hdmi.c
+@@ -1295,10 +1295,10 @@ static void xlnx_drm_hdmi_encoder_atomic_mode_set(struct drm_encoder *encoder,
+ 	gpiod_set_value_cansleep(xhdmi->tx_refclk_rdy_gpio, 0);
+ 
+ 	/* request required tmds clock rate */
+-	ret = clk_set_rate(xhdmi->tmds_clk, adjusted_mode->clock * 1000);
++	ret = clk_set_rate(xhdmi->tmds_clk, VphyPtr->HdmiTxRefClkHz);
+ 	if (ret) {
+ 		dev_err(xhdmi->dev, "failed to set tmds clock rate to %d: %d\n",
+-					(adjusted_mode->clock * 1000), ret);
++					VphyPtr->HdmiTxRefClkHz, ret);
+ 	}
+ 
+ 	/* When switching between modes with same Phy RefClk phy tx_refxlk_rdy_en
+-- 
+2.17.1
+
