@@ -1,4 +1,4 @@
-From b9882958401df8395404d505e1a13a3f8b4ca300 Mon Sep 17 00:00:00 2001
+From 64f923343e52fa4f0886e4b49a792c0f76452d07 Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Tue, 25 Feb 2020 17:25:24 +0100
 Subject: [PATCH] topic-miami: support new filesystem structure
@@ -11,8 +11,8 @@ Add MTD and UBI support and boot from QSPI using UBI filesystem
  configs/topic_miami_defconfig     | 14 ++++++++
  configs/topic_miamilite_defconfig | 14 ++++++++
  configs/topic_miamiplus_defconfig | 14 ++++++++
- include/configs/topic_miami.h     | 55 ++++++++++++++++++++++---------
- 5 files changed, 89 insertions(+), 26 deletions(-)
+ include/configs/topic_miami.h     | 56 ++++++++++++++++++++++---------
+ 5 files changed, 90 insertions(+), 26 deletions(-)
 
 diff --git a/arch/arm/dts/zynq-topic-miami.dts b/arch/arm/dts/zynq-topic-miami.dts
 index 58a10e11aa..63fbaf2e9f 100644
@@ -140,7 +140,7 @@ index c8365d531d..7180f10a24 100644
 +# CONFIG_ALTERA_QSPI is not set
 +# CONFIG_MTD_SPI_NAND is not set
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
-index e9524b7fc9..e832a695de 100644
+index e9524b7fc9..911f3e65b9 100644
 --- a/include/configs/topic_miami.h
 +++ b/include/configs/topic_miami.h
 @@ -54,6 +54,14 @@
@@ -167,10 +167,11 @@ index e9524b7fc9..e832a695de 100644
  	"uramdisk.image.gz ram 0x4000000 0x10000000\0" \
  	"dfu_ram=run usbreset && dfu 0 ram 0\0" \
  	"thor_ram=run usbreset && thordown 0 ram 0\0"
-@@ -90,19 +98,39 @@
+@@ -90,19 +98,40 @@
  
  #undef CONFIG_EXTRA_ENV_SETTINGS
  #define CONFIG_EXTRA_ENV_SETTINGS	\
++	"bootargs=quiet\0" \
 +	"boot_a_script=load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; source ${scriptaddr}\0" \
 +	"boot_prefixes=/ /boot/\0" \
 +	"boot_scripts=boot.scr\0" \
@@ -210,7 +211,7 @@ index e9524b7fc9..e832a695de 100644
  	"fdt_high=0x20000000\0"	\
  	"initrd_high=0x20000000\0"	\
  	"mmc_loadbit=echo Loading bitstream from SD/MMC/eMMC to RAM.. && " \
-@@ -114,21 +142,18 @@
+@@ -114,21 +143,18 @@
  		"sf read ${devicetree_addr} 0xC0000 ${devicetree_size} && " \
  		"sf read ${kernel_addr} 0x100000 ${kernel_size} && " \
  		"bootm ${kernel_addr} - ${devicetree_addr}\0" \
