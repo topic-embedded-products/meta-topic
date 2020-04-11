@@ -21,5 +21,10 @@ do_compile() {
     true
 }
 
+PACKAGES =+ "${PN}-partials"
+RPROVIDES_${PN}-partials = "pr-demo-partials"
+FILES_${PN}-partials = "${FPGA_BITSTREAM_PATH}"
+
 SRC_URI[tdkzu9.md5sum] = "bf85875460f3b32536ebf39075fd8896"
 SRC_URI[tdkz30.md5sum] = "7dee9ff9c4e7176fd7df2158cb77b5c5"
+
