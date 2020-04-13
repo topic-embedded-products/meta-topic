@@ -19,6 +19,7 @@ EXTRAPATCHES_zynqmp = "\
 	"
 
 SRC_URI_append = "\
+	file://enable-kexec-support.cfg \
 	${EXTRAPATCHES} \
 	file://0001-iio-accel-Add-support-for-the-Bosch-Sensortec-BMI088.patch \
 	file://0001-Add-ltc3562-voltage-regulator-driver.patch \
