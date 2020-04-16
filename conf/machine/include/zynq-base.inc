@@ -50,4 +50,5 @@ XILINX_LM_LICENSE_FILE ?= "${XILINX_VIVADO_PATH}/data/ip/core_licenses/Xilinx.li
 DEVICETREE ??= "zynq-7000.dtb"
 WKS_FILE = "sdimage-swu.wks"
 IMAGE_BOOT_FILES = "boot.bin u-boot.img"
+IMAGE_OVERHEAD_FACTOR="1.1"
 do_image_wic[depends] += "mtools-native:do_populate_sysroot dosfstools-native:do_populate_sysroot"
