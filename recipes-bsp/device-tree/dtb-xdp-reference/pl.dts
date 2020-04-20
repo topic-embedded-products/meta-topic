@@ -159,20 +159,6 @@
 				xlnx,use-user-ports = <0x1>;
 			};
 
-			/* UART 16550 controller for uBlaze_mipi0 */
-			axi_uart16550_ublaze_mipi0: serial@a0042000 {
-				clock-names = "ref_clk";
-				clocks = <&zynqmp_clk PL0_REF>;
-				compatible = "xlnx,xps-uart16550-2.00.a", "ns16550a";
-				current-speed = <115200>;
-				device_type = "serial";
-				interrupt-parent = <&gic>;
-				interrupts = <0 91 4>; /* pl_ps_0[2] */
-				reg = <0x0 0xA0042000 0x0 0x2000>;
-				reg-offset = <0x1000>;
-				reg-shift = <2>;
-			};
-
 			/* VCU */
 			vcu_0: vcu@a0240000 {
 				#address-cells = <2>;

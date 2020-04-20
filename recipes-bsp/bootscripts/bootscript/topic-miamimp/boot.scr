@@ -1,4 +1,4 @@
-setenv bootargs $bootargs coherent_pool=512k
+setenv bootargs $bootargs coherent_pool=512k drm_kms_helper.edid_firmware=HDMI-A-1:edid/1920x1080.bin
 if test "${devtype}" = "mmc"; then
 	echo "Loading kernel from mmc ${devnum}:${devplist}..."
 	if ext4load ${devtype} ${devnum}:${devplist} $fdt_addr /boot/system.dtb && ext4load ${devtype} ${devnum}:${devplist} $kernel_addr /boot/Image; then

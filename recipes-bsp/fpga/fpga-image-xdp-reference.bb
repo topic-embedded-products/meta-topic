@@ -14,7 +14,8 @@ PV = "1"
 
 BOARD_DESIGN_PATH = "${BPN}-${MACHINE}"
 TOPICDOWNLOADS_URI ?= "http://topic-downloads.fra1.digitaloceanspaces.com"
-BOARD_DESIGN_URI = "${TOPICDOWNLOADS_URI}/files/${BOARD_DESIGN_PATH}-${PV}.tar.xz;name=${MACHINE}"
+#BOARD_DESIGN_URI = "${TOPICDOWNLOADS_URI}/files/${BOARD_DESIGN_PATH}-${PV}.tar.xz;name=${MACHINE}"
+BOARD_DESIGN_URI = "file://${HOME}/Downloads/fpga.bit"
 
 PKGV = "${PV}"
 S = "${WORKDIR}"
@@ -22,7 +23,7 @@ B = "${S}"
 
 # Nothing to build
 do_compile() {
-    true
+    cp ${HOME}/Downloads/fpga.bit ${S}/fpga.bit
 }
 
 SRC_URI[xdpzu7.md5sum] = "0b5860a586b4bea70f4c1d44d6aabbc8"
