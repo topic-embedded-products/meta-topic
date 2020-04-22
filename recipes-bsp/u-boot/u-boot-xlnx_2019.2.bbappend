@@ -20,6 +20,7 @@ SRC_URI_append = "\
 	file://0015-spi_flash-do-not-write-out-of-bounds-when-doing-unal.patch \
 	file://0016-topic-miami-support-new-filesystem-structure.patch \
 	file://0017-xdp-psu_init_gpl-Set-DDR-to-2133MHz.patch \
+	file://0001-board-topic-miami-Set-FCLK1-to-150MHz.patch \
 	"
 
 # Glitches on serial input interrupt the boot sequence on some boards, use
