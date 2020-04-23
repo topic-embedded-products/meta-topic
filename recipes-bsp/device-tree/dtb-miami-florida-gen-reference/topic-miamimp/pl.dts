@@ -12,7 +12,7 @@
 	fragment@0 {
 		target = <&fpga_full>;
 		__overlay__ {
-			firmware-name = "fpga.bin.fpga-image-miamimp-florida-gen-reference";
+			firmware-name = "fpga.bin.fpga-image-pr-reference";
 		};
 	};
 
@@ -67,7 +67,10 @@
 						};
 					};
 					port@1 {
-						reg = <1>;
+						reg = <1>; /* HDMI monitor */
+					};
+					port@2 {
+						reg = <2>; /* Audio link */
 					};
 				};
 			};
@@ -188,6 +191,14 @@
 						pclk-sample = <1>; /* Sample on rising edge */
 					};
 				};
+			};
+
+			dyplo: dyplo@a0400000 {
+				compatible = "topic,dyplo-1.00.a";
+				reg = <0x0 0xA0400000 0x0 0x200000>;
+				interrupt-parent = <&gic>;
+				interrupts = <0 111 4>; /* pl_ps_irq1[7] */
+				dma-coherent; /* HPC port with AxCACHE=0b1111 AxPROT=0b010*/
 			};
 		};
 	};

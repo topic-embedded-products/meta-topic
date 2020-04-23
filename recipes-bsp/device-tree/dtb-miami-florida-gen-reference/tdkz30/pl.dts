@@ -31,6 +31,31 @@
 				};
 			};
 
+			leds-emio {
+				compatible = "gpio-leds";
+				emio-led-d2 {
+					label = "d2:green";
+					gpios = <&gpio0 70 0>; /* EMIO 16 */
+				};
+				emio-led-d3 {
+					label = "d3:green";
+					gpios = <&gpio0 71 0>; /* EMIO 17 */
+				};
+				emio-led-d4 {
+					label = "d4:green";
+					gpios = <&gpio0 72 0>; /* EMIO 18 */
+					linux,default-trigger = "mmc0";
+				};
+				emio-led-d5 {
+					label = "d5:green";
+					gpios = <&gpio0 73 0>; /* EMIO 19 */
+				};
+				emio-led-d6 {
+					label = "d6:green";
+					gpios = <&gpio0 74 0>; /* EMIO 20 */
+				};
+			};
+
 			adv7511_hdmi_snd {
 				compatible = "simple-audio-card";
 				simple-audio-card,name = "HDMI monitor";
