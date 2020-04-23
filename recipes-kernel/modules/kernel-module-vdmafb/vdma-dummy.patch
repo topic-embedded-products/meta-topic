@@ -1,0 +1,181 @@
+diff --git a/vdmafb.c b/vdmafb.c
+index 711cdba..b8927fd 100644
+--- a/vdmafb.c
++++ b/vdmafb.c
+@@ -39,6 +39,7 @@
+ #include <linux/slab.h>
+ #include <linux/dma/xilinx_dma.h>
+ 
++#define DEBUG
+ /* Register locations */
+ #define VDMAFB_CONTROL	0x00
+ 
+@@ -65,7 +66,7 @@
+ struct vdmafb_dev {
+ 	struct backlight_device *backlight;
+ 	struct fb_info info;
+-	void __iomem *regs;
++	//void __iomem *regs;
+ 	/* Physical and virtual addresses of framebuffer */
+ 	phys_addr_t fb_phys;
+ 	void __iomem *fb_virt;
+@@ -77,6 +78,7 @@ struct vdmafb_dev {
+ 	u32 pseudo_palette[16];
+ };
+ 
++/*
+ static inline u32 vdmafb_readreg(struct vdmafb_dev *fbdev, loff_t offset)
+ {
+ 	return ioread32(fbdev->regs + offset);
+@@ -86,9 +88,11 @@ static inline void vdmafb_writereg(struct vdmafb_dev *fbdev, loff_t offset, u32
+ {
+ 	iowrite32(data, fbdev->regs + offset);
+ }
++*/
+ 
+ static int vdmafb_bl_update_status(struct backlight_device *bl)
+ {
++/*
+ 	struct vdmafb_dev *fbdev = bl_get_data(bl);
+ 	int	brightness = bl->props.brightness;
+ 	u32 power = 1;
+@@ -101,13 +105,18 @@ static int vdmafb_bl_update_status(struct backlight_device *bl)
+ 	vdmafb_writereg(fbdev, VDMAFB_BACKLIGHT_CONTROL, power);
+ 	vdmafb_writereg(fbdev, VDMAFB_BACKLIGHT_LEVEL_1K, brightness);
+ 	return 0;
++*/
++	return 0;
+ }
+ 
+ static int vdmafb_bl_get_brightness(struct backlight_device *bl)
+ {
++/*
+ 	struct vdmafb_dev *fbdev = bl_get_data(bl);
+ 
+ 	return vdmafb_readreg(fbdev, VDMAFB_BACKLIGHT_LEVEL_1K);
++*/
++	return 0;
+ }
+ 
+ static const struct backlight_ops vdmafb_bl_ops = {
+@@ -126,7 +135,7 @@ static int vdmafb_setupfb(struct vdmafb_dev *fbdev)
+ 	int ret;
+ 
+ 	/* Disable display */
+-	vdmafb_writereg(fbdev, VDMAFB_CONTROL, 0);
++	//vdmafb_writereg(fbdev, VDMAFB_CONTROL, 0);
+ 
+ 	dmaengine_terminate_all(fbdev->dma);
+ 
+@@ -171,27 +180,27 @@ static int vdmafb_setupfb(struct vdmafb_dev *fbdev)
+ 	dma_async_issue_pending(fbdev->dma);
+ 
+ 	/* Configure IP via registers */
+-	vdmafb_writereg(fbdev, VDMAFB_HORIZONTAL_TOTAL,
+-		var->hsync_len + var->left_margin + var->xres + var->right_margin);
+-	vdmafb_writereg(fbdev, VDMAFB_HORIZONTAL_SYNC, var->hsync_len);
+-	vdmafb_writereg(fbdev, VDMAFB_HORIZONTAL_FRONT_PORCH, var->left_margin);
+-	vdmafb_writereg(fbdev, VDMAFB_HORIZONTAL_WIDTH, var->xres);
+-	vdmafb_writereg(fbdev, VDMAFB_HORIZONTAL_BACK_PORCH, var->right_margin);
+-	vdmafb_writereg(fbdev, VDMAFB_HORIZONTAL_POLARITY, 0); /* TODO */
+-	vdmafb_writereg(fbdev, VDMAFB_VERTICAL_TOTAL,
+-		var->vsync_len + var->upper_margin + var->yres + var->lower_margin);
+-	vdmafb_writereg(fbdev, VDMAFB_VERTICAL_SYNC, var->vsync_len);
+-	vdmafb_writereg(fbdev, VDMAFB_VERTICAL_FRONT_PORCH, var->upper_margin);
+-	vdmafb_writereg(fbdev, VDMAFB_VERTICAL_HEIGHT, var->yres);
+-	vdmafb_writereg(fbdev, VDMAFB_VERTICAL_BACK_PORCH, var->lower_margin);
+-	vdmafb_writereg(fbdev, VDMAFB_VERTICAL_POLARITY, 0);
+-	/* Enable output */
+-	vdmafb_writereg(fbdev, VDMAFB_CONTROL, VDMAFB_CONTROL_ENABLE);
+-
+-	/* Set brightness */
+-
+-	vdmafb_writereg(fbdev, VDMAFB_BACKLIGHT_CONTROL, 1);
+-	vdmafb_writereg(fbdev, VDMAFB_BACKLIGHT_LEVEL_1K, 800);
++//	vdmafb_writereg(fbdev, VDMAFB_HORIZONTAL_TOTAL,
++//		var->hsync_len + var->left_margin + var->xres + var->right_margin);
++//	vdmafb_writereg(fbdev, VDMAFB_HORIZONTAL_SYNC, var->hsync_len);
++//	vdmafb_writereg(fbdev, VDMAFB_HORIZONTAL_FRONT_PORCH, var->left_margin);
++//	vdmafb_writereg(fbdev, VDMAFB_HORIZONTAL_WIDTH, var->xres);
++//	vdmafb_writereg(fbdev, VDMAFB_HORIZONTAL_BACK_PORCH, var->right_margin);
++//	vdmafb_writereg(fbdev, VDMAFB_HORIZONTAL_POLARITY, 0); /* TODO */
++//	vdmafb_writereg(fbdev, VDMAFB_VERTICAL_TOTAL,
++//		var->vsync_len + var->upper_margin + var->yres + var->lower_margin);
++//	vdmafb_writereg(fbdev, VDMAFB_VERTICAL_SYNC, var->vsync_len);
++//	vdmafb_writereg(fbdev, VDMAFB_VERTICAL_FRONT_PORCH, var->upper_margin);
++//	vdmafb_writereg(fbdev, VDMAFB_VERTICAL_HEIGHT, var->yres);
++//	vdmafb_writereg(fbdev, VDMAFB_VERTICAL_BACK_PORCH, var->lower_margin);
++//	vdmafb_writereg(fbdev, VDMAFB_VERTICAL_POLARITY, 0);
++//	/* Enable output */
++//	vdmafb_writereg(fbdev, VDMAFB_CONTROL, VDMAFB_CONTROL_ENABLE);
++//
++//	/* Set brightness */
++//
++//	vdmafb_writereg(fbdev, VDMAFB_BACKLIGHT_CONTROL, 1);
++//	vdmafb_writereg(fbdev, VDMAFB_BACKLIGHT_LEVEL_1K, 800);
+ 
+ 	return 0;
+ }
+@@ -325,18 +334,32 @@ static int vdmafb_probe(struct platform_device *pdev)
+ 	vdmafb_init_fix(fbdev);
+ 
+ 	/* Request I/O resource */
+-	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (!res) {
+-		dev_err(&pdev->dev, "I/O resource request failed\n");
+-		return -ENXIO;
+-	}
+-	res->flags &= ~IORESOURCE_CACHEABLE;
+-	fbdev->regs = devm_ioremap_resource(&pdev->dev, res);
+-	if (IS_ERR(fbdev->regs))
+-		return PTR_ERR(fbdev->regs);
++//	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++//	if (!res) {
++//		dev_err(&pdev->dev, "I/O resource request failed\n");
++//		return -ENXIO;
++//	}
++//	res->flags &= ~IORESOURCE_CACHEABLE;
++//	fbdev->regs = devm_ioremap_resource(&pdev->dev, res);
++//	if (IS_ERR(fbdev->regs))
++//		return PTR_ERR(fbdev->regs);
+ 
+ 	/* Allocate framebuffer memory */
+-	fbsize = fbdev->info.fix.smem_len;
++	fbsize = fbdev->info.fix.smem_len * 3;
++	fbdev->fb_virt = dma_alloc_coherent(&pdev->dev, PAGE_ALIGN(fbsize),
++					    &fbdev->fb_phys, GFP_KERNEL);
++	if (!fbdev->fb_virt) {
++		dev_err(&pdev->dev,
++			"Frame buffer memory allocation failed\n");
++		return -ENOMEM;
++	}
++	fbdev->info.fix.smem_start = fbdev->fb_phys;
++	fbdev->info.screen_base = fbdev->fb_virt;
++	fbdev->info.pseudo_palette = fbdev->pseudo_palette;
++
++	dev_err(&pdev->dev,"%s virt=%p phys=%x size=%d\n", __func__,
++		fbdev->fb_virt, fbdev->fb_phys, fbsize);
++
+ 	fbdev->fb_virt = dma_alloc_coherent(&pdev->dev, PAGE_ALIGN(fbsize),
+ 					    &fbdev->fb_phys, GFP_KERNEL);
+ 	if (!fbdev->fb_virt) {
+@@ -348,7 +371,7 @@ static int vdmafb_probe(struct platform_device *pdev)
+ 	fbdev->info.screen_base = fbdev->fb_virt;
+ 	fbdev->info.pseudo_palette = fbdev->pseudo_palette;
+ 
+-	pr_debug("%s virt=%p phys=%x size=%d\n", __func__,
++	dev_err(&pdev->dev,"%s virt=%p phys=%x size=%d\n", __func__,
+ 		fbdev->fb_virt, fbdev->fb_phys, fbsize);
+ 
+ 	/* Clear framebuffer */
+@@ -414,8 +437,8 @@ static int vdmafb_remove(struct platform_device *pdev)
+ 		backlight_device_unregister(fbdev->backlight);
+ 	unregister_framebuffer(&fbdev->info);
+ 	/* Disable display */
+-	vdmafb_writereg(fbdev, VDMAFB_BACKLIGHT_CONTROL, 0);
+-	vdmafb_writereg(fbdev, VDMAFB_CONTROL, 0);
++	//vdmafb_writereg(fbdev, VDMAFB_BACKLIGHT_CONTROL, 0);
++	//vdmafb_writereg(fbdev, VDMAFB_CONTROL, 0);
+ 	dma_release_channel(fbdev->dma);
+ 	dma_free_coherent(&pdev->dev, PAGE_ALIGN(fbdev->info.fix.smem_len),
+ 			  fbdev->fb_virt, fbdev->fb_phys);
