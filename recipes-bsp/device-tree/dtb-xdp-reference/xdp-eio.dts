@@ -108,7 +108,7 @@
 				compatible = "xlnx,v-frmbuf-rd-2.1", "xlnx,axi-frmbuf-rd-v2.1";
 				interrupt-names = "interrupt";
 				interrupt-parent = <&gic>;
-				interrupts = <0 110 4>;
+				interrupts = <0 96 4>;
 				reg = <0x0 0xa0140000 0x0 0x10000>;
 				reset-gpios = <&gpio 107 GPIO_ACTIVE_LOW>;
 				xlnx,dma-addr-width = <32>;
@@ -118,7 +118,7 @@
 				xlnx,pixels-per-clock = <2>;
 				xlnx,s-axi-ctrl-addr-width = <0x7>;
 				xlnx,s-axi-ctrl-data-width = <0x20>;
-				xlnx,vid-formats = "bgr888","rgb888","xbgr8888","xrgb8888","vuy888","xvuy8888","y8","yuyv","uyvy","nv16","nv12";
+				xlnx,vid-formats = "xrgb8888","bgr888","rgb888","xbgr8888","vuy888","xvuy8888","y8","yuyv","uyvy","nv16","nv12";
 				xlnx,video-width = <8>;
 			};
 
@@ -166,10 +166,10 @@
 				clock-names = "s_axi_lite_aclk";
 				interrupt-names = "mm2s_introut";
 				interrupt-parent = <&gic>;
-				interrupts = <0 96 4>;
+				interrupts = <0 110 4>;
 				dma-channel@a0020000 {
 					compatible = "xlnx,axi-vdma-mm2s-channel";
-					interrupts = <0 96 4>;
+					interrupts = <0 110 4>;
 					xlnx,datawidth = <64>;
 					xlnx,genlock-mode;
 				};
