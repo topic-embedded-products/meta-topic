@@ -5,7 +5,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
 PV = "2"
 
-inherit uboot_bootscript deploy
+inherit uboot_bootscript
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 SRC_URI = "file://boot.scr"
@@ -22,12 +22,5 @@ do_install () {
 }
 
 FILES_${PN} = "/boot"
-
-do_deploy () {
-	install -d ${DEPLOYDIR}
-	install ${S}/autorun.uimage.scr ${DEPLOYDIR}/boot.scr
-}
-do_deploy[dirs] = "${B}"
-addtask deploy before do_build after do_compile
 
 do_configure[noexec] = "1"
