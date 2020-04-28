@@ -260,8 +260,8 @@
 		assigned-clock-parents = <0>, <0>, <0>, <0>, <0>,
 					<&si5341 1 3>,
 					<&si5341 1 2>,
-					<&si5341 1 4>,
 					<&si5341 1 1>,
+					<&si5341 1 4>,
 					<&si5341 1 1>,
 					<&si5341 1 0>,
 					<&si5341 1 0>,
@@ -304,21 +304,21 @@
 		};
 
 		out@2 {
-			/* PL_MGT_REFCLK0 HDMI TX refclk (default 148.5 MHz) */
+			/* PL_MGT_REFCLK0 (148.5 MHz) */
 			reg = <2>;
 			silabs,format = <1>; /* LVDS 3v3 */
 			silabs,common-mode = <3>;
 			silabs,amplitude = <3>;
-			silabs,synth-master;
 			always-on;
 		};
 
 		out@3 {
-			/* PL_MGT_REFCLK2 (148.5 MHz) */
+			/* PL_MGT_REFCLK2 HDMI TX refclk (default 148.5 MHz) */
 			reg = <3>;
 			silabs,format = <1>; /* LVDS 3v3 */
 			silabs,common-mode = <3>;
 			silabs,amplitude = <3>;
+			silabs,synth-master;
 			always-on;
 		};
 
