@@ -1,3 +1,8 @@
+inherit gitpkgv
+
+PV = "${XLNX_HDMI_VERSION}+${SRCPV}"
+PKGV = "${XLNX_HDMI_VERSION}+${GITPKGV}"
+
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
 RPROVIDES_${PN} = "dp159"
