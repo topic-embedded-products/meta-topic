@@ -31,6 +31,11 @@
 	fragment@1 {
 		target-path = "/";
 		__overlay__ {
+
+			qmfoc {
+				compatible = "qdesys,qmfoc-1.00.a";
+			};
+
 			sdio_wifi_pwrseq: sdio_wifi_pwrseq {
 				compatible = "mmc-pwrseq-simple";
 				reset-gpios = <&gpio 100 GPIO_ACTIVE_HIGH>; /* EMIO 22 = WIFI_ENABLE */
@@ -124,6 +129,14 @@
 	fragment@5 {
 		target = <&amba>;
 		__overlay__ {
+
+			/* Faster video clock */
+			misc_clk_6: misc_clk_6 {
+				#clock-cells = <0>;
+				clock-frequency = <333027650>;
+				compatible = "fixed-clock";
+			};
+
 			/* FAN controller */
 			pl_fan_controller: fan-controller@a0012000 {
 				compatible = "topic,axi-pwm-fan-controller";
@@ -131,15 +144,6 @@
 				nr-fans = <1>;
 				clocks = <&zynqmp_clk PL0_REF>;
 				topic,initial-pwm = <0x80>; /* Run at 50% */
-			};
-
-			/* MOTOR controller */
-			pl_motor_controller: motor-controller@a0013000 {
-				compatible = "topic,axi-pwm-motor-controller";
-				reg = <0x0 0xa0013000 0x0 0x1000>;
-				nr-motors = <4>;
-				clocks = <&zynqmp_clk PL0_REF>;
-				topic,initial-pwm = <0x0>; /* Off */
 			};
 
 			/* UART 16550 controller for BT */
@@ -159,34 +163,453 @@
 				xlnx,use-user-ports = <0x1>;
 			};
 
-			/* HDMI output */
-
-			/* UART 16550 controller for uBlaze_hdmi */
-			axi_uart16550_ublaze_hdmi: serial@a0040000 {
-				clock-names = "ref_clk";
+			/* MIPI Camera 0 */
+			mipi_cam_0_axi_iic: i2c@a0130000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clock-names = "s_axi_aclk";
 				clocks = <&zynqmp_clk PL0_REF>;
-				compatible = "xlnx,xps-uart16550-2.00.a", "ns16550a";
-				current-speed = <115200>;
-				device_type = "serial";
+				compatible = "xlnx,axi-iic-2.0", "xlnx,xps-iic-2.00.a";
+				interrupt-names = "iic2intc_irpt";
 				interrupt-parent = <&gic>;
-				interrupts = <0 109 4>; /* pl_ps_1[5] */
-				reg = <0x0 0xA0040000 0x0 0x2000>;
-				reg-offset = <0x1000>;
-				reg-shift = <2>;
+				interrupts = <0 92 4>;
+				reg = <0x0 0xa0130000 0x0 0x10000>;
+
+				mipi_cam_0_imx274: sensor@1a{
+					compatible = "sony,imx274";
+					reg = <0x1a>;
+					#address-cells = <1>;
+					#size-cells = <0>;
+					reset-gpios = <&gpio 78 GPIO_ACTIVE_HIGH>;
+
+					port@0 {
+						reg = <0>;
+
+						mipi_cam_0_imx274_out: endpoint {
+							remote-endpoint = <&mipi_cam_0_csiss_in>;
+							clock-lanes = <0>;
+							data-lanes = <1 2 3 4>;
+						};
+					};
+				};
 			};
 
-			/* UART 16550 controller for uBlaze_mipi0 */
-			axi_uart16550_ublaze_mipi0: serial@a0042000 {
-				clock-names = "ref_clk";
-				clocks = <&zynqmp_clk PL0_REF>;
-				compatible = "xlnx,xps-uart16550-2.00.a", "ns16550a";
-				current-speed = <115200>;
-				device_type = "serial";
+			mipi_cam_0_csiss: csiss@a00f0000 {
+				clock-names = "lite_aclk", "dphy_clk_200M", "video_aclk";
+				clocks = <&zynqmp_clk PL0_REF>, <&si5341 0 6>, <&misc_clk_6>;
+
+				compatible = "xlnx,mipi-csi2-rx-subsystem-4.1", "xlnx,mipi-csi2-rx-subsystem-4.0";
+				interrupt-names = "csirxss_csi_irq";
 				interrupt-parent = <&gic>;
-				interrupts = <0 91 4>; /* pl_ps_0[2] */
-				reg = <0x0 0xA0042000 0x0 0x2000>;
-				reg-offset = <0x1000>;
-				reg-shift = <2>;
+				interrupts = <0 91 4>;
+				reg = <0x0 0xa00f0000 0x0 0x10000>;
+				xlnx,axis-tdata-width = <32>;
+				xlnx,cal-mode = "NONE";
+				xlnx,clk-io-swap = "false";
+				xlnx,clk-lane-io-position = <0x1a>;
+				xlnx,clk-lp-io-swap = "false";
+				xlnx,csi-en-activelanes = "true";
+				xlnx,csi-en-crc = "true";
+				xlnx,csi-filter-userdatatype = "true";
+				xlnx,csi-opt1-regs = "false";
+				xlnx,csi-pxl-format = "RAW10";
+				xlnx,csi2rx-dbg = <0x0>;
+				xlnx,data-lane0-io-position = <0x2>;
+				xlnx,data-lane1-io-position = <0x4>;
+				xlnx,data-lane2-io-position = <0x6>;
+				xlnx,data-lane3-io-position = <0x8>;
+				xlnx,dl0-io-swap = "false";
+				xlnx,dl0-lp-io-swap = "false";
+				xlnx,dl1-io-swap = "false";
+				xlnx,dl1-lp-io-swap = "false";
+				xlnx,dl2-io-swap = "false";
+				xlnx,dl2-lp-io-swap = "false";
+				xlnx,dl3-io-swap = "false";
+				xlnx,dl3-lp-io-swap = "false";
+				xlnx,dphy-lanes = <0x4>;
+				xlnx,dphy-mode = "SLAVE";
+				xlnx,en-active-lanes ;
+				xlnx,en-bg0-pin0 = "false";
+				xlnx,en-bg0-pin6 = "false";
+				xlnx,en-bg1-pin0 = "false";
+				xlnx,en-bg1-pin6 = "false";
+				xlnx,en-bg2-pin0 = "false";
+				xlnx,en-bg2-pin6 = "false";
+				xlnx,en-bg3-pin0 = "false";
+				xlnx,en-bg3-pin6 = "false";
+				xlnx,en-clk300m = "false";
+				xlnx,en-csi-v2-0 = "false";
+				xlnx,en-exdesigns = "false";
+				xlnx,en-timeout-regs = "false";
+				xlnx,en-vcx = "false";
+				xlnx,esc-timeout = <0x6400>;
+				xlnx,fifo-rd-en-control = "true";
+				xlnx,hs-line-rate = <0x5a0>;
+				xlnx,hs-settle-ns = <0x8d>;
+				xlnx,hs-timeout = <0x10005>;
+				xlnx,idly-group-name = "mipi_csi2rx_idly_group";
+				xlnx,idly-tap = <0x1>;
+				xlnx,init = <0x186a0>;
+				xlnx,is-7series = "false";
+				xlnx,max-lanes = <0x4>;
+				xlnx,mipi-slv-int = <0x0>;
+				xlnx,ppc = <0x2>;
+				xlnx,share-idlyctrl = "false";
+				xlnx,vc = <0x4>;
+				xlnx,vfb ;
+
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+
+					port@0 {
+						reg = <0>;
+						xlnx,cfa-pattern = "rggb";
+						xlnx,video-format = <XVIP_VF_MONO_SENSOR>;
+						xlnx,video-width = <8>;
+
+						mipi_cam_0_csiss_out: endpoint {
+							remote-endpoint = <&mipi_cam_0_demosaic_in>;
+						};
+					};
+					port@1 {
+						reg = <1>;
+						xlnx,cfa-pattern = "rggb";
+						xlnx,video-format = <XVIP_VF_MONO_SENSOR>;
+						xlnx,video-width = <8>;
+
+						mipi_cam_0_csiss_in: endpoint {
+							remote-endpoint = <&mipi_cam_0_imx274_out>;
+							data-lanes = <1 2 3 4>;
+						};
+					};
+				};
+			};
+
+			mipi_cam_0_demosaic: demosaic@a0140000 {
+				compatible = "xlnx,v-demosaic-1.0", "xlnx,v-demosaic";
+				reg = <0x0 0xa0140000 0x0 0x10000>;
+				clock-names = "ap_clk";
+				clocks = <&misc_clk_6>;
+				interrupt-names = "interrupt";
+				interrupt-parent = <&gic>;
+				interrupts = <0 107 4>;
+				reset-gpios = <&gpio 104 GPIO_ACTIVE_LOW>;
+				xlnx,max-height = <2160>;
+				xlnx,max-width = <3840>;
+				xlnx,s-axi-ctrl-addr-width = <6>;
+				xlnx,s-axi-ctrl-data-width = <32>;
+
+				assigned-clocks        = <&si5341 1 0>, <&si5341 0 6>;
+				assigned-clock-parents = <0>,           <&si5341 1 0>;
+				assigned-clock-rates   = <400000000>,   <200000000>;
+
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+
+					port@0 {
+						reg = <0>;
+
+						xlnx,cfa-pattern = "rggb";
+						xlnx,video-width = <8>;
+
+						mipi_cam_0_demosaic_in: endpoint {
+							remote-endpoint = <&mipi_cam_0_csiss_out>;
+						};
+					};
+
+
+					port@1 {
+						reg = <1>;
+						xlnx,cfa-pattern = "rggb";
+						xlnx,video-width = <8>;
+
+						mipi_cam_0_demosaic_out: endpoint {
+							remote-endpoint = <&mipi_cam_0_ss_in>;
+						};
+					};
+				};
+			};
+
+			mipi_cam_0_ss: v_proc_ss_csc@a0100000 {
+				#dma-cells = <1>;
+				compatible = "xlnx,v-vpss-csc";
+				clock-names = "aclk";
+				clocks = <&misc_clk_6>;
+				reg = <0x0 0xa0100000 0x0 0x10000>;
+				reset-gpios = <&gpio 108 GPIO_ACTIVE_LOW>;
+				xlnx,colorspace-support = <0x0>;
+				xlnx,csc-enable-window = "false";
+				xlnx,max-height = <0x870>;
+				xlnx,max-width = <0xf00>;
+				xlnx,num-video-components = <0x3>;
+				xlnx,samples-per-clk = <0x2>;
+				xlnx,topology = <0x3>;
+				xlnx,use-uram = <0x0>;
+				xlnx,video-width = <0x8>;
+
+				ports {
+					#address-cells = <0x1>;
+					#size-cells = <0x0>;
+
+					port@0 {
+						reg = <0x0>;
+						xlnx,video-format = <XVIP_VF_RBG>;
+						xlnx,video-width = <0x8>;
+
+						mipi_cam_0_ss_in: endpoint {
+							remote-endpoint = <&mipi_cam_0_demosaic_out>;
+						};
+					};
+
+					port@1 {
+						reg = <0x1>;
+						xlnx,video-format = <XVIP_VF_RBG>;
+						xlnx,video-width = <0x8>;
+
+						mipi_cam_0_ss_out: endpoint {
+							remote-endpoint = <&mipi_cam_0_topic_mediactl_in>;
+						};
+					};
+				};
+			};
+
+			/* MIPI Camera 1 */
+			mipi_cam_1_axi_iic: i2c@a01b0000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clock-names = "s_axi_aclk";
+				clocks = <&zynqmp_clk PL0_REF>;
+				compatible = "xlnx,axi-iic-2.0", "xlnx,xps-iic-2.00.a";
+				interrupt-names = "iic2intc_irpt";
+				interrupt-parent = <&gic>;
+				interrupts = <0 95 4>;
+				reg = <0x0 0xa01b0000 0x0 0x10000>;
+
+				mipi_cam_1_imx274: sensor@1a{
+					compatible = "sony,imx274";
+					reg = <0x1a>;
+					#address-cells = <1>;
+					#size-cells = <0>;
+					reset-gpios = <&gpio 79 GPIO_ACTIVE_HIGH>;
+
+					port@0 {
+						reg = <0>;
+
+						mipi_cam_1_imx274_out: endpoint {
+							remote-endpoint = <&mipi_cam_1_csiss_in>;
+							clock-lanes = <0>;
+							data-lanes = <1 2 3 4>;
+						};
+					};
+				};
+			};
+
+			mipi_cam_1_csiss: csiss@a0180000 {
+				clock-names = "lite_aclk", "dphy_clk_200M", "video_aclk";
+				clocks = <&zynqmp_clk PL0_REF>, <&si5341 0 6>, <&misc_clk_6>;
+
+				compatible = "xlnx,mipi-csi2-rx-subsystem-4.1", "xlnx,mipi-csi2-rx-subsystem-4.0";
+				interrupt-names = "csirxss_csi_irq";
+				interrupt-parent = <&gic>;
+				interrupts = <0 94 4>;
+				reg = <0x0 0xa0180000 0x0 0x10000>;
+				xlnx,axis-tdata-width = <32>;
+				xlnx,cal-mode = "NONE";
+				xlnx,clk-io-swap = "false";
+				xlnx,clk-lane-io-position = <0x1a>;
+				xlnx,clk-lp-io-swap = "false";
+				xlnx,csi-en-activelanes = "true";
+				xlnx,csi-en-crc = "true";
+				xlnx,csi-filter-userdatatype = "true";
+				xlnx,csi-opt1-regs = "false";
+				xlnx,csi-pxl-format = "RAW10";
+				xlnx,csi2rx-dbg = <0x0>;
+				xlnx,data-lane0-io-position = <0x2>;
+				xlnx,data-lane1-io-position = <0x4>;
+				xlnx,data-lane2-io-position = <0x6>;
+				xlnx,data-lane3-io-position = <0x8>;
+				xlnx,dl0-io-swap = "false";
+				xlnx,dl0-lp-io-swap = "false";
+				xlnx,dl1-io-swap = "false";
+				xlnx,dl1-lp-io-swap = "false";
+				xlnx,dl2-io-swap = "false";
+				xlnx,dl2-lp-io-swap = "false";
+				xlnx,dl3-io-swap = "false";
+				xlnx,dl3-lp-io-swap = "false";
+				xlnx,dphy-lanes = <0x4>;
+				xlnx,dphy-mode = "SLAVE";
+				xlnx,en-active-lanes ;
+				xlnx,en-bg0-pin0 = "false";
+				xlnx,en-bg0-pin6 = "false";
+				xlnx,en-bg1-pin0 = "false";
+				xlnx,en-bg1-pin6 = "false";
+				xlnx,en-bg2-pin0 = "false";
+				xlnx,en-bg2-pin6 = "false";
+				xlnx,en-bg3-pin0 = "false";
+				xlnx,en-bg3-pin6 = "false";
+				xlnx,en-clk300m = "false";
+				xlnx,en-csi-v2-0 = "false";
+				xlnx,en-exdesigns = "false";
+				xlnx,en-timeout-regs = "false";
+				xlnx,en-vcx = "false";
+				xlnx,esc-timeout = <0x6400>;
+				xlnx,fifo-rd-en-control = "true";
+				xlnx,hs-line-rate = <0x5a0>;
+				xlnx,hs-settle-ns = <0x8d>;
+				xlnx,hs-timeout = <0x10005>;
+				xlnx,idly-group-name = "mipi_csi2rx_idly_group";
+				xlnx,idly-tap = <0x1>;
+				xlnx,init = <0x186a0>;
+				xlnx,is-7series = "false";
+				xlnx,max-lanes = <0x4>;
+				xlnx,mipi-slv-int = <0x0>;
+				xlnx,ppc = <0x2>;
+				xlnx,share-idlyctrl = "false";
+				xlnx,vc = <0x4>;
+				xlnx,vfb ;
+
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+
+					port@0 {
+						reg = <0>;
+						xlnx,cfa-pattern = "rggb";
+						xlnx,video-format = <XVIP_VF_MONO_SENSOR>;
+						xlnx,video-width = <8>;
+
+						mipi_cam_1_csiss_out: endpoint {
+							remote-endpoint = <&mipi_cam_1_demosaic_in>;
+						};
+					};
+					port@1 {
+						reg = <1>;
+						xlnx,cfa-pattern = "rggb";
+						xlnx,video-format = <XVIP_VF_MONO_SENSOR>;
+						xlnx,video-width = <8>;
+
+						mipi_cam_1_csiss_in: endpoint {
+							remote-endpoint = <&mipi_cam_1_imx274_out>;
+							data-lanes = <1 2 3 4>;
+						};
+					};
+				};
+			};
+
+			mipi_cam_1_demosaic: demosaic@a01c0000 {
+				compatible = "xlnx,v-demosaic-1.0", "xlnx,v-demosaic";
+				reg = <0x0 0xa01c0000 0x0 0x10000>;
+				clock-names = "ap_clk";
+				clocks = <&misc_clk_6>;
+				interrupt-names = "interrupt";
+				interrupt-parent = <&gic>;
+				interrupts = <0 108 4>;
+				reset-gpios = <&gpio 105 GPIO_ACTIVE_LOW>;
+				xlnx,max-height = <2160>;
+				xlnx,max-width = <3840>;
+				xlnx,s-axi-ctrl-addr-width = <6>;
+				xlnx,s-axi-ctrl-data-width = <32>;
+
+				assigned-clocks        = <&si5341 1 0>, <&si5341 0 6>;
+				assigned-clock-parents = <0>,           <&si5341 1 0>;
+				assigned-clock-rates   = <400000000>,   <200000000>;
+
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+
+					port@0 {
+						reg = <0>;
+
+						xlnx,cfa-pattern = "rggb";
+						xlnx,video-width = <8>;
+
+						mipi_cam_1_demosaic_in: endpoint {
+							remote-endpoint = <&mipi_cam_1_csiss_out>;
+						};
+					};
+
+
+					port@1 {
+						reg = <1>;
+						xlnx,cfa-pattern = "rggb";
+						xlnx,video-width = <8>;
+
+						mipi_cam_1_demosaic_out: endpoint {
+							remote-endpoint = <&mipi_cam_1_ss_in>;
+						};
+					};
+				};
+			};
+
+			mipi_cam_1_ss: v_proc_ss_csc@a0040000 {
+				clock-names = "aclk";
+				clocks = <&misc_clk_6>;
+				compatible = "xlnx,v-vpss-csc";
+				reg = <0x0 0xa0040000 0x0 0x10000>;
+				reset-gpios = <&gpio 109 GPIO_ACTIVE_LOW>;
+				xlnx,colorspace-support = <0x0>;
+				xlnx,csc-enable-window = "false";
+				xlnx,max-height = <0x870>;
+				xlnx,max-width = <0xf00>;
+				xlnx,num-video-components = <0x3>;
+				xlnx,samples-per-clk = <0x2>;
+				xlnx,topology = <0x3>;
+				xlnx,use-uram = <0x0>;
+				xlnx,video-width = <0x8>;
+
+				ports {
+					#address-cells = <0x1>;
+					#size-cells = <0x0>;
+
+					port@0 {
+						reg = <0x0>;
+						xlnx,video-format = <XVIP_VF_RBG>;
+						xlnx,video-width = <0x8>;
+
+						mipi_cam_1_ss_in: endpoint {
+							remote-endpoint = <&mipi_cam_1_demosaic_out>;
+						};
+					};
+
+					port@1 {
+						reg = <0x1>;
+						xlnx,video-format = <XVIP_VF_RBG>;
+						xlnx,video-width = <0x8>;
+
+						mipi_cam_1_ss_out: endpoint {
+							remote-endpoint = <&mipi_cam_1_topic_mediactl_in>;
+						};
+					};
+				};
+			};
+
+			mipi_cam_1_topic_mediactl: topic_mediactl@1 {
+				compatible = "topic,mediactl";
+				ports {
+
+					port@0 {
+						reg = <0x0>;
+						xlnx,video-format = <XVIP_VF_RBG>;
+						xlnx,video-width = <0x8>;
+
+						mipi_cam_0_topic_mediactl_in: endpoint {
+							remote-endpoint = <&mipi_cam_0_ss_out>;
+						};
+					};
+
+					port@1 {
+						reg = <0x0>;
+						xlnx,video-format = <XVIP_VF_RBG>;
+						xlnx,video-width = <0x8>;
+
+						mipi_cam_1_topic_mediactl_in: endpoint {
+							remote-endpoint = <&mipi_cam_1_ss_out>;
+						};
+					};
+				};
 			};
 
 			/* VCU */
