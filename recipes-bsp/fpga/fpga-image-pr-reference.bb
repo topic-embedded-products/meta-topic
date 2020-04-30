@@ -4,9 +4,10 @@ require recipes-bsp/fpga/fpga-image.inc
 LICENSE = "CLOSED"
 
 # Only for Florida gen with a ZU9 or 7030
-COMPATIBLE_MACHINE = "^tdkzu9|^tdkz30"
+COMPATIBLE_MACHINE = "^tdkzu|^tdkz30"
 
 PV = "7"
+PV_tdkzu15 = "02419a0"
 
 BOARD_DESIGN_PATH = "${BPN}-${MACHINE}"
 TOPICDOWNLOADS_URI ?= "http://topic-downloads.fra1.digitaloceanspaces.com"
@@ -26,5 +27,5 @@ RPROVIDES_${PN}-partials = "pr-demo-partials"
 FILES_${PN}-partials = "${FPGA_BITSTREAM_PATH}"
 
 SRC_URI[tdkzu9.md5sum] = "bf85875460f3b32536ebf39075fd8896"
+SRC_URI[tdkzu15.md5sum] = "58ae0ad0ae1473a552ff7ae1511f23e9"
 SRC_URI[tdkz30.md5sum] = "7dee9ff9c4e7176fd7df2158cb77b5c5"
-
