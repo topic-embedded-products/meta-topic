@@ -48,7 +48,7 @@ PACKAGES =+ "${PN}-dev"
 FILES_${PN}-dev = "${FPGA_BITSTREAM_PATH}/bitstreams*/${BPN}-${MACHINE}.dcp"
 
 SRC_URI[tdkzu6.md5sum] = "e06f16961b8e5cc21ea0dcc55d7251a5"
-SRC_URI[tdkzu9.md5sum] = "e17e5efc3745062d0cdc2bf3e6004820"
+SRC_URI[tdkzu9.md5sum] = "eb4215d64f40ba672b21ea7e09a2c8f7"
 SRC_URI[tdkzu15.md5sum] = "58ae0ad0ae1473a552ff7ae1511f23e9"
 SRC_URI[tdkz15.md5sum] = "d934339734d23af4c159615c33e7f4e4"
 SRC_URI[tdkz30.md5sum] = "cd6f694c1715ad39c0c14a773946ff73"
