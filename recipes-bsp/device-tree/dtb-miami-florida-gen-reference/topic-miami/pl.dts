@@ -7,7 +7,7 @@
 	fragment@0 {
 		target = <&fpga_full>;
 		__overlay__ {
-			firmware-name = "fpga.bin.fpga-image-miami-florida-gen-reference";
+			firmware-name = "fpga.bin.fpga-image-pr-reference";
 		};
 	};
 
@@ -28,6 +28,31 @@
 					gpios = <&gpio0 59 1>; /* EMIO 5, active low */
 					linux,code = <61>; /* KEY_F3 */
 					gpio-key,wakeup;
+				};
+			};
+
+			leds-emio {
+				compatible = "gpio-leds";
+				emio-led-d2 {
+					label = "d2:green";
+					gpios = <&gpio0 70 0>; /* EMIO 16 */
+				};
+				emio-led-d3 {
+					label = "d3:green";
+					gpios = <&gpio0 71 0>; /* EMIO 17 */
+				};
+				emio-led-d4 {
+					label = "d4:green";
+					gpios = <&gpio0 72 0>; /* EMIO 18 */
+					linux,default-trigger = "mmc0";
+				};
+				emio-led-d5 {
+					label = "d5:green";
+					gpios = <&gpio0 73 0>; /* EMIO 19 */
+				};
+				emio-led-d6 {
+					label = "d6:green";
+					gpios = <&gpio0 74 0>; /* EMIO 20 */
 				};
 			};
 
@@ -254,6 +279,15 @@
 				vertical-front-porch = <4>;
 				vertical-back-porch = <23>;
 				vertical-polarity = <0>;
+			};
+
+			dyplo: dyplo@64400000 {
+				compatible = "topic,dyplo-1.00.a";
+				reg = <0x64400000 0x200000>;
+				interrupt-parent = <&intc>;
+				interrupts = <0 57 0x4>;
+				nvmem-cells = <&dyplolicense>;
+				nvmem-cell-names = "license";
 			};
 		};
 	};
