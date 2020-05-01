@@ -6,14 +6,11 @@ LICENSE = "CLOSED"
 # Only for Florida gen with a ZU6, ZU9, ZU15 or 7030
 COMPATIBLE_MACHINE = "^tdkzu|^tdkz30"
 
-PV = "7"
-PV_tdkz30 = "36+fef1205"
-PV_tdkzu6 = "38+8838cd5"
-PV_tdkzu9 = "38+8838cd5"
+PV = "38+8838cd5"
 PV_tdkzu15 = "36+02419a0"
 
 BOARD_DESIGN_PATH = "${BPN}-${MACHINE}"
-TOPICDOWNLOADS_URI ?= "http://topic-downloads.fra1.digitaloceanspaces.com"
+TOPICDOWNLOADS_URI ?= "https://topic-downloads.fra1.digitaloceanspaces.com"
 BOARD_DESIGN_URI = "${TOPICDOWNLOADS_URI}/files/${BOARD_DESIGN_PATH}-${PV}.tar.xz;name=${MACHINE}"
 
 PKGV = "${PV}"
@@ -52,4 +49,4 @@ FILES_${PN}-dev = "${FPGA_BITSTREAM_PATH}/bitstreams*/${BPN}-${MACHINE}.dcp"
 SRC_URI[tdkzu6.md5sum] = "e06f16961b8e5cc21ea0dcc55d7251a5"
 SRC_URI[tdkzu9.md5sum] = "e17e5efc3745062d0cdc2bf3e6004820"
 SRC_URI[tdkzu15.md5sum] = "58ae0ad0ae1473a552ff7ae1511f23e9"
-SRC_URI[tdkz30.md5sum] = "cf51ea735ef905b871da03afcb664b7c"
+SRC_URI[tdkz30.md5sum] = "cd6f694c1715ad39c0c14a773946ff73"
