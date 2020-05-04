@@ -1,0 +1,29 @@
+From f3954b7fdab788d169171b1df8876ed41f02bb57 Mon Sep 17 00:00:00 2001
+From: Leon Leijssen <leon.leijssen@topic.nl>
+Date: Mon, 4 May 2020 10:17:40 +0200
+Subject: [PATCH] drm: xlnx: pl_disp: fix missing xlnx_crtc_unregister()
+
+During shutdown of the system WARN_ON(!list_empty(&helper->xlnx_crtcs)) in
+xlnx_crtc.c xlnx_crtc_helper_fini() was being triggered. Fix it by
+unregistering the registered crtc.
+
+Signed-off-by: Leon Leijssen <leon.leijssen@topic.nl>
+---
+ drivers/gpu/drm/xlnx/xlnx_pl_disp.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/gpu/drm/xlnx/xlnx_pl_disp.c b/drivers/gpu/drm/xlnx/xlnx_pl_disp.c
+index a4de9b31a717..4411067f7581 100644
+--- a/drivers/gpu/drm/xlnx/xlnx_pl_disp.c
++++ b/drivers/gpu/drm/xlnx/xlnx_pl_disp.c
+@@ -499,6 +499,7 @@ static void xlnx_pl_disp_unbind(struct device *dev, struct device *master,
+ {
+ 	struct xlnx_pl_disp *xlnx_pl_disp = dev_get_drvdata(dev);
+ 
++	xlnx_crtc_unregister(xlnx_pl_disp->drm, &xlnx_pl_disp->xlnx_crtc);
+ 	drm_plane_cleanup(&xlnx_pl_disp->plane);
+ 	drm_crtc_cleanup(&xlnx_pl_disp->xlnx_crtc.crtc);
+ }
+-- 
+2.17.1
+
