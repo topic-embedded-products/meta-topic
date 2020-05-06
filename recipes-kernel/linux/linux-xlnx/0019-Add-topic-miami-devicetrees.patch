@@ -1,7 +1,7 @@
-From 4488ae88f723df15d806b8b0b02aab28fb81ca5b Mon Sep 17 00:00:00 2001
+From c46e81b7f390d2b39bcd8c934eb9eb022f9cee09 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 14 Jun 2018 13:19:00 +0200
-Subject: [PATCH 19/30] Add topic-miami devicetrees
+Subject: [PATCH 19/31] Add topic-miami devicetrees
 
 Just a copy from the topic-miami branch contents, not actually added to Makefile
 Adapted to 4.19 kernel and removed a lot of old trees
@@ -9,26 +9,20 @@ Adapted to 4.19 kernel and removed a lot of old trees
  arch/arm/boot/dts/topic-miami-florida-mio.dts |   2 +
  .../arm/boot/dts/topic-miami-florida-mio.dtsi | 155 +++++++
  arch/arm/boot/dts/topic-miami-florida.dtsi    |  27 ++
- arch/arm/boot/dts/topic-miami.dts             |   2 +
- arch/arm/boot/dts/topic-miami.dtsi            | 335 +++++++++++++++
- arch/arm/boot/dts/topic-miamilite.dts         |   3 +
+ arch/arm/boot/dts/topic-miami.dtsi            | 335 ++++++++++++++
  arch/arm/boot/dts/topic-miamilite.dtsi        |  51 +++
- arch/arm/boot/dts/topic-miamiplus.dts         |   3 +
- arch/arm/boot/dts/topic-miamiplus.dtsi        |  97 +++++
+ arch/arm/boot/dts/topic-miamiplus.dtsi        |  97 ++++
  .../zynqmp-topic-miamimp-florida-gen.dts      | 279 ++++++++++++
  .../zynqmp-topic-miamimp-florida-test.dts     | 188 ++++++++
- .../boot/dts/xilinx/zynqmp-topic-miamimp.dts  | 376 ++++++++++++++++
- .../dts/xilinx/zynqmp-topic-miamiplusmp.dts   | 401 ++++++++++++++++++
+ .../boot/dts/xilinx/zynqmp-topic-miamimp.dts  | 369 +++++++++++++++
+ .../dts/xilinx/zynqmp-topic-miamiplusmp.dts   | 422 ++++++++++++++++++
  arch/arm64/configs/topic_miamimp_defconfig    | 399 +++++++++++++++++
- 14 files changed, 2318 insertions(+)
+ 11 files changed, 2324 insertions(+)
  create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dts
  create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dtsi
  create mode 100644 arch/arm/boot/dts/topic-miami-florida.dtsi
- create mode 100644 arch/arm/boot/dts/topic-miami.dts
  create mode 100644 arch/arm/boot/dts/topic-miami.dtsi
- create mode 100644 arch/arm/boot/dts/topic-miamilite.dts
  create mode 100644 arch/arm/boot/dts/topic-miamilite.dtsi
- create mode 100644 arch/arm/boot/dts/topic-miamiplus.dts
  create mode 100644 arch/arm/boot/dts/topic-miamiplus.dtsi
  create mode 100644 arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
  create mode 100644 arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-test.dts
@@ -238,14 +232,6 @@ index 000000000000..1b79b5fc2c9a
 +		phy-handle = <&phy3>;
 +	};
 +};
-diff --git a/arch/arm/boot/dts/topic-miami.dts b/arch/arm/boot/dts/topic-miami.dts
-new file mode 100644
-index 000000000000..e4cf68de9723
---- /dev/null
-+++ b/arch/arm/boot/dts/topic-miami.dts
-@@ -0,0 +1,2 @@
-+/dts-v1/;
-+/include/ "topic-miami.dtsi"
 diff --git a/arch/arm/boot/dts/topic-miami.dtsi b/arch/arm/boot/dts/topic-miami.dtsi
 new file mode 100644
 index 000000000000..4a50728a20fd
@@ -587,15 +573,6 @@ index 000000000000..4a50728a20fd
 +		};
 +	};
 +};
-diff --git a/arch/arm/boot/dts/topic-miamilite.dts b/arch/arm/boot/dts/topic-miamilite.dts
-new file mode 100644
-index 000000000000..6a827e6d3e33
---- /dev/null
-+++ b/arch/arm/boot/dts/topic-miamilite.dts
-@@ -0,0 +1,3 @@
-+/dts-v1/;
-+/include/ "topic-miami.dtsi"
-+/include/ "topic-miamilite.dtsi"
 diff --git a/arch/arm/boot/dts/topic-miamilite.dtsi b/arch/arm/boot/dts/topic-miamilite.dtsi
 new file mode 100644
 index 000000000000..8b352dda67bc
@@ -653,15 +630,6 @@ index 000000000000..8b352dda67bc
 +		io-standard = <1>;
 +	};
 +};
-diff --git a/arch/arm/boot/dts/topic-miamiplus.dts b/arch/arm/boot/dts/topic-miamiplus.dts
-new file mode 100644
-index 000000000000..d46ccf27d17c
---- /dev/null
-+++ b/arch/arm/boot/dts/topic-miamiplus.dts
-@@ -0,0 +1,3 @@
-+/dts-v1/;
-+/include/ "topic-miami.dtsi"
-+/include/ "topic-miamiplus.dtsi"
 diff --git a/arch/arm/boot/dts/topic-miamiplus.dtsi b/arch/arm/boot/dts/topic-miamiplus.dtsi
 new file mode 100644
 index 000000000000..c63b30266fa3
@@ -1246,10 +1214,10 @@ index 000000000000..d8bcf375ab71
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
 new file mode 100644
-index 000000000000..2758c363a1e2
+index 000000000000..7ee4726a1ee7
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
-@@ -0,0 +1,376 @@
+@@ -0,0 +1,369 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -1325,13 +1293,6 @@ index 000000000000..2758c363a1e2
 +		compatible = "usb-nop-xceiv";
 +		#phy-cells = <0>;
 +		reset-gpios = <&gpioex 0 0>;
-+	};
-+
-+	/* Make temperature readouts show up in hwmon applications */
-+	iio-hwmon-ams-temp {
-+		compatible = "iio-hwmon";
-+		io-channels = <&xilinx_ams 7>, <&xilinx_ams 8>, <&xilinx_ams 20>;
-+		io-channel-names = "ps_temp", "remote_temp", "pl_temp";
 +	};
 +};
 +
@@ -1628,10 +1589,10 @@ index 000000000000..2758c363a1e2
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
 new file mode 100644
-index 000000000000..58d55cb7d119
+index 000000000000..cd308f68d96d
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
-@@ -0,0 +1,401 @@
+@@ -0,0 +1,422 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -1709,23 +1670,18 @@ index 000000000000..58d55cb7d119
 +		};
 +	};
 +
-+	/* USB PHY reset IO pins */
-+	usb_phy0: usb2phy0 {
-+		compatible = "usb-nop-xceiv";
-+		#phy-cells = <0>;
-+		reset-gpios = <&gpioex 3 0>;
-+	};
-+	usb_phy1: usb2phy1 {
-+		compatible = "usb-nop-xceiv";
-+		#phy-cells = <0>;
-+		reset-gpios = <&gpioex 1 0>;
-+	};
-+
 +	/* XTAL for Si5345 */
 +	xtal50MHz: xtal_50_clock {
 +		compatible = "fixed-clock";
 +		#clock-cells = <0x0>;
 +		clock-frequency = <50000000>;
++	};
++
++	/* Make temperature readouts show up in hwmon applications */
++	iio-hwmon-ams-temp {
++		compatible = "iio-hwmon";
++		io-channels = <&xilinx_ams 7>, <&xilinx_ams 8>, <&xilinx_ams 20>;
++		io-channel-names = "ps_temp", "remote_temp", "pl_temp";
 +	};
 +};
 +
@@ -1741,18 +1697,36 @@ index 000000000000..58d55cb7d119
 +	status = "okay";
 +};
 +
++&i2c0 {
++	status = "okay";
++	clock-frequency = <400000>;
++};
++
 +&i2c1 {
 +	status = "okay";
 +	clock-frequency = <400000>;
 +
 +	/* GPIO expander */
-+	gpioex: pca9554@20 {
++	gpioex: pca9554@38 {
 +		compatible = "nxp,pca9554";
-+		reg = <0x20>;
-+		gpio-line-names = "USERLED", "USB1_RESET_N", "ETH_RESET_N", "USB0_RESET_N";
++		reg = <0x38>; /* PCA9554A adress starts at 0b111000 */
++		gpio-line-names = "USERLED", "", "ETH_RESET_N", "USB0_RESET_N", "USB1_RESET_N";
 +		gpio-controller;
 +		#gpio-cells = <2>;
++
++		usb0-reset {
++			gpio-hog;
++			gpios = <3 0>;
++			output-high;
++		};
++
++		usb1-reset {
++			gpio-hog;
++			gpios = <4 0>;
++			output-high;
++		};
 +	};
++
 +	/* EEPROM */
 +	eeprom: eeprom@51 {
 +		compatible = "atmel,24c32";
@@ -1764,10 +1738,11 @@ index 000000000000..58d55cb7d119
 +			reg = <0x0 6>;
 +		};
 +	};
++
 +	/* Programmable clock (for logic) */
 +	/* TODO: Properties as if this were a 5341 chip, there's no driver for the si5345 yet */
-+	si5345: si5345@74 {
-+		reg = <0x74>;
++	si5345: si5345@68 {
++		reg = <0x68>;
 +		compatible = "silabs,si5345";
 +		#clock-cells = <2>;
 +		#address-cells = <1>;
@@ -1797,13 +1772,13 @@ index 000000000000..58d55cb7d119
 +		assigned-clock-parents = <0>, <0>, <0>, <0>, <0>,
 +					<&si5345 1 0>, /* out 0 */
 +					<&si5345 1 0>,
-+					<&si5345 1 0>,
++					<&si5345 1 2>,
 +					<&si5345 1 0>,
 +					<&si5345 1 0>,
 +					<&si5345 1 2>, /* out 5 */
++					<&si5345 1 0>,
++					<&si5345 1 0>,
 +					<&si5345 1 1>,
-+					<&si5345 1 0>,
-+					<&si5345 1 0>,
 +					<&si5345 1 0>;
 +		assigned-clock-rates =	<400000000>, /* synth 0 */
 +					<104000000>,
@@ -1812,13 +1787,13 @@ index 000000000000..58d55cb7d119
 +					<0>,
 +					<100000000>, /* out 0 */
 +					<100000000>,
++					<125000000>,
 +					<100000000>,
 +					<100000000>,
++					< 25000000>, /* out 5 (ethernet) */
 +					<100000000>,
-+					<125000000>, /* out 5 */
-+					< 26000000>,
-+					< 25000000>,
 +					<100000000>,
++					< 26000000>, /* out 8 (USB) */
 +					<100000000>;
 +
 +		out@0 {
@@ -1990,7 +1965,7 @@ index 000000000000..58d55cb7d119
 +	phys = <&lane1 PHY_TYPE_USB3 0 3 26000000>; /* Lane 1, Refclk 3 */
 +	maximum-speed = "super-speed";
 +	/* refclk for USB3 from clock synth */
-+	assigned-clocks      = <&si5345 0 6>;
++	assigned-clocks      = <&si5345 0 8>;
 +	assigned-clock-rates = <26000000>;
 +};
 +
@@ -2003,15 +1978,18 @@ index 000000000000..58d55cb7d119
 +	dr_mode = "host";
 +	snps,usb3_lpm_capable;
 +	phy-names = "usb3-phy";
-+	phys = <&lane3 PHY_TYPE_USB3 0 3 26000000>; /* Lane 3, Refclk 3 */
++	phys = <&lane3 PHY_TYPE_USB3 1 3 26000000>; /* Lane 3, Refclk 3 */
 +	maximum-speed = "super-speed";
 +	/* refclk for USB3 from clock synth */
-+	assigned-clocks      = <&si5345 0 6>;
++	assigned-clocks      = <&si5345 0 8>;
 +	assigned-clock-rates = <26000000>;
 +};
 +
 +&pcie {
 +	phys = <&lane0 PHY_TYPE_PCIE 0 0 100000000>;
++	/* refclk0 from clock synth */
++	assigned-clocks      = <&si5345 0 0>;
++	assigned-clock-rates = <100000000>;
 +};
 +
 +&gem2 {
@@ -2020,16 +1998,20 @@ index 000000000000..58d55cb7d119
 +	phy-mode = "sgmii";
 +	nvmem-cells = <&gem2_mac>;
 +	nvmem-cell-names = "mac-address";
-+	phys = <&lane2 PHY_TYPE_SGMII 0 2 125000000>; /* Lane 2 refclk 2 */
++	phys = <&lane2 PHY_TYPE_SGMII 2 2 125000000>; /* Lane 2 refclk 2 */
++	/* Need 25MHz and 125MHz clocks (Xilinx drivers lack proper clk support) */
++	assigned-clocks      = <&si5345 0 5>, <&si5345 0 2>;
++	assigned-clock-rates =    <25000000>,   <125000000>;
 +
 +	mdio {
 +		#address-cells = <1>;
 +		#size-cells = <0>;
 +
-+		miamiphy: ethernet-phy@3 {
++		miamiphy: ethernet-phy@1 {
 +			/* PHY on the board */
 +			device_type = "ethernet-phy";
-+			reg = <0x3>;
++			reg = <0x1>;
++			reset-gpios = <&gpioex 2 1>; /* Active low, on port 2 of GPIO expander */
 +		};
 +	};
 +};

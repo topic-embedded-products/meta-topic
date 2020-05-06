@@ -53,6 +53,8 @@ SRC_URI_append = "\
 	file://0029-drm-bridge-adv7511-Enable-SPDIF-support.patch \
 	file://0030-devicetree-zynqmp.dtsi-Add-bootmode-selection-suppor.patch \
 	file://0031-media-axi-hdmi-rx-Honor-pclk-sample-from-devicetree.patch \
+	file://0001-clk-clk-si5341-Add-support-for-the-Si5345-series.patch \
+	file://0001-net-mdio_device-Reset-GPIO-is-allowed-to-sleep.patch \
 	"
 
 # Compile overlay-capable devicetrees
