@@ -1,7 +1,7 @@
-From c46e81b7f390d2b39bcd8c934eb9eb022f9cee09 Mon Sep 17 00:00:00 2001
+From 09f7e77378e32280e0e390480dccbfc01f92a7b0 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 14 Jun 2018 13:19:00 +0200
-Subject: [PATCH 19/31] Add topic-miami devicetrees
+Subject: [PATCH 19/32] Add topic-miami devicetrees
 
 Just a copy from the topic-miami branch contents, not actually added to Makefile
 Adapted to 4.19 kernel and removed a lot of old trees
@@ -9,20 +9,26 @@ Adapted to 4.19 kernel and removed a lot of old trees
  arch/arm/boot/dts/topic-miami-florida-mio.dts |   2 +
  .../arm/boot/dts/topic-miami-florida-mio.dtsi | 155 +++++++
  arch/arm/boot/dts/topic-miami-florida.dtsi    |  27 ++
+ arch/arm/boot/dts/topic-miami.dts             |   3 +
  arch/arm/boot/dts/topic-miami.dtsi            | 335 ++++++++++++++
+ arch/arm/boot/dts/topic-miamilite.dts         |   3 +
  arch/arm/boot/dts/topic-miamilite.dtsi        |  51 +++
+ arch/arm/boot/dts/topic-miamiplus.dts         |   4 +
  arch/arm/boot/dts/topic-miamiplus.dtsi        |  97 ++++
  .../zynqmp-topic-miamimp-florida-gen.dts      | 279 ++++++++++++
  .../zynqmp-topic-miamimp-florida-test.dts     | 188 ++++++++
- .../boot/dts/xilinx/zynqmp-topic-miamimp.dts  | 369 +++++++++++++++
+ .../boot/dts/xilinx/zynqmp-topic-miamimp.dts  | 376 ++++++++++++++++
  .../dts/xilinx/zynqmp-topic-miamiplusmp.dts   | 422 ++++++++++++++++++
  arch/arm64/configs/topic_miamimp_defconfig    | 399 +++++++++++++++++
- 11 files changed, 2324 insertions(+)
+ 14 files changed, 2341 insertions(+)
  create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dts
  create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dtsi
  create mode 100644 arch/arm/boot/dts/topic-miami-florida.dtsi
+ create mode 100644 arch/arm/boot/dts/topic-miami.dts
  create mode 100644 arch/arm/boot/dts/topic-miami.dtsi
+ create mode 100644 arch/arm/boot/dts/topic-miamilite.dts
  create mode 100644 arch/arm/boot/dts/topic-miamilite.dtsi
+ create mode 100644 arch/arm/boot/dts/topic-miamiplus.dts
  create mode 100644 arch/arm/boot/dts/topic-miamiplus.dtsi
  create mode 100644 arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
  create mode 100644 arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-test.dts
@@ -232,6 +238,15 @@ index 000000000000..1b79b5fc2c9a
 +		phy-handle = <&phy3>;
 +	};
 +};
+diff --git a/arch/arm/boot/dts/topic-miami.dts b/arch/arm/boot/dts/topic-miami.dts
+new file mode 100644
+index 000000000000..112bab6be313
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miami.dts
+@@ -0,0 +1,3 @@
++/dts-v1/;
++/include/ "topic-miami.dtsi"
++
 diff --git a/arch/arm/boot/dts/topic-miami.dtsi b/arch/arm/boot/dts/topic-miami.dtsi
 new file mode 100644
 index 000000000000..4a50728a20fd
@@ -573,6 +588,15 @@ index 000000000000..4a50728a20fd
 +		};
 +	};
 +};
+diff --git a/arch/arm/boot/dts/topic-miamilite.dts b/arch/arm/boot/dts/topic-miamilite.dts
+new file mode 100644
+index 000000000000..6a827e6d3e33
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miamilite.dts
+@@ -0,0 +1,3 @@
++/dts-v1/;
++/include/ "topic-miami.dtsi"
++/include/ "topic-miamilite.dtsi"
 diff --git a/arch/arm/boot/dts/topic-miamilite.dtsi b/arch/arm/boot/dts/topic-miamilite.dtsi
 new file mode 100644
 index 000000000000..8b352dda67bc
@@ -630,6 +654,16 @@ index 000000000000..8b352dda67bc
 +		io-standard = <1>;
 +	};
 +};
+diff --git a/arch/arm/boot/dts/topic-miamiplus.dts b/arch/arm/boot/dts/topic-miamiplus.dts
+new file mode 100644
+index 000000000000..cc6eb2990e64
+--- /dev/null
++++ b/arch/arm/boot/dts/topic-miamiplus.dts
+@@ -0,0 +1,4 @@
++/dts-v1/;
++/include/ "topic-miami.dtsi"
++/include/ "topic-miamiplus.dtsi"
++
 diff --git a/arch/arm/boot/dts/topic-miamiplus.dtsi b/arch/arm/boot/dts/topic-miamiplus.dtsi
 new file mode 100644
 index 000000000000..c63b30266fa3
@@ -1214,10 +1248,10 @@ index 000000000000..d8bcf375ab71
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
 new file mode 100644
-index 000000000000..7ee4726a1ee7
+index 000000000000..2758c363a1e2
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
-@@ -0,0 +1,369 @@
+@@ -0,0 +1,376 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -1293,6 +1327,13 @@ index 000000000000..7ee4726a1ee7
 +		compatible = "usb-nop-xceiv";
 +		#phy-cells = <0>;
 +		reset-gpios = <&gpioex 0 0>;
++	};
++
++	/* Make temperature readouts show up in hwmon applications */
++	iio-hwmon-ams-temp {
++		compatible = "iio-hwmon";
++		io-channels = <&xilinx_ams 7>, <&xilinx_ams 8>, <&xilinx_ams 20>;
++		io-channel-names = "ps_temp", "remote_temp", "pl_temp";
 +	};
 +};
 +
