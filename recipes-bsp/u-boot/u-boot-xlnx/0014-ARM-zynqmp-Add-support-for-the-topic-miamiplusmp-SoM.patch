@@ -1,17 +1,17 @@
-From 60b7c4498c87aaeb7201227de5408363493c484a Mon Sep 17 00:00:00 2001
+From 7d4e5fe51c8bfc3d73978ece04da18685d49d5e1 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 12 Feb 2020 11:45:06 +0100
-Subject: [PATCH 14/18] ARM: zynqmp: Add support for the topic-miamiplusmp SoM
+Subject: [PATCH 14/17] ARM: zynqmp: Add support for the topic-miamiplusmp SoM
 
 A larger version of the topic-miamimp SoM, with integrated USB PHYs and
 an ethernet PHY.
 ---
  arch/arm/dts/Makefile                         |     1 +
- arch/arm/dts/zynqmp-topic-miamiplusmp.dts     |   170 +
- .../zynqmp-topic-miamiplusmp/psu_init_gpl.c   |  1048 +
- .../zynqmp-topic-miamiplusmp/psu_init_gpl.h   | 38979 ++++++++++++++++
+ arch/arm/dts/zynqmp-topic-miamiplusmp.dts     |   160 +
+ .../zynqmp-topic-miamiplusmp/psu_init_gpl.c   |  1039 +
+ .../zynqmp-topic-miamiplusmp/psu_init_gpl.h   | 38864 ++++++++++++++++
  configs/topic_miamiplusmp_defconfig           |   114 +
- 5 files changed, 40312 insertions(+)
+ 5 files changed, 40178 insertions(+)
  create mode 100644 arch/arm/dts/zynqmp-topic-miamiplusmp.dts
  create mode 100644 board/topic/zynqmp/zynqmp-topic-miamiplusmp/psu_init_gpl.c
  create mode 100644 board/topic/zynqmp/zynqmp-topic-miamiplusmp/psu_init_gpl.h
@@ -31,10 +31,10 @@ index fa14d0fda8..b5502ec939 100644
  	zynqmp-zcu102-revB.dtb			\
 diff --git a/arch/arm/dts/zynqmp-topic-miamiplusmp.dts b/arch/arm/dts/zynqmp-topic-miamiplusmp.dts
 new file mode 100644
-index 0000000000..5651c7955d
+index 0000000000..83f3567df9
 --- /dev/null
 +++ b/arch/arm/dts/zynqmp-topic-miamiplusmp.dts
-@@ -0,0 +1,170 @@
+@@ -0,0 +1,160 @@
 +/*
 + * dts file for Topic Miami Plus MPSoC
 + *
@@ -77,7 +77,7 @@ index 0000000000..5651c7955d
 +
 +	memory@0 {
 +		device_type = "memory";
-+		reg = <0x0 0x0 0x0 0x80000000>;
++		reg = <0x0 0x0 0x0 0x80000000>, <0x8 0x00000000 0x0 0x80000000>;
 +	};
 +};
 +
@@ -94,12 +94,12 @@ index 0000000000..5651c7955d
 +};
 +
 +&i2c0 {
-+	status = "okay";
++	status = "disabled";
 +	clock-frequency = <400000>;
 +};
 +
 +&i2c1 {
-+	status = "okay";
++	status = "disabled";
 +	clock-frequency = <400000>;
 +	/* GPIO expander */
 +	gpioex: pca9554@20 {
@@ -176,10 +176,6 @@ index 0000000000..5651c7955d
 +	status = "okay";
 +};
 +
-+&uart1 {
-+	status = "okay";
-+};
-+
 +&usb0 {
 +	status = "okay";
 +};
@@ -187,10 +183,7 @@ index 0000000000..5651c7955d
 +&dwc3_0 {
 +	status = "okay";
 +	dr_mode = "host";
-+	snps,usb3_lpm_capable;
-+	phy-names = "usb3-phy";
-+	phys = <&lane1 PHY_TYPE_USB3 0 3 26000000>;
-+	maximum-speed = "super-speed";
++	maximum-speed = "high-speed"; /* No super-speed */
 +};
 +
 +&usb1 {
@@ -200,17 +193,14 @@ index 0000000000..5651c7955d
 +&dwc3_1 {
 +	status = "okay";
 +	dr_mode = "host";
-+	snps,usb3_lpm_capable;
-+	phy-names = "usb3-phy";
-+	phys = <&lane3 PHY_TYPE_USB3 0 3 26000000>;
-+	maximum-speed = "super-speed";
++	maximum-speed = "high-speed"; /* No super-speed */
 +};
 diff --git a/board/topic/zynqmp/zynqmp-topic-miamiplusmp/psu_init_gpl.c b/board/topic/zynqmp/zynqmp-topic-miamiplusmp/psu_init_gpl.c
 new file mode 100644
-index 0000000000..9caec9717c
+index 0000000000..35dc6d8489
 --- /dev/null
 +++ b/board/topic/zynqmp/zynqmp-topic-miamiplusmp/psu_init_gpl.c
-@@ -0,0 +1,1048 @@
+@@ -0,0 +1,1039 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * (c) Copyright 2015 Xilinx, Inc. All rights reserved.
@@ -283,6 +273,7 @@ index 0000000000..9caec9717c
 +	psu_mask_write(0xFF5E0120, 0x013F3F07U, 0x01010F00U);
 +	psu_mask_write(0xFF5E0124, 0x013F3F07U, 0x01010F00U);
 +	psu_mask_write(0xFF5E007C, 0x013F3F07U, 0x01010502U);
++	psu_mask_write(0xFF5E0080, 0x013F3F07U, 0x01010502U);
 +	psu_mask_write(0xFF5E0090, 0x01003F07U, 0x01000200U);
 +	psu_mask_write(0xFF5E009C, 0x01003F07U, 0x01000602U);
 +	psu_mask_write(0xFF5E00A4, 0x01003F07U, 0x01000502U);
@@ -635,18 +626,18 @@ index 0000000000..9caec9717c
 +	psu_mask_write(0xFF180074, 0x000000FEU, 0x00000040U);
 +	psu_mask_write(0xFF180078, 0x000000FEU, 0x000000C0U);
 +	psu_mask_write(0xFF18007C, 0x000000FEU, 0x000000C0U);
-+	psu_mask_write(0xFF180080, 0x000000FEU, 0x000000C0U);
-+	psu_mask_write(0xFF180084, 0x000000FEU, 0x000000C0U);
++	psu_mask_write(0xFF180080, 0x000000FEU, 0x00000000U);
++	psu_mask_write(0xFF180084, 0x000000FEU, 0x00000000U);
 +	psu_mask_write(0xFF180088, 0x000000FEU, 0x00000040U);
 +	psu_mask_write(0xFF18008C, 0x000000FEU, 0x00000040U);
 +	psu_mask_write(0xFF180090, 0x000000FEU, 0x00000000U);
 +	psu_mask_write(0xFF180094, 0x000000FEU, 0x00000000U);
-+	psu_mask_write(0xFF180098, 0x000000FEU, 0x00000080U);
-+	psu_mask_write(0xFF18009C, 0x000000FEU, 0x00000080U);
-+	psu_mask_write(0xFF1800A0, 0x000000FEU, 0x00000080U);
-+	psu_mask_write(0xFF1800A4, 0x000000FEU, 0x00000080U);
-+	psu_mask_write(0xFF1800A8, 0x000000FEU, 0x00000080U);
-+	psu_mask_write(0xFF1800AC, 0x000000FEU, 0x00000080U);
++	psu_mask_write(0xFF180098, 0x000000FEU, 0x00000000U);
++	psu_mask_write(0xFF18009C, 0x000000FEU, 0x00000000U);
++	psu_mask_write(0xFF1800A0, 0x000000FEU, 0x00000000U);
++	psu_mask_write(0xFF1800A4, 0x000000FEU, 0x00000000U);
++	psu_mask_write(0xFF1800A8, 0x000000FEU, 0x00000000U);
++	psu_mask_write(0xFF1800AC, 0x000000FEU, 0x00000000U);
 +	psu_mask_write(0xFF1800B0, 0x000000FEU, 0x00000000U);
 +	psu_mask_write(0xFF1800B4, 0x000000FEU, 0x00000010U);
 +	psu_mask_write(0xFF1800B8, 0x000000FEU, 0x00000010U);
@@ -682,7 +673,7 @@ index 0000000000..9caec9717c
 +	psu_mask_write(0xFF180130, 0x000000FEU, 0x000000A0U);
 +	psu_mask_write(0xFF180134, 0x000000FEU, 0x000000A0U);
 +	psu_mask_write(0xFF180204, 0xFFFFFFFFU, 0x40000000U);
-+	psu_mask_write(0xFF180208, 0xFFFFFFFFU, 0x00B02002U);
++	psu_mask_write(0xFF180208, 0xFFFFFFFFU, 0x00B02000U);
 +	psu_mask_write(0xFF18020C, 0x00003FFFU, 0x0000000BU);
 +	psu_mask_write(0xFF180138, 0x03FFFFFFU, 0x03FFFFFFU);
 +	psu_mask_write(0xFF18013C, 0x03FFFFFFU, 0x03FFFFFFU);
@@ -735,7 +726,7 @@ index 0000000000..9caec9717c
 +	psu_mask_write(0xFF180324, 0x03C00000U, 0x00000000U);
 +	psu_mask_write(0xFF5E0238, 0x00000600U, 0x00000000U);
 +	psu_mask_write(0xFF5E0238, 0x00008000U, 0x00000000U);
-+	psu_mask_write(0xFF5E0238, 0x00000008U, 0x00000000U);
++	psu_mask_write(0xFF5E0238, 0x00000018U, 0x00000000U);
 +	psu_mask_write(0xFF5E0238, 0x00007800U, 0x00000000U);
 +	psu_mask_write(0xFF5E0238, 0x00000006U, 0x00000000U);
 +	psu_mask_write(0xFF000034, 0x000000FFU, 0x00000005U);
@@ -769,29 +760,20 @@ index 0000000000..9caec9717c
 +static unsigned long psu_serdes_init_data(void)
 +{
 +	psu_mask_write(0xFD410000, 0x0000001FU, 0x0000000DU);
-+	psu_mask_write(0xFD410004, 0x0000001FU, 0x00000008U);
++	psu_mask_write(0xFD410004, 0x0000001FU, 0x0000000DU);
 +	psu_mask_write(0xFD410008, 0x0000001FU, 0x0000000FU);
 +	psu_mask_write(0xFD41000C, 0x0000001FU, 0x00000008U);
 +	psu_mask_write(0xFD402860, 0x00000080U, 0x00000080U);
-+	psu_mask_write(0xFD402864, 0x00000088U, 0x00000008U);
++	psu_mask_write(0xFD402864, 0x00000081U, 0x00000001U);
 +	psu_mask_write(0xFD402868, 0x00000082U, 0x00000002U);
 +	psu_mask_write(0xFD40286C, 0x00000080U, 0x00000080U);
-+	psu_mask_write(0xFD406094, 0x00000010U, 0x00000010U);
 +	psu_mask_write(0xFD40E094, 0x00000010U, 0x00000010U);
 +	psu_mask_write(0xFD40E368, 0x000000FFU, 0x00000038U);
 +	psu_mask_write(0xFD40E36C, 0x00000007U, 0x00000003U);
-+	psu_mask_write(0xFD406368, 0x000000FFU, 0x00000038U);
-+	psu_mask_write(0xFD40636C, 0x00000007U, 0x00000003U);
-+	psu_mask_write(0xFD406370, 0x000000FFU, 0x000000F4U);
-+	psu_mask_write(0xFD406374, 0x000000FFU, 0x00000031U);
-+	psu_mask_write(0xFD406378, 0x000000FFU, 0x00000002U);
-+	psu_mask_write(0xFD40637C, 0x00000033U, 0x00000030U);
 +	psu_mask_write(0xFD40E370, 0x000000FFU, 0x000000F4U);
 +	psu_mask_write(0xFD40E374, 0x000000FFU, 0x00000031U);
 +	psu_mask_write(0xFD40E378, 0x000000FFU, 0x00000002U);
 +	psu_mask_write(0xFD40E37C, 0x00000033U, 0x00000030U);
-+	psu_mask_write(0xFD40506C, 0x00000003U, 0x00000003U);
-+	psu_mask_write(0xFD4040F4, 0x00000003U, 0x00000003U);
 +	psu_mask_write(0xFD40906C, 0x0000000FU, 0x0000000FU);
 +	psu_mask_write(0xFD4080F4, 0x0000000BU, 0x0000000BU);
 +	psu_mask_write(0xFD40D06C, 0x00000003U, 0x00000003U);
@@ -818,12 +800,12 @@ index 0000000000..9caec9717c
 +	psu_mask_write(0xFD401944, 0x00000001U, 0x00000001U);
 +	psu_mask_write(0xFD401994, 0x00000007U, 0x00000007U);
 +	psu_mask_write(0xFD40589C, 0x00000080U, 0x00000080U);
-+	psu_mask_write(0xFD4058F8, 0x000000FFU, 0x0000001AU);
-+	psu_mask_write(0xFD4058FC, 0x000000FFU, 0x0000001AU);
-+	psu_mask_write(0xFD405990, 0x000000FFU, 0x00000010U);
-+	psu_mask_write(0xFD405924, 0x000000FFU, 0x000000FEU);
-+	psu_mask_write(0xFD405928, 0x000000FFU, 0x00000000U);
-+	psu_mask_write(0xFD405900, 0x000000FFU, 0x0000001AU);
++	psu_mask_write(0xFD4058F8, 0x000000FFU, 0x00000064U);
++	psu_mask_write(0xFD4058FC, 0x000000FFU, 0x00000064U);
++	psu_mask_write(0xFD405990, 0x000000FFU, 0x00000011U);
++	psu_mask_write(0xFD405924, 0x000000FFU, 0x00000004U);
++	psu_mask_write(0xFD405928, 0x000000FFU, 0x000000FEU);
++	psu_mask_write(0xFD405900, 0x000000FFU, 0x00000064U);
 +	psu_mask_write(0xFD40592C, 0x000000FFU, 0x00000000U);
 +	psu_mask_write(0xFD405980, 0x000000FFU, 0x000000FFU);
 +	psu_mask_write(0xFD405914, 0x000000FFU, 0x000000F7U);
@@ -884,7 +866,7 @@ index 0000000000..9caec9717c
 +	psu_mask_write(0xFD409978, 0x00000010U, 0x00000010U);
 +	psu_mask_write(0xFD40D978, 0x00000010U, 0x00000010U);
 +	psu_mask_write(0xFD3D001C, 0xFFFFFFFFU, 0x00000001U);
-+	psu_mask_write(0xFD410010, 0x00000077U, 0x00000031U);
++	psu_mask_write(0xFD410010, 0x00000077U, 0x00000011U);
 +	psu_mask_write(0xFD410014, 0x00000077U, 0x00000035U);
 +	psu_mask_write(0xFD410040, 0x00000030U, 0x00000000U);
 +	psu_mask_write(0xFD410044, 0x00000030U, 0x00000000U);
@@ -896,7 +878,7 @@ index 0000000000..9caec9717c
 +{
 +	psu_mask_write(0xFF5E023C, 0x00000400U, 0x00000000U);
 +	psu_mask_write(0xFF9D0080, 0x00000001U, 0x00000001U);
-+	psu_mask_write(0xFF9D007C, 0x00000001U, 0x00000000U);
++	psu_mask_write(0xFF9D007C, 0x00000001U, 0x00000001U);
 +	psu_mask_write(0xFF5E023C, 0x00000140U, 0x00000000U);
 +	psu_mask_write(0xFF5E023C, 0x00000800U, 0x00000000U);
 +	psu_mask_write(0xFF9E0080, 0x00000001U, 0x00000001U);
@@ -906,7 +888,7 @@ index 0000000000..9caec9717c
 +	psu_mask_write(0xFD1A0100, 0x000C0000U, 0x00000000U);
 +	psu_mask_write(0xFE20C200, 0x00023FFFU, 0x00022457U);
 +	psu_mask_write(0xFE20C630, 0x003FFF00U, 0x00000000U);
-+	psu_mask_write(0xFE20C11C, 0x00000600U, 0x00000600U);
++	psu_mask_write(0xFE20C11C, 0x00000400U, 0x00000400U);
 +	psu_mask_write(0xFE20C12C, 0x00004000U, 0x00004000U);
 +	psu_mask_write(0xFE30C200, 0x00023FFFU, 0x00022457U);
 +	psu_mask_write(0xFE30C630, 0x003FFF00U, 0x00000000U);
@@ -935,16 +917,16 @@ index 0000000000..9caec9717c
 +	psu_mask_write(0xFD480088, 0x000000FFU, 0x00000001U);
 +	psu_mask_write(0xFD4800D4, 0x000000FFU, 0x00000060U);
 +	psu_mask_write(0xFD4800A4, 0x000003FFU, 0x00000000U);
-+	psu_mask_write(0xFD480184, 0x00000FFFU, 0x00000041U);
++	psu_mask_write(0xFD480184, 0x00000FFFU, 0x00000082U);
 +	psu_mask_write(0xFD480190, 0x00000040U, 0x00000000U);
 +	psu_mask_write(0xFD480194, 0x0000FFE2U, 0x0000FFE2U);
 +	psu_mask_write(0xFD480094, 0x00007E00U, 0x00004A00U);
 +	psu_mask_write(0xFD480174, 0x0000FFFFU, 0x00009000U);
-+	psu_mask_write(0xFD480200, 0xFFFFFFFFU, 0x10EED011U);
++	psu_mask_write(0xFD480200, 0xFFFFFFFFU, 0x10EED021U);
 +	psu_mask_write(0xFD480204, 0xFFFFFFFFU, 0x10EE0007U);
 +	psu_mask_write(0xFD480208, 0x000000FFU, 0x00000000U);
 +	psu_mask_write(0xFD480060, 0x0000FFFFU, 0x00000400U);
-+	psu_mask_write(0xFD480064, 0x000001FFU, 0x00000105U);
++	psu_mask_write(0xFD480064, 0x000001FFU, 0x00000106U);
 +	psu_mask_write(0xFD480010, 0x00001000U, 0x00000000U);
 +	psu_mask_write(0xFD480164, 0x00001FFEU, 0x00000000U);
 +	psu_mask_write(0xFD48013C, 0x00000020U, 0x00000000U);
@@ -959,7 +941,6 @@ index 0000000000..9caec9717c
 +	psu_mask_write(0xFD1A0100, 0x00020000U, 0x00000000U);
 +	psu_mask_write(0xFF0A0008, 0xFFFFFFFFU, 0xFBFF0400U);
 +	mask_poll(0xFD4023E4, 0x00000010U);
-+	mask_poll(0xFD4063E4, 0x00000010U);
 +	mask_poll(0xFD40A3E4, 0x00000010U);
 +	mask_poll(0xFD40E3E4, 0x00000010U);
 +
@@ -1261,10 +1242,10 @@ index 0000000000..9caec9717c
 +}
 diff --git a/board/topic/zynqmp/zynqmp-topic-miamiplusmp/psu_init_gpl.h b/board/topic/zynqmp/zynqmp-topic-miamiplusmp/psu_init_gpl.h
 new file mode 100644
-index 0000000000..6baefd3f67
+index 0000000000..86e92c4b0a
 --- /dev/null
 +++ b/board/topic/zynqmp/zynqmp-topic-miamiplusmp/psu_init_gpl.h
-@@ -0,0 +1,38979 @@
+@@ -0,0 +1,38864 @@
 +/******************************************************************************
 +*
 +* Copyright (C) 2010-2019 <Xilinx Inc.>
@@ -2198,6 +2179,8 @@ index 0000000000..6baefd3f67
 +#define CRL_APB_I2C1_REF_CTRL_OFFSET                                               0XFF5E0124
 +#undef CRL_APB_SPI0_REF_CTRL_OFFSET 
 +#define CRL_APB_SPI0_REF_CTRL_OFFSET                                               0XFF5E007C
++#undef CRL_APB_SPI1_REF_CTRL_OFFSET 
++#define CRL_APB_SPI1_REF_CTRL_OFFSET                                               0XFF5E0080
 +#undef CRL_APB_CPU_R5_CTRL_OFFSET 
 +#define CRL_APB_CPU_R5_CTRL_OFFSET                                                 0XFF5E0090
 +#undef CRL_APB_IOU_SWITCH_CTRL_OFFSET 
@@ -2845,6 +2828,48 @@ index 0000000000..6baefd3f67
 +#define CRL_APB_SPI0_REF_CTRL_SRCSEL_DEFVAL                    0x01001800
 +#define CRL_APB_SPI0_REF_CTRL_SRCSEL_SHIFT                     0
 +#define CRL_APB_SPI0_REF_CTRL_SRCSEL_MASK                      0x00000007U
++
++/*
++* Clock active signal. Switch to 0 to disable the clock
++*/
++#undef CRL_APB_SPI1_REF_CTRL_CLKACT_DEFVAL 
++#undef CRL_APB_SPI1_REF_CTRL_CLKACT_SHIFT 
++#undef CRL_APB_SPI1_REF_CTRL_CLKACT_MASK 
++#define CRL_APB_SPI1_REF_CTRL_CLKACT_DEFVAL                    0x01001800
++#define CRL_APB_SPI1_REF_CTRL_CLKACT_SHIFT                     24
++#define CRL_APB_SPI1_REF_CTRL_CLKACT_MASK                      0x01000000U
++
++/*
++* 6 bit divider
++*/
++#undef CRL_APB_SPI1_REF_CTRL_DIVISOR1_DEFVAL 
++#undef CRL_APB_SPI1_REF_CTRL_DIVISOR1_SHIFT 
++#undef CRL_APB_SPI1_REF_CTRL_DIVISOR1_MASK 
++#define CRL_APB_SPI1_REF_CTRL_DIVISOR1_DEFVAL                  0x01001800
++#define CRL_APB_SPI1_REF_CTRL_DIVISOR1_SHIFT                   16
++#define CRL_APB_SPI1_REF_CTRL_DIVISOR1_MASK                    0x003F0000U
++
++/*
++* 6 bit divider
++*/
++#undef CRL_APB_SPI1_REF_CTRL_DIVISOR0_DEFVAL 
++#undef CRL_APB_SPI1_REF_CTRL_DIVISOR0_SHIFT 
++#undef CRL_APB_SPI1_REF_CTRL_DIVISOR0_MASK 
++#define CRL_APB_SPI1_REF_CTRL_DIVISOR0_DEFVAL                  0x01001800
++#define CRL_APB_SPI1_REF_CTRL_DIVISOR0_SHIFT                   8
++#define CRL_APB_SPI1_REF_CTRL_DIVISOR0_MASK                    0x00003F00U
++
++/*
++* 000 = IOPLL; 010 = RPLL; 011 = DPLL; (This signal may only be toggled af
++    * ter 4 cycles of the old clock and 4 cycles of the new clock. This is not
++    *  usually an issue, but designers must be aware.)
++*/
++#undef CRL_APB_SPI1_REF_CTRL_SRCSEL_DEFVAL 
++#undef CRL_APB_SPI1_REF_CTRL_SRCSEL_SHIFT 
++#undef CRL_APB_SPI1_REF_CTRL_SRCSEL_MASK 
++#define CRL_APB_SPI1_REF_CTRL_SRCSEL_DEFVAL                    0x01001800
++#define CRL_APB_SPI1_REF_CTRL_SRCSEL_SHIFT                     0
++#define CRL_APB_SPI1_REF_CTRL_SRCSEL_MASK                      0x00000007U
 +
 +/*
 +* Turing this off will shut down the OCM, some parts of the APM, and preve
@@ -35175,6 +35200,16 @@ index 0000000000..6baefd3f67
 +/*
 +* Block level reset
 +*/
++#undef CRL_APB_RST_LPD_IOU2_SPI1_RESET_DEFVAL 
++#undef CRL_APB_RST_LPD_IOU2_SPI1_RESET_SHIFT 
++#undef CRL_APB_RST_LPD_IOU2_SPI1_RESET_MASK 
++#define CRL_APB_RST_LPD_IOU2_SPI1_RESET_DEFVAL                 0x0017FFFF
++#define CRL_APB_RST_LPD_IOU2_SPI1_RESET_SHIFT                  4
++#define CRL_APB_RST_LPD_IOU2_SPI1_RESET_MASK                   0x00000010U
++
++/*
++* Block level reset
++*/
 +#undef CRL_APB_RST_LPD_IOU2_TTC0_RESET_DEFVAL 
 +#undef CRL_APB_RST_LPD_IOU2_TTC0_RESET_SHIFT 
 +#undef CRL_APB_RST_LPD_IOU2_TTC0_RESET_MASK 
@@ -36422,26 +36457,12 @@ index 0000000000..6baefd3f67
 +#define SERDES_L0_L2_REF_CLK_SEL_OFFSET                                            0XFD402868
 +#undef SERDES_L0_L3_REF_CLK_SEL_OFFSET 
 +#define SERDES_L0_L3_REF_CLK_SEL_OFFSET                                            0XFD40286C
-+#undef SERDES_L1_TM_PLL_DIG_37_OFFSET 
-+#define SERDES_L1_TM_PLL_DIG_37_OFFSET                                             0XFD406094
 +#undef SERDES_L3_TM_PLL_DIG_37_OFFSET 
 +#define SERDES_L3_TM_PLL_DIG_37_OFFSET                                             0XFD40E094
 +#undef SERDES_L3_PLL_SS_STEPS_0_LSB_OFFSET 
 +#define SERDES_L3_PLL_SS_STEPS_0_LSB_OFFSET                                        0XFD40E368
 +#undef SERDES_L3_PLL_SS_STEPS_1_MSB_OFFSET 
 +#define SERDES_L3_PLL_SS_STEPS_1_MSB_OFFSET                                        0XFD40E36C
-+#undef SERDES_L1_PLL_SS_STEPS_0_LSB_OFFSET 
-+#define SERDES_L1_PLL_SS_STEPS_0_LSB_OFFSET                                        0XFD406368
-+#undef SERDES_L1_PLL_SS_STEPS_1_MSB_OFFSET 
-+#define SERDES_L1_PLL_SS_STEPS_1_MSB_OFFSET                                        0XFD40636C
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_0_LSB_OFFSET 
-+#define SERDES_L1_PLL_SS_STEP_SIZE_0_LSB_OFFSET                                    0XFD406370
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_1_OFFSET 
-+#define SERDES_L1_PLL_SS_STEP_SIZE_1_OFFSET                                        0XFD406374
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_2_OFFSET 
-+#define SERDES_L1_PLL_SS_STEP_SIZE_2_OFFSET                                        0XFD406378
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_OFFSET 
-+#define SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_OFFSET                                    0XFD40637C
 +#undef SERDES_L3_PLL_SS_STEP_SIZE_0_LSB_OFFSET 
 +#define SERDES_L3_PLL_SS_STEP_SIZE_0_LSB_OFFSET                                    0XFD40E370
 +#undef SERDES_L3_PLL_SS_STEP_SIZE_1_OFFSET 
@@ -36450,10 +36471,6 @@ index 0000000000..6baefd3f67
 +#define SERDES_L3_PLL_SS_STEP_SIZE_2_OFFSET                                        0XFD40E378
 +#undef SERDES_L3_PLL_SS_STEP_SIZE_3_MSB_OFFSET 
 +#define SERDES_L3_PLL_SS_STEP_SIZE_3_MSB_OFFSET                                    0XFD40E37C
-+#undef SERDES_L1_TM_DIG_6_OFFSET 
-+#define SERDES_L1_TM_DIG_6_OFFSET                                                  0XFD40506C
-+#undef SERDES_L1_TX_DIG_TM_61_OFFSET 
-+#define SERDES_L1_TX_DIG_TM_61_OFFSET                                              0XFD4040F4
 +#undef SERDES_L2_TM_DIG_6_OFFSET 
 +#define SERDES_L2_TM_DIG_6_OFFSET                                                  0XFD40906C
 +#undef SERDES_L2_TX_DIG_TM_61_OFFSET 
@@ -36726,15 +36743,15 @@ index 0000000000..6baefd3f67
 +#define SERDES_L0_L1_REF_CLK_SEL_L1_REF_CLK_LCL_SEL_MASK       0x00000080U
 +
 +/*
-+* Bit 3 of lane 1 ref clock mux one hot sel. Set to 1 to select lane 3 sli
++* Bit 0 of lane 1 ref clock mux one hot sel. Set to 1 to select lane 0 sli
 +    * cer output from ref clock network
 +*/
-+#undef SERDES_L0_L1_REF_CLK_SEL_L1_REF_CLK_SEL_3_DEFVAL 
-+#undef SERDES_L0_L1_REF_CLK_SEL_L1_REF_CLK_SEL_3_SHIFT 
-+#undef SERDES_L0_L1_REF_CLK_SEL_L1_REF_CLK_SEL_3_MASK 
-+#define SERDES_L0_L1_REF_CLK_SEL_L1_REF_CLK_SEL_3_DEFVAL       0x00000080
-+#define SERDES_L0_L1_REF_CLK_SEL_L1_REF_CLK_SEL_3_SHIFT        3
-+#define SERDES_L0_L1_REF_CLK_SEL_L1_REF_CLK_SEL_3_MASK         0x00000008U
++#undef SERDES_L0_L1_REF_CLK_SEL_L1_REF_CLK_SEL_0_DEFVAL 
++#undef SERDES_L0_L1_REF_CLK_SEL_L1_REF_CLK_SEL_0_SHIFT 
++#undef SERDES_L0_L1_REF_CLK_SEL_L1_REF_CLK_SEL_0_MASK 
++#define SERDES_L0_L1_REF_CLK_SEL_L1_REF_CLK_SEL_0_DEFVAL       0x00000080
++#define SERDES_L0_L1_REF_CLK_SEL_L1_REF_CLK_SEL_0_SHIFT        0
++#define SERDES_L0_L1_REF_CLK_SEL_L1_REF_CLK_SEL_0_MASK         0x00000001U
 +
 +/*
 +* Sel of lane 2 ref clock local mux. Set to 1 to select lane 1 slicer outp
@@ -36772,16 +36789,6 @@ index 0000000000..6baefd3f67
 +/*
 +* Enable/Disable coarse code satureation limiting logic
 +*/
-+#undef SERDES_L1_TM_PLL_DIG_37_TM_ENABLE_COARSE_SATURATION_DEFVAL 
-+#undef SERDES_L1_TM_PLL_DIG_37_TM_ENABLE_COARSE_SATURATION_SHIFT 
-+#undef SERDES_L1_TM_PLL_DIG_37_TM_ENABLE_COARSE_SATURATION_MASK 
-+#define SERDES_L1_TM_PLL_DIG_37_TM_ENABLE_COARSE_SATURATION_DEFVAL  0x00000000
-+#define SERDES_L1_TM_PLL_DIG_37_TM_ENABLE_COARSE_SATURATION_SHIFT  4
-+#define SERDES_L1_TM_PLL_DIG_37_TM_ENABLE_COARSE_SATURATION_MASK  0x00000010U
-+
-+/*
-+* Enable/Disable coarse code satureation limiting logic
-+*/
 +#undef SERDES_L3_TM_PLL_DIG_37_TM_ENABLE_COARSE_SATURATION_DEFVAL 
 +#undef SERDES_L3_TM_PLL_DIG_37_TM_ENABLE_COARSE_SATURATION_SHIFT 
 +#undef SERDES_L3_TM_PLL_DIG_37_TM_ENABLE_COARSE_SATURATION_MASK 
@@ -36808,86 +36815,6 @@ index 0000000000..6baefd3f67
 +#define SERDES_L3_PLL_SS_STEPS_1_MSB_SS_NUM_OF_STEPS_1_MSB_DEFVAL  0x00000000
 +#define SERDES_L3_PLL_SS_STEPS_1_MSB_SS_NUM_OF_STEPS_1_MSB_SHIFT  0
 +#define SERDES_L3_PLL_SS_STEPS_1_MSB_SS_NUM_OF_STEPS_1_MSB_MASK  0x00000007U
-+
-+/*
-+* Spread Spectrum No of Steps [7:0]
-+*/
-+#undef SERDES_L1_PLL_SS_STEPS_0_LSB_SS_NUM_OF_STEPS_0_LSB_DEFVAL 
-+#undef SERDES_L1_PLL_SS_STEPS_0_LSB_SS_NUM_OF_STEPS_0_LSB_SHIFT 
-+#undef SERDES_L1_PLL_SS_STEPS_0_LSB_SS_NUM_OF_STEPS_0_LSB_MASK 
-+#define SERDES_L1_PLL_SS_STEPS_0_LSB_SS_NUM_OF_STEPS_0_LSB_DEFVAL  0x00000000
-+#define SERDES_L1_PLL_SS_STEPS_0_LSB_SS_NUM_OF_STEPS_0_LSB_SHIFT  0
-+#define SERDES_L1_PLL_SS_STEPS_0_LSB_SS_NUM_OF_STEPS_0_LSB_MASK  0x000000FFU
-+
-+/*
-+* Spread Spectrum No of Steps [10:8]
-+*/
-+#undef SERDES_L1_PLL_SS_STEPS_1_MSB_SS_NUM_OF_STEPS_1_MSB_DEFVAL 
-+#undef SERDES_L1_PLL_SS_STEPS_1_MSB_SS_NUM_OF_STEPS_1_MSB_SHIFT 
-+#undef SERDES_L1_PLL_SS_STEPS_1_MSB_SS_NUM_OF_STEPS_1_MSB_MASK 
-+#define SERDES_L1_PLL_SS_STEPS_1_MSB_SS_NUM_OF_STEPS_1_MSB_DEFVAL  0x00000000
-+#define SERDES_L1_PLL_SS_STEPS_1_MSB_SS_NUM_OF_STEPS_1_MSB_SHIFT  0
-+#define SERDES_L1_PLL_SS_STEPS_1_MSB_SS_NUM_OF_STEPS_1_MSB_MASK  0x00000007U
-+
-+/*
-+* Step Size for Spread Spectrum [7:0]
-+*/
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_0_LSB_SS_STEP_SIZE_0_LSB_DEFVAL 
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_0_LSB_SS_STEP_SIZE_0_LSB_SHIFT 
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_0_LSB_SS_STEP_SIZE_0_LSB_MASK 
-+#define SERDES_L1_PLL_SS_STEP_SIZE_0_LSB_SS_STEP_SIZE_0_LSB_DEFVAL  0x00000000
-+#define SERDES_L1_PLL_SS_STEP_SIZE_0_LSB_SS_STEP_SIZE_0_LSB_SHIFT  0
-+#define SERDES_L1_PLL_SS_STEP_SIZE_0_LSB_SS_STEP_SIZE_0_LSB_MASK  0x000000FFU
-+
-+/*
-+* Step Size for Spread Spectrum [15:8]
-+*/
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_1_SS_STEP_SIZE_1_DEFVAL 
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_1_SS_STEP_SIZE_1_SHIFT 
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_1_SS_STEP_SIZE_1_MASK 
-+#define SERDES_L1_PLL_SS_STEP_SIZE_1_SS_STEP_SIZE_1_DEFVAL     0x00000000
-+#define SERDES_L1_PLL_SS_STEP_SIZE_1_SS_STEP_SIZE_1_SHIFT      0
-+#define SERDES_L1_PLL_SS_STEP_SIZE_1_SS_STEP_SIZE_1_MASK       0x000000FFU
-+
-+/*
-+* Step Size for Spread Spectrum [23:16]
-+*/
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_2_SS_STEP_SIZE_2_DEFVAL 
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_2_SS_STEP_SIZE_2_SHIFT 
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_2_SS_STEP_SIZE_2_MASK 
-+#define SERDES_L1_PLL_SS_STEP_SIZE_2_SS_STEP_SIZE_2_DEFVAL     0x00000000
-+#define SERDES_L1_PLL_SS_STEP_SIZE_2_SS_STEP_SIZE_2_SHIFT      0
-+#define SERDES_L1_PLL_SS_STEP_SIZE_2_SS_STEP_SIZE_2_MASK       0x000000FFU
-+
-+/*
-+* Step Size for Spread Spectrum [25:24]
-+*/
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_SS_STEP_SIZE_3_MSB_DEFVAL 
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_SS_STEP_SIZE_3_MSB_SHIFT 
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_SS_STEP_SIZE_3_MSB_MASK 
-+#define SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_SS_STEP_SIZE_3_MSB_DEFVAL  0x00000000
-+#define SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_SS_STEP_SIZE_3_MSB_SHIFT  0
-+#define SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_SS_STEP_SIZE_3_MSB_MASK  0x00000003U
-+
-+/*
-+* Enable/Disable test mode force on SS step size
-+*/
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_FORCE_SS_STEP_SIZE_DEFVAL 
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_FORCE_SS_STEP_SIZE_SHIFT 
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_FORCE_SS_STEP_SIZE_MASK 
-+#define SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_FORCE_SS_STEP_SIZE_DEFVAL  0x00000000
-+#define SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_FORCE_SS_STEP_SIZE_SHIFT  4
-+#define SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_FORCE_SS_STEP_SIZE_MASK  0x00000010U
-+
-+/*
-+* Enable/Disable test mode force on SS no of steps
-+*/
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_FORCE_SS_NUM_OF_STEPS_DEFVAL 
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_FORCE_SS_NUM_OF_STEPS_SHIFT 
-+#undef SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_FORCE_SS_NUM_OF_STEPS_MASK 
-+#define SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_FORCE_SS_NUM_OF_STEPS_DEFVAL  0x00000000
-+#define SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_FORCE_SS_NUM_OF_STEPS_SHIFT  5
-+#define SERDES_L1_PLL_SS_STEP_SIZE_3_MSB_FORCE_SS_NUM_OF_STEPS_MASK  0x00000020U
 +
 +/*
 +* Step Size for Spread Spectrum [7:0]
@@ -36948,46 +36875,6 @@ index 0000000000..6baefd3f67
 +#define SERDES_L3_PLL_SS_STEP_SIZE_3_MSB_FORCE_SS_NUM_OF_STEPS_DEFVAL  0x00000000
 +#define SERDES_L3_PLL_SS_STEP_SIZE_3_MSB_FORCE_SS_NUM_OF_STEPS_SHIFT  5
 +#define SERDES_L3_PLL_SS_STEP_SIZE_3_MSB_FORCE_SS_NUM_OF_STEPS_MASK  0x00000020U
-+
-+/*
-+* Bypass Descrambler
-+*/
-+#undef SERDES_L1_TM_DIG_6_BYPASS_DESCRAM_DEFVAL 
-+#undef SERDES_L1_TM_DIG_6_BYPASS_DESCRAM_SHIFT 
-+#undef SERDES_L1_TM_DIG_6_BYPASS_DESCRAM_MASK 
-+#define SERDES_L1_TM_DIG_6_BYPASS_DESCRAM_DEFVAL               0x00000000
-+#define SERDES_L1_TM_DIG_6_BYPASS_DESCRAM_SHIFT                1
-+#define SERDES_L1_TM_DIG_6_BYPASS_DESCRAM_MASK                 0x00000002U
-+
-+/*
-+* Enable Bypass for <1> TM_DIG_CTRL_6
-+*/
-+#undef SERDES_L1_TM_DIG_6_FORCE_BYPASS_DESCRAM_DEFVAL 
-+#undef SERDES_L1_TM_DIG_6_FORCE_BYPASS_DESCRAM_SHIFT 
-+#undef SERDES_L1_TM_DIG_6_FORCE_BYPASS_DESCRAM_MASK 
-+#define SERDES_L1_TM_DIG_6_FORCE_BYPASS_DESCRAM_DEFVAL         0x00000000
-+#define SERDES_L1_TM_DIG_6_FORCE_BYPASS_DESCRAM_SHIFT          0
-+#define SERDES_L1_TM_DIG_6_FORCE_BYPASS_DESCRAM_MASK           0x00000001U
-+
-+/*
-+* Bypass scrambler signal
-+*/
-+#undef SERDES_L1_TX_DIG_TM_61_BYPASS_SCRAM_DEFVAL 
-+#undef SERDES_L1_TX_DIG_TM_61_BYPASS_SCRAM_SHIFT 
-+#undef SERDES_L1_TX_DIG_TM_61_BYPASS_SCRAM_MASK 
-+#define SERDES_L1_TX_DIG_TM_61_BYPASS_SCRAM_DEFVAL             0x00000000
-+#define SERDES_L1_TX_DIG_TM_61_BYPASS_SCRAM_SHIFT              1
-+#define SERDES_L1_TX_DIG_TM_61_BYPASS_SCRAM_MASK               0x00000002U
-+
-+/*
-+* Enable/disable scrambler bypass signal
-+*/
-+#undef SERDES_L1_TX_DIG_TM_61_FORCE_BYPASS_SCRAM_DEFVAL 
-+#undef SERDES_L1_TX_DIG_TM_61_FORCE_BYPASS_SCRAM_SHIFT 
-+#undef SERDES_L1_TX_DIG_TM_61_FORCE_BYPASS_SCRAM_MASK 
-+#define SERDES_L1_TX_DIG_TM_61_FORCE_BYPASS_SCRAM_DEFVAL       0x00000000
-+#define SERDES_L1_TX_DIG_TM_61_FORCE_BYPASS_SCRAM_SHIFT        0
-+#define SERDES_L1_TX_DIG_TM_61_FORCE_BYPASS_SCRAM_MASK         0x00000001U
 +
 +/*
 +* Bypass 8b10b decoder
@@ -38578,16 +38465,6 @@ index 0000000000..6baefd3f67
 +#define USB3_0_XHCI_GUCTL1_RESUME_TERMSEL_XCVRSEL_UNIFY_MASK   0x00000400U
 +
 +/*
-+* Reserved
-+*/
-+#undef USB3_0_XHCI_GUCTL1_RESERVED_9_DEFVAL 
-+#undef USB3_0_XHCI_GUCTL1_RESERVED_9_SHIFT 
-+#undef USB3_0_XHCI_GUCTL1_RESERVED_9_MASK 
-+#define USB3_0_XHCI_GUCTL1_RESERVED_9_DEFVAL                   0x00000000
-+#define USB3_0_XHCI_GUCTL1_RESERVED_9_SHIFT                    9
-+#define USB3_0_XHCI_GUCTL1_RESERVED_9_MASK                     0x00000200U
-+
-+/*
 +* Host IN Auto Retry (USBHstInAutoRetryEn) When set, this field enables th
 +    * e Auto Retry feature. For IN transfers (non-isochronous) that encounter
 +    * data packets with CRC errors or internal overrun scenarios, the auto ret
@@ -39787,17 +39664,6 @@ index 0000000000..6baefd3f67
 +#define SERDES_L0_PLL_STATUS_READ_1_PLL_LOCK_STATUS_READ_SHIFT  4
 +#define SERDES_L0_PLL_STATUS_READ_1_PLL_LOCK_STATUS_READ_MASK  0x00000010U
 +#define SERDES_L0_PLL_STATUS_READ_1_OFFSET                                         0XFD4023E4
-+
-+/*
-+* Status Read value of PLL Lock
-+*/
-+#undef SERDES_L1_PLL_STATUS_READ_1_PLL_LOCK_STATUS_READ_DEFVAL 
-+#undef SERDES_L1_PLL_STATUS_READ_1_PLL_LOCK_STATUS_READ_SHIFT 
-+#undef SERDES_L1_PLL_STATUS_READ_1_PLL_LOCK_STATUS_READ_MASK 
-+#define SERDES_L1_PLL_STATUS_READ_1_PLL_LOCK_STATUS_READ_DEFVAL  0x00000001
-+#define SERDES_L1_PLL_STATUS_READ_1_PLL_LOCK_STATUS_READ_SHIFT  4
-+#define SERDES_L1_PLL_STATUS_READ_1_PLL_LOCK_STATUS_READ_MASK  0x00000010U
-+#define SERDES_L1_PLL_STATUS_READ_1_OFFSET                                         0XFD4063E4
 +
 +/*
 +* Status Read value of PLL Lock

@@ -1,0 +1,76 @@
+/* Overlay devicetree for the programmable logic part */
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/clock/xlnx-zynqmp-clk.h>
+
+/ {
+	/* This fragment causes the FPGA image to load */
+	fragment@0 {
+		target = <&fpga_full>;
+		__overlay__ {
+			firmware-name = "fpga.bin.fpga-image-ttp-reference";
+		};
+	};
+
+	/* EMIO 5 user LED */
+	fragment@1 {
+		target-path = "/";
+		__overlay__ {
+			leds-pl {
+				compatible = "gpio-leds";
+				eio_led_1 {
+					label = "pl-user:green";
+					gpios = <&gpio 83 GPIO_ACTIVE_LOW>; /* EMIO 5 */
+					linux,default-trigger = "disk-activity"; /* Blink when NVME disk is working */
+				};
+			};
+		};
+	};
+
+	fragment@2 {
+		target = <&amba>;
+		__overlay__ {
+			#address-cells = <2>;
+			#size-cells = <2>;
+			interrupt-parent = <&gic>;
+
+			/* FAN controller */
+			pl_fan_controller: fan-controller@8000a000 {
+				compatible = "topic,axi-pwm-fan-controller";
+				reg = <0x0 0x8000a000 0x0 0x1000>;
+				nr-fans = <1>;
+				clocks = <&zynqmp_clk PL0_REF>;
+				topic,initial-pwm = <25>; /* Run at 10% */
+			};
+
+			 /* temperature sensor on i2c Uses lm75 hwmon driver */
+			axi_iic_0: i2c@80009000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clock-names = "s_axi_aclk";
+				clocks = <&zynqmp_clk PL0_REF>;
+				compatible = "xlnx,axi-iic-2.0", "xlnx,xps-iic-2.00.a";
+				interrupt-names = "iic2intc_irpt";
+				interrupt-parent = <&gic>;
+				interrupts = <0 89 4>;
+				reg = <0x0 0x80009000 0x0 0x1000>;
+
+				tmp101pl: sensor@4a{
+					compatible = "ti,tmp101";
+					reg = <0x4a>;
+				};
+			};
+		};
+	};
+
+	/* FPGA causes a "spike" which confuses the ethernet PHY. */
+	fragment@3 {
+		target = <&gem2>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+};

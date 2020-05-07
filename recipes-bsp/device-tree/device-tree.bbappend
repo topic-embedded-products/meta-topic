@@ -8,3 +8,8 @@ SRC_URI_append_xdpzu7 = " \
 		file://zynqmp-topic-miamimp-xilinx-xdp.dts \
 		file://zynqmp-topic-miamimp-xilinx-xdp-usbhost.dts \
 		"
+
+COMPATIBLE_MACHINE_ttpzu9 = ".*"
+SRC_URI_append_ttpzu9 = " \
+		file://${MACHINE}.dts \
+		"
