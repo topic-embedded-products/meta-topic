@@ -94,6 +94,8 @@ xz < pmutmp/deploy/images/zynqmp-pmu/pmu-firmware-zynqmp-pmu.bin > ../meta-topic
 
 Don't forget to remove the three extra lines from your `local.conf` file afterwards...
 
+Note: On the meta-xilinx zeus branch (the current one) the microblaze toolchain is broken. Revert commit de77bf7a8a9b1600f449ba42fa0da211c712fef0 in the meta-xilinx submodule to work around it.
+
 
 # Additional information
 
