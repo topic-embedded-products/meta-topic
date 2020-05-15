@@ -304,3 +304,8 @@
 &gem2 {
 	status = "disabled";
 };
+
+/* Carrier provides VBAT for RTC */
+&rtc {
+	status = "okay";
+};

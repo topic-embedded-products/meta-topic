@@ -18,7 +18,10 @@ TOPICBSPCONFIG_tdpzu9 = "file://topic-miamimp-standard.cfg file://topic-miamiplu
 TOPICBSPCONFIG_ttpzu9 = "file://topic-miamimp-standard.cfg file://topic-miamiplusmp-extra.cfg file://ttpzu9-extra.cfg"
 TOPICBSPCONFIG_xdpzu7 = "file://topic-xdpzu7-standard.cfg"
 
-SRC_URI_append = " ${TOPICBSPCONFIG}"
+SRC_URI_append = "\
+	${TOPICBSPCONFIG} \
+	${@bb.utils.contains("MACHINE_FEATURES", "rtc", "file://zynqmp-rtc.cfg", "", d)} \
+	"
 
 KERNEL_DEVICETREE_topic-miamilite = "\
 	topic-miamilite.dtb \
