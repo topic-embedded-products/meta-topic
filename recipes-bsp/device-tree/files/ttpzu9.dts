@@ -40,11 +40,13 @@
 	/* USB PHY reset IO pin */
 	usb_phy0: usb2phy0 {
 		compatible = "usb-nop-xceiv";
+		vcc-supply = <&reg_1v8_miami>;
 		#phy-cells = <0>;
 		reset-gpios = <&gpioex 3 1>;
 	};
 	usb_phy1: usb2phy1 {
 		compatible = "usb-nop-xceiv";
+		vcc-supply = <&reg_1v8_miami>;
 		#phy-cells = <0>;
 		reset-gpios = <&gpioex 4 1>;
 	};
@@ -84,6 +86,7 @@
 	ttp_gpioex: pca9534@27 {
 		compatible = "nxp,pca9534";
 		reg = <0x27>;
+		vcc-supply = <&reg_3v3_miami>;
 		gpio-line-names = "SW_RST_N", "SOM_RST_N_MIAM", "GEN_IRQ", "VBAT_EN", "USB_OTG_EN", "USB_OTG_OC_N", "PEWAKE0", "N_PWR_KILL";
 		gpio-controller;
 		#gpio-cells = <2>;
@@ -215,7 +218,7 @@
 
 &dwc3_0 {
 	status = "okay";
-	dr_mode = "host"; /* "host", "peripheral" or "otg" */
+	dr_mode = "otg"; /* "host", "peripheral" or "otg" */
 	maximum-speed = "high-speed"; /* super-speed not available on carrier */
 	/* see: https://forums.xilinx.com/t5/Embedded-Linux/Zynqmp-USB2-0/td-p/790522/page/2 */
 	snps,dis_u2_susphy_quirk;
@@ -224,6 +227,8 @@
 	/delete-property/ phys;
 	/delete-property/ snps,usb3_lpm_capable;
 	usb-phy = <&usb_phy0>;
+	vbus-drv;
+	vbus-supply = <&reg_usb0_vbus>; /* Not implemented in driver */
 };
 
 &usb1 {
@@ -250,11 +255,6 @@
 	/* refclk0 from clock synth, GTR clock and M2 clock */
 	assigned-clocks      = <&si5345 0 0>, <&si5341 0 4>;
 	assigned-clock-rates =   <100000000>,   <100000000>;
-};
-
-/* Postpone serdes until PL is up, and hence the clocks... */
-&serdes {
-	status = "disabled";
 };
 
 &gpio {

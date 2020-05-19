@@ -1,4 +1,4 @@
-From b10df2c258d08d78b51b5f9d291b7224d01a33a9 Mon Sep 17 00:00:00 2001
+From 2edf09bfa4413e1b1b6052fb12e43d3cfc8cd591 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 14 Jun 2018 13:19:00 +0200
 Subject: [PATCH 19/32] Add topic-miami devicetrees
@@ -15,12 +15,12 @@ Adapted to 4.19 kernel and removed a lot of old trees
  arch/arm/boot/dts/topic-miamilite.dtsi        |  51 +++
  arch/arm/boot/dts/topic-miamiplus.dts         |   4 +
  arch/arm/boot/dts/topic-miamiplus.dtsi        |  97 +++++
- .../zynqmp-topic-miamimp-florida-gen.dts      | 279 ++++++++++++
- .../zynqmp-topic-miamimp-florida-test.dts     | 188 +++++++++
- .../boot/dts/xilinx/zynqmp-topic-miamimp.dts  | 376 +++++++++++++++++
- .../dts/xilinx/zynqmp-topic-miamiplusmp.dts   | 366 ++++++++++++++++
+ .../zynqmp-topic-miamimp-florida-gen.dts      | 283 +++++++++++++
+ .../zynqmp-topic-miamimp-florida-test.dts     | 187 ++++++++
+ .../boot/dts/xilinx/zynqmp-topic-miamimp.dts  | 377 +++++++++++++++++
+ .../dts/xilinx/zynqmp-topic-miamiplusmp.dts   | 375 ++++++++++++++++
  arch/arm64/configs/topic_miamimp_defconfig    | 399 ++++++++++++++++++
- 14 files changed, 2285 insertions(+)
+ 14 files changed, 2298 insertions(+)
  create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dts
  create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dtsi
  create mode 100644 arch/arm/boot/dts/topic-miami-florida.dtsi
@@ -769,10 +769,10 @@ index 000000000000..c63b30266fa3
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
 new file mode 100644
-index 000000000000..8e4aa9f00ca5
+index 000000000000..35f0e0f6e531
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
-@@ -0,0 +1,279 @@
+@@ -0,0 +1,283 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -975,11 +975,8 @@ index 000000000000..8e4aa9f00ca5
 +/* USB connected through MIO and GPIO expander */
 +&usb0 {
 +	status = "okay";
-+	vbus-supply = <&reg_usb0_vbus>; /* This apparently no longer works */
-+	dr_mode = "host"; /* "host", "peripheral" or "otg", apparently no effect */
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_usb0_default>;
-+	usb-phy = <&usb_phy0>;
 +	/* see: https://forums.xilinx.com/t5/Embedded-Linux/Zynqmp-USB2-0/td-p/790522/page/2 */
 +	/delete-property/ clocks;
 +	/delete-property/ clock-names;
@@ -989,13 +986,20 @@ index 000000000000..8e4aa9f00ca5
 +
 +&dwc3_0 {
 +	status = "okay";
-+	dr_mode = "host"; /* "host", "peripheral" or "otg" */
++	dr_mode = "otg"; /* "host", "peripheral" or "otg" */
 +	maximum-speed = "high-speed"; /* super-speed not available on carrier */
 +	/* see: https://forums.xilinx.com/t5/Embedded-Linux/Zynqmp-USB2-0/td-p/790522/page/2 */
 +	snps,dis_u2_susphy_quirk;
 +	snps,dis_u3_susphy_quirk;
 +	/delete-property/ phy-names;
 +	/delete-property/ phys;
++	usb-phy = <&usb_phy0>;
++	vbus-supply = <&reg_usb0_vbus>; /* This apparently no longer works */
++	ulpi {
++		phy {
++			compatible = "smsc,usb3340";
++		};
++	};
 +};
 +
 +&pinctrl0 {
@@ -1054,10 +1058,10 @@ index 000000000000..8e4aa9f00ca5
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-test.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-test.dts
 new file mode 100644
-index 000000000000..d8bcf375ab71
+index 000000000000..7739d2e82a67
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-test.dts
-@@ -0,0 +1,188 @@
+@@ -0,0 +1,187 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -1180,16 +1184,15 @@ index 000000000000..d8bcf375ab71
 +/* USB connected through MIO and GPIO expander */
 +&usb0 {
 +	status = "okay";
-+	vbus-supply = <&reg_usb0_vbus>; /* This apparently no longer works */
-+	dr_mode = "otg"; /* "host", "peripheral" or "otg" */
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_usb0_default>;
-+	usb-phy = <&usb_phy0>;
 +};
 +&dwc3_0 {
 +	status = "okay";
 +	dr_mode = "host"; /* "host", "peripheral" or "otg" */
 +	maximum-speed = "high-speed"; /* super-speed not available on carrier */
++	vbus-supply = <&reg_usb0_vbus>; /* This apparently no longer works */
++	usb-phy = <&usb_phy0>;
 +};
 +
 +&pinctrl0 {
@@ -1248,10 +1251,10 @@ index 000000000000..d8bcf375ab71
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
 new file mode 100644
-index 000000000000..2758c363a1e2
+index 000000000000..ee700eb64800
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
-@@ -0,0 +1,376 @@
+@@ -0,0 +1,377 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -1326,7 +1329,8 @@ index 000000000000..2758c363a1e2
 +	usb_phy0: phy0 {
 +		compatible = "usb-nop-xceiv";
 +		#phy-cells = <0>;
-+		reset-gpios = <&gpioex 0 0>;
++		vcc-supply = <&reg_3v3_miami>;
++		reset-gpios = <&gpioex 0 GPIO_ACTIVE_LOW>;
 +	};
 +
 +	/* Make temperature readouts show up in hwmon applications */
@@ -1630,10 +1634,10 @@ index 000000000000..2758c363a1e2
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
 new file mode 100644
-index 000000000000..5ff77c05b541
+index 000000000000..1688825c05b3
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
-@@ -0,0 +1,366 @@
+@@ -0,0 +1,375 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -1685,12 +1689,20 @@ index 000000000000..5ff77c05b541
 +		reg = <0x0 0x0 0x0 0x80000000>;
 +	};
 +
-+	/* Represents the 3v3 supply on the Miami SOM. */
++	/* Represents the 3v3 supply on the SOM. */
 +	reg_3v3_miami: regulator_3v3_miami {
 +		compatible = "regulator-fixed";
 +		regulator-name = "3v3-miami";
 +		regulator-min-microvolt = <3300000>;
 +		regulator-max-microvolt = <3300000>;
++	};
++
++	/* Represents the 1v8 supply on the SOM. */
++	reg_1v8_miami: regulator_1v8_miami {
++		compatible = "regulator-fixed";
++		regulator-name = "1v8-miami";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
 +	};
 +
 +	/* Heartbeat led. Use separate instance to make it probe quickly */
@@ -1746,6 +1758,7 @@ index 000000000000..5ff77c05b541
 +	/* GPIO expander */
 +	gpioex: pca9554@38 {
 +		compatible = "nxp,pca9554";
++		vcc-supply = <&reg_1v8_miami>;
 +		reg = <0x38>; /* PCA9554A adress starts at 0b111000 */
 +		gpio-line-names = "USERLED", "", "ETH_RESET_N", "USB0_RESET_N", "USB1_RESET_N", "", "", "";
 +		gpio-controller;
