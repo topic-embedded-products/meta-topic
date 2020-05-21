@@ -1,0 +1,35 @@
+From f93084495012c597a4ccb7f5fc46f381126fa9fe Mon Sep 17 00:00:00 2001
+From: Leon Leijssen <leon.leijssen@topic.nl>
+Date: Thu, 21 May 2020 11:39:09 +0200
+Subject: [PATCH] xilinx-drm-hdmi: add support for RGBA
+
+---
+ hdmi/xilinx_drm_hdmi.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/hdmi/xilinx_drm_hdmi.c b/hdmi/xilinx_drm_hdmi.c
+index 51378bb..e909f08 100644
+--- a/hdmi/xilinx_drm_hdmi.c
++++ b/hdmi/xilinx_drm_hdmi.c
+@@ -1047,6 +1047,10 @@ static u32 hdmitx_find_media_bus(struct xlnx_drm_hdmi *xhdmi, u32 drm_fourcc)
+ 	case DRM_FORMAT_RGB888:
+ 		xhdmi->xvidc_colordepth = XVIDC_BPC_8;
+ 		return XVIDC_CSF_RGB;
++	case DRM_FORMAT_ABGR8888:
++	case DRM_FORMAT_ARGB8888:
++		xhdmi->xvidc_colordepth = XVIDC_BPC_8;
++		return XVIDC_CSF_RGBA;
+ 	case DRM_FORMAT_XBGR2101010:
+ 		xhdmi->xvidc_colordepth = XVIDC_BPC_10;
+ 		return XVIDC_CSF_RGB;
+@@ -1240,6 +1244,7 @@ static void xlnx_drm_hdmi_encoder_atomic_mode_set(struct drm_encoder *encoder,
+ 	/* check if resolution is supported at requested bit depth */
+ 	switch (xhdmi->xvidc_colorfmt) {
+ 		case XVIDC_CSF_RGB:
++		case XVIDC_CSF_RGBA:
+ 		case XVIDC_CSF_YCRCB_444:
+ 			if ((xhdmi->xvidc_colordepth > XVIDC_BPC_8) &&
+ 				(mode->hdisplay >= 3840) &&
+-- 
+2.17.1
+
