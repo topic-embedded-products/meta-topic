@@ -57,6 +57,8 @@ SRC_URI_append = "\
 	file://0001-clk-clk-si5341-Add-support-for-the-Si5345-series.patch \
 	file://0001-net-mdio_device-Reset-GPIO-is-allowed-to-sleep.patch \
 	file://0001-miamiplusmp-update-board-model-correct-qspi-size.patch \
+	file://0001-devicetree-miamimp-control-VBUS-power.patch \
+	file://0001-usb-dwc3-Add-support-for-VBUS-power-control.patch \
 	"
 
 # Compile overlay-capable devicetrees

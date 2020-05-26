@@ -34,7 +34,6 @@
 		regulator-max-microvolt = <5000000>;
 		gpio = <&ttp_gpioex 4 0>;
 		enable-active-high;
-		regulator-always-on; /* for USB host mode, "vbus" no longer works? */
 	};
 
 	/* USB PHY reset IO pin */
@@ -252,8 +251,7 @@
 	/delete-property/ phys;
 	/delete-property/ snps,usb3_lpm_capable;
 	usb-phy = <&usb_phy0>;
-	vbus-drv;
-	vbus-supply = <&reg_usb0_vbus>; /* Not implemented in driver */
+	vbus-supply = <&reg_usb0_vbus>;
 };
 
 &usb1 {
