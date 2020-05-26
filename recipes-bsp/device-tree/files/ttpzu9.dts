@@ -207,6 +207,27 @@
 	};
 };
 
+&si5345 {
+	out@0 {
+		always-on;
+	};
+	out@1 {
+		always-on;
+	};
+	out@4 {
+		always-on;
+	};
+	out@6 {
+		always-on;
+	};
+	out@7 {
+		always-on;
+	};
+	out@9 {
+		always-on;
+	};
+};
+
 &usb0 {
 	status = "okay";
 	/* see: https://forums.xilinx.com/t5/Embedded-Linux/Zynqmp-USB2-0/td-p/790522/page/2 */
@@ -214,6 +235,10 @@
 	/delete-property/ clock-names;
 	clocks = <&zynqmp_clk USB0_BUS_REF>;
 	clock-names = "bus_clk";
+};
+
+&uart1 {
+	status = "disabled";
 };
 
 &dwc3_0 {

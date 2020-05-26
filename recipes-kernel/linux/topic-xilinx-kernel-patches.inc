@@ -56,6 +56,7 @@ SRC_URI_append = "\
 	file://0032-xlnx_pl_disp-fix-missing-xlnx_crtc_unregister.patch \
 	file://0001-clk-clk-si5341-Add-support-for-the-Si5345-series.patch \
 	file://0001-net-mdio_device-Reset-GPIO-is-allowed-to-sleep.patch \
+	file://0001-miamiplusmp-update-board-model-correct-qspi-size.patch \
 	"
 
 # Compile overlay-capable devicetrees
