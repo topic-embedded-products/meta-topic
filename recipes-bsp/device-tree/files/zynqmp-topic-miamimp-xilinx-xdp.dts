@@ -55,7 +55,6 @@
 		regulator-max-microvolt = <5000000>;
 		gpio = <&gpio 77 GPIO_ACTIVE_LOW>; /* MIO77 -> USB_OTG_EN */
 		enable-active-high;
-		/* regulator-always-on; */ /* for USB host mode, "vbus" no longer works? */
 	};
 
 	leds: leds {
@@ -67,9 +66,7 @@
 		};
 	};
 
-	/* USB PHY reset IO pin. Does not work this way, using hog instead. */
 	usb_phy0: phy0 {
-		status = "disabled";
 		compatible = "usb-nop-xceiv";
 		#phy-cells = <0>;
 		reset-gpios = <&gpio 65 GPIO_ACTIVE_LOW>; /* MIO65 -> USB_RESET */
@@ -124,13 +121,6 @@
 		gpios = <96 0>; /* EMIO 18 */
 		output-high;
 		line-name = "GPS-DSEL";
-	};
-
-	usb-reset {
-		gpio-hog;
-		gpios = <65 0>;
-		output-high;
-		line-name = "USB_RESET";
 	};
 };
 
@@ -402,7 +392,8 @@
 &dwc3_0 {
 	status = "okay";
 	dr_mode = "peripheral"; /* One of host, peripheral, otg */
-	vbus-supply = <&reg_usb0_vbus>; /* Educated guess, does not work */
+	vbus-supply = <&reg_usb0_vbus>;
+	usb-phy = <&usb_phy0>;
 
 	/* USB3 controller uses GTX lane "2" and refclk "2" at 26MHz */
 	phy-names = "usb3-phy";
