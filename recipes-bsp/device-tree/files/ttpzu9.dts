@@ -283,18 +283,6 @@
 };
 
 &gpio {
-	switch-pl0 {
-		gpio-hog;
-		gpios = <84 0>; /* EMIO 6 */
-		input;
-		line-name = "switch_pl0";
-	};
-	switch-pl1 {
-		gpio-hog;
-		gpios = <85 0>; /* EMIO 7 */
-		input;
-		line-name = "switch_pl1";
-	};
 	eth-led1 {
 		gpio-hog;
 		gpios = <86 0>; /* EMIO 8 */
