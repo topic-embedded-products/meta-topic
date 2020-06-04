@@ -23,6 +23,7 @@ SRC_URI_append = "\
 	file://0017-xdp-psu_init_gpl-Set-DDR-to-2133MHz.patch \
 	file://0018-board-topic-miami-Set-FCLK1-to-150MHz.patch \
 	file://0019-dts-Add-spi-flash-to-compatible-list-for-miami-SOMs.patch \
+	file://0001-board-topic-miamiplusmp-Set-DDR-to-1833MT-s.patch \
 	"
 
 # Glitches on serial input interrupt the boot sequence on some boards, use
