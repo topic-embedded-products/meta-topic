@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaa
 
 BOARD_DESIGN_URI = ""
 
-PV = "a5ef2890405ae37c22dee9cd3156587995560a3"
+PV = "6d9002ae6d99d713d33ecc51ba96f242bdd6c541"
 
 BOARD_DESIGN_PATH = "${BPN}-${MACHINE}"
 TOPICDOWNLOADS_URI ?= "http://topic-downloads.fra1.digitaloceanspaces.com"
@@ -25,4 +25,4 @@ do_compile() {
     true
 }
 
-SRC_URI[ttpzu9.sha256sum] = "3c2dfd7c3e096552645b8918e2ddc50133802ccf800c681c8149f92776d75641"
+SRC_URI[ttpzu9.sha256sum] = "def34f8e2a4632cdc77b6253f35a326a301637f06a0926a88d497e46fb115095"
