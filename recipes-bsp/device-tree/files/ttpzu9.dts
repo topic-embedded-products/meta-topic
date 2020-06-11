@@ -51,6 +51,15 @@
 	};
 };
 
+/* SD1 */
+&sdhci1 {
+	status = "okay";
+	bus-width = <4>;
+	xlnx,mio_bank = <1>;
+	no-1-8-v; /* No UHS capability, 3v3 only */
+	disable-wp;
+};
+
 &i2c0 {
 	status = "okay";
 	clock-frequency = <400000>;
