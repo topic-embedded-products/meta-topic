@@ -39,8 +39,7 @@ SOC_VARIANT ?= ""
 # The SOM_FAMILY is more specific than the SOC_FAMILY (=zynqmp) in the MACHINEOVERRIDES
 MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 
-require conf/machine/include/tune-zynqmp.inc
-require conf/machine/include/machine-xilinx-overrides.inc
+require conf/machine/cortexa53-zynqmp.conf
 require conf/machine/include/machine-xilinx-default.inc
 
 # The RTC only works if a battery is connected, which most boards do not have
