@@ -1,26 +1,25 @@
-From 081d05c86eb1eb1dc44aeed9ee19243723d8d9bd Mon Sep 17 00:00:00 2001
+From 05cdb3273fa573d77ed8072592fd2e34938c7e9a Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 14 Jun 2018 13:19:00 +0200
-Subject: [PATCH 19/32] Add topic-miami devicetrees
+Subject: [PATCH 10/10] Add topic-miami devicetrees
 
-Just a copy from the topic-miami branch contents, not actually added to Makefile
-Adapted to 4.19 kernel and removed a lot of old trees
+Adds the devicetrees for topic system-on-modules to the kernel
 ---
  arch/arm/boot/dts/topic-miami-florida-mio.dts |   2 +
  .../arm/boot/dts/topic-miami-florida-mio.dtsi | 155 +++++++
  arch/arm/boot/dts/topic-miami-florida.dtsi    |  27 ++
  arch/arm/boot/dts/topic-miami.dts             |   3 +
- arch/arm/boot/dts/topic-miami.dtsi            | 335 +++++++++++++++
+ arch/arm/boot/dts/topic-miami.dtsi            | 331 +++++++++++++++
  arch/arm/boot/dts/topic-miamilite.dts         |   3 +
  arch/arm/boot/dts/topic-miamilite.dtsi        |  51 +++
  arch/arm/boot/dts/topic-miamiplus.dts         |   4 +
  arch/arm/boot/dts/topic-miamiplus.dtsi        |  97 +++++
- .../zynqmp-topic-miamimp-florida-gen.dts      | 283 +++++++++++++
+ .../zynqmp-topic-miamimp-florida-gen.dts      | 282 +++++++++++++
  .../zynqmp-topic-miamimp-florida-test.dts     | 187 ++++++++
  .../boot/dts/xilinx/zynqmp-topic-miamimp.dts  | 377 +++++++++++++++++
- .../dts/xilinx/zynqmp-topic-miamiplusmp.dts   | 377 +++++++++++++++++
+ .../dts/xilinx/zynqmp-topic-miamiplusmp.dts   | 373 ++++++++++++++++
  arch/arm64/configs/topic_miamimp_defconfig    | 399 ++++++++++++++++++
- 14 files changed, 2300 insertions(+)
+ 14 files changed, 2291 insertions(+)
  create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dts
  create mode 100644 arch/arm/boot/dts/topic-miami-florida-mio.dtsi
  create mode 100644 arch/arm/boot/dts/topic-miami-florida.dtsi
@@ -249,10 +248,10 @@ index 000000000000..112bab6be313
 +
 diff --git a/arch/arm/boot/dts/topic-miami.dtsi b/arch/arm/boot/dts/topic-miami.dtsi
 new file mode 100644
-index 000000000000..4a50728a20fd
+index 000000000000..d20d2d673818
 --- /dev/null
 +++ b/arch/arm/boot/dts/topic-miami.dtsi
-@@ -0,0 +1,335 @@
+@@ -0,0 +1,331 @@
 +/include/ "zynq-7000.dtsi"
 +
 +/* Remove broken I2C driver and replace with bitbang GPIO */
@@ -484,23 +483,15 @@ index 000000000000..4a50728a20fd
 +		};
 +		partition@qspi-u-boot-img {
 +			label = "qspi-u-boot-img";
-+			reg = <0x20000 0x80000>;
++			reg = <0x20000 0xC0000>;
 +		};
 +		partition@qspi-u-boot-env {
 +			label = "qspi-u-boot-env";
-+			reg = <0xA0000 0x20000>;
-+		};
-+		partition@qspi-device-tree {
-+			label = "qspi-device-tree";
-+			reg = <0xC0000 0x20000>;
-+		};
-+		partition@qspi-linux {
-+			label = "qspi-linux";
-+			reg = <0x100000 0x480000>;
++			reg = <0xE0000 0x20000>;
 +		};
 +		partition@qspi-rootfs {
 +			label = "qspi-rootfs";
-+			reg = <0x580000 0x1A80000>;
++			reg = <0x100000 0x1F00000>;
 +		};
 +		/* Everything */
 +		partition@qspi-all {
@@ -508,6 +499,10 @@ index 000000000000..4a50728a20fd
 +			reg = <0x0 0x2000000>;
 +		};
 +	};
++};
++
++&watchdog0 {
++	reset-on-timeout;
 +};
 +
 +&gem0 {
@@ -769,10 +764,10 @@ index 000000000000..c63b30266fa3
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
 new file mode 100644
-index 000000000000..35f0e0f6e531
+index 000000000000..2b3ed5644ec5
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp-florida-gen.dts
-@@ -0,0 +1,283 @@
+@@ -0,0 +1,282 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -797,7 +792,6 @@ index 000000000000..35f0e0f6e531
 +		regulator-max-microvolt = <5000000>;
 +		gpio = <&gpioexf 1 0>;
 +		enable-active-high;
-+		regulator-always-on; /* for USB host mode, "vbus" no longer works? */
 +	};
 +
 +	xtal_27Mhz: clock_xtal_27Mhz {
@@ -987,6 +981,7 @@ index 000000000000..35f0e0f6e531
 +&dwc3_0 {
 +	status = "okay";
 +	dr_mode = "otg"; /* "host", "peripheral" or "otg" */
++	vbus-supply = <&reg_usb0_vbus>;
 +	maximum-speed = "high-speed"; /* super-speed not available on carrier */
 +	/* see: https://forums.xilinx.com/t5/Embedded-Linux/Zynqmp-USB2-0/td-p/790522/page/2 */
 +	snps,dis_u2_susphy_quirk;
@@ -994,7 +989,6 @@ index 000000000000..35f0e0f6e531
 +	/delete-property/ phy-names;
 +	/delete-property/ phys;
 +	usb-phy = <&usb_phy0>;
-+	vbus-supply = <&reg_usb0_vbus>; /* This apparently no longer works */
 +	ulpi {
 +		phy {
 +			compatible = "smsc,usb3340";
@@ -1251,7 +1245,7 @@ index 000000000000..7739d2e82a67
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
 new file mode 100644
-index 000000000000..ee700eb64800
+index 000000000000..87fc10e99036
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamimp.dts
 @@ -0,0 +1,377 @@
@@ -1341,10 +1335,6 @@ index 000000000000..ee700eb64800
 +	};
 +};
 +
-+&pcap {
-+	status = "okay";
-+};
-+
 +&gpio {
 +	status = "okay";
 +	pinctrl-names = "default";
@@ -1422,6 +1412,7 @@ index 000000000000..ee700eb64800
 +&qspi {
 +	status = "okay";
 +	is-dual = <1>;
++	multi-die = <1>;
 +	flash@0 {
 +		compatible = "st,m25p80", "n25q256a";
 +		#address-cells = <1>;
@@ -1431,6 +1422,7 @@ index 000000000000..ee700eb64800
 +		spi-rx-bus-width = <4>;
 +		spi-max-frequency = <166000000>;
 +		is-dual = <1>;
++		multi-die = <1>;
 +		partition@qspi-boot-bin {
 +			label = "qspi-boot-bin";
 +			reg = <0x00000 0x60000>;
@@ -1482,6 +1474,8 @@ index 000000000000..ee700eb64800
 +
 +&watchdog0 {
 +	status = "okay";
++	timeout-sec = <5>;
++	reset-on-timeout;
 +};
 +
 +&xilinx_ams {
@@ -1634,10 +1628,10 @@ index 000000000000..ee700eb64800
 +};
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
 new file mode 100644
-index 000000000000..339196135176
+index 000000000000..418797ace8a8
 --- /dev/null
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
-@@ -0,0 +1,377 @@
+@@ -0,0 +1,373 @@
 +/*
 + * dts file for Topic Miami MPSoC
 + *
@@ -1737,10 +1731,6 @@ index 000000000000..339196135176
 +		io-channels = <&xilinx_ams 7>, <&xilinx_ams 8>, <&xilinx_ams 20>;
 +		io-channel-names = "ps_temp", "remote_temp", "pl_temp";
 +	};
-+};
-+
-+&pcap {
-+	status = "okay";
 +};
 +
 +&gpio {

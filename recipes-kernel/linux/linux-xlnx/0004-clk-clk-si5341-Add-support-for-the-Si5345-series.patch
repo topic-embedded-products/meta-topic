@@ -1,7 +1,7 @@
-From e580f75f6c193c02d7b9db4507f9cc9e4457dbe7 Mon Sep 17 00:00:00 2001
+From 00bc55587069a6c281bd9e624dc3a45ead9523e7 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 20 Feb 2020 15:17:22 +0100
-Subject: [PATCH] clk: clk-si5341: Add support for the Si5345 series
+Subject: [PATCH 04/10] clk: clk-si5341: Add support for the Si5345 series
 
 Add support for the Si5342, Si5344 and Si5345 chips. These are equivalent
 to the Si5341 family, but with more clock input options (which are not
@@ -10,9 +10,8 @@ supported yet by this driver).
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 ---
  .../bindings/clock/silabs,si5341.txt          | 11 ++-
- drivers/clk/Kconfig                           |  9 ++-
  drivers/clk/clk-si5341.c                      | 69 +++++++++++++++++--
- 3 files changed, 78 insertions(+), 11 deletions(-)
+ 2 files changed, 74 insertions(+), 6 deletions(-)
 
 diff --git a/Documentation/devicetree/bindings/clock/silabs,si5341.txt b/Documentation/devicetree/bindings/clock/silabs,si5341.txt
 index a70c333e4cd4..504cce3abe46 100644
@@ -51,30 +50,6 @@ index a70c333e4cd4..504cce3abe46 100644
  - reg: i2c device address, usually 0x74
  - #clock-cells: from common clock binding; shall be set to 2.
  	The first value is "0" for outputs, "1" for synthesizers.
-diff --git a/drivers/clk/Kconfig b/drivers/clk/Kconfig
-index 289548ba8730..7b1818208593 100644
---- a/drivers/clk/Kconfig
-+++ b/drivers/clk/Kconfig
-@@ -91,15 +91,14 @@ config COMMON_CLK_SCPI
- 	  firmware providing all the clock controls.
- 
- config COMMON_CLK_SI5341
--	tristate "Clock driver for SiLabs 5341 and 5340 A/B/C/D devices"
-+	tristate "Clock driver for SiLabs 5340, 5341, 5342, 5344 and 5345"
- 	depends on I2C
- 	select REGMAP_I2C
- 	help
--	  This driver supports Silicon Labs Si5341 and Si5340 programmable clock
-+	  This driver supports Silicon Labs Si5340 tru Si5345 programmable clock
- 	  generators. Not all features of these chips are currently supported
--	  by the driver, in particular it only supports XTAL input. The chip can
--	  be pre-programmed to support other configurations and features not yet
--	  implemented in the driver.
-+	  by the driver. The chip can be pre-programmed to support other
-+	  configurations and features not yet implemented in the driver.
- 
- config COMMON_CLK_SI5351
- 	tristate "Clock driver for SiLabs 5351A/B/C"
 diff --git a/drivers/clk/clk-si5341.c b/drivers/clk/clk-si5341.c
 index 3c228b018116..3d7acab9d280 100644
 --- a/drivers/clk/clk-si5341.c
@@ -116,7 +91,7 @@ index 3c228b018116..3d7acab9d280 100644
  /* Range of the synthesizer fractional divider */
  #define SI5341_SYNTH_N_MIN	10
 @@ -65,6 +77,7 @@ struct clk_si5341 {
- 	u64 freq_vco; /* 13500?14256 MHz */
+ 	u64 freq_vco; /* 13500–14256 MHz */
  	u8 num_outputs;
  	u8 num_synth;
 +	u16 chip_id;

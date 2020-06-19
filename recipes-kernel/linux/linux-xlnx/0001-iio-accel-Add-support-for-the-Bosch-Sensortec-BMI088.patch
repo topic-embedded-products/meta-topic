@@ -1,7 +1,7 @@
-From 56ff07b82c71596ef5fb1feac0e40fb18139ee64 Mon Sep 17 00:00:00 2001
+From dc3631d1679a7c543490304458c38bd9d17f6f85 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 13 Mar 2020 08:04:56 +0100
-Subject: [PATCH] iio: accel: Add support for the Bosch-Sensortec BMI088
+Subject: [PATCH 01/10] iio: accel: Add support for the Bosch-Sensortec BMI088
 
 The BMI088 is a combined module with both accelerometer and gyroscope.
 This adds the accelerometer driver support for the SPI interface.
@@ -20,10 +20,10 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  create mode 100644 drivers/iio/accel/bmi088-accel.h
 
 diff --git a/drivers/iio/accel/Kconfig b/drivers/iio/accel/Kconfig
-index 5d91a6dda894..7ed9c82b731b 100644
+index d4ef35aeb579..f5b54a6899e3 100644
 --- a/drivers/iio/accel/Kconfig
 +++ b/drivers/iio/accel/Kconfig
-@@ -151,6 +151,23 @@ config BMC150_ACCEL_SPI
+@@ -135,6 +135,23 @@ config BMC150_ACCEL_SPI
  	tristate
  	select REGMAP_SPI
  
@@ -48,10 +48,10 @@ index 5d91a6dda894..7ed9c82b731b 100644
  	tristate "MiraMEMS DA280 3-axis 14-bit digital accelerometer driver"
  	depends on I2C
 diff --git a/drivers/iio/accel/Makefile b/drivers/iio/accel/Makefile
-index 3a051cf37f40..f44613103ae5 100644
+index 56bd0215e0d4..745d1ae4a5cc 100644
 --- a/drivers/iio/accel/Makefile
 +++ b/drivers/iio/accel/Makefile
-@@ -19,6 +19,8 @@ obj-$(CONFIG_BMA400_I2C) += bma400_i2c.o
+@@ -17,6 +17,8 @@ obj-$(CONFIG_BMA220) += bma220_spi.o
  obj-$(CONFIG_BMC150_ACCEL) += bmc150-accel-core.o
  obj-$(CONFIG_BMC150_ACCEL_I2C) += bmc150-accel-i2c.o
  obj-$(CONFIG_BMC150_ACCEL_SPI) += bmc150-accel-spi.o
