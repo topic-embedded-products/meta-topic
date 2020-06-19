@@ -1,7 +1,7 @@
-From 20485cfd989be562bedcfd43ee21d3a917047d16 Mon Sep 17 00:00:00 2001
+From 442e3b3e1e8e761a37f8687094ff5c33438f8722 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 12 Jun 2020 09:48:55 +0200
-Subject: [PATCH 20/20] zynqmp-topic boards: Add no-1-8-v quirk to SD1
+Subject: [PATCH 20/21] zynqmp-topic boards: Add no-1-8-v quirk to SD1
  controller
 
 The SD interface has a 3v3 level shifter so cannot be used in ultraspeed

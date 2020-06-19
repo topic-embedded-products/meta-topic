@@ -1,7 +1,7 @@
-From 961bb8b17be3cd6d8ddcd04d5a0bd9a718b25fed Mon Sep 17 00:00:00 2001
+From 6f81e8952e7c6dbca120866dca6292dc37c5662c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 18 Oct 2019 07:34:13 +0200
-Subject: [PATCH 06/16] board, zynqmp: Fix for wrong AMS setting by ROM
+Subject: [PATCH 06/21] board, zynqmp: Fix for wrong AMS setting by ROM
 
 A bug in the ZynqMP bootrom sets the PS_SYSMON_ANALOG_BUS register
 at 0xFFA50914 to the wrong value 0x3201. This causes the AMS to
@@ -18,11 +18,11 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  1 file changed, 6 insertions(+)
 
 diff --git a/board/xilinx/zynqmp/zynqmp.c b/board/xilinx/zynqmp/zynqmp.c
-index 853f4f9aba..ff9ba76e4b 100644
+index 8610663711..868b29fe24 100644
 --- a/board/xilinx/zynqmp/zynqmp.c
 +++ b/board/xilinx/zynqmp/zynqmp.c
-@@ -346,6 +346,9 @@ int board_early_init_f(void)
- 	return ret;
+@@ -341,6 +341,9 @@ static int multi_boot(void)
+ 	return 0;
  }
  
 +#define PS_SYSMON_ANALOG_BUS_VAL	0x3210
@@ -30,8 +30,8 @@ index 853f4f9aba..ff9ba76e4b 100644
 +
  int board_init(void)
  {
- #if defined(CONFIG_SPL_BUILD)
-@@ -357,6 +360,9 @@ int board_init(void)
+ #if defined(CONFIG_ZYNQMP_FIRMWARE)
+@@ -360,6 +363,9 @@ int board_init(void)
  
  	printf("EL Level:\tEL%d\n", current_el());
  

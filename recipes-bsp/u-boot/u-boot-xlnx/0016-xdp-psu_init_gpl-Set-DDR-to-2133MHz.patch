@@ -1,7 +1,7 @@
-From bc6c9b45c2117d015c096bd37b949411bbcc5915 Mon Sep 17 00:00:00 2001
+From fd9b2f46b04b170156248b2d5c7d115dc6fa3337 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Mar 2020 15:15:54 +0100
-Subject: [PATCH 17/17] xdp/psu_init_gpl: Set DDR to 2133MHz
+Subject: [PATCH 16/21] xdp/psu_init_gpl: Set DDR to 2133MHz
 
 There seems to be an issue with DDR access from PL at 2400MT/s, after
 updating the PMU and ATF firmware this is causing extremely slow DDR
