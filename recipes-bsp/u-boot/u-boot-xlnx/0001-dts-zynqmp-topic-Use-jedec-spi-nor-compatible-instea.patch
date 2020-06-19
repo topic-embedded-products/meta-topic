@@ -1,0 +1,54 @@
+From 0b5396dfaf260f04d08e9747f79d2af42b83a118 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 11 Aug 2020 16:56:34 +0200
+Subject: [PATCH] dts/zynqmp-topic*: Use jedec,spi-nor compatible instead of
+ spi-flash
+
+---
+ arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts | 2 +-
+ arch/arm/dts/zynqmp-topic-miamimp.dts            | 2 +-
+ arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi       | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts b/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
+index a02d075071..7083804029 100644
+--- a/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
++++ b/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
+@@ -59,7 +59,7 @@
+ 	status = "okay";
+ 	is-dual = <1>;
+ 	flash@0 {
+-		compatible = "st,m25p80", "n25q256a", "spi-flash";
++		compatible = "st,m25p80", "n25q256a", "jedec,spi-nor";
+ 		m25p,fast-read;
+ 		reg = <0x0>;
+ 		spi-tx-bus-width = <1>;
+diff --git a/arch/arm/dts/zynqmp-topic-miamimp.dts b/arch/arm/dts/zynqmp-topic-miamimp.dts
+index bc9e1a623e..d69e0e64ae 100644
+--- a/arch/arm/dts/zynqmp-topic-miamimp.dts
++++ b/arch/arm/dts/zynqmp-topic-miamimp.dts
+@@ -83,7 +83,7 @@
+ 	is-dual = <1>;
+ 	num-cs = <1>;
+ 	flash@0 {
+-		compatible = "st,m25p80", "n25q256a", "spi-flash";
++		compatible = "st,m25p80", "n25q256a", "jedec,spi-nor";
+ 		reg = <0x0>;
+ 		spi-tx-bus-width = <1>;
+ 		spi-rx-bus-width = <4>;
+diff --git a/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi b/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi
+index 8dd0989d4c..105f7254c9 100644
+--- a/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi
++++ b/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi
+@@ -82,7 +82,7 @@
+ 	is-dual = <1>;
+ 	num-cs = <1>;
+ 	flash@0 {
+-		compatible = "st,m25p80", "n25q00a", "spi-flash";
++		compatible = "st,m25p80", "n25q00a", "jedec,spi-nor";
+ 		reg = <0x0>;
+ 		spi-tx-bus-width = <1>;
+ 		spi-rx-bus-width = <4>;
+-- 
+2.17.1
+

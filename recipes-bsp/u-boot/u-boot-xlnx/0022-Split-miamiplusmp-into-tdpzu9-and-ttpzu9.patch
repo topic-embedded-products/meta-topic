@@ -1,7 +1,7 @@
-From f42d2eed885797b2368ca868cc44f60ef2b99231 Mon Sep 17 00:00:00 2001
+From 701268e4e3043b9cc4b753516f23e3c5ef334b2e Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 25 Jun 2020 10:55:01 +0200
-Subject: [PATCH 21/21] Split miamiplusmp into tdpzu9 and ttpzu9
+Subject: [PATCH 22/26] Split miamiplusmp into tdpzu9 and ttpzu9
 
 We cannot use the same bootloader code for both carriers with the
 miamiplusmp SOM because the early-init code differs. So split
@@ -27,10 +27,10 @@ and rename the board.
  create mode 100644 configs/topic_ttpzu9_defconfig
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index b5502ec939..8104e77a76 100644
+index 18e3c4886c..e8b7a8c924 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -191,7 +191,8 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
+@@ -290,7 +290,8 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
  	zynqmp-mini-qspi-x2-single.dtb		\
  	zynqmp-mini-qspi-x2-stacked.dtb		\
  	zynqmp-topic-miamimp.dtb		\

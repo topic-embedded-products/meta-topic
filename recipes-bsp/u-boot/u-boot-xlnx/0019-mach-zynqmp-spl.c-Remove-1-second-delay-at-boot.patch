@@ -1,7 +1,7 @@
-From 3b3f406baa228135959258e3a2d4a5ff9bd8c9f8 Mon Sep 17 00:00:00 2001
+From fec9a2a5678fa87864970a9410ee53d72e0bd24c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 26 May 2020 08:40:17 +0200
-Subject: [PATCH] mach-zynqmp/spl.c: Remove 1-second delay at boot
+Subject: [PATCH 19/26] mach-zynqmp/spl.c: Remove 1-second delay at boot
 
 SPL boot is slow on the zynqMP because of this delay. The initialization done
 in psu_init no longer requires an external delay, so this can be removed to
@@ -16,27 +16,27 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/mach-zynqmp/spl.c b/arch/arm/mach-zynqmp/spl.c
-index 1d6d959b7d..19ca5daa1b 100644
+index fb6a6c05f3..f77f0cb6a4 100644
 --- a/arch/arm/mach-zynqmp/spl.c
 +++ b/arch/arm/mach-zynqmp/spl.c
-@@ -24,8 +24,6 @@ void board_init_f(ulong dummy)
+@@ -26,8 +26,6 @@ void board_init_f(ulong dummy)
  	debug_uart_init();
  	puts("Debug uart enabled\n"); /* or printch() */
  #endif
 -	/* Delay is required for clocks to be propagated */
 -	udelay(1000000);
+ }
  
- 	/* Clear the BSS */
- 	memset(__bss_start, 0, __bss_end - __bss_start);
-@@ -86,6 +84,8 @@ u32 spl_boot_device(void)
+ static void ps_mode_reset(ulong mode)
+@@ -105,6 +103,8 @@ u32 spl_boot_device(void)
  #ifdef CONFIG_SPL_MMC_SUPPORT
  	case SD_MODE1:
  	case SD1_LSHFT_MODE: /* not working on silicon v1 */
 +		/* Without this SD boot fails */
 +		udelay(1000000);
- /* if both controllers enabled, then these two are the second controller */
- #ifdef CONFIG_SPL_ZYNQMP_TWO_SDHCI
  		return BOOT_DEVICE_MMC2;
+ 	case SD_MODE:
+ 	case EMMC_MODE:
 -- 
 2.17.1
 

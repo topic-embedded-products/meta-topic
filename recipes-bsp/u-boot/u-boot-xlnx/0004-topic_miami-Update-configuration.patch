@@ -1,45 +1,38 @@
-From 076b253ad89f9d9145b8c32454622a9b9e0e2c9c Mon Sep 17 00:00:00 2001
+From c533069b0c86833c7bd961ef9202ea7cdb1fab6b Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 9 Oct 2019 10:26:37 +0200
-Subject: [PATCH 04/16] topic_miami: Update configuration
+Subject: [PATCH 04/26] topic_miami: Update configuration
 
 Remove unused "NET" support and make a slightly smaller SPL
 ---
- configs/topic_miami_defconfig | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ configs/topic_miami_defconfig | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
-index 64ebfaed35..f41235d8d3 100644
+index c58924be2f..5f3d2fa9c9 100644
 --- a/configs/topic_miami_defconfig
 +++ b/configs/topic_miami_defconfig
-@@ -12,6 +12,8 @@ CONFIG_DEBUG_UART=y
- CONFIG_DISTRO_DEFAULTS=y
+@@ -17,6 +17,8 @@ CONFIG_SYS_LDSCRIPT="arch/arm/mach-zynq/u-boot.lds"
  CONFIG_BOOTDELAY=0
+ CONFIG_USE_PREBOOT=y
  CONFIG_SPL_STACK_R=y
 +# CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR is not set
 +# CONFIG_SPL_RAM_SUPPORT is not set
  CONFIG_SPL_SPI_LOAD=y
+ CONFIG_SYS_SPI_U_BOOT_OFFS=0x20000
  CONFIG_SYS_PROMPT="zynq-uboot> "
- CONFIG_CMD_THOR_DOWNLOAD=y
-@@ -24,10 +26,12 @@ CONFIG_CMD_MMC=y
- CONFIG_CMD_SF=y
- CONFIG_CMD_USB=y
+@@ -30,8 +32,11 @@ CONFIG_CMD_USB=y
  # CONFIG_CMD_SETEXPR is not set
--# CONFIG_CMD_NET is not set
+ # CONFIG_CMD_NET is not set
  CONFIG_CMD_CACHE=y
 +# CONFIG_ISO_PARTITION is not set
 +# CONFIG_SPL_PARTITION_UUIDS is not set
  CONFIG_OF_EMBED=y
  CONFIG_DEFAULT_DEVICE_TREE="zynq-topic-miami"
 +# CONFIG_NET is not set
+ CONFIG_SYS_RELOC_GD_ENV_ADDR=y
  CONFIG_SPL_DM_SEQ_ALIAS=y
  CONFIG_DFU_RAM=y
- CONFIG_FPGA_XILINX=y
-@@ -55,4 +59,3 @@ CONFIG_USB_GADGET_PRODUCT_NUM=0x0300
- CONFIG_CI_UDC=y
- CONFIG_USB_GADGET_DOWNLOAD=y
- CONFIG_USB_FUNCTION_THOR=y
--# CONFIG_REGEX is not set
 -- 
 2.17.1
 
