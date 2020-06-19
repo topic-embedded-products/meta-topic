@@ -1,0 +1,32 @@
+From ec8b60cfc323e87299c37b7fa0792d85f95c3823 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 13 Aug 2020 14:11:37 +0200
+Subject: [PATCH 16/16] media: axi-hdmi-rx: Initialize bus_type
+
+The v4l2-fwnode expects the bus_type member passed to v4l2_fwnode_endpoint_parse
+to have an actual value. Set it to V4L2_MBUS_UNKNOWN (0) to request the bus type
+to be obtained from the devicetree.
+
+This fixes the color coding and sync signals were not being read from the devicetree.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/media/platform/axi-hdmi-rx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/media/platform/axi-hdmi-rx.c b/drivers/media/platform/axi-hdmi-rx.c
+index f2c5b03fbe42..41e52d61d894 100644
+--- a/drivers/media/platform/axi-hdmi-rx.c
++++ b/drivers/media/platform/axi-hdmi-rx.c
+@@ -869,7 +869,7 @@ static int axi_hdmi_rx_probe(struct platform_device *pdev)
+ 	struct device_node *ep_node;
+ 	struct axi_hdmi_rx *hdmi_rx;
+ 	struct resource *res;
+-	struct v4l2_fwnode_endpoint bus_cfg;
++	struct v4l2_fwnode_endpoint bus_cfg = { .bus_type = V4L2_MBUS_UNKNOWN };
+ 	int ret;
+ 
+ 	hdmi_rx = devm_kzalloc(&pdev->dev, sizeof(*hdmi_rx), GFP_KERNEL);
+-- 
+2.17.1
+

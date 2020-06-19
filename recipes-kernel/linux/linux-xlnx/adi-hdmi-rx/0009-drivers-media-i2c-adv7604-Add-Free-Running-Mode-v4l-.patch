@@ -1,0 +1,105 @@
+From 9734c2dfe5fe6442b25030b361b06c4f75377870 Mon Sep 17 00:00:00 2001
+From: Dragos Bogdan <dragos.bogdan@analog.com>
+Date: Mon, 8 Jun 2015 12:06:17 +0300
+Subject: [PATCH 09/16] drivers/media/i2c/adv7604: Add Free Running Mode v4l
+ control.
+
+It allows to either disable or enable free running mode or
+set it to automatic. In automatic mode the adv7604 will
+go to free run mode if no external signal source could be detected.
+---
+ drivers/media/i2c/adv7604.c | 44 +++++++++++++++++++++++++++++++++++++
+ include/media/i2c/adv7604.h |  1 +
+ 2 files changed, 45 insertions(+)
+
+diff --git a/drivers/media/i2c/adv7604.c b/drivers/media/i2c/adv7604.c
+index 2dedd6ebb236..c3b23750f075 100644
+--- a/drivers/media/i2c/adv7604.c
++++ b/drivers/media/i2c/adv7604.c
+@@ -203,6 +203,7 @@ struct adv76xx_state {
+ 	struct v4l2_ctrl *analog_sampling_phase_ctrl;
+ 	struct v4l2_ctrl *free_run_color_manual_ctrl;
+ 	struct v4l2_ctrl *free_run_color_ctrl;
++	struct v4l2_ctrl *free_run_mode_ctrl;
+ 	struct v4l2_ctrl *rgb_quantization_range_ctrl;
+ };
+ 
+@@ -1235,6 +1236,30 @@ static int adv76xx_s_ctrl(struct v4l2_ctrl *ctrl)
+ 		cp_write(sd, 0xc1, (ctrl->val & 0x00ff00) >> 8);
+ 		cp_write(sd, 0xc2, (u8)(ctrl->val & 0x0000ff));
+ 		return 0;
++	case V4L2_CID_ADV_RX_FREE_RUN_MODE:
++		switch (ctrl->val) {
++		case 0: /* Disabled */
++			/* Disable the free run feature in HDMI mode. */
++			cp_write_clr_set(sd, 0xba, 0x1, 0);
++			/* Do not force the CP core free run. */
++			cp_write_clr_set(sd, 0xbf, 0x1, 0);
++			break;
++		case 1: /* Enabled */
++			/* Enable the free run feature in HDMI mode. */
++			cp_write_clr_set(sd, 0xba, 0x1, 1);
++			/* Force the CP core to free run. */
++			cp_write_clr_set(sd, 0xbf, 0x1, 1);
++			break;
++		case 2: /* Automatic */
++			/* Enable the free run feature in HDMI mode. */
++			cp_write_clr_set(sd, 0xba, 0x1, 1);
++			/* Do not force the CP core free run. */
++			cp_write_clr_set(sd, 0xbf, 0x1, 0);
++			break;
++		default:
++			break;
++		}
++		return 0;
+ 	}
+ 	return -EINVAL;
+ }
+@@ -2746,6 +2771,23 @@ static const struct v4l2_ctrl_config adv76xx_ctrl_free_run_color = {
+ 	.def = 0x0,
+ };
+ 
++static const char * const adv76xx_free_run_mode_strings[] = {
++	"Disabled",
++	"Enabled",
++	"Automatic",
++};
++
++static const struct v4l2_ctrl_config adv76xx_ctrl_free_run_mode = {
++	.ops = &adv76xx_ctrl_ops,
++	.id = V4L2_CID_ADV_RX_FREE_RUN_MODE,
++	.name = "Free Running Mode",
++	.type = V4L2_CTRL_TYPE_MENU,
++	.min = 0,
++	.max = ARRAY_SIZE(adv76xx_free_run_mode_strings) - 1,
++	.def = 2,
++	.qmenu = adv76xx_free_run_mode_strings,
++};
++
+ /* ----------------------------------------------------------------------- */
+ 
+ struct adv76xx_register_map {
+@@ -3502,6 +3544,8 @@ static int adv76xx_probe(struct i2c_client *client,
+ 		v4l2_ctrl_new_custom(hdl, &adv76xx_ctrl_free_run_color_manual, NULL);
+ 	state->free_run_color_ctrl =
+ 		v4l2_ctrl_new_custom(hdl, &adv76xx_ctrl_free_run_color, NULL);
++	state->free_run_mode_ctrl =
++		v4l2_ctrl_new_custom(hdl, &adv76xx_ctrl_free_run_mode, NULL);
+ 
+ 	sd->ctrl_handler = hdl;
+ 	if (hdl->error) {
+diff --git a/include/media/i2c/adv7604.h b/include/media/i2c/adv7604.h
+index 77a9799128b6..095cf5931371 100644
+--- a/include/media/i2c/adv7604.h
++++ b/include/media/i2c/adv7604.h
+@@ -150,6 +150,7 @@ enum adv76xx_pad {
+ #define V4L2_CID_ADV_RX_ANALOG_SAMPLING_PHASE	(V4L2_CID_DV_CLASS_BASE + 0x1000)
+ #define V4L2_CID_ADV_RX_FREE_RUN_COLOR_MANUAL	(V4L2_CID_DV_CLASS_BASE + 0x1001)
+ #define V4L2_CID_ADV_RX_FREE_RUN_COLOR		(V4L2_CID_DV_CLASS_BASE + 0x1002)
++#define V4L2_CID_ADV_RX_FREE_RUN_MODE		(V4L2_CID_DV_CLASS_BASE + 0x1003)
+ 
+ /* notify events */
+ #define ADV76XX_HOTPLUG		1
+-- 
+2.17.1
+

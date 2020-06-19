@@ -1,0 +1,48 @@
+From 534eccd5e81ca6be33e2e561bd4b0be06df4f291 Mon Sep 17 00:00:00 2001
+From: Alexandru Ardelean <alexandru.ardelean@analog.com>
+Date: Fri, 24 Apr 2020 10:13:06 +0300
+Subject: [PATCH 05/16] media: axi-hdmi-rx: move axi_hdmi_rx_read() under
+ VIDEO_ADV_DEBUG
+
+If the VIDEO_ADV_DEBUG Kconfig symbol is undefined, it will complain that
+the axi_hdmi_rx_read() function is unused.
+
+Signed-off-by: Alexandru Ardelean <alexandru.ardelean@analog.com>
+(cherry picked from commit 8499daae9034d9ec830d496dbd6ba049c071f63e)
+---
+ drivers/media/platform/axi-hdmi-rx.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/media/platform/axi-hdmi-rx.c b/drivers/media/platform/axi-hdmi-rx.c
+index 6547c9bc6912..6bbd92f3d363 100644
+--- a/drivers/media/platform/axi-hdmi-rx.c
++++ b/drivers/media/platform/axi-hdmi-rx.c
+@@ -90,12 +90,6 @@ static void axi_hdmi_rx_write(struct axi_hdmi_rx *axi_hdmi_rx,
+ 	writel(val, axi_hdmi_rx->base + reg);
+ }
+ 
+-static unsigned int axi_hdmi_rx_read(struct axi_hdmi_rx *axi_hdmi_rx,
+-	unsigned int reg)
+-{
+-	return readl(axi_hdmi_rx->base + reg);
+-}
+-
+ static struct axi_hdmi_rx *to_axi_hdmi_rx(struct v4l2_device *v4l2_dev)
+ {
+ 	return container_of(v4l2_dev, struct axi_hdmi_rx, v4l2_dev);
+@@ -294,6 +288,12 @@ static const struct vb2_ops axi_hdmi_rx_qops = {
+ 
+ #ifdef CONFIG_VIDEO_ADV_DEBUG
+ 
++static unsigned int axi_hdmi_rx_read(struct axi_hdmi_rx *axi_hdmi_rx,
++	unsigned int reg)
++{
++	return readl(axi_hdmi_rx->base + reg);
++}
++
+ static int axi_hdmi_rx_g_register(struct file *file, void *priv_fh,
+ 	struct v4l2_dbg_register *reg)
+ {
+-- 
+2.17.1
+

@@ -1,0 +1,37 @@
+From c0b7b34862a64814c7e443df5b27f493855346ad Mon Sep 17 00:00:00 2001
+From: Alexandru Ardelean <alexandru.ardelean@analog.com>
+Date: Thu, 3 Oct 2019 10:43:42 +0300
+Subject: [PATCH 06/16] [media] axi-hdmi-rx: rework bridge notifier to new
+ format
+
+This has changed in newer kernels, and we need to update the axi-hdmi-rx
+driver.
+
+Signed-off-by: Alexandru Ardelean <alexandru.ardelean@analog.com>
+---
+ drivers/media/platform/axi-hdmi-rx.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/media/platform/axi-hdmi-rx.c b/drivers/media/platform/axi-hdmi-rx.c
+index 6bbd92f3d363..eca26d8b8e96 100644
+--- a/drivers/media/platform/axi-hdmi-rx.c
++++ b/drivers/media/platform/axi-hdmi-rx.c
+@@ -924,9 +924,12 @@ static int axi_hdmi_rx_probe(struct platform_device *pdev)
+ 	hdmi_rx->asd.match_type = V4L2_ASYNC_MATCH_FWNODE;
+ 	hdmi_rx->asd.match.fwnode = of_fwnode_handle(of_graph_get_remote_port_parent(ep_node));
+ 
+-	hdmi_rx->asds[0] = &hdmi_rx->asd;
+-	hdmi_rx->notifier.subdevs = hdmi_rx->asds;
+-	hdmi_rx->notifier.num_subdevs = ARRAY_SIZE(hdmi_rx->asds);
++	v4l2_async_notifier_init(&hdmi_rx->notifier);
++	ret = v4l2_async_notifier_add_subdev(&hdmi_rx->notifier,
++					     &hdmi_rx->asd);
++	if (ret < 0)
++		goto err_device_unregister;
++
+ 	hdmi_rx->notifier.ops = &axi_hdmi_rx_async_ops;
+ 
+ 	ret = v4l2_async_notifier_register(&hdmi_rx->v4l2_dev,
+-- 
+2.17.1
+
