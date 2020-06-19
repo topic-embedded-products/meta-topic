@@ -1,0 +1,27 @@
+From b70ea1e6f6be601e176aec20bbaa3e5901152403 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Wed, 12 Aug 2020 15:31:54 +0200
+Subject: [PATCH 2/4] drm: axi_hdmi_encoder.c: Add missing drm_print.h include
+
+Missing drm_print.h include causes build failure
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
+index 3ec973c593c0..e6a3bc565d6c 100644
+--- a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
++++ b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
+@@ -20,6 +20,7 @@
+ #include <drm/drm_crtc_helper.h>
+ #include <drm/drm_encoder_slave.h>
+ #include <drm/drm_edid.h>
++#include <drm/drm_print.h>
+ #include <drm/drm_probe_helper.h>
+ 
+ #include "axi_hdmi_drv.h"
+-- 
+2.17.1
+

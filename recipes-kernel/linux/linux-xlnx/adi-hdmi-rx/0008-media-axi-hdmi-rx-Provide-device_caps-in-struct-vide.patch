@@ -1,0 +1,29 @@
+From 4d28b20d7f22fbf9d0bb484cc6363dffb15b7278 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 13 Aug 2020 09:35:45 +0200
+Subject: [PATCH 08/16] media: axi-hdmi-rx: Provide device_caps in struct
+ video_device
+
+Need to provide this info, otherwise video_register_device will trigger a WARN
+and fail.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/media/platform/axi-hdmi-rx.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/media/platform/axi-hdmi-rx.c b/drivers/media/platform/axi-hdmi-rx.c
+index 88b4677054e0..f2c5b03fbe42 100644
+--- a/drivers/media/platform/axi-hdmi-rx.c
++++ b/drivers/media/platform/axi-hdmi-rx.c
+@@ -748,6 +748,7 @@ static int axi_hdmi_rx_nodes_register(struct axi_hdmi_rx *hdmi_rx)
+ 		 "%s", hdmi_rx->v4l2_dev.name);
+ 	vdev->v4l2_dev = &hdmi_rx->v4l2_dev;
+ 	vdev->fops = &axi_hdmi_rx_fops;
++	vdev->device_caps = V4L2_CAP_VIDEO_CAPTURE | V4L2_CAP_STREAMING;
+ 	vdev->release = video_device_release_empty;
+ 	vdev->ctrl_handler = s->subdev->ctrl_handler;
+ 	vdev->lock = &s->lock;
+-- 
+2.17.1
+

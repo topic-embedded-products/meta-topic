@@ -1,0 +1,164 @@
+From 7224e7d029415de1ff3fe0c13bce976b5135b683 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Wed, 3 Jun 2020 08:18:58 +0200
+Subject: [PATCH 08/12] usb: dwc3: Add support for VBUS power control
+
+Support VBUS power control using regulator framework. Enables the regulator
+while the port is in host mode.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ .../devicetree/bindings/usb/dwc3.txt          |  1 +
+ drivers/usb/dwc3/core.c                       | 34 ++++++++++++++-----
+ drivers/usb/dwc3/core.h                       |  4 +++
+ drivers/usb/dwc3/drd.c                        |  6 ++--
+ 4 files changed, 33 insertions(+), 12 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/usb/dwc3.txt b/Documentation/devicetree/bindings/usb/dwc3.txt
+index 9e09693e14e2..f6b619a2e5f4 100644
+--- a/Documentation/devicetree/bindings/usb/dwc3.txt
++++ b/Documentation/devicetree/bindings/usb/dwc3.txt
+@@ -36,6 +36,7 @@ Optional properties:
+  - phys: from the *Generic PHY* bindings
+  - phy-names: from the *Generic PHY* bindings; supported names are "usb2-phy"
+ 	or "usb3-phy".
++ - vbus-supply: Regulator handle that provides the VBUS power.
+  - resets: a single pair of phandle and reset specifier
+  - snps,usb2-lpm-disable: indicate if we don't want to enable USB2 HW LPM
+  - snps,usb3_lpm_capable: determines if platform is USB3 LPM capable
+diff --git a/drivers/usb/dwc3/core.c b/drivers/usb/dwc3/core.c
+index a65a03985070..fdf6a97b1b54 100644
+--- a/drivers/usb/dwc3/core.c
++++ b/drivers/usb/dwc3/core.c
+@@ -26,6 +26,7 @@
+ #include <linux/acpi.h>
+ #include <linux/pinctrl/consumer.h>
+ #include <linux/of_address.h>
++#include <linux/regulator/consumer.h>
+ #include <linux/reset.h>
+ 
+ #include <linux/usb/ch9.h>
+@@ -113,6 +114,23 @@ void dwc3_set_prtcap(struct dwc3 *dwc, u32 mode)
+ 	dwc->current_dr_role = mode;
+ }
+ 
++void dwc3_set_vbus(struct dwc3 *dwc, bool enable)
++{
++	int ret;
++
++	if (dwc->vbus_reg && enable != dwc->vbus_reg_enabled) {
++		if (enable)
++			ret = regulator_enable(dwc->vbus_reg);
++		else
++			ret = regulator_disable(dwc->vbus_reg);
++		if (!ret)
++			dwc->vbus_reg_enabled = enable;
++	}
++
++	if (dwc->usb2_phy)
++		otg_set_vbus(dwc->usb2_phy->otg, enable);
++}
++
+ static void __dwc3_set_mode(struct work_struct *work)
+ {
+ 	struct dwc3 *dwc = work_to_dwc(work);
+@@ -165,8 +183,7 @@ static void __dwc3_set_mode(struct work_struct *work)
+ 		if (ret) {
+ 			dev_err(dwc->dev, "failed to initialize host\n");
+ 		} else {
+-			if (dwc->usb2_phy)
+-				otg_set_vbus(dwc->usb2_phy->otg, true);
++			dwc3_set_vbus(dwc, true);
+ 			phy_set_mode(dwc->usb2_generic_phy, PHY_MODE_USB_HOST);
+ 			phy_set_mode(dwc->usb3_generic_phy, PHY_MODE_USB_HOST);
+ 		}
+@@ -174,8 +191,7 @@ static void __dwc3_set_mode(struct work_struct *work)
+ 	case DWC3_GCTL_PRTCAP_DEVICE:
+ 		dwc3_event_buffers_setup(dwc);
+ 
+-		if (dwc->usb2_phy)
+-			otg_set_vbus(dwc->usb2_phy->otg, false);
++		dwc3_set_vbus(dwc, false);
+ 		phy_set_mode(dwc->usb2_generic_phy, PHY_MODE_USB_DEVICE);
+ 		phy_set_mode(dwc->usb3_generic_phy, PHY_MODE_USB_DEVICE);
+ 
+@@ -1282,8 +1298,7 @@ static int dwc3_core_init_mode(struct dwc3 *dwc)
+ 	case USB_DR_MODE_PERIPHERAL:
+ 		dwc3_set_prtcap(dwc, DWC3_GCTL_PRTCAP_DEVICE);
+ 
+-		if (dwc->usb2_phy)
+-			otg_set_vbus(dwc->usb2_phy->otg, false);
++		dwc3_set_vbus(dwc, false);
+ 		phy_set_mode(dwc->usb2_generic_phy, PHY_MODE_USB_DEVICE);
+ 		phy_set_mode(dwc->usb3_generic_phy, PHY_MODE_USB_DEVICE);
+ 
+@@ -1297,8 +1312,7 @@ static int dwc3_core_init_mode(struct dwc3 *dwc)
+ 	case USB_DR_MODE_HOST:
+ 		dwc3_set_prtcap(dwc, DWC3_GCTL_PRTCAP_HOST);
+ 
+-		if (dwc->usb2_phy)
+-			otg_set_vbus(dwc->usb2_phy->otg, true);
++		dwc3_set_vbus(dwc, true);
+ 		phy_set_mode(dwc->usb2_generic_phy, PHY_MODE_USB_HOST);
+ 		phy_set_mode(dwc->usb3_generic_phy, PHY_MODE_USB_HOST);
+ 
+@@ -1584,6 +1598,10 @@ static int dwc3_probe(struct platform_device *pdev)
+ 
+ 	dwc3_get_properties(dwc);
+ 
++	dwc->vbus_reg = devm_regulator_get(dev, "vbus");
++	if (IS_ERR(dwc->vbus_reg))
++		return PTR_ERR(dwc->vbus_reg);
++
+ 	dwc->reset = devm_reset_control_get_optional_shared(dev, NULL);
+ 	if (IS_ERR(dwc->reset))
+ 		return PTR_ERR(dwc->reset);
+diff --git a/drivers/usb/dwc3/core.h b/drivers/usb/dwc3/core.h
+index 8faa2b476197..62376966b620 100644
+--- a/drivers/usb/dwc3/core.h
++++ b/drivers/usb/dwc3/core.h
+@@ -1115,6 +1115,9 @@ struct dwc3 {
+ 
+ 	bool			phys_ready;
+ 
++	struct regulator	*vbus_reg;
++	bool			vbus_reg_enabled;
++
+ 	struct ulpi		*ulpi;
+ 	bool			ulpi_ready;
+ 
+@@ -1433,6 +1436,7 @@ struct dwc3_gadget_ep_cmd_params {
+ 
+ /* prototypes */
+ void dwc3_set_prtcap(struct dwc3 *dwc, u32 mode);
++void dwc3_set_vbus(struct dwc3 *dwc, bool enable);
+ void dwc3_set_mode(struct dwc3 *dwc, u32 mode);
+ u32 dwc3_core_fifo_space(struct dwc3_ep *dep, u8 type);
+ 
+diff --git a/drivers/usb/dwc3/drd.c b/drivers/usb/dwc3/drd.c
+index c946d64142ad..5e719cc4996e 100644
+--- a/drivers/usb/dwc3/drd.c
++++ b/drivers/usb/dwc3/drd.c
+@@ -384,8 +384,7 @@ void dwc3_otg_update(struct dwc3 *dwc, bool ignore_idstatus)
+ 		if (ret) {
+ 			dev_err(dwc->dev, "failed to initialize host\n");
+ 		} else {
+-			if (dwc->usb2_phy)
+-				otg_set_vbus(dwc->usb2_phy->otg, true);
++			dwc3_set_vbus(dwc, true);
+ 			if (dwc->usb2_generic_phy)
+ 				phy_set_mode(dwc->usb2_generic_phy,
+ 					     PHY_MODE_USB_HOST);
+@@ -398,8 +397,7 @@ void dwc3_otg_update(struct dwc3 *dwc, bool ignore_idstatus)
+ 		dwc3_event_buffers_setup(dwc);
+ 		spin_unlock_irqrestore(&dwc->lock, flags);
+ 
+-		if (dwc->usb2_phy)
+-			otg_set_vbus(dwc->usb2_phy->otg, false);
++		dwc3_set_vbus(dwc, false);
+ 		if (dwc->usb2_generic_phy)
+ 			phy_set_mode(dwc->usb2_generic_phy,
+ 				     PHY_MODE_USB_DEVICE);
+-- 
+2.17.1
+

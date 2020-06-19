@@ -140,7 +140,8 @@
 					adv7611: endpoint {
 						remote-endpoint = <&axi_hdmi_rx>;
 						bus-width = <24>;
-						hsync-active = <0>; /* Parallel bus */
+						bus-type = <5>;  /* V4L2_FWNODE_BUS_TYPE_PARALLEL */
+						hsync-active = <0>;
 						vsync-active = <0>;
 					};
 				};
@@ -234,7 +235,8 @@
 					axi_hdmi_rx: endpoint {
 						remote-endpoint = <&adv7611>;
 						bus-width = <24>;
-						hsync-active = <0>; /* Parallel bus */
+						bus-type = <5>;  /* V4L2_FWNODE_BUS_TYPE_PARALLEL */
+						hsync-active = <0>;
 						vsync-active = <0>;
 						pclk-sample = <1>; /* Sample on rising edge */
 					};

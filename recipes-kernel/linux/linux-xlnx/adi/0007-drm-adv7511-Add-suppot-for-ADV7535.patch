@@ -1,0 +1,223 @@
+From 3c0ac94fe2a7be689b6bf36579ef67f1a0d5eb4b Mon Sep 17 00:00:00 2001
+From: Bogdan Togorean <bogdan.togorean@analog.com>
+Date: Thu, 11 Jul 2019 15:26:28 +0300
+Subject: [PATCH 07/12] drm: adv7511: Add suppot for ADV7535
+
+Add support for chip ADV7535. Only ADV7533 allow supply
+V1P2 to be 1.2V or 1.8V. On ADV7535 is always 1.8V.
+
+Signed-off-by: Bogdan Togorean <bogdan.togorean@analog.com>
+---
+ .../bindings/display/bridge/adi,adv7511.txt   | 24 +++++++-------
+ drivers/gpu/drm/bridge/adv7511/adv7511.h      |  2 ++
+ drivers/gpu/drm/bridge/adv7511/adv7511_drv.c  | 31 ++++++++++++++-----
+ 3 files changed, 38 insertions(+), 19 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/display/bridge/adi,adv7511.txt b/Documentation/devicetree/bindings/display/bridge/adi,adv7511.txt
+index 2c887536258c..f94368c95161 100644
+--- a/Documentation/devicetree/bindings/display/bridge/adi,adv7511.txt
++++ b/Documentation/devicetree/bindings/display/bridge/adi,adv7511.txt
+@@ -1,10 +1,10 @@
+-Analog Device ADV7511(W)/13/33 HDMI Encoders
++Analog Device ADV7511(W)/13/33/35 HDMI Encoders
+ -----------------------------------------
+ 
+-The ADV7511, ADV7511W, ADV7513 and ADV7533 are HDMI audio and video transmitters
+-compatible with HDMI 1.4 and DVI 1.0. They support color space conversion,
+-S/PDIF, CEC and HDCP. ADV7533 supports the DSI interface for input pixels, while
+-the others support RGB interface.
++The ADV7511, ADV7511W, ADV7513, ADV7533 and ADV7535 are HDMI audio and video
++transmitters compatible with HDMI 1.4 and DVI 1.0. They support color space
++conversion, S/PDIF, CEC and HDCP. ADV7533/5 supports the DSI interface for input
++pixels, while the others support RGB interface.
+ 
+ Required properties:
+ 
+@@ -13,6 +13,7 @@ Required properties:
+ 		"adi,adv7511w"
+ 		"adi,adv7513"
+ 		"adi,adv7533"
++		"adi,adv7535"
+ 
+ - reg: I2C slave addresses
+   The ADV7511 internal registers are split into four pages exposed through
+@@ -52,14 +53,14 @@ The following input format properties are required except in "rgb 1x" and
+ - bgvdd-supply: A 1.8V supply that powers up the BGVDD pin. This is
+   needed only for ADV7511.
+ 
+-The following properties are required for ADV7533:
++The following properties are required for ADV7533 and ADV7535:
+ 
+ - adi,dsi-lanes: Number of DSI data lanes connected to the DSI host. It should
+   be one of 1, 2, 3 or 4.
+ - a2vdd-supply: 1.8V supply that powers up the A2VDD pin on the chip.
+ - v3p3-supply: A 3.3V supply that powers up the V3P3 pin on the chip.
+ - v1p2-supply: A supply that powers up the V1P2 pin on the chip. It can be
+-  either 1.2V or 1.8V.
++  either 1.2V or 1.8V for ADV7533 but only 1.8V for ADV7535.
+ 
+ Optional properties:
+ 
+@@ -71,21 +72,22 @@ Optional properties:
+ - adi,embedded-sync: The input uses synchronization signals embedded in the
+   data stream (similar to BT.656). Defaults to separate H/V synchronization
+   signals.
+-- adi,disable-timing-generator: Only for ADV7533. Disables the internal timing
+-  generator. The chip will rely on the sync signals in the DSI data lanes,
+-  rather than generate its own timings for HDMI output.
++- adi,disable-timing-generator: Only for ADV7533 and ADV7535. Disables the
++  internal timing generator. The chip will rely on the sync signals in the
++  DSI data lanes, rather than generate its own timings for HDMI output.
+ - clocks: from common clock binding: reference to the CEC clock.
+ - clock-names: from common clock binding: must be "cec".
+ - reg-names : Names of maps with programmable addresses.
+ 	It can contain any map needing a non-default address.
+ 	Possible maps names are : "main", "edid", "cec", "packet"
+ 
++
+ Required nodes:
+ 
+ The ADV7511 has two video ports. Their connections are modelled using the OF
+ graph bindings specified in Documentation/devicetree/bindings/graph.txt.
+ 
+-- Video port 0 for the RGB, YUV or DSI input. In the case of ADV7533, the
++- Video port 0 for the RGB, YUV or DSI input. In the case of ADV7533/5, the
+   remote endpoint phandle should be a reference to a valid mipi_dsi_host device
+   node.
+ - Video port 1 for the HDMI output
+diff --git a/drivers/gpu/drm/bridge/adv7511/adv7511.h b/drivers/gpu/drm/bridge/adv7511/adv7511.h
+index 52b2adfdc877..702432615ec8 100644
+--- a/drivers/gpu/drm/bridge/adv7511/adv7511.h
++++ b/drivers/gpu/drm/bridge/adv7511/adv7511.h
+@@ -91,6 +91,7 @@
+ #define ADV7511_REG_ARC_CTRL			0xdf
+ #define ADV7511_REG_CEC_I2C_ADDR		0xe1
+ #define ADV7511_REG_CEC_CTRL			0xe2
++#define ADV7511_REG_SUPPLY_SELECT		0xe4
+ #define ADV7511_REG_CHIP_ID_HIGH		0xf5
+ #define ADV7511_REG_CHIP_ID_LOW			0xf6
+ 
+@@ -320,6 +321,7 @@ struct adv7511_video_config {
+ enum adv7511_type {
+ 	ADV7511,
+ 	ADV7533,
++	ADV7535,
+ };
+ 
+ #define ADV7511_MAX_ADDRS 3
+diff --git a/drivers/gpu/drm/bridge/adv7511/adv7511_drv.c b/drivers/gpu/drm/bridge/adv7511/adv7511_drv.c
+index 2f8f7510f07e..59284b0f41a4 100644
+--- a/drivers/gpu/drm/bridge/adv7511/adv7511_drv.c
++++ b/drivers/gpu/drm/bridge/adv7511/adv7511_drv.c
+@@ -367,7 +367,7 @@ static void adv7511_power_on(struct adv7511 *adv7511)
+ 	 */
+ 	regcache_sync(adv7511->regmap);
+ 
+-	if (adv7511->type == ADV7533)
++	if (adv7511->type == ADV7533 || adv7511->type == ADV7535)
+ 		adv7533_dsi_power_on(adv7511);
+ 	adv7511->powered = true;
+ }
+@@ -387,7 +387,7 @@ static void __adv7511_power_off(struct adv7511 *adv7511)
+ static void adv7511_power_off(struct adv7511 *adv7511)
+ {
+ 	__adv7511_power_off(adv7511);
+-	if (adv7511->type == ADV7533)
++	if (adv7511->type == ADV7533 || adv7511->type == ADV7535)
+ 		adv7533_dsi_power_off(adv7511);
+ 	adv7511->powered = false;
+ }
+@@ -766,7 +766,7 @@ static void adv7511_mode_set(struct adv7511 *adv7511,
+ 	regmap_update_bits(adv7511->regmap, 0x17,
+ 		0x60, (vsync_polarity << 6) | (hsync_polarity << 5));
+ 
+-	if (adv7511->type == ADV7533)
++	if (adv7511->type == ADV7533 || adv7511->type == ADV7535)
+ 		adv7533_mode_set(adv7511, adj_mode);
+ 
+ 	drm_mode_copy(&adv7511->curr_mode, adj_mode);
+@@ -879,7 +879,7 @@ static int adv7511_bridge_attach(struct drm_bridge *bridge)
+ 				 &adv7511_connector_helper_funcs);
+ 	drm_connector_attach_encoder(&adv->connector, bridge->encoder);
+ 
+-	if (adv->type == ADV7533)
++	if (adv->type == ADV7533 || adv->type == ADV7535)
+ 		ret = adv7533_attach_dsi(adv);
+ 
+ 	if (adv->i2c_main->irq)
+@@ -957,7 +957,7 @@ static bool adv7511_cec_register_volatile(struct device *dev, unsigned int reg)
+ 	struct i2c_client *i2c = to_i2c_client(dev);
+ 	struct adv7511 *adv7511 = i2c_get_clientdata(i2c);
+ 
+-	if (adv7511->type == ADV7533)
++	if (adv7511->type == ADV7533 || adv7511->type == ADV7535)
+ 		reg -= ADV7533_REG_CEC_OFFSET;
+ 
+ 	switch (reg) {
+@@ -999,7 +999,7 @@ static int adv7511_init_cec_regmap(struct adv7511 *adv)
+ 		goto err;
+ 	}
+ 
+-	if (adv->type == ADV7533) {
++	if (adv->type == ADV7533 || adv->type == ADV7535) {
+ 		ret = adv7533_patch_cec_registers(adv);
+ 		if (ret)
+ 			goto err;
+@@ -1099,8 +1099,9 @@ static int adv7511_probe(struct i2c_client *i2c, const struct i2c_device_id *id)
+ 	struct adv7511_link_config link_config;
+ 	struct adv7511 *adv7511;
+ 	struct device *dev = &i2c->dev;
++	struct regulator *reg_v1p2;
+ 	unsigned int val;
+-	int ret;
++	int ret, reg_v1p2_uV;
+ 
+ 	if (!dev->of_node)
+ 		return -EINVAL;
+@@ -1168,6 +1169,18 @@ static int adv7511_probe(struct i2c_client *i2c, const struct i2c_device_id *id)
+ 	if (ret)
+ 		goto uninit_regulators;
+ 
++	if (adv7511->type == ADV7533) {
++		ret = match_string(adv7533_supply_names, adv7511->num_supplies,
++									"v1p2");
++		reg_v1p2 = adv7511->supplies[ret].consumer;
++		reg_v1p2_uV = regulator_get_voltage(reg_v1p2);
++
++		if (reg_v1p2_uV == 1200000) {
++			regmap_update_bits(adv7511->regmap,
++				ADV7511_REG_SUPPLY_SELECT, 0x80, 0x80);
++		}
++	}
++
+ 	adv7511_packet_disable(adv7511, 0xffff);
+ 
+ 	adv7511->i2c_edid = i2c_new_ancillary_device(i2c, "edid",
+@@ -1247,7 +1260,7 @@ static int adv7511_remove(struct i2c_client *i2c)
+ {
+ 	struct adv7511 *adv7511 = i2c_get_clientdata(i2c);
+ 
+-	if (adv7511->type == ADV7533)
++	if (adv7511->type == ADV7533 || adv7511->type == ADV7535)
+ 		adv7533_detach_dsi(adv7511);
+ 	i2c_unregister_device(adv7511->i2c_cec);
+ 	if (adv7511->cec_clk)
+@@ -1273,6 +1286,7 @@ static const struct i2c_device_id adv7511_i2c_ids[] = {
+ 	{ "adv7513", ADV7511 },
+ #ifdef CONFIG_DRM_I2C_ADV7533
+ 	{ "adv7533", ADV7533 },
++	{ "adv7535", ADV7535 },
+ #endif
+ 	{ }
+ };
+@@ -1284,6 +1298,7 @@ static const struct of_device_id adv7511_of_ids[] = {
+ 	{ .compatible = "adi,adv7513", .data = (void *)ADV7511 },
+ #ifdef CONFIG_DRM_I2C_ADV7533
+ 	{ .compatible = "adi,adv7533", .data = (void *)ADV7533 },
++	{ .compatible = "adi,adv7535", .data = (void *)ADV7535 },
+ #endif
+ 	{ }
+ };
+-- 
+2.17.1
+
