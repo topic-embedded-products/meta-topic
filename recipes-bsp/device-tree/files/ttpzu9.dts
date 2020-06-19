@@ -260,7 +260,12 @@
 	/delete-property/ phys;
 	/delete-property/ snps,usb3_lpm_capable;
 	usb-phy = <&usb_phy0>;
-	vbus-supply = <&reg_usb0_vbus>;
+	connector {
+		compatible = "usb-b-connector";
+		label = "micro-USB-otg";
+		type = "micro";
+		vbus-supply = <&reg_usb0_vbus>;
+	};
 };
 
 &usb1 {
@@ -278,6 +283,10 @@
 	maximum-speed = "super-speed";
 	snps,usb3_lpm_capable;
 	usb-phy = <&usb_phy1>;
+	connector {
+		compatible = "usb-b-connector";
+		label = "USB3";
+	};
 };
 
 &pcie {
