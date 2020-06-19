@@ -1,7 +1,7 @@
 
 # Use our patched repo
-SRCREV = "198bd10b433d37614ff2d44be4fbf443f17284c3"
-SRC_URI = "git://github.com/topic-embedded-products/xlnx-embeddedsw.git;protocol=https;branch=topic-2019.2"
+SRCREV = "cdebc09459ad23e3c34aa7f96c07a47429c58042"
+SRC_URI = "git://github.com/topic-embedded-products/xlnx-embeddedsw.git;protocol=https;branch=topic-2020.1"
 
 # Copy the pm_cfg_obj.c (makefile uses wildcard and will pick it up automatically)
 do_configure_append() {
