@@ -1,7 +1,7 @@
-From d345afb75c1551dfa05c00d42ef197a0e28a5eab Mon Sep 17 00:00:00 2001
+From 4308c5ae02c0eea3218ae6cec8c5b1f22e91232a Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 22 Apr 2020 16:27:19 +0200
-Subject: [PATCH] board: topic-miami: Set FCLK1 to 150MHz
+Subject: [PATCH 17/26] board: topic-miami: Set FCLK1 to 150MHz
 
 In all reference designs the FCLK1 runs at 150MHz, but the bootloader
 doesn't set it up like that. Set the divider to 8 to generate the
@@ -12,10 +12,10 @@ correct clock. Fixes (a.o.) the DMA speed being too slow.
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/board/topic/zynq/zynq-topic-miami/ps7_init_gpl.c b/board/topic/zynq/zynq-topic-miami/ps7_init_gpl.c
-index b195d7a25b..10d02570ec 100644
+index 360beaef8e..e7cc2c2dec 100644
 --- a/board/topic/zynq/zynq-topic-miami/ps7_init_gpl.c
 +++ b/board/topic/zynq/zynq-topic-miami/ps7_init_gpl.c
-@@ -50,7 +50,7 @@ static unsigned long ps7_clock_init_data_3_0[] = {
+@@ -49,7 +49,7 @@ static unsigned long ps7_clock_init_data_3_0[] = {
  	EMIT_MASKWRITE(0XF8000158, 0x00003F33U, 0x00000601U),
  	EMIT_MASKWRITE(0XF8000168, 0x00003F31U, 0x00000601U),
  	EMIT_MASKWRITE(0XF8000170, 0x03F03F30U, 0x00100C00U),
@@ -25,10 +25,10 @@ index b195d7a25b..10d02570ec 100644
  	EMIT_MASKWRITE(0XF80001A0, 0x03F03F30U, 0x00101800U),
  	EMIT_MASKWRITE(0XF80001C4, 0x00000001U, 0x00000001U),
 diff --git a/board/topic/zynq/zynq-topic-miamilite/ps7_init_gpl.c b/board/topic/zynq/zynq-topic-miamilite/ps7_init_gpl.c
-index 957cac7291..fae0066d7c 100644
+index edd8b3296b..b496af5ac9 100644
 --- a/board/topic/zynq/zynq-topic-miamilite/ps7_init_gpl.c
 +++ b/board/topic/zynq/zynq-topic-miamilite/ps7_init_gpl.c
-@@ -50,7 +50,7 @@ static unsigned long ps7_clock_init_data_3_0[] = {
+@@ -49,7 +49,7 @@ static unsigned long ps7_clock_init_data_3_0[] = {
  	EMIT_MASKWRITE(0xF8000158, 0x00003F33U, 0x00000601U),
  	EMIT_MASKWRITE(0xF8000168, 0x00003F31U, 0x00000601U),
  	EMIT_MASKWRITE(0xF8000170, 0x03F03F30U, 0x00100C00U),

@@ -1,7 +1,7 @@
-From 8d3c1ac524bd2b1f8379d9e91b6e6d0180f44d0c Mon Sep 17 00:00:00 2001
+From b4db667d53a2f66321c429373194e12cdf573a7e Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 20 Oct 2017 13:01:54 +0200
-Subject: [PATCH 03/16] configs/topic_miami.h: Use same partitioning for USB
+Subject: [PATCH 03/26] configs/topic_miami.h: Use same partitioning for USB
  boot as for SD
 
 Use the same partitioning as the SD card by default. This allows to
@@ -12,10 +12,10 @@ partitioning and boot using that instead of requiring a ramdisk image.
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
-index c32c63ced6..6f8f2b4ede 100644
+index d58f8eb0d7..13b955281b 100644
 --- a/include/configs/topic_miami.h
 +++ b/include/configs/topic_miami.h
-@@ -63,15 +63,15 @@
+@@ -53,15 +53,15 @@
  # endif
  # define EXTRA_ENV_USB \
  	"usbreset=" ENV_USB_RESET "\0" \

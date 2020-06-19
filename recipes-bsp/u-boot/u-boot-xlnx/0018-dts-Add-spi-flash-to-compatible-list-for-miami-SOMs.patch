@@ -1,7 +1,7 @@
-From a2f4ef37fece8c260bbb5041ccfd9865d4c2ce0b Mon Sep 17 00:00:00 2001
+From 395a6a826adea98560ca44f0a2645190cc49dd08 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 26 May 2020 07:48:38 +0200
-Subject: [PATCH 19/19] dts: Add "spi-flash" to compatible list for miami SOMs
+Subject: [PATCH 18/26] dts: Add "spi-flash" to compatible list for miami SOMs
 
 The compatible list for a SPI flash device must contain "spi-flash" for the
 spi-flash driver to recognize it. Without this, the driver may fall back to
@@ -17,7 +17,7 @@ http://u-boot.10912.n7.nabble.com/PATCH-v2-dm-spi-prevent-setting-a-speed-of-0-H
  4 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm/dts/zynq-topic-miami.dts b/arch/arm/dts/zynq-topic-miami.dts
-index 63fbaf2e9f..9612efe817 100644
+index 463eab21f0..363d2bd4fd 100644
 --- a/arch/arm/dts/zynq-topic-miami.dts
 +++ b/arch/arm/dts/zynq-topic-miami.dts
 @@ -36,7 +36,7 @@

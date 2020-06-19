@@ -1,7 +1,7 @@
-From bb6f8d13b28afbf6d021f5a554bc59cbf3b38bdb Mon Sep 17 00:00:00 2001
+From a818995d39173b9e9e50bbe0091189fb95f95c1c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 23 Feb 2017 12:07:49 +0100
-Subject: [PATCH 02/16] board: topic_miamilite: Support cost-reduced version
+Subject: [PATCH 02/26] board: topic_miamilite: Support cost-reduced version
 
 To reduce board cost, the topic-miamilite board hardware was adapted. It now
 only has single QSPI NOR flash and a single DDR RAM chip. This reduces the
@@ -35,7 +35,7 @@ index 366fd5bbb1..c06549c076 100644
 +	};
  };
 diff --git a/board/topic/zynq/zynq-topic-miamilite/ps7_init_gpl.c b/board/topic/zynq/zynq-topic-miamilite/ps7_init_gpl.c
-index afec4038d3..28670bd962 100644
+index ae4666f7d5..edd8b3296b 100644
 --- a/board/topic/zynq/zynq-topic-miamilite/ps7_init_gpl.c
 +++ b/board/topic/zynq/zynq-topic-miamilite/ps7_init_gpl.c
 @@ -59,7 +59,7 @@ static unsigned long ps7_clock_init_data_3_0[] = {
@@ -115,10 +115,10 @@ index db6e642890..08d5344125 100644
 -0xE000D0A0 0xE2FF06EB // LQSPI_CFG - Quad read, dual flash
 +0xE000D0A0 0x82FF04EB // LQSPI_CFG - QIOREAD mode, Numonyx/Micron
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
-index f14c4ee3a8..c32c63ced6 100644
+index 73fdfae461..d58f8eb0d7 100644
 --- a/include/configs/topic_miami.h
 +++ b/include/configs/topic_miami.h
-@@ -57,9 +57,12 @@
+@@ -47,9 +47,12 @@
  /* Setup proper boot sequences for Miami boards */
  
  #if defined(CONFIG_USB)

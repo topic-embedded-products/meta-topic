@@ -1,7 +1,7 @@
-From 2ade67bf0cc4825f8aa05b7420a740c46436dd27 Mon Sep 17 00:00:00 2001
+From 9a21ec57eb15b4d81918318e1c077afff71f6253 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 26 Jun 2020 13:41:10 +0200
-Subject: [PATCH 22/22] zynqmp-topic-miamimp/psu_init_gpl: New DDR chips
+Subject: [PATCH 23/26] zynqmp-topic-miamimp/psu_init_gpl: New DDR chips
 
 New chips are single rank, old were dual-rank, but same capacity.
 

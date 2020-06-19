@@ -1,7 +1,7 @@
-From 7d4e5fe51c8bfc3d73978ece04da18685d49d5e1 Mon Sep 17 00:00:00 2001
+From b26384152746d4b965f8b672311dc77deef8b899 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 12 Feb 2020 11:45:06 +0100
-Subject: [PATCH 14/17] ARM: zynqmp: Add support for the topic-miamiplusmp SoM
+Subject: [PATCH 14/26] ARM: zynqmp: Add support for the topic-miamiplusmp SoM
 
 A larger version of the topic-miamimp SoM, with integrated USB PHYs and
 an ethernet PHY.
@@ -18,10 +18,10 @@ an ethernet PHY.
  create mode 100644 configs/topic_miamiplusmp_defconfig
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index fa14d0fda8..b5502ec939 100644
+index 03a825865f..18e3c4886c 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -191,6 +191,7 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
+@@ -290,6 +290,7 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
  	zynqmp-mini-qspi-x2-single.dtb		\
  	zynqmp-mini-qspi-x2-stacked.dtb		\
  	zynqmp-topic-miamimp.dtb		\

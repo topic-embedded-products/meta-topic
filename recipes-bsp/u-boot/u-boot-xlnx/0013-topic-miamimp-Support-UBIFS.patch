@@ -1,7 +1,7 @@
-From 582dea7a09e062bd897ba42c64835efc4e35bfdb Mon Sep 17 00:00:00 2001
+From 6a72024dd3ff583844028803c4650f02e5ce06dd Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Wed, 5 Feb 2020 10:05:39 +0100
-Subject: [PATCH 13/16] topic-miamimp: Support UBIFS
+Subject: [PATCH 13/26] topic-miamimp: Support UBIFS
 
 ---
  include/configs/topic_miamimp.h | 10 +++++++++-
@@ -30,12 +30,12 @@ index ff9b892ee7..94e55f326a 100644
  #include "xilinx_zynqmp.h"
  
 diff --git a/include/configs/xilinx_zynqmp.h b/include/configs/xilinx_zynqmp.h
-index 1356314096..7894fe6eb5 100644
+index a3461214c9..fa4a29e390 100644
 --- a/include/configs/xilinx_zynqmp.h
 +++ b/include/configs/xilinx_zynqmp.h
-@@ -259,10 +259,12 @@
- #define BOOTENV_DEV_NAME_XILINX(devtypeu, devtypel, instance) \
- 	"xilinx "
+@@ -160,10 +160,12 @@
+ # define BOOT_TARGET_DEVICES_NAND(func)
+ #endif
  
 -#define BOOTENV_DEV_QSPI(devtypeu, devtypel, instance) \
 -	"bootcmd_" #devtypel #instance "=sf probe " #instance " 0 0 && " \
