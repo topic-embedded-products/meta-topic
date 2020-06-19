@@ -11,10 +11,8 @@ SOM_FAMILY = "topic-miami"
 KMACHINE = "${MACHINE_BOARD}"
 
 include conf/machine/include/zynq-base.inc
-include conf/machine/include/tune-zynq.inc
-
-# tune-zynq is adding an unused zImage
-KERNEL_IMAGETYPES_remove = "zImage"
+require conf/machine/include/soc-zynq.inc
+require conf/machine/include/machine-xilinx-default.inc
 
 MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 
