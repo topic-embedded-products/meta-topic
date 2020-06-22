@@ -76,20 +76,20 @@ Go to the `build` directory (use topic-platform to create one).
 
 Add these lines to `conf/local.conf`:
 ```
-MACHINE="zynqmp-pmu"
+MACHINE="microblaze-pmu"
 DISTRO="xilinx-standalone"
 TMPDIR="${TOPDIR}/pmutmp"
 ```
 Now execute:
 ```
 . ./profile
-MACHINE=zynqmp-pmu bitbake pmu-firmware
+MACHINE=microblaze-pmu bitbake pmu-firmware
 ```
-The PMU firmware binary will be created in `pmutmp/deploy/images/zynqmp-pmu/`.
+The PMU firmware binary will be created in `pmutmp/deploy/images/microblaze-pmu/`.
 Compress this using `xz` and replace the `pmu-firmware.bin.xz` file in
 `u-boot-xlnx`:
 ```
-xz < pmutmp/deploy/images/zynqmp-pmu/pmu-firmware-zynqmp-pmu.bin > ../meta-topic/recipes-bsp/u-boot/u-boot-xlnx/pmu-firmware-zynqmp-pmu.bin.xz
+xz < pmutmp/deploy/images/microblaze-pmu/pmu-firmware-microblaze-pmu.bin > ../meta-topic/recipes-bsp/u-boot/u-boot-xlnx/pmu-firmware-zynqmp-pmu.bin.xz
 ```
 
 Don't forget to remove the three extra lines from your `local.conf` file afterwards...
