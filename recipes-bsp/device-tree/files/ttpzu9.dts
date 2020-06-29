@@ -161,6 +161,7 @@
 			silabs,format = <1>; /* LVDS 1v8 */
 			silabs,common-mode = <13>;
 			silabs,amplitude = <3>;
+			always-on;
 		};
 
 		out@1 {
@@ -168,6 +169,7 @@
 			silabs,format = <1>; /* LVDS 1v8 */
 			silabs,common-mode = <13>;
 			silabs,amplitude = <3>;
+			always-on;
 		};
 
 		out@2 {
@@ -175,6 +177,7 @@
 			silabs,format = <1>; /* LVDS 1v8 */
 			silabs,common-mode = <13>;
 			silabs,amplitude = <3>;
+			always-on;
 		};
 
 		out@3 {
@@ -182,6 +185,7 @@
 			silabs,format = <1>; /* LVDS 1v8 */
 			silabs,common-mode = <13>;
 			silabs,amplitude = <3>;
+			always-on;
 		};
 
 		out@4 {
