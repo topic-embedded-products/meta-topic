@@ -26,6 +26,7 @@ SRC_URI_append = "\
 	file://0020-zynqmp-topic-boards-Add-no-1-8-v-quirk-to-SD1-contro.patch \
 	file://0021-Split-miamiplusmp-into-tdpzu9-and-ttpzu9.patch \
 	file://0022-zynqmp-topic-miamimp-psu_init_gpl-New-DDR-chips.patch \
+	file://0001-ttpzu9-psu_init_gpl-Run-DDR-at-2400.patch \
 	"
 
 # Glitches on serial input interrupt the boot sequence on some boards, use
