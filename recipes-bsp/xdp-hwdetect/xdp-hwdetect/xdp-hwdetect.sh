@@ -46,46 +46,52 @@ stty -F /dev/ttyS0 115200 crtscts
 
 mknod /dev/start_stream c 243 0
 
-yavta -w '0x0098c981 4' /dev/v4l-subdev2
+if yavta -w '0x0098c981 4' /dev/v4l-subdev2
+then
+	#SONY IMX274 Sensor
+	media-ctl -d /dev/media0 -V "\"IMX274_0\":0  [fmt:SRGGB10_1X10/1920x1080 field:none]"
+	#MIPI CSI2-Rx Subsystem
+	media-ctl -d /dev/media0 -V "\"a00f0000.csiss\":1  [fmt:SRGGB10_1X10/1920x1080 field:none]"
+	media-ctl -d /dev/media0 -V "\"a00f0000.csiss\":0  [fmt:SRGGB8_1X8/1920x1080 field:none]"
+	#Demosaic IP
+	media-ctl -d /dev/media0 -V "\"a0140000.demosaic\":0  [fmt:SRGGB8_1X8/1920x1080 field:none]"
+	media-ctl -d /dev/media0 -V "\"a0140000.demosaic\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
 
-#SONY IMX274 Sensor
-media-ctl -d /dev/media0 -V "\"IMX274_0\":0  [fmt:SRGGB10_1X10/1920x1080 field:none]"
-#MIPI CSI2-Rx Subsystem
-media-ctl -d /dev/media0 -V "\"a00f0000.csiss\":1  [fmt:SRGGB10_1X10/1920x1080 field:none]"
-media-ctl -d /dev/media0 -V "\"a00f0000.csiss\":0  [fmt:SRGGB8_1X8/1920x1080 field:none]"
-#Demosaic IP
-media-ctl -d /dev/media0 -V "\"a0140000.demosaic\":0  [fmt:SRGGB8_1X8/1920x1080 field:none]"
-media-ctl -d /dev/media0 -V "\"a0140000.demosaic\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
-
-media-ctl -d /dev/media0 -V "\"a0100000.v_proc_ss\":0  [fmt:RBG888_1X24/1920x1080 field:none]"
-media-ctl -d /dev/media0 -V "\"a0100000.v_proc_ss\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
+	media-ctl -d /dev/media0 -V "\"a0100000.v_proc_ss\":0  [fmt:RBG888_1X24/1920x1080 field:none]"
+	media-ctl -d /dev/media0 -V "\"a0100000.v_proc_ss\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
+fi
 
 # Load the settings for camera 1
+if yavta -w '0x0098c981 4' /dev/v4l-subdev6
+then
+	#SONY IMX274 Sensor
+	media-ctl -d /dev/media0 -V "\"IMX274_1\":0  [fmt:SRGGB10_1X10/1920x1080 field:none]"
+	#MIPI CSI2-Rx Subsystem
+	media-ctl -d /dev/media0 -V "\"a0180000.csiss\":1  [fmt:SRGGB10_1X10/1920x1080 field:none]"
+	media-ctl -d /dev/media0 -V "\"a0180000.csiss\":0  [fmt:SRGGB8_1X8/1920x1080 field:none]"
+	#Demosaic IP
+	media-ctl -d /dev/media0 -V "\"a01c0000.demosaic\":0  [fmt:SRGGB8_1X8/1920x1080 field:none]"
+	media-ctl -d /dev/media0 -V "\"a01c0000.demosaic\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
 
-yavta -w '0x0098c981 4' /dev/v4l-subdev6
-
-#SONY IMX274 Sensor
-media-ctl -d /dev/media0 -V "\"IMX274_1\":0  [fmt:SRGGB10_1X10/1920x1080 field:none]"
-#MIPI CSI2-Rx Subsystem
-media-ctl -d /dev/media0 -V "\"a0180000.csiss\":1  [fmt:SRGGB10_1X10/1920x1080 field:none]"
-media-ctl -d /dev/media0 -V "\"a0180000.csiss\":0  [fmt:SRGGB8_1X8/1920x1080 field:none]"
-#Demosaic IP
-media-ctl -d /dev/media0 -V "\"a01c0000.demosaic\":0  [fmt:SRGGB8_1X8/1920x1080 field:none]"
-media-ctl -d /dev/media0 -V "\"a01c0000.demosaic\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
-
-media-ctl -d /dev/media0 -V "\"a0040000.v_proc_ss\":0  [fmt:RBG888_1X24/1920x1080 field:none]"
-media-ctl -d /dev/media0 -V "\"a0040000.v_proc_ss\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
+	media-ctl -d /dev/media0 -V "\"a0040000.v_proc_ss\":0  [fmt:RBG888_1X24/1920x1080 field:none]"
+	media-ctl -d /dev/media0 -V "\"a0040000.v_proc_ss\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
+fi
 
 #Set the color correction correctly
+if [ -e /dev/v4l-subdev0 ]
+then
+	yavta -w '0x0098c9a1 80' /dev/v4l-subdev0
+	yavta -w '0x0098c9a2 55' /dev/v4l-subdev0
+	yavta -w '0x0098c9a3 35' /dev/v4l-subdev0
+	yavta -w '0x0098c9a4 24' /dev/v4l-subdev0
+	yavta -w '0x0098c9a5 40' /dev/v4l-subdev0
+fi
 
-yavta -w '0x0098c9a1 80' /dev/v4l-subdev0
-yavta -w '0x0098c9a2 55' /dev/v4l-subdev0
-yavta -w '0x0098c9a3 35' /dev/v4l-subdev0
-yavta -w '0x0098c9a4 24' /dev/v4l-subdev0
-yavta -w '0x0098c9a5 40' /dev/v4l-subdev0
-
-yavta -w '0x0098c9a1 80' /dev/v4l-subdev4
-yavta -w '0x0098c9a2 55' /dev/v4l-subdev4
-yavta -w '0x0098c9a3 35' /dev/v4l-subdev4
-yavta -w '0x0098c9a4 24' /dev/v4l-subdev4
-yavta -w '0x0098c9a5 40' /dev/v4l-subdev4
+if [ -e /dev/v4l-subdev4 ]
+then
+	yavta -w '0x0098c9a1 80' /dev/v4l-subdev4
+	yavta -w '0x0098c9a2 55' /dev/v4l-subdev4
+	yavta -w '0x0098c9a3 35' /dev/v4l-subdev4
+	yavta -w '0x0098c9a4 24' /dev/v4l-subdev4
+	yavta -w '0x0098c9a5 40' /dev/v4l-subdev4
+fi

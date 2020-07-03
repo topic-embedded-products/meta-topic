@@ -2,6 +2,7 @@ SUMMARY = "Hardware detection script for XDP"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
 
+PV = "2"
 SRC_URI = "file://init file://${BPN}.service file://${BPN}.sh"
 S = "${WORKDIR}"
 
@@ -11,6 +12,8 @@ INITSCRIPT_NAME = "${BPN}.sh"
 INITSCRIPT_PARAMS = "start 08 S ."
 
 SYSTEMD_SERVICE_${PN} = "${BPN}.service"
+
+RDEPENDS_${PN} += "yavta media-ctl"
 
 do_compile() {
 	true
