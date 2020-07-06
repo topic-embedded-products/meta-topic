@@ -21,8 +21,7 @@
 
 	gpio-poweroff {
 		compatible = "gpio-poweroff";
-		gpios = <&ttp_gpioex 7 1>; /* Output 7, active low */
-		input;
+		gpios = <&ttp_gpioex 7 GPIO_ACTIVE_LOW>;
 		force-pm-power-off; /* Replace the PSCI power-off callback */
 	};
 
@@ -32,7 +31,7 @@
 		regulator-name = "usb0-vbus";
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
-		gpio = <&ttp_gpioex 4 0>;
+		gpio = <&ttp_gpioex 4 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 	};
 
@@ -41,13 +40,13 @@
 		compatible = "usb-nop-xceiv";
 		vcc-supply = <&reg_1v8_miami>;
 		#phy-cells = <0>;
-		reset-gpios = <&gpioex 3 1>;
+		reset-gpios = <&gpioex 3 GPIO_ACTIVE_LOW>;
 	};
 	usb_phy1: usb2phy1 {
 		compatible = "usb-nop-xceiv";
 		vcc-supply = <&reg_1v8_miami>;
 		#phy-cells = <0>;
-		reset-gpios = <&gpioex 4 1>;
+		reset-gpios = <&gpioex 4 GPIO_ACTIVE_LOW>;
 	};
 };
 
