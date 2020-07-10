@@ -87,6 +87,22 @@
 	};
 };
 
+/* Operating points for 1333 MHz operation */
+&cpu_opp_table {
+	opp00 {
+		opp-hz = /bits/ 64 <1333333320>;
+	};
+	opp01 {
+		opp-hz = /bits/ 64 <666666660>;
+	};
+	opp02 {
+		opp-hz = /bits/ 64 <444444440>;
+	};
+	opp03 {
+		opp-hz = /bits/ 64 <333333330>;
+	};
+};
+
 &gpio {
 	status = "okay";
 	pinctrl-names = "default";
