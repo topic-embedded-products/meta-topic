@@ -14,8 +14,7 @@
 / {
 	gpio-poweroff {
 		compatible = "gpio-poweroff";
-		gpios = <&tdp_gpioex11 2 1>; /* Output 7, active low */
-		input;
+		gpios = <&tdp_gpioex11 2 GPIO_ACTIVE_LOW>;
 		force-pm-power-off; /* Replace the PSCI power-off callback */
 	};
 
@@ -25,7 +24,7 @@
 		#size-cells = <0>;
 		power {
 			label = "power";
-			gpios = <&tdp_gpioex10 0 1>; /* Input 0, active low */
+			gpios = <&tdp_gpioex10 0 GPIO_ACTIVE_LOW>; /* Input 0, active low */
 			linux,code = <116>; /* KEY_POWER */
 			gpio-key,wakeup;
 		};
@@ -54,13 +53,13 @@
 		compatible = "usb-nop-xceiv";
 		vcc-supply = <&reg_1v8_miami>;
 		#phy-cells = <0>;
-		reset-gpios = <&gpioex 3 1>;
+		reset-gpios = <&gpioex 3 GPIO_ACTIVE_LOW>;
 	};
 	usb_phy1: usb2phy1 {
 		compatible = "usb-nop-xceiv";
 		vcc-supply = <&reg_1v8_miami>;
 		#phy-cells = <0>;
-		reset-gpios = <&gpioex 4 1>;
+		reset-gpios = <&gpioex 4 GPIO_ACTIVE_LOW>;
 	};
 };
 
@@ -235,29 +234,6 @@
 
 &serdes {
 	status = "okay";
-};
-
-/* Displayport */
-&xlnx_dpdma {
-	status = "okay";
-};
-&zynqmp_dpsub {
-	phy-names = "dp-phy0";
-	phys = <&lane1 6 0 2 27000000>;
-	status = "okay";
-	xlnx,max-lanes = <1>;
-};
-&zynqmp_dp_snd_pcm0 {
-        status = "okay";
-};
-&zynqmp_dp_snd_pcm1 {
-        status = "okay";
-};
-&zynqmp_dp_snd_card0 {
-        status = "okay";
-};
-&zynqmp_dp_snd_codec0 {
-        status = "okay";
 };
 
 /* Postpone ethernet until after FPGA programming to workaround "spike" on IO pads issue */
