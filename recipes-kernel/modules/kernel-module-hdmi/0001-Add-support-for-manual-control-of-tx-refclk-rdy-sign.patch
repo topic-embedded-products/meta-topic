@@ -1,0 +1,79 @@
+From f8ee619cbfa24425532075d224478862d0fa2d75 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 4 Jul 2019 13:13:57 +0200
+Subject: [PATCH] Add support for manual control of tx-refclk-rdy signal
+
+Since clk_set_rate is a synchronous call, the clock will be up and
+running after it. If there's no logic in the PL to assert the
+tx_refclk_rdy signal to the VPHY, use GPIO calls to manually control
+this signal after each change to the clock frequency.
+---
+ hdmi/xilinx_drm_hdmi.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/hdmi/xilinx_drm_hdmi.c b/hdmi/xilinx_drm_hdmi.c
+index fd68fb7..0904cd8 100644
+--- a/hdmi/xilinx_drm_hdmi.c
++++ b/hdmi/xilinx_drm_hdmi.c
+@@ -28,6 +28,7 @@
+ #include <linux/clk.h>
+ #include <linux/delay.h>
+ #include <linux/device.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/module.h>
+ #include <linux/mutex.h>
+ #include <linux/component.h>
+@@ -127,6 +128,8 @@ struct xlnx_drm_hdmi {
+ 	struct clk *tmds_clk;
+ 	/* retimer that we configure by setting a clock rate */
+ 	struct clk *retimer_clk;
++	/* tx_refclk_rdy pin */
++	struct gpio_desc *tx_refclk_rdy_gpio;
+ 
+ 	/* HDMI TXSS interrupt */
+ 	int irq;
+@@ -1166,6 +1169,8 @@ static void xlnx_drm_hdmi_encoder_atomic_mode_set(struct drm_encoder *encoder,
+ 	adjusted_mode->clock = VphyPtr->HdmiTxRefClkHz / 1000;
+ 	dev_dbg(xhdmi->dev,"adjusted_mode->clock = %u Hz\n", adjusted_mode->clock);
+ 
++	gpiod_set_value_cansleep(xhdmi->tx_refclk_rdy_gpio, 0);
++
+ 	/* request required tmds clock rate */
+ 	ret = clk_set_rate(xhdmi->tmds_clk, adjusted_mode->clock * 1000);
+ 	if (ret) {
+@@ -1183,6 +1188,8 @@ static void xlnx_drm_hdmi_encoder_atomic_mode_set(struct drm_encoder *encoder,
+ 		XVphy_ClkDetFreqReset(VphyPtr, 0, XVPHY_DIR_TX);
+ 	}
+ 
++	gpiod_set_value_cansleep(xhdmi->tx_refclk_rdy_gpio, 1);
++
+ 	xhdmi->tx_audio_data->tmds_clk = clk_get_rate(xhdmi->tmds_clk);
+ 	/* if the mode is HDMI 2.0, use a multiplier value of 4 */
+ 	if (HdmiTxSsPtr->HdmiTxPtr->Stream.TMDSClockRatio) {
+@@ -2314,6 +2321,14 @@ static int xlnx_drm_hdmi_probe(struct platform_device *pdev)
+ 	XTmrCtr_ConfigTable[instance * 2 + 1].SysClockFreqHz = axi_clk_rate;
+ 	XV_HdmiTx_ConfigTable[instance].AxiLiteClkFreq = axi_clk_rate;
+ 
++	xhdmi->tx_refclk_rdy_gpio = devm_gpiod_get_optional(&pdev->dev,
++					"tx-refclk-rdy", GPIOD_OUT_LOW);
++	if (IS_ERR(xhdmi->tx_refclk_rdy_gpio)) {
++		ret = PTR_ERR(xhdmi->tx_refclk_rdy_gpio);
++		dev_err(&pdev->dev, "failed to acquire tx-refclk-rdy gpio\n");
++		return ret;
++	}
++
+ 	/* acquire Tmds clock for output resolution */
+ 	xhdmi->tmds_clk = devm_clk_get(&pdev->dev, "txref-clk");
+ 	if (IS_ERR(xhdmi->tmds_clk)) {
+@@ -2332,6 +2347,8 @@ static int xlnx_drm_hdmi_probe(struct platform_device *pdev)
+ 		return ret;
+ 	}
+ 
++	gpiod_set_value_cansleep(xhdmi->tx_refclk_rdy_gpio, 1);
++
+ 	xhdmi->tx_audio_data->tmds_clk = clk_get_rate(xhdmi->tmds_clk);
+ 	/* support to drive an external retimer IC on the TX path, depending on TX clock line rate */
+ 	xhdmi->retimer_clk = devm_clk_get(&pdev->dev, "retimer-clk");
+-- 
+2.17.1
+

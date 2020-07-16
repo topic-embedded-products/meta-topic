@@ -10,6 +10,11 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-axi-hdmi-rx \
 	kernel-module-bitblit \
 	kernel-module-dma-axi-dmac \
+	kernel-module-g-ether \
+	kernel-module-u-ether \
+	kernel-module-usb-f-ecm \
+	kernel-module-usb-f-ecm-subset \
+	kernel-module-usb-f-rndis \
 	kernel-module-snd-hwdep \
 	kernel-module-snd-soc-adi-axi-spdif \
 	kernel-module-snd-soc-adv7511-hdmi \
@@ -20,6 +25,7 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-videobuf2-vmalloc \
 	kernel-module-virt-dma \
 	kernel-module-xilinx-dma \
+	firmware-imageon-edid \
 	"
 
 KERNEL_MODULE_AUTOLOAD += "adi_axi_hdmi"

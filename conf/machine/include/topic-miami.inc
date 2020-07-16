@@ -13,6 +13,9 @@ KMACHINE = "${MACHINE_BOARD}"
 include conf/machine/include/zynq-base.inc
 include conf/machine/include/tune-zynq.inc
 
+# tune-zynq is adding an unused zImage
+KERNEL_IMAGETYPES_remove = "zImage"
+
 MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 
 # Workaround for broken check on IMAGE_FEATURES in kernel recipe
@@ -36,7 +39,7 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	"
 
 # Use QSPI flash with 64k sector size
-MKUBIFS_ARGS = "-m 1 -e 65408 -c 440"
+MKUBIFS_ARGS = "-m 1 -e 65408 -c 496 -x zlib"
 UBINIZE_ARGS = "-m 1 -p 64KiB"
 UBI_VOLNAME = "qspi-rootfs"
 

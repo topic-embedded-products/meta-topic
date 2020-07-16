@@ -14,12 +14,13 @@ do_compile() {
 }
 
 FILES_${PN} = "${nonarch_base_libdir}/firmware /etc/firmware"
+# inhibit dbg/dev packages
+PACKAGES = "${PN}"
 
 do_install() {
 	install -d ${D}${nonarch_base_libdir}/firmware/brcm
-	install -m 644 ${S}/brcmfmac43430-sdio.MUR1DX.txt ${D}${nonarch_base_libdir}/firmware/brcm
-	install -m 644 ${S}/BCM43430A1.1DX.hcd ${D}${nonarch_base_libdir}/firmware/brcm
-	ln -s brcmfmac43430-sdio.MUR1DX.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43430-sdio.txt
+	install -m 644 ${S}/brcmfmac43430-sdio.MUR1DX.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43430-sdio.txt
+	install -m 644 ${S}/BCM43430A1.1DX.hcd ${D}${nonarch_base_libdir}/firmware/brcm/
 	install -d ${D}/etc
 	ln -s ..${nonarch_base_libdir}/firmware ${D}/etc/firmware
 }

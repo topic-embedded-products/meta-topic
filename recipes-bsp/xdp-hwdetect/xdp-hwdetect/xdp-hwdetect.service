@@ -1,0 +1,14 @@
+[Unit]
+Description=XDP expansion board detection
+DefaultDependencies=no
+Wants=fpga-firmware-load.service
+After=fpga-firmware-load.service
+
+[Service]
+Type=oneshot
+ExecStart=@BINDIR@/xdp-hwdetect.sh
+RemainAfterExit=yes
+
+[Install]
+RequiredBy=systemd-modules-load.service
+WantedBy=multi-user.target

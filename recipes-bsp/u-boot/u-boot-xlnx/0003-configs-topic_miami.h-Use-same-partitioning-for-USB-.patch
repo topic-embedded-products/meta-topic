@@ -1,0 +1,42 @@
+From 8d3c1ac524bd2b1f8379d9e91b6e6d0180f44d0c Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 20 Oct 2017 13:01:54 +0200
+Subject: [PATCH 03/16] configs/topic_miami.h: Use same partitioning for USB
+ boot as for SD
+
+Use the same partitioning as the SD card by default. This allows to
+insert an SD card into a USB reader or use an USB drive with the same
+partitioning and boot using that instead of requiring a ramdisk image.
+---
+ include/configs/topic_miami.h | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
+index c32c63ced6..6f8f2b4ede 100644
+--- a/include/configs/topic_miami.h
++++ b/include/configs/topic_miami.h
+@@ -63,15 +63,15 @@
+ # endif
+ # define EXTRA_ENV_USB \
+ 	"usbreset=" ENV_USB_RESET "\0" \
+-	"usbboot=run usbreset && if usb start; then " \
++	"usbboot=run usbreset; if usb start; then " \
+ 		"echo Booting from USB... && " \
+ 		"if load usb 0 0x1900000 ${bootscript}; then "\
+ 		"source 0x1900000; fi; " \
+-		"load usb 0 ${kernel_addr} ${kernel_image} && " \
+-		"load usb 0 ${devicetree_addr} ${devicetree_image} && " \
+-		"load usb 0 ${ramdisk_load_address} ${ramdisk_image} && " \
+-		"bootm ${kernel_addr} ${ramdisk_load_address} "\
+-			"${devicetree_addr}; " \
++		"setenv bootargs console=ttyPS0,115200 " \
++			"root=/dev/sda2 rw rootfstype=ext4 rootwait quiet; " \
++		"load usb 0 ${kernel_addr} ${kernel_image}&& " \
++		"load usb 0 ${devicetree_addr} ${devicetree_image}&& " \
++		"bootm ${kernel_addr} - ${devicetree_addr}; " \
+ 	"fi\0"
+   /* Note that addresses here should match the addresses in the env */
+ # undef DFU_ALT_INFO
+-- 
+2.17.1
+

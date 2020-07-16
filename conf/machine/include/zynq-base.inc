@@ -6,7 +6,7 @@ include conf/machine/include/zynq-default-providers.inc
 MACHINE_CLASS = "zynq"
 
 # Add u-boot image to rootfs
-EXTRA_IMAGEDEPENDS = "virtual/bootloader sd-bootscript"
+EXTRA_IMAGEDEPENDS = "virtual/bootloader"
 
 # Most boards will have a reference design for the machine. This is usually a
 # single package that RDEPENDS on the FPGA image and other needful things.
@@ -48,6 +48,7 @@ XILINX_LM_LICENSE_FILE ?= "${XILINX_VIVADO_PATH}/data/ip/core_licenses/Xilinx.li
 
 # WIC image support.
 DEVICETREE ??= "zynq-7000.dtb"
-WKS_FILE = "sdimage-bootpart.wks"
-IMAGE_BOOT_FILES = "boot.bin u-boot.img uImage autorun.scr ${DEVICETREE};devicetree.dtb"
+WKS_FILE = "sdimage-swu.wks"
+IMAGE_BOOT_FILES = "boot.bin u-boot.img"
+IMAGE_OVERHEAD_FACTOR="1.1"
 do_image_wic[depends] += "mtools-native:do_populate_sysroot dosfstools-native:do_populate_sysroot"

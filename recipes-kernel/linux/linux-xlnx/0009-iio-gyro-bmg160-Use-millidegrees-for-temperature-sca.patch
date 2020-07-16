@@ -1,0 +1,42 @@
+From 8efa6f581c8c34718aea1ef8d7d20d858afcbcc2 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 12 Feb 2019 11:22:54 +0100
+Subject: [PATCH 09/30] iio/gyro/bmg160: Use millidegrees for temperature scale
+
+Standard unit for temperature is millidegrees Celcius, whereas this driver
+was reporting in degrees. Fix the scale factor in the driver.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/iio/gyro/bmg160_core.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/iio/gyro/bmg160_core.c b/drivers/iio/gyro/bmg160_core.c
+index 63ca31628a93..92c07ab826eb 100644
+--- a/drivers/iio/gyro/bmg160_core.c
++++ b/drivers/iio/gyro/bmg160_core.c
+@@ -582,11 +582,10 @@ static int bmg160_read_raw(struct iio_dev *indio_dev,
+ 	case IIO_CHAN_INFO_LOW_PASS_FILTER_3DB_FREQUENCY:
+ 		return bmg160_get_filter(data, val);
+ 	case IIO_CHAN_INFO_SCALE:
+-		*val = 0;
+ 		switch (chan->type) {
+ 		case IIO_TEMP:
+-			*val2 = 500000;
+-			return IIO_VAL_INT_PLUS_MICRO;
++			*val = 500;
++			return IIO_VAL_INT;
+ 		case IIO_ANGL_VEL:
+ 		{
+ 			int i;
+@@ -594,6 +593,7 @@ static int bmg160_read_raw(struct iio_dev *indio_dev,
+ 			for (i = 0; i < ARRAY_SIZE(bmg160_scale_table); ++i) {
+ 				if (bmg160_scale_table[i].dps_range ==
+ 							data->dps_range) {
++					*val = 0;
+ 					*val2 = bmg160_scale_table[i].scale;
+ 					return IIO_VAL_INT_PLUS_MICRO;
+ 				}
+-- 
+2.17.1
+

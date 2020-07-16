@@ -1,0 +1,27 @@
+From ef02b1e12b5718892df91b4920f77dae1ebb2f4e Mon Sep 17 00:00:00 2001
+From: Niek van Agt <niek.van.agt@topic.nl>
+Date: Fri, 10 Jan 2020 11:38:53 +0100
+Subject: [PATCH] Give PCAP ctrl back to ICAP for partial programming (Dyplo)
+
+---
+ lib/sw_services/xilfpga/src/interface/zynqmp/xilfpga_pcap.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/lib/sw_services/xilfpga/src/interface/zynqmp/xilfpga_pcap.c b/lib/sw_services/xilfpga/src/interface/zynqmp/xilfpga_pcap.c
+index 3809ed918..20d8b07fb 100644
+--- a/lib/sw_services/xilfpga/src/interface/zynqmp/xilfpga_pcap.c
++++ b/lib/sw_services/xilfpga/src/interface/zynqmp/xilfpga_pcap.c
+@@ -532,6 +532,10 @@ static u32 XFpga_PostConfigPcap(XFpga *InstancePtr)
+ 	/* Disable the PCAP clk */
+ 	RegVal = Xil_In32(PCAP_CLK_CTRL);
+ 	Xil_Out32(PCAP_CLK_CTRL, RegVal & ~(PCAP_CLK_EN_MASK));
++  
++  /* Give PCAP_CTRL back to ICAP (for Dyplo PR programming via ICAP) */
++	Xil_Out32(CSU_PCAP_CTRL, 0x0);
++  
+ #ifdef XFPGA_SECURE_MODE
+ 	if (((u8 *)InstancePtr->WriteInfo.AddrPtr_Size != NULL) &&
+ 	    ((InstancePtr->WriteInfo.Flags & XFPGA_ENCRYPTION_USERKEY_EN) != 0U)) {
+-- 
+2.17.1
+

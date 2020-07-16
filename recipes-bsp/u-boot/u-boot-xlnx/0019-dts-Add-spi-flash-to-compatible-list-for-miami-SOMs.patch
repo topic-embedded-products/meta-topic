@@ -1,0 +1,73 @@
+From a2f4ef37fece8c260bbb5041ccfd9865d4c2ce0b Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 26 May 2020 07:48:38 +0200
+Subject: [PATCH 19/19] dts: Add "spi-flash" to compatible list for miami SOMs
+
+The compatible list for a SPI flash device must contain "spi-flash" for the
+spi-flash driver to recognize it. Without this, the driver may fall back to
+100kHz clock rate default, displaying:
+  Warning: SPI speed fallback to 100 kHz
+See also this thread in the u-boot maillist:
+http://u-boot.10912.n7.nabble.com/PATCH-v2-dm-spi-prevent-setting-a-speed-of-0-Hz-td346224.html
+---
+ arch/arm/dts/zynq-topic-miami.dts                | 2 +-
+ arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts | 2 +-
+ arch/arm/dts/zynqmp-topic-miamimp.dts            | 2 +-
+ arch/arm/dts/zynqmp-topic-miamiplusmp.dts        | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/dts/zynq-topic-miami.dts b/arch/arm/dts/zynq-topic-miami.dts
+index 63fbaf2e9f..9612efe817 100644
+--- a/arch/arm/dts/zynq-topic-miami.dts
++++ b/arch/arm/dts/zynq-topic-miami.dts
+@@ -36,7 +36,7 @@
+ 	is-dual = <0>;
+ 	num-cs = <1>;
+ 	flash@0 {
+-		compatible = "st,m25p80", "n25q256a";
++		compatible = "st,m25p80", "n25q256a", "spi-flash";
+ 		m25p,fast-read;
+ 		reg = <0x0>;
+ 		spi-tx-bus-width = <1>;
+diff --git a/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts b/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
+index 78dc56cc25..b03c4808f2 100644
+--- a/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
++++ b/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
+@@ -59,7 +59,7 @@
+ 	status = "okay";
+ 	is-dual = <1>;
+ 	flash@0 {
+-		compatible = "st,m25p80", "n25q256a";
++		compatible = "st,m25p80", "n25q256a", "spi-flash";
+ 		m25p,fast-read;
+ 		reg = <0x0>;
+ 		spi-tx-bus-width = <1>;
+diff --git a/arch/arm/dts/zynqmp-topic-miamimp.dts b/arch/arm/dts/zynqmp-topic-miamimp.dts
+index eb593c9048..2561386cb6 100644
+--- a/arch/arm/dts/zynqmp-topic-miamimp.dts
++++ b/arch/arm/dts/zynqmp-topic-miamimp.dts
+@@ -83,7 +83,7 @@
+ 	is-dual = <1>;
+ 	num-cs = <1>;
+ 	flash@0 {
+-		compatible = "st,m25p80", "n25q256a";
++		compatible = "st,m25p80", "n25q256a", "spi-flash";
+ 		reg = <0x0>;
+ 		spi-tx-bus-width = <1>;
+ 		spi-rx-bus-width = <4>;
+diff --git a/arch/arm/dts/zynqmp-topic-miamiplusmp.dts b/arch/arm/dts/zynqmp-topic-miamiplusmp.dts
+index 83f3567df9..17fe220eb5 100644
+--- a/arch/arm/dts/zynqmp-topic-miamiplusmp.dts
++++ b/arch/arm/dts/zynqmp-topic-miamiplusmp.dts
+@@ -84,7 +84,7 @@
+ 	is-dual = <1>;
+ 	num-cs = <1>;
+ 	flash@0 {
+-		compatible = "st,m25p80", "n25q256a";
++		compatible = "st,m25p80", "n25q256a", "spi-flash";
+ 		reg = <0x0>;
+ 		spi-tx-bus-width = <1>;
+ 		spi-rx-bus-width = <4>;
+-- 
+2.17.1
+

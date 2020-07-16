@@ -1,0 +1,87 @@
+From 045ffa7921b9a071d2a6f07190d8bcccc442af96 Mon Sep 17 00:00:00 2001
+From: Leon Leijssen <leon.leijssen@topic.nl>
+Date: Mon, 18 May 2020 13:53:06 +0200
+Subject: [PATCH] miamiplusmp: update board model & correct qspi size
+
+---
+ .../boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts     | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
+index 5ff77c05b541..08eb3aabb37d 100644
+--- a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
++++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
+@@ -21,7 +21,7 @@
+ #include <dt-bindings/phy/phy.h>
+ 
+ / {
+-	model = "Topic Miami MPSoC";
++	model = "Topic Miami Plus MPSoC";
+ 	compatible = "topic,miamiplusmp", "xlnx,zynqmp";
+ 
+ 	aliases {
+@@ -187,12 +187,14 @@
+ 					<100000000>;
+ 
+ 		out@0 {
++			/* MGT_D_REFCLK_0 */
+ 			reg = <0>;
+ 			silabs,format = <1>; /* LVDS 3v3 */
+ 			silabs,common-mode = <3>;
+ 			silabs,amplitude = <3>;
+ 		};
+ 		out@1 {
++			/* MGT_D_REFCLK_2 */
+ 			reg = <1>;
+ 			silabs,format = <1>; /* LVDS 3v3 */
+ 			silabs,common-mode = <3>;
+@@ -215,6 +217,7 @@
+ 			always-on;
+ 		};
+ 		out@4 {
++			/* MGT_D_REFCLK_6 */
+ 			reg = <4>;
+ 			silabs,format = <1>; /* LVDS 3v3 */
+ 			silabs,common-mode = <3>;
+@@ -229,6 +232,7 @@
+ 			always-on;
+ 		};
+ 		out@6 {
++			/* MGT_D_REFCLK_4 */
+ 			reg = <6>;
+ 			silabs,format = <1>; /* LVDS 3v3 */
+ 			silabs,common-mode = <3>;
+@@ -236,6 +240,7 @@
+ 		};
+ 
+ 		out@7 {
++			/* CLOCK_FPGA0 */
+ 			reg = <7>;
+ 			silabs,format = <1>; /* LVDS 1v8 */
+ 			silabs,common-mode = <13>;
+@@ -252,6 +257,7 @@
+ 		};
+ 
+ 		out@9 {
++			/* CLOCK_FPGA1 */
+ 			reg = <9>;
+ 			silabs,format = <1>; /* LVDS 1v8 */
+ 			silabs,common-mode = <13>;
+@@ -286,12 +292,12 @@
+ 		};
+ 		partition@qspi-rootfs {
+ 			label = "qspi-rootfs";
+-			reg = <0x180000 0x7e80000>;
++			reg = <0x180000 0xFE80000>;
+ 		};
+ 		/* Everything */
+ 		partition@qspi-all {
+ 			label = "qspi-all";
+-			reg = <0x0 0x8000000>;
++			reg = <0x0 0x10000000>;
+ 		};
+ 	};
+ };
+-- 
+2.17.1
+

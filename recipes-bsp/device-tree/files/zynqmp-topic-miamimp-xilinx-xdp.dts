@@ -55,7 +55,6 @@
 		regulator-max-microvolt = <5000000>;
 		gpio = <&gpio 77 GPIO_ACTIVE_LOW>; /* MIO77 -> USB_OTG_EN */
 		enable-active-high;
-		/* regulator-always-on; */ /* for USB host mode, "vbus" no longer works? */
 	};
 
 	leds: leds {
@@ -67,7 +66,6 @@
 		};
 	};
 
-	/* USB PHY reset IO pin. */
 	usb_phy0: phy0 {
 		compatible = "usb-nop-xceiv";
 		#phy-cells = <0>;
@@ -79,6 +77,29 @@
 		compatible = "fixed-clock";
 		#clock-cells = <0x0>;
 		clock-frequency = <48000000>;
+	};
+
+	/* Make temperature readouts show up in hwmon applications */
+	iio-hwmon-ams-temp {
+		compatible = "iio-hwmon";
+		io-channels = <&xilinx_ams 7>, <&xilinx_ams 8>, <&xilinx_ams 20>;
+		io-channel-names = "ps_temp", "remote_temp", "pl_temp";
+	};
+};
+
+/* Operating points for 1333 MHz operation */
+&cpu_opp_table {
+	opp00 {
+		opp-hz = /bits/ 64 <1333333320>;
+	};
+	opp01 {
+		opp-hz = /bits/ 64 <666666660>;
+	};
+	opp02 {
+		opp-hz = /bits/ 64 <444444440>;
+	};
+	opp03 {
+		opp-hz = /bits/ 64 <333333330>;
 	};
 };
 
@@ -126,6 +147,7 @@
 &qspi {
 	status = "okay";
 	is-dual = <1>;
+	multi-die = <1>;
 	flash@0 {
 		compatible = "st,m25p80", "n25q256a";
 		#address-cells = <1>;
@@ -135,26 +157,27 @@
 		spi-rx-bus-width = <4>;
 		spi-max-frequency = <166000000>;
 		is-dual = <1>;
+		multi-die = <1>;
 		partition@qspi-boot-bin {
 			label = "qspi-boot-bin";
 			reg = <0x00000 0x60000>;
 		};
 		partition@qspi-u-boot-itb {
-			label = "qspi-atf-spi-ub";
+			label = "qspi-u-boot-itb";
 			reg = <0x60000 0x100000>;
 		};
 		partition@qspi-u-boot-env {
-			label = "qspi-u-boot-bin";
+			label = "qspi-u-boot-env";
 			reg = <0x160000 0x20000>;
 		};
 		partition@qspi-rootfs {
 			label = "qspi-rootfs";
-			reg = <0x180000 0x7e80000>;
+			reg = <0x180000 0x3e80000>;
 		};
 		/* Everything */
 		partition@qspi-all {
 			label = "qspi-all";
-			reg = <0x0 0x8000000>;
+			reg = <0x0 0x4000000>;
 		};
 	};
 };
@@ -243,8 +266,8 @@
 		assigned-clock-parents = <0>, <0>, <0>, <0>, <0>,
 					<&si5341 1 3>,
 					<&si5341 1 2>,
-					<&si5341 1 4>,
 					<&si5341 1 1>,
+					<&si5341 1 4>,
 					<&si5341 1 1>,
 					<&si5341 1 0>,
 					<&si5341 1 0>,
@@ -287,21 +310,21 @@
 		};
 
 		out@2 {
-			/* PL_MGT_REFCLK0 HDMI TX refclk (default 148.5 MHz) */
+			/* PL_MGT_REFCLK0 (148.5 MHz) */
 			reg = <2>;
 			silabs,format = <1>; /* LVDS 3v3 */
 			silabs,common-mode = <3>;
 			silabs,amplitude = <3>;
-			silabs,synth-master;
 			always-on;
 		};
 
 		out@3 {
-			/* PL_MGT_REFCLK2 (148.5 MHz) */
+			/* PL_MGT_REFCLK2 HDMI TX refclk (default 148.5 MHz) */
 			reg = <3>;
 			silabs,format = <1>; /* LVDS 3v3 */
 			silabs,common-mode = <3>;
 			silabs,amplitude = <3>;
+			silabs,synth-master;
 			always-on;
 		};
 
@@ -372,6 +395,7 @@
 	disable-wp;
 	bus-width = <4>;
 	non-removable; /* It is removable actually... */
+	no-1-8-v; /* No high-speed capability */
 };
 
 /* USB connected through MIO and GPIO expander */
@@ -384,7 +408,8 @@
 &dwc3_0 {
 	status = "okay";
 	dr_mode = "peripheral"; /* One of host, peripheral, otg */
-	vbus-supply = <&reg_usb0_vbus>; /* Educated guess, does not work */
+	vbus-supply = <&reg_usb0_vbus>;
+	usb-phy = <&usb_phy0>;
 
 	/* USB3 controller uses GTX lane "2" and refclk "2" at 26MHz */
 	phy-names = "usb3-phy";
@@ -548,11 +573,14 @@
 		conf-rx {
 			pins = "MIO25";
 			bias-high-impedance;
+			bias-pull-up;
+			schmitt-cmos = <PIN_INPUT_TYPE_SCHMITT>;
 		};
 
 		conf-tx {
 			pins = "MIO24";
 			bias-disable;
+			schmitt-cmos = <PIN_INPUT_TYPE_CMOS>;
 		};
 	};
 
@@ -575,6 +603,12 @@
 			pins = "MIO33", "MIO34", "MIO35", "MIO68", "MIO69", "MIO70", "MIO71", "MIO72", "MIO73";
 			bias-pull-up;
 		};
+
+		/* Pull-up the USB reset pin, driver doesn't support reset */
+		conf-usbreset {
+			pins = "MIO66";
+			bias-pull-up;
+		};
 	};
 
 	pinctrl_sdhci0_emmc_default: sdhci0-emmc-default {
@@ -590,12 +624,18 @@
 		};
 
 		conf {
-			groups = "sdio0_0_grp", "sdio0_pc_0_grp";
-			slew-rate = <SLEW_RATE_SLOW>;
+			groups = "sdio0_0_grp";
+			slew-rate = <SLEW_RATE_FAST>;
 			io-standard = <IO_STANDARD_LVCMOS18>;
 			bias-disable;
 		};
 
+		conf-pc {
+			groups = "sdio0_pc_0_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+			bias-pull-up;
+		};
 	};
 
 	pinctrl_sdhci1_sd_default: sdhci1-sd-default {
@@ -606,8 +646,8 @@
 		};
 		conf {
 			groups = "sdio1_2_grp";
-			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			slew-rate = <SLEW_RATE_FAST>;
+			io-standard = <IO_STANDARD_LVCMOS33>;
 			bias-disable;
 		};
 
@@ -619,7 +659,7 @@
 		conf-cd {
 			groups = "sdio1_cd_0_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS33>;
 			bias-pull-up;
 		};
 	};

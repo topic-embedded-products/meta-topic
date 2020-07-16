@@ -12,7 +12,7 @@
 	fragment@0 {
 		target = <&fpga_full>;
 		__overlay__ {
-			firmware-name = "fpga.bin.fpga-image-miamimp-florida-gen-reference";
+			firmware-name = "fpga.bin.fpga-image-pr-reference";
 		};
 	};
 
@@ -67,7 +67,10 @@
 						};
 					};
 					port@1 {
-						reg = <1>;
+						reg = <1>; /* HDMI monitor */
+					};
+					port@2 {
+						reg = <2>; /* Audio link */
 					};
 				};
 			};
@@ -75,43 +78,30 @@
 	};
 
 	fragment@3 {
-		target = <&i2cmux>;
+		target = <&i2cmux_3>;
 		__overlay__ {
 			#address-cells = <1>;
 			#size-cells = <0>;
-			i2c@1 {
-				/* HDMI O - Connects directly to HDMI connector */
-				#address-cells = <1>;
-				#size-cells = <0>;
-				reg = <1>;
-			};
-			i2c@3 {
-				/* HDMI IN */
-				#address-cells = <1>;
-				#size-cells = <0>;
-				reg = <3>;
-				/* copied from zynq-zed-imageon.dts */
-				adv7611@4c {
-					compatible = "adi,adv7611";
-					reg = <0x4c>;
-					#address-cells = <0x1>;
-					#size-cells = <0x0>;
-					bus-width = <24>;
-					hsync-active = <0>; /* Parallel bus */
-					vsync-active = <0>;
-					interrupt-parent = <&gpio>;
-					interrupts = <99 4>; /* EMIO 21 */
-					adi,int1-config = <1>; /* ADV76XX_INT1_CONFIG_ACTIVE_LOW */
-					reset-gpios = <&gpio 91 0>; /* EMIO 13 */
-					port@0 {
-						reg = <0x0>;
-					};
-					port@1 {
-						reg = <0x1>;
-						adv7611: endpoint {
-							bus-width = <16>;
-							remote-endpoint = <&axi_hdmi_rx>;
-						};
+			/* HDMI IN */
+			adv7611@4c {
+				compatible = "adi,adv7611";
+				reg = <0x4c>;
+				#address-cells = <0x1>;
+				#size-cells = <0x0>;
+				interrupt-parent = <&gpio>;
+				interrupts = <99 4>; /* EMIO 21 */
+				adi,int1-config = <1>; /* ADV76XX_INT1_CONFIG_ACTIVE_LOW */
+				reset-gpios = <&gpio 91 0>; /* EMIO 13 */
+				port@0 {
+					reg = <0x0>;
+				};
+				port@1 {
+					reg = <0x1>;
+					adv7611: endpoint {
+						remote-endpoint = <&axi_hdmi_rx>;
+						bus-width = <24>;
+						hsync-active = <0>; /* Parallel bus */
+						vsync-active = <0>;
 					};
 				};
 			};
@@ -161,6 +151,27 @@
 				};
 			};
 
+			axi_dmac: dmac@a0000000 {
+				compatible = "adi,axi-dmac-1.00.a";
+				reg = <0x0 0xa0000000 0x0 0x10000>;
+				#dma-cells = <1>;
+				interrupt-parent = <&gic>;
+				interrupts = <0 90 4>; /* pl_ps_0[1] */
+				clocks = <&zynqmp_clk PL0_REF>;
+
+				adi,channels {
+					#size-cells = <0>;
+					#address-cells = <1>;
+					dma-channel@0 {
+						reg = <0>;
+						adi,source-bus-width = <64>;
+						adi,source-bus-type = <2>;
+						adi,destination-bus-width = <64>;
+						adi,destination-bus-type = <0>;
+					};
+				};
+			};
+
 			axi_hdmi_rx_core: axi-hdmi-rx@a0020000 {
 				compatible = "adi,axi-hdmi-rx-1.00.a";
 				reg = <0x0 0xa0020000 0x0 0x10000>;
@@ -175,31 +186,19 @@
 					axi_hdmi_rx: endpoint {
 						remote-endpoint = <&adv7611>;
 						bus-width = <24>;
+						hsync-active = <0>; /* Parallel bus */
+						vsync-active = <0>;
+						pclk-sample = <1>; /* Sample on rising edge */
 					};
 				};
 			};
 
-			axi_dmac: dmac@a0000000 {
-				compatible = "adi,axi-dmac-1.00.a";
-				reg = <0x0 0xa0000000 0x0 0x10000>;
-				#dma-cells = <1>;
+			dyplo: dyplo@a0400000 {
+				compatible = "topic,dyplo-1.00.a";
+				reg = <0x0 0xA0400000 0x0 0x200000>;
 				interrupt-parent = <&gic>;
-				interrupts = <0 90 4>; /* pl_ps_0[1] */
-				clocks = <&zynqmp_clk PL0_REF>;
-
-				adi,channels {
-					#size-cells = <0>;
-					#address-cells = <1>;
-					dma-channel@0 {
-						reg = <0>;
-						adi,length-width = <14>;
-						adi,source-bus-width = <64>;
-						adi,source-bus-type = <2>;
-						adi,destination-bus-width = <64>;
-						adi,destination-bus-type = <0>;
-						adi,2d;
-					};
-				};
+				interrupts = <0 111 4>; /* pl_ps_irq1[7] */
+				dma-coherent; /* HPC port with AxCACHE=0b1111 AxPROT=0b010*/
 			};
 		};
 	};

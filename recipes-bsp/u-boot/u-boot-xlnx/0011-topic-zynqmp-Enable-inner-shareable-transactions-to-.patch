@@ -1,0 +1,64 @@
+From e224d3e9914461b8b36f040cd51d0aed717004b4 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 5 Nov 2019 10:50:27 +0100
+Subject: [PATCH 11/16] topic zynqmp: Enable inner shareable transactions to be
+ broadcast
+
+Allows the HPC (cache coherent) port to actually work. See:
+  https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18842098/Zynq+UltraScale+MPSoC+Cache+Coherency
+
+For both zynqmp boards
+---
+ .../topic/zynqmp/zynqmp-topic-miamimp-xilinx-xdp/psu_regs.txt  | 3 +++
+ board/topic/zynqmp/zynqmp-topic-miamimp/psu_regs.txt           | 3 +++
+ configs/topic_miamimp_defconfig                                | 1 +
+ configs/topic_miamimp_xilinx_xdp_defconfig                     | 1 +
+ 4 files changed, 8 insertions(+)
+ create mode 100644 board/topic/zynqmp/zynqmp-topic-miamimp-xilinx-xdp/psu_regs.txt
+ create mode 100644 board/topic/zynqmp/zynqmp-topic-miamimp/psu_regs.txt
+
+diff --git a/board/topic/zynqmp/zynqmp-topic-miamimp-xilinx-xdp/psu_regs.txt b/board/topic/zynqmp/zynqmp-topic-miamimp-xilinx-xdp/psu_regs.txt
+new file mode 100644
+index 0000000000..ee9560d27e
+--- /dev/null
++++ b/board/topic/zynqmp/zynqmp-topic-miamimp-xilinx-xdp/psu_regs.txt
+@@ -0,0 +1,3 @@
++# Enable "broadcast inner sharable" to make the HPC ports work
++0xFF41A040 3
++
+diff --git a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_regs.txt b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_regs.txt
+new file mode 100644
+index 0000000000..ee9560d27e
+--- /dev/null
++++ b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_regs.txt
+@@ -0,0 +1,3 @@
++# Enable "broadcast inner sharable" to make the HPC ports work
++0xFF41A040 3
++
+diff --git a/configs/topic_miamimp_defconfig b/configs/topic_miamimp_defconfig
+index 853af48159..a5d4e2eb76 100644
+--- a/configs/topic_miamimp_defconfig
++++ b/configs/topic_miamimp_defconfig
+@@ -11,6 +11,7 @@ CONFIG_IDENT_STRING="Topic Miami MPSoC"
+ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI_SUPPORT=y
+ CONFIG_PMUFW_INIT_FILE="board/topic/zynqmp/pmufw.bin"
++CONFIG_BOOT_INIT_FILE="board/topic/zynqmp/zynqmp-topic-miamimp/psu_regs.txt"
+ CONFIG_ZYNQMP_USB=y
+ CONFIG_SPL_ZYNQMP_TWO_SDHCI=y
+ CONFIG_DEBUG_UART=y
+diff --git a/configs/topic_miamimp_xilinx_xdp_defconfig b/configs/topic_miamimp_xilinx_xdp_defconfig
+index d803beefe6..06b7433989 100644
+--- a/configs/topic_miamimp_xilinx_xdp_defconfig
++++ b/configs/topic_miamimp_xilinx_xdp_defconfig
+@@ -11,6 +11,7 @@ CONFIG_IDENT_STRING="Topic XDP (Xilinx Drone Platform)"
+ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI_SUPPORT=y
+ CONFIG_PMUFW_INIT_FILE="board/topic/zynqmp/pmufw.bin"
++CONFIG_BOOT_INIT_FILE="board/topic/zynqmp/zynqmp-topic-miamimp-xilinx-xdp/psu_regs.txt"
+ CONFIG_ZYNQMP_USB=y
+ CONFIG_SPL_ZYNQMP_TWO_SDHCI=y
+ CONFIG_DEBUG_UART=y
+-- 
+2.17.1
+

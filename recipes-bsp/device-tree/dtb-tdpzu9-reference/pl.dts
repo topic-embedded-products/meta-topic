@@ -1,0 +1,155 @@
+/* Overlay devicetree for the programmable logic part */
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/clock/xlnx-zynqmp-clk.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+
+/ {
+	/* This fragment causes the FPGA image to load */
+	fragment@0 {
+		target = <&fpga_full>;
+		__overlay__ {
+			firmware-name = "fpga.bin.fpga-image-tdp-reference";
+		};
+	};
+
+	/* EMIO 5 user LED */
+	fragment@1 {
+		target-path = "/";
+		__overlay__ {
+			leds-pl {
+				compatible = "gpio-leds";
+				eio_led_1 {
+					label = "pl-user:green";
+					gpios = <&gpio 83 GPIO_ACTIVE_LOW>; /* EMIO 5 */
+					linux,default-trigger = "disk-activity"; /* Blink when NVME disk is working */
+				};
+			};
+		};
+	};
+
+	fragment@2 {
+		target = <&amba>;
+		__overlay__ {
+			#address-cells = <2>;
+			#size-cells = <2>;
+			interrupt-parent = <&gic>;
+
+			 /* temperature sensor on i2c Uses lm75 hwmon driver */
+			axi_iic_0: i2c@80009000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clock-names = "s_axi_aclk";
+				clocks = <&zynqmp_clk PL0_REF>;
+				compatible = "xlnx,axi-iic-2.0", "xlnx,xps-iic-2.00.a";
+				interrupt-names = "iic2intc_irpt";
+				interrupt-parent = <&gic>;
+				interrupts = <0 89 4>;
+				reg = <0x0 0x80009000 0x0 0x1000>;
+
+				tmp101pl: sensor@4a{
+					compatible = "ti,tmp101";
+					reg = <0x4a>;
+					/* Interrupt not actually used by driver */
+					interrupt-parent = <&gpio>;
+					interrupts = <82 IRQ_TYPE_LEVEL_LOW>; /* EMIO 4 */
+				};
+			};
+
+			pl_fan_controller: fan-controller@8000a000 {
+				compatible = "topic,axi-pwm-fan-controller";
+				reg = <0x0 0x8000a000 0x0 0x1000>;
+				nr-fans = <1>;
+				clocks = <&zynqmp_clk PL0_REF>;
+				topic,initial-pwm = <100>; /* Run at 40% */
+			};
+
+			/* UART 16550 controller for BT */
+			axi_uart16550_0: serial@a0010000 {
+				clock-names = "ref_clk";
+				clocks = <&zynqmp_clk PL0_REF>;
+				compatible = "xlnx,xps-uart16550-2.00.a", "ns16550a";
+				current-speed = <115200>;
+				device_type = "serial";
+				interrupt-parent = <&gic>;
+				interrupts = <0 90 4>; /* pl_ps_0[1] */
+				reg = <0x0 0xA0010000 0x0 0x2000>;
+				reg-offset = <0x1000>;
+				reg-shift = <2>;
+			};
+
+			/* GPIO controllers */
+			axi_gpio_0: gpio@80020000 {
+				#gpio-cells = <3>;
+				clock-names = "s_axi_aclk";
+				clocks = <&zynqmp_clk PL0_REF>;
+				compatible = "xlnx,axi-gpio-2.0", "xlnx,xps-gpio-1.00.a";
+				gpio-controller ;
+				reg = <0x0 0x80020000 0x0 0x10000>;
+				xlnx,all-inputs = <0x0>;
+				xlnx,all-inputs-2 = <0x0>;
+				xlnx,all-outputs = <0x1>;
+				xlnx,all-outputs-2 = <0x0>;
+				xlnx,dout-default = <0x00000000>;
+				xlnx,dout-default-2 = <0x00000000>;
+				xlnx,gpio-width = <0x4>;
+				xlnx,gpio2-width = <0x20>;
+				xlnx,interrupt-present = <0x0>;
+				xlnx,is-dual = <0x0>;
+				xlnx,tri-default = <0xFFFFFFFF>;
+				xlnx,tri-default-2 = <0xFFFFFFFF>;
+			};
+			axi_gpio_pmod: gpio@80030000 {
+				#gpio-cells = <3>;
+				clock-names = "s_axi_aclk";
+				clocks = <&zynqmp_clk PL0_REF>;
+				compatible = "xlnx,axi-gpio-2.0", "xlnx,xps-gpio-1.00.a";
+				gpio-controller ;
+				reg = <0x0 0x80030000 0x0 0x10000>;
+				xlnx,all-inputs = <0x0>;
+				xlnx,all-inputs-2 = <0x0>;
+				xlnx,all-outputs = <0x0>;
+				xlnx,all-outputs-2 = <0x0>;
+				xlnx,dout-default = <0x00000000>;
+				xlnx,dout-default-2 = <0x00000000>;
+				xlnx,gpio-width = <0x8>;
+				xlnx,gpio2-width = <0x8>;
+				xlnx,interrupt-present = <0x0>;
+				xlnx,is-dual = <0x1>;
+				xlnx,tri-default = <0xFFFFFFFF>;
+				xlnx,tri-default-2 = <0xFFFFFFFF>;
+			};
+			axi_gpio_usb: gpio@80040000 {
+				#gpio-cells = <3>;
+				clock-names = "s_axi_aclk";
+				clocks = <&zynqmp_clk PL0_REF>;
+				compatible = "xlnx,axi-gpio-2.0", "xlnx,xps-gpio-1.00.a";
+				gpio-controller ;
+				reg = <0x0 0x80040000 0x0 0x10000>;
+				xlnx,all-inputs = <0x0>;
+				xlnx,all-inputs-2 = <0x0>;
+				xlnx,all-outputs = <0x0>;
+				xlnx,all-outputs-2 = <0x0>;
+				xlnx,dout-default = <0x00000000>;
+				xlnx,dout-default-2 = <0x00000000>;
+				xlnx,gpio-width = <0x3>;
+				xlnx,gpio2-width = <0x20>;
+				xlnx,interrupt-present = <0x0>;
+				xlnx,is-dual = <0x0>;
+				xlnx,tri-default = <0xFFFFFFFF>;
+				xlnx,tri-default-2 = <0xFFFFFFFF>;
+			};
+		};
+	};
+
+	/* FPGA causes a "spike" which confuses the ethernet PHY. */
+	fragment@3 {
+		target = <&gem2>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+};

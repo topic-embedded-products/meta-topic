@@ -1,5 +1,0 @@
-setenv bootargs $bootargs root=/dev/mmcblk${devnum}p2 rw rootwait
-load ${devtype} ${devnum}:${distro_bootpart} $fdt_addr system.dtb
-load ${devtype} ${devnum}:${distro_bootpart} $kernel_addr Image
-echo "Booting..."
-booti $kernel_addr - $fdt_addr

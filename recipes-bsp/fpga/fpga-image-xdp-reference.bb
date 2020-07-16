@@ -10,18 +10,19 @@ LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaa
 
 BOARD_DESIGN_URI = ""
 
-PV = "0"
-S = "${WORKDIR}/${BPN}"
+PV = "2"
 
-PLNAME = "${BPN}"
-BASEFILENAME = "${PLNAME}-${PV}"
-TOPICEMBEDDED_URIBASE ?= "http://www.topicembeddedproducts.com/support/download/public/reference-images/"
-SRC_URI = "${TOPICEMBEDDED_URIBASE}/${BASEFILENAME}.tar.xz;name=${PLNAME}"
+BOARD_DESIGN_PATH = "${BPN}-${MACHINE}"
+TOPICDOWNLOADS_URI ?= "http://topic-downloads.fra1.digitaloceanspaces.com"
+BOARD_DESIGN_URI = "${TOPICDOWNLOADS_URI}/files/${BOARD_DESIGN_PATH}-${PV}.tar.xz;name=${MACHINE}"
 
-# Precompiled bitstream
+PKGV = "${PV}"
+S = "${WORKDIR}"
+B = "${S}"
+
+# Nothing to build
 do_compile() {
-	true
+    true
 }
 
-SRC_URI[fpga-image-xdp-reference.md5sum] = "01b09682c1fd78f4b62c23dc5e88c1f4"
-SRC_URI[fpga-image-xdp-reference.sha256sum] = "72e39660c6365885436c48f835bd18bda49a954cae9d3d650ca2704c2d2eb24d"
+SRC_URI[xdpzu7.md5sum] = "973cc3a607565fcd06276d12ba39b5b5"

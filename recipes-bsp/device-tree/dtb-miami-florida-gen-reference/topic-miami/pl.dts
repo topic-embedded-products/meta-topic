@@ -7,7 +7,7 @@
 	fragment@0 {
 		target = <&fpga_full>;
 		__overlay__ {
-			firmware-name = "fpga.bin.fpga-image-miami-florida-gen-reference";
+			firmware-name = "fpga.bin.fpga-image-pr-reference";
 		};
 	};
 
@@ -31,6 +31,31 @@
 				};
 			};
 
+			leds-emio {
+				compatible = "gpio-leds";
+				emio-led-d2 {
+					label = "d2:green";
+					gpios = <&gpio0 70 0>; /* EMIO 16 */
+				};
+				emio-led-d3 {
+					label = "d3:green";
+					gpios = <&gpio0 71 0>; /* EMIO 17 */
+				};
+				emio-led-d4 {
+					label = "d4:green";
+					gpios = <&gpio0 72 0>; /* EMIO 18 */
+					linux,default-trigger = "mmc0";
+				};
+				emio-led-d5 {
+					label = "d5:green";
+					gpios = <&gpio0 73 0>; /* EMIO 19 */
+				};
+				emio-led-d6 {
+					label = "d6:green";
+					gpios = <&gpio0 74 0>; /* EMIO 20 */
+				};
+			};
+
 			adv7511_hdmi_snd {
 				compatible = "simple-audio-card";
 				simple-audio-card,name = "HDMI monitor";
@@ -38,7 +63,6 @@
 					"Speaker", "Speaker";
 				simple-audio-card,routing =
 					"Speaker", "TX";
-
 				simple-audio-card,dai-link@0 {
 					format = "spdif";
 					cpu {
@@ -82,6 +106,11 @@
 					};
 					port@1 {
 						reg = <1>;
+						/* HDMI connector */
+					};
+					port@2 {
+						reg = <2>;
+						/* Audio link */
 					};
 				};
 			};
@@ -89,43 +118,30 @@
 	};
 
 	fragment@3 {
-		target = <&i2cmux>;
+		target = <&i2cmux_3>;
 		__overlay__ {
 			#address-cells = <1>;
 			#size-cells = <0>;
-			i2c@1 {
-				/* HDMI O - Connects directly to HDMI connector */
-				#address-cells = <1>;
-				#size-cells = <0>;
-				reg = <1>;
-			};
-			i2c@3 {
-				/* HDMI IN */
-				#address-cells = <1>;
-				#size-cells = <0>;
-				reg = <3>;
-				/* copied from zynq-zed-imageon.dts */
-				adv7611@4c {
-					compatible = "adi,adv7611";
-					reg = <0x4c>;
-					#address-cells = <0x1>;
-					#size-cells = <0x0>;
-					bus-width = <24>;
-					hsync-active = <0>; /* Parallel bus */
-					vsync-active = <0>;
-					interrupt-parent = <&gpio0>;
-					interrupts = <57 4>; /* EMIO GPIO 3 */
-					adi,int1-config = <1>; /* ADV76XX_INT1_CONFIG_ACTIVE_LOW */
-					reset-gpios = <&gpio0 55 0>; /* EMIO GPIO 1 */
-					port@0 {
-						reg = <0x0>;
-					};
-					port@1 {
-						reg = <0x1>;
-						adv7611: endpoint {
-							bus-width = <16>;
-							remote-endpoint = <&axi_hdmi_rx>;
-						};
+			/* HDMI IN */
+			adv7611@4c {
+				compatible = "adi,adv7611";
+				reg = <0x4c>;
+				#address-cells = <0x1>;
+				#size-cells = <0x0>;
+				interrupt-parent = <&gpio0>;
+				interrupts = <57 4>; /* EMIO GPIO 3 */
+				adi,int1-config = <1>; /* ADV76XX_INT1_CONFIG_ACTIVE_LOW */
+				reset-gpios = <&gpio0 55 0>; /* EMIO GPIO 1 */
+				port@0 {
+					reg = <0x0>;
+				};
+				port@1 {
+					reg = <0x1>;
+					adv7611: endpoint {
+						remote-endpoint = <&axi_hdmi_rx>;
+						bus-width = <24>;
+						hsync-active = <0>; /* Parallel bus */
+						vsync-active = <0>;
 					};
 				};
 			};
@@ -184,6 +200,26 @@
 				#sound-dai-cells = <0>;
 			};
 
+			axi_dmac: dmac@43c00000 {
+				compatible = "adi,axi-dmac-1.00.a";
+				reg = <0x43c00000 0x10000>;
+				#dma-cells = <1>;
+				interrupts = <0 58 4>;
+				clocks = <&clkc 16>;
+
+				adi,channels {
+					#size-cells = <0>;
+					#address-cells = <1>;
+					dma-channel@0 {
+						reg = <0>;
+						adi,source-bus-width = <64>;
+						adi,source-bus-type = <2>;
+						adi,destination-bus-width = <64>;
+						adi,destination-bus-type = <0>;
+					};
+				};
+			};
+
 			axi_hdmi_rx_core: axi-hdmi-rx@43c10000 {
 				compatible = "adi,axi-hdmi-rx-1.00.a";
 				reg = <0x43c10000 0x10000>;
@@ -198,28 +234,9 @@
 					axi_hdmi_rx: endpoint {
 						remote-endpoint = <&adv7611>;
 						bus-width = <24>;
-					};
-				};
-			};
-
-			axi_dmac: dmac@43c00000 {
-				compatible = "adi,axi-dmac-1.00.a";
-				reg = <0x43c00000 0x10000>;
-				#dma-cells = <1>;
-				interrupts = <0 58 4>;
-				clocks = <&clkc 16>;
-
-				adi,channels {
-					#size-cells = <0>;
-					#address-cells = <1>;
-					dma-channel@0 {
-						reg = <0>;
-						adi,length-width = <14>;
-						adi,source-bus-width = <64>;
-						adi,source-bus-type = <2>;
-						adi,destination-bus-width = <64>;
-						adi,destination-bus-type = <0>;
-						adi,2d;
+						hsync-active = <0>; /* Parallel bus */
+						vsync-active = <0>;
+						pclk-sample = <1>; /* Sample on rising edge */
 					};
 				};
 			};
@@ -262,6 +279,15 @@
 				vertical-front-porch = <4>;
 				vertical-back-porch = <23>;
 				vertical-polarity = <0>;
+			};
+
+			dyplo: dyplo@64400000 {
+				compatible = "topic,dyplo-1.00.a";
+				reg = <0x64400000 0x200000>;
+				interrupt-parent = <&intc>;
+				interrupts = <0 57 0x4>;
+				nvmem-cells = <&dyplolicense>;
+				nvmem-cell-names = "license";
 			};
 		};
 	};

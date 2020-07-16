@@ -13,8 +13,9 @@ PROVIDES = ""
 RRECOMMENDS_${PN} = "fpga-firmware-load"
 
 BITSTREAM = "Unsupported-board-for-overlay"
-BITSTREAM_topic-miami = "fpga-image-miami-florida-gen-reference"
-BITSTREAM_topic-miamimp = "fpga-image-miamimp-florida-gen-reference"
+BITSTREAM_topic-miami = "fpga-image-pr-reference"
+BITSTREAM_topic-miamimp = "fpga-image-pr-reference"
+
 RDEPENDS_${PN} += "${BITSTREAM}"
 
 COMPATIBLE_MACHINE = "^tdkz"
