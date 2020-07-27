@@ -388,16 +388,6 @@
 	pinctrl-0 = <&pinctrl_sdhci0_emmc_default>;
 };
 
-/* uSD card or wifi card */
-&sdhci1 {
-	status = "okay";
-	xlnx,mio_bank = <1>;
-	disable-wp;
-	bus-width = <4>;
-	non-removable; /* It is removable actually... */
-	no-1-8-v; /* No high-speed capability */
-};
-
 /* USB connected through MIO and GPIO expander */
 &usb0 {
 	status = "okay";
