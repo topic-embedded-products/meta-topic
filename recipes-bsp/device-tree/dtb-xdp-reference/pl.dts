@@ -38,7 +38,7 @@
 
 			sdio_wifi_pwrseq: sdio_wifi_pwrseq {
 				compatible = "mmc-pwrseq-simple";
-				reset-gpios = <&gpio 100 GPIO_ACTIVE_HIGH>; /* EMIO 22 = WIFI_ENABLE */
+				reset-gpios = <&gpio 100 GPIO_ACTIVE_LOW>; /* EMIO 22 = WIFI_ENABLE */
 				post-power-on-delay-ms = <1>; /* 100 us according to datasheet */
 			};
 
@@ -676,6 +676,19 @@
 				nvmem-cells = <&dyplolicense>;
 				nvmem-cell-names = "license";
 			};
+		};
+	};
+
+	fragment@6 {
+		target = <&sdhci1>;
+		__overlay__ {
+			status = "okay";
+			xlnx,mio_bank = <1>;
+			disable-wp;
+			bus-width = <4>;
+			non-removable; /* WiFi is soldered on */
+			no-1-8-v; /* No high-speed capability */
+			mmc-pwrseq = <&sdio_wifi_pwrseq>;
 		};
 	};
 };
