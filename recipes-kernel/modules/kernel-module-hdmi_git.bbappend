@@ -12,4 +12,5 @@ SRC_URI_append = "\
 	file://0002-TOPIC-4_HDP_mechanism_fix.patch \
 	file://0003-xiling-drm-hdmi-do-not-floor-tx-refclock.patch \
 	file://0004-xilinx-drm-hdmi-add-support-for-RGBA.patch \
+	file://0001-Changed-the-structure-to-now-longer-check-using-the-.patch \
 	"
