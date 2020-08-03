@@ -65,6 +65,8 @@ PMU_FIRMWARE_DEPLOY_DIR = "${WORKDIR}"
 PMU_FIRMWARE_IMAGE_NAME = "pmu-firmware-zynqmp-pmu"
 
 SERIAL_CONSOLE = "115200 ttyPS0"
+# We only want to run getty on the console.
+SERIAL_CONSOLES = "115200;ttyPS0"
 
 KERNEL_DEVICETREE = "xilinx/zynqmp-topic-miamimp.dtb"
 
