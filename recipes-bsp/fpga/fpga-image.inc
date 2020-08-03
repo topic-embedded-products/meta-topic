@@ -21,7 +21,7 @@ FPGA_BITSTREAM_PATH ?= "${datadir}"
 # Tool paths and versions may differ, the output should be the same, so
 # do not take these into account.
 do_compile[vardepsexclude] += "XILINX_TOOL_PATH XILINX_LM_LICENSE_FILE XILINX_TOOL_ARCH XILINX_VIVADO_PATH"
-do_convert_bitstreams[vardepsexclude] += "WORKDIR"
+do_convert_bitstreams[vardepsexclude] += "WORKDIR WORKDIRBIN"
 
 # Required parameters
 BOARD_DESIGN_URI ?= ""
@@ -97,12 +97,17 @@ EOF
 	fi
 }
 
+# Where to store the "bin" files after conversion
+WORKDIRBIN = "${WORKDIR}/converted-bin"
 # Postcondition for do_compile must be that there's a fpga.bit
 # bitstream to be loaded at board startup, and optionally there can be
 # partial bitstreams in a bitstreams directory.
 do_convert_bitstreams() {
+	rm -rf "${WORKDIRBIN}"
+	mkdir -p "${WORKDIRBIN}"
+
 	# Convert static bitfile
-	fpga-bit-to-bin.py --flip fpga.bit ${WORKDIR}/fpga.bin
+	fpga-bit-to-bin.py --flip fpga.bit ${WORKDIRBIN}/fpga.bin
 
 	# Create symbolic link to build/bitstreams
 	if [ ! -d bitstreams ]
@@ -120,10 +125,10 @@ do_convert_bitstreams() {
 		do
 			if [ -d "${path}" ]
 			then
-				mkdir -p "${WORKDIR}/${path}"
+				mkdir -p "${WORKDIRBIN}/${path}"
 				for p in ${path}/*.bit
 				do
-					fpga-bit-to-bin.py --flip "${p}" "${WORKDIR}/${p}.bin"
+					fpga-bit-to-bin.py --flip "${p}" "${WORKDIRBIN}/${p}.bin"
 				done
 			fi
 		done
@@ -135,11 +140,11 @@ FILES_${PN} = "${FPGA_BITSTREAM_PATH} ${FPGA_STATIC_BITSTREAM_PATH}"
 do_install() {
 	install -d ${D}${FPGA_BITSTREAM_PATH}
 	install -d ${D}${FPGA_STATIC_BITSTREAM_PATH}
-	install -m 644 ${WORKDIR}/fpga.bin ${D}${FPGA_STATIC_BITSTREAM_PATH}/fpga.bin
+	install -m 644 ${WORKDIRBIN}/fpga.bin ${D}${FPGA_STATIC_BITSTREAM_PATH}/fpga.bin
 	install -d ${D}${FPGA_BITSTREAM_PATH}/bitstreams
-	if [ -d ${WORKDIR}/bitstreams ]
+	if [ -d ${WORKDIRBIN}/bitstreams ]
 	then
-		cp -r ${WORKDIR}/bitstreams/* ${D}${FPGA_BITSTREAM_PATH}/bitstreams/
+		cp -r ${WORKDIRBIN}/bitstreams/* ${D}${FPGA_BITSTREAM_PATH}/bitstreams/
 	fi
 }
 
