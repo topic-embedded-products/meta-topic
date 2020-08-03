@@ -29,4 +29,10 @@ do_install() {
 	install -d ${D}${systemd_unitdir}/system
 	install -m 0644 ${WORKDIR}/${BPN}.service ${D}${systemd_unitdir}/system/
 	sed -i -e 's,@BINDIR@,${bindir},g' ${D}${systemd_unitdir}/system/${BPN}.service
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}
+	then
+		# Create symlink that blocks ttyS0 (it's the bluetooth port, cannot run getty)
+		install -d ${D}${sysconfdir}/systemd/system
+		ln -s /dev/null ${D}${sysconfdir}/systemd/system/getty@ttyS0.service
+	fi
 }
