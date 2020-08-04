@@ -8,7 +8,7 @@ inherit devicetree
 # We do not provide virtual/dtb, there may be more overlays
 PROVIDES = ""
 
-RRECOMMENDS_${PN} = "fpga-firmware-load"
+RRECOMMENDS_${PN} = "fpga-firmware-load tdpzu-hwdetect"
 
 BITSTREAM = "Unsupported-board-for-overlay"
 BITSTREAM_tdpzu9 = "fpga-image-tdp-reference"

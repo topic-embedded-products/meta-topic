@@ -214,19 +214,19 @@
 	};
 	bt-dev-wake {
 		gpio-hog;
-		gpios = <91 0>; /* EMIO 12 */
+		gpios = <90 0>; /* EMIO 12 */
 		input;
 		line-name = "bt-dev-wake";
 	};
 	bt-en {
 		gpio-hog;
-		gpios = <92 0>; /* EMIO 13 */
+		gpios = <91 0>; /* EMIO 13 */
 		output-high; /* Enable by default */
 		line-name = "bt-en";
 	};
 	wifi-en {
 		gpio-hog;
-		gpios = <93 0>; /* EMIO 14 */
+		gpios = <92 0>; /* EMIO 14 */
 		output-low; /* Disable, no SDIO controller available */
 		line-name = "wifi-en";
 	};
