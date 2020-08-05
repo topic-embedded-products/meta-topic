@@ -1,4 +1,4 @@
-From 814cd2b281d0cb7d9c812258907aaebdc1da3ce2 Mon Sep 17 00:00:00 2001
+From 55aa6f995eb8d5c33364c5f31f0cd8ace05b4f39 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 3 Jun 2020 08:18:58 +0200
 Subject: [PATCH] usb: dwc3: Add support for VBUS power control
@@ -9,10 +9,10 @@ while the port is in host mode.
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 ---
  .../devicetree/bindings/usb/dwc3.txt          |  1 +
- drivers/usb/dwc3/core.c                       | 38 +++++++++++++++----
- drivers/usb/dwc3/core.h                       |  4 ++
- drivers/usb/dwc3/drd.c                        |  6 +--
- 4 files changed, 37 insertions(+), 12 deletions(-)
+ drivers/usb/dwc3/core.c                       | 34 ++++++++++++++-----
+ drivers/usb/dwc3/core.h                       |  4 +++
+ drivers/usb/dwc3/drd.c                        |  6 ++--
+ 4 files changed, 33 insertions(+), 12 deletions(-)
 
 diff --git a/Documentation/devicetree/bindings/usb/dwc3.txt b/Documentation/devicetree/bindings/usb/dwc3.txt
 index 947589f2299f..06e93f3f9ef7 100644
@@ -27,7 +27,7 @@ index 947589f2299f..06e93f3f9ef7 100644
   - snps,usb3_lpm_capable: determines if platform is USB3 LPM capable
   - snps,disable_scramble_quirk: true when SW should disable data scrambling.
 diff --git a/drivers/usb/dwc3/core.c b/drivers/usb/dwc3/core.c
-index 2de3c6e75717..e03b499031b1 100644
+index 2de3c6e75717..2271ce3b0991 100644
 --- a/drivers/usb/dwc3/core.c
 +++ b/drivers/usb/dwc3/core.c
 @@ -26,6 +26,7 @@
@@ -102,17 +102,13 @@ index 2de3c6e75717..e03b499031b1 100644
  		phy_set_mode(dwc->usb2_generic_phy, PHY_MODE_USB_HOST);
  		phy_set_mode(dwc->usb3_generic_phy, PHY_MODE_USB_HOST);
  
-@@ -1570,6 +1584,14 @@ static int dwc3_probe(struct platform_device *pdev)
+@@ -1570,6 +1584,10 @@ static int dwc3_probe(struct platform_device *pdev)
  
  	dwc3_get_properties(dwc);
  
-+	dwc->vbus_reg = devm_regulator_get_optional(dev, "vbus");
-+	if (IS_ERR(dwc->vbus_reg)) {
-+		if (PTR_ERR(dwc->vbus_reg) == -EPROBE_DEFER)
-+			return -EPROBE_DEFER;
-+		dev_dbg(dev, "No vbus regulator: %d\n", PTR_ERR(dwc->vbus_reg));
-+		dwc->vbus_reg = NULL;
-+	}
++	dwc->vbus_reg = devm_regulator_get(dev, "vbus");
++	if (IS_ERR(dwc->vbus_reg))
++		return PTR_ERR(dwc->vbus_reg);
 +
  	dwc->reset = devm_reset_control_get_optional_shared(dev, NULL);
  	if (IS_ERR(dwc->reset))
