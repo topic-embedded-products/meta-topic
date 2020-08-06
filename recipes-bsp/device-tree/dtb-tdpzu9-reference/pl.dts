@@ -16,16 +16,36 @@
 		};
 	};
 
-	/* EMIO 5 user LED */
+	/* User LEDs */
 	fragment@1 {
 		target-path = "/";
 		__overlay__ {
 			leds-pl {
 				compatible = "gpio-leds";
-				eio_led_1 {
+				user_led_1 {
 					label = "pl-user:green";
 					gpios = <&gpio 83 GPIO_ACTIVE_LOW>; /* EMIO 5 */
+					linux,default-trigger = "mmc0"; /* Blink on eMMC activity */
+				};
+				gp-led-0 {
+					label = "gp0:green";
+					gpios = <&gpio 94 GPIO_ACTIVE_LOW>; /* EMIO 16 */
 					linux,default-trigger = "disk-activity"; /* Blink when NVME disk is working */
+				};
+				gp-led-1 {
+					label = "gp1:green";
+					gpios = <&gpio 95 GPIO_ACTIVE_LOW>; /* EMIO 17 */
+					linux,default-trigger = "mmc1";
+				};
+				gp-led-2 {
+					label = "gp2:green";
+					gpios = <&gpio 96 GPIO_ACTIVE_LOW>; /* EMIO 18 */
+					linux,default-trigger = "mtd";
+				};
+				gp-led-3 {
+					label = "gp3:green";
+					gpios = <&gpio 97 GPIO_ACTIVE_LOW>; /* EMIO 19 */
+					linux,default-trigger = "bluetooth-power";
 				};
 			};
 		};
@@ -82,26 +102,6 @@
 			};
 
 			/* GPIO controllers */
-			axi_gpio_0: gpio@80020000 {
-				#gpio-cells = <3>;
-				clock-names = "s_axi_aclk";
-				clocks = <&zynqmp_clk PL0_REF>;
-				compatible = "xlnx,axi-gpio-2.0", "xlnx,xps-gpio-1.00.a";
-				gpio-controller ;
-				reg = <0x0 0x80020000 0x0 0x10000>;
-				xlnx,all-inputs = <0x0>;
-				xlnx,all-inputs-2 = <0x0>;
-				xlnx,all-outputs = <0x1>;
-				xlnx,all-outputs-2 = <0x0>;
-				xlnx,dout-default = <0x00000000>;
-				xlnx,dout-default-2 = <0x00000000>;
-				xlnx,gpio-width = <0x4>;
-				xlnx,gpio2-width = <0x20>;
-				xlnx,interrupt-present = <0x0>;
-				xlnx,is-dual = <0x0>;
-				xlnx,tri-default = <0xFFFFFFFF>;
-				xlnx,tri-default-2 = <0xFFFFFFFF>;
-			};
 			axi_gpio_pmod: gpio@80030000 {
 				#gpio-cells = <3>;
 				clock-names = "s_axi_aclk";
