@@ -69,6 +69,7 @@
 	bus-width = <4>;
 	xlnx,mio_bank = <1>;
 	no-1-8-v; /* No UHS capability, 3v3 only */
+	/delete-property/ disable-wp; /* WP is connected on this board */
 };
 
 &i2c0 {
