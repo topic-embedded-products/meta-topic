@@ -12,7 +12,7 @@ SRC_URI_append = "\
 	file://0006-board-zynqmp-Fix-for-wrong-AMS-setting-by-ROM.patch \
 	file://0007-ARM-zynqmp-Add-support-for-the-topic-miamimp-system-.patch \
 	file://0008-Add-support-for-zynqmp-xilinx-xdp-platform.patch \
-	file://0009-Pinmux-WIFI-or-SD-based-on-card-detect-GPIO-input-st.patch \
+	file://0009-Pinmux-WIFI-or-SD-based-on-bootmode-selection.patch \
 	file://0010-board-topic-zynqmp-Implement-SPL-boot-fallbacks.patch \
 	file://0011-topic-zynqmp-Enable-inner-shareable-transactions-to-.patch \
 	file://0012-Disable-spi-transfer-breakable-by-CTRL-C-support.patch \
