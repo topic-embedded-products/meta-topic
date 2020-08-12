@@ -39,7 +39,7 @@ echo out > /sys/class/gpio/gpio97/direction
 stty -F /dev/ttyS0 115200 crtscts
 # TODO: All boards get the same address... EEPROM?
 BD_ADDR=a4:88:aa:ee:cc:66
-(hciattach /dev/ttyS0 -t 10 bcm43xx 921600 flow nosleep $BD_ADDR bcm43xx_init && hciconfig hci0 up) &
+hciattach /dev/ttyS0 -t 10 bcm43xx 921600 flow nosleep $BD_ADDR bcm43xx_init &
 
 # Load the settings for camera 0
 
