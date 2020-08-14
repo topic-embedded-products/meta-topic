@@ -14,6 +14,9 @@ include conf/machine/include/zynq-base.inc
 require conf/machine/include/soc-zynq.inc
 require conf/machine/include/machine-xilinx-default.inc
 
+# tune-zynq is adding an unused zImage
+KERNEL_IMAGETYPES_remove = "zImage"
+
 MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 
 # Workaround for broken check on IMAGE_FEATURES in kernel recipe
