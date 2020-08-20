@@ -1,0 +1,16 @@
+#include "zynqmp-topic-miamimp-xilinx-xdp-usbhost.dts"
+
+/*
+ * SD card. If you're booting from SD you cannot wait for the FPGA overlay
+ * to be programmed before initializing it.
+ * Added benefit is that only the first "status=okay" has any real effect. So
+ * when the FPGA overlay loads, it won't replace the properties here, and the
+ * WiFi chip will not be taken out of reset.
+ */
+&sdhci1 {
+	status = "okay";
+	xlnx,mio_bank = <1>;
+	disable-wp;
+	bus-width = <4>;
+	no-1-8-v; /* No high-speed capability */
+};
