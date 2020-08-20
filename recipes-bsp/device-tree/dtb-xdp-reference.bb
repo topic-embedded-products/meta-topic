@@ -13,7 +13,7 @@ PROVIDES = ""
 RRECOMMENDS_${PN} = "fpga-firmware-load xdp-hwdetect"
 
 BITSTREAM = "Unsupported-board-for-overlay"
-BITSTREAM_xdpzu7 = "fpga-image-xdp-reference"
+BITSTREAM_xdpzu7 = "fpga-image-pr-reference"
 RDEPENDS_${PN} += "${BITSTREAM}"
 
 COMPATIBLE_MACHINE = "^xdp"
