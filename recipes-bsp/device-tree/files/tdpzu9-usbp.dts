@@ -1,0 +1,35 @@
+/*
+ * dts file for tdpzu9 (Topic Developmentkit Plus) board without PL
+ *
+ * (C) Copyright 2020, Topic Embedded Products BV
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ */
+
+#include "tdpzu9.dts"
+
+/* Change the second USB port into peripheral mode */
+
+&dwc3_1 {
+	dr_mode = "peripheral";
+};
+
+/*
+# note that g_ether will only configure the first USB peripheral port
+# To use the second USB as ethernet gadget, use configfs like this:
+cd /sys/kernel/config/usb_gadget
+mkdir g1
+cd g1
+echo "64" > bMaxPacketSize0
+echo "0x200" > bcdUSB
+echo "0x100" > bcdDevice
+echo "0x03FD" > idVendor
+echo "0x0502" > idProduct
+mkdir configs/c1.1
+mkdir functions/rndis.rn0
+ln -s functions/rndis.rn0/ configs/c1.1/
+echo "fe300000.dwc3" > UDC
+*/
