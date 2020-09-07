@@ -42,9 +42,6 @@ BD_ADDR=a4:88:aa:ee:cc:66
 hciattach /dev/ttyS0 -t 10 bcm43xx 921600 flow nosleep $BD_ADDR bcm43xx_init &
 
 # Load the settings for camera 0
-
-mknod /dev/start_stream c 243 0
-
 if yavta -w '0x0098c981 4' /dev/v4l-subdev2
 then
 	#SONY IMX274 Sensor
