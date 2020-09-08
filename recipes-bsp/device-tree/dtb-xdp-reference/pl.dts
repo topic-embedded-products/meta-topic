@@ -23,7 +23,7 @@
 	fragment@0 {
 		target = <&fpga_full>;
 		__overlay__ {
-			firmware-name = "fpga.bin.fpga-image-pr-reference";
+			firmware-name = "fpga.bin.@BITSTREAM@";
 		};
 	};
 

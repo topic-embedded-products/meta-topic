@@ -4,6 +4,7 @@ SECTION = "bsp"
 # the device trees from within the layer are licensed as MIT, kernel includes are GPL
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
+PV = "2"
 
 inherit devicetree
 
@@ -18,6 +19,11 @@ RDEPENDS_${PN} += "${BITSTREAM}"
 
 COMPATIBLE_MACHINE = "^xdp"
 SRC_URI = "file://pl.dts file://xdp-eio.dts"
+
+do_replacevars() {
+    sed -i 's/@BITSTREAM@/${BITSTREAM}/g' ${S}/pl.dts
+}
+addtask replacevars after do_patch before do_compile
 
 # devicetree.bbclass installs into /boot/devicetree while we want to install
 # into /lib/firmware
