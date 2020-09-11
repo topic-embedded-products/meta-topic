@@ -9,7 +9,7 @@ COMPATIBLE_MACHINE = "^(tdkz|xdpzu)"
 PV = "38+8838cd5"
 PV_tdkzu15 = "36+02419a0"
 PV_tdkz15 = "39+d47bd96"
-PV_xdpzu7 = "43+d506c0a"
+PV_xdpzu7 = "46+f3fed4e"
 
 BOARD_DESIGN_PATH = "${BPN}-${MACHINE}"
 TOPICDOWNLOADS_URI ?= "https://topic-downloads.fra1.digitaloceanspaces.com"
