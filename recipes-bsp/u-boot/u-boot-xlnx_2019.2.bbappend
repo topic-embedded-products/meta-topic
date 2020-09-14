@@ -28,6 +28,7 @@ SRC_URI_append = "\
 	file://0022-zynqmp-topic-miamimp-psu_init_gpl-New-DDR-chips.patch \
 	file://0001-ttpzu9-psu_init_gpl-Run-DDR-at-2400.patch \
 	file://0001-xdp-Set-DDR-to-2400-MT-s.patch \
+	file://0001-ttpzu9-Configure-DDR-as-32-bit-wide.patch \
 	"
 
 # Glitches on serial input interrupt the boot sequence on some boards, use
