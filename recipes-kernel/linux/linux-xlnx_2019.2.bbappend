@@ -16,7 +16,7 @@ TOPICBSPCONFIG_topic-miami = "file://topic-miami-standard.cfg"
 TOPICBSPCONFIG_topic-miamimp = "file://topic-miamimp-standard.cfg"
 TOPICBSPCONFIG_tdpzu9 = "file://topic-miamimp-standard.cfg file://topic-miamiplusmp-extra.cfg file://tdpzu9-extra.cfg"
 TOPICBSPCONFIG_ttpzu9 = "file://topic-miamimp-standard.cfg file://topic-miamiplusmp-extra.cfg file://ttpzu9-extra.cfg file://usb-wired-network-adapters.cfg"
-TOPICBSPCONFIG_xdpzu7 = "file://topic-xdpzu7-standard.cfg"
+TOPICBSPCONFIG_xdpzu7 = "file://topic-xdpzu7-standard.cfg file://usb-wired-network-adapters.cfg"
 
 SRC_URI_append = "\
 	${TOPICBSPCONFIG} \
