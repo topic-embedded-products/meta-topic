@@ -2,9 +2,6 @@
 # to add support for the Miami modules. Most patches are backports from newer
 # kernels, so they're in mainline but not yet in Xilinx' tree. The exceptions
 # to that are the ltc3562 driver, HDMI drivers and the devicetrees.
-#
-# TODO:
-#  HDMI in and HDMI audio
 
 require topic-xilinx-kernel-patches.inc
 
