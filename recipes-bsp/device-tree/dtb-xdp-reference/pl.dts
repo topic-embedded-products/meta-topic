@@ -365,11 +365,53 @@
 
 					port@1 {
 						reg = <0x1>;
-						xlnx,video-format = <XVIP_VF_RBG>;
+						xlnx,video-format = <XVIP_VF_YUV_422>;
 						xlnx,video-width = <0x8>;
 
 						mipi_cam_0_ss_out: endpoint {
-							remote-endpoint = <&mipi_cam_0_topic_mediactl_in>;
+							remote-endpoint = <&mipi_cam_0_vcap_in>;
+						};
+					};
+				};
+			};
+
+			mipi_cam_0_fb: v_frmbuf_wr@a0110000 {
+				compatible = "xlnx,v-frmbuf-wr-2.1", "xlnx,axi-frmbuf-wr-v2.1";
+				#dma-cells = <1>;
+				clock-names = "ap_clk";
+				clocks = <&misc_clk_6>;
+				interrupt-names = "interrupt";
+				interrupt-parent = <&gic>;
+				interrupts = <0 110 4>;
+				reg = <0x0 0xa0110000 0x0 0x10000>;
+				reset-gpios = <&gpio 102 GPIO_ACTIVE_LOW>;
+				xlnx,dma-addr-width = <32>;
+				xlnx,dma-align = <16>;
+				xlnx,max-height = <2160>;
+				xlnx,max-width = <3840>;
+				xlnx,pixels-per-clock = <2>;
+				xlnx,s-axi-ctrl-addr-width = <0x7>;
+				xlnx,s-axi-ctrl-data-width = <0x20>;
+				xlnx,vid-formats = "bgr888", "xbgr8888", "xrgb8888", "uyvy", "y8", "vuy888", "xvuy8888", "yuyv", "nv12", "nv16";
+				xlnx,video-width = <8>;
+			};
+
+
+			vcap_mipi0 {
+				compatible = "xlnx,video";
+				dmas = <&mipi_cam_0_fb 0>;
+				dma-names = "port0";
+				xlnx,vid-formats = "bgr888", "xbgr8888", "xrgb8888", "uyvy", "y8", "vuy888", "xvuy8888", "yuyv", "nv12", "nv16";
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+
+					port@0 {
+						reg = <0>;
+						direction = "input";
+
+						mipi_cam_0_vcap_in: endpoint {
+							remote-endpoint = <&mipi_cam_0_ss_out>;
 						};
 					};
 				};
@@ -591,16 +633,6 @@
 				ports {
 
 					port@0 {
-						reg = <0x0>;
-						xlnx,video-format = <XVIP_VF_RBG>;
-						xlnx,video-width = <0x8>;
-
-						mipi_cam_0_topic_mediactl_in: endpoint {
-							remote-endpoint = <&mipi_cam_0_ss_out>;
-						};
-					};
-
-					port@1 {
 						reg = <0x0>;
 						xlnx,video-format = <XVIP_VF_RBG>;
 						xlnx,video-width = <0x8>;
