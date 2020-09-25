@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaa
 
 BOARD_DESIGN_URI = ""
 
-PV = "115+3f976cb"
+PV = "129+430df4c"
 
 BOARD_DESIGN_PATH = "${BPN}"
 TOPICDOWNLOADS_URI ?= "http://topic-downloads.fra1.digitaloceanspaces.com"
@@ -25,4 +25,4 @@ do_compile() {
    cp ${BOARD_DESIGN_PATH}-${PV} fpga.bit
 }
 
-SRC_URI[tdpzu9.sha256sum] = "5cc71ba82f1d582584fd4caecf476586d1194e11af8b262bb24a0dd0edb429d2"
+SRC_URI[tdpzu9.sha256sum] = "4b1b70f519e27094678a61180ab00192b8f8e6188d03b27fafc2ba12b1bc502c"

@@ -1,22 +1,30 @@
-From 6566d4f4f690709e13e524da374c3d47f3a1e566 Mon Sep 17 00:00:00 2001
+From b950f8ee362391d82627adcc671df3e00b8de7fa Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 8 Sep 2020 15:51:22 +0200
 Subject: [PATCH] zynqmp-topic-miamiplusmp.dts: Support hardware revision v1r1
 
 Add a GPIO hog for the ethernet clock switch
+Replaced pca9554a by pcal9554b (latched interrupt and configurable IO, address 0x20)
 ---
- arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ .../boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts   | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
-index 6f7a005500ed..5d58fa6b63a9 100644
+index 2a346e414d36..c13f2e0f7f72 100644
 --- a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
 +++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
-@@ -120,9 +120,15 @@
- 		compatible = "nxp,pca9554";
+@@ -116,13 +116,19 @@
+ 	clock-frequency = <400000>;
+ 
+ 	/* GPIO expander */
+-	gpioex: pca9554@38 {
+-		compatible = "nxp,pca9554";
++	gpioex: pcal9554@20 {
++		compatible = "nxp,pcal9554b";
  		vcc-supply = <&reg_1v8_miami>;
- 		reg = <0x38>; /* PCA9554A adress starts at 0b111000 */
+-		reg = <0x38>; /* PCA9554A adress starts at 0b111000 */
 -		gpio-line-names = "USERLED", "", "ETH_RESET_N", "USB0_RESET_N", "USB1_RESET_N", "", "", "";
++		reg = <0x20>;
 +		gpio-line-names = "USERLED", "", "ETH_RESET_N", "USB0_RESET_N", "USB1_RESET_N", "CLK_SW_CNTRL", "", "";
  		gpio-controller;
  		#gpio-cells = <2>;

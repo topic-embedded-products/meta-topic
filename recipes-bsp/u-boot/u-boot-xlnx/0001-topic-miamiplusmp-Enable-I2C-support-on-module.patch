@@ -1,0 +1,64 @@
+From cd2660239213ba0fe4f020f8a42e4e041f59e7bb Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 28 Sep 2020 11:22:23 +0200
+Subject: [PATCH] topic-miamiplusmp: Enable I2C support on module
+
+The I2C bus on the module itself can be used to detect board revision
+and read/write the eeprom on it.
+---
+ arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi | 4 ++--
+ configs/topic_tdpzu9_defconfig             | 2 --
+ configs/topic_ttpzu9_defconfig             | 2 --
+ 3 files changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi b/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi
+index 8dd0989d4c..a205ecc3ac 100644
+--- a/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi
++++ b/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi
+@@ -60,7 +60,7 @@
+ };
+ 
+ &i2c1 {
+-	status = "disabled";
++	status = "okay";
+ 	clock-frequency = <400000>;
+ 	/* GPIO expander */
+ 	gpioex: pca9554@20 {
+@@ -72,7 +72,7 @@
+ 	};
+ 	/* EEPROM */
+ 	eeprom: eeprom@51 {
+-		compatible = "at24,24c32";
++		compatible = "atmel,24c32";
+ 		reg = <0x51>;
+ 	};
+ };
+diff --git a/configs/topic_tdpzu9_defconfig b/configs/topic_tdpzu9_defconfig
+index 6b3ed6a05f..0eb0da7148 100644
+--- a/configs/topic_tdpzu9_defconfig
++++ b/configs/topic_tdpzu9_defconfig
+@@ -69,8 +69,6 @@ CONFIG_DM_GPIO=y
+ CONFIG_DM_PCA953X=y
+ CONFIG_DM_I2C=y
+ CONFIG_SYS_I2C_CADENCE=y
+-CONFIG_I2C_MUX=y
+-CONFIG_I2C_MUX_PCA954x=y
+ CONFIG_LED=y
+ CONFIG_LED_GPIO=y
+ CONFIG_MISC=y
+diff --git a/configs/topic_ttpzu9_defconfig b/configs/topic_ttpzu9_defconfig
+index f1ab0a8d39..f29a07ad92 100644
+--- a/configs/topic_ttpzu9_defconfig
++++ b/configs/topic_ttpzu9_defconfig
+@@ -69,8 +69,6 @@ CONFIG_DM_GPIO=y
+ CONFIG_DM_PCA953X=y
+ CONFIG_DM_I2C=y
+ CONFIG_SYS_I2C_CADENCE=y
+-CONFIG_I2C_MUX=y
+-CONFIG_I2C_MUX_PCA954x=y
+ CONFIG_LED=y
+ CONFIG_LED_GPIO=y
+ CONFIG_MISC=y
+-- 
+2.17.1
+

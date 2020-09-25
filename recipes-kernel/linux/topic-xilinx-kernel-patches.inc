@@ -60,6 +60,7 @@ SRC_URI_append = "\
 	file://0001-devicetree-miamimp-control-VBUS-power.patch \
 	file://0001-usb-dwc3-Add-support-for-VBUS-power-control.patch \
 	file://0001-zynqmp-topic-miamiplusmp.dts-Support-hardware-revisi.patch \
+	file://0001-gpio-pca953x-Add-support-for-the-NXP-PCAL9554B-C.patch \
 	"
 
 # Compile overlay-capable devicetrees
