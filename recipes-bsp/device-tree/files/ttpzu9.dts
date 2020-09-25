@@ -200,6 +200,7 @@
 			silabs,format = <4>; /* CMOS */
 			silabs,common-mode = <3>; /* TODO: Correct values... */
 			silabs,amplitude = <3>; /* TODO: Correct values... */
+			always-on;
 		};
 
 		out@6 {
@@ -237,6 +238,11 @@
 	out@9 {
 		always-on;
 	};
+};
+
+/* Disable the 'hog' for the clock switch */
+&gpioex {
+	/delete-node/ eth-clk-sw-ctrl;
 };
 
 &usb0 {
