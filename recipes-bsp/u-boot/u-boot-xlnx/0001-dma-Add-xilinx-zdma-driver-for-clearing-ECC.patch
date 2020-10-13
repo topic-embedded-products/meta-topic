@@ -1,4 +1,4 @@
-From 57b1b376dd875f153b02fe50d4eba18863fa5283 Mon Sep 17 00:00:00 2001
+From b259f0b99048ae927e5d8dbf7f858e5032568ad9 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 9 Oct 2020 09:08:27 +0200
 Subject: [PATCH] dma: Add xilinx-zdma driver for clearing ECC
@@ -9,9 +9,9 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 ---
  drivers/dma/Kconfig       |   9 +++
  drivers/dma/Makefile      |   1 +
- drivers/dma/xilinx-zdma.c | 130 ++++++++++++++++++++++++++++++++++++++
+ drivers/dma/xilinx-zdma.c | 131 ++++++++++++++++++++++++++++++++++++++
  include/xilinx-zdma.h     |  11 ++++
- 4 files changed, 151 insertions(+)
+ 4 files changed, 152 insertions(+)
  create mode 100644 drivers/dma/xilinx-zdma.c
  create mode 100644 include/xilinx-zdma.h
 
@@ -46,10 +46,10 @@ index b5f9147e0a..45747f5759 100644
 +obj-$(CONFIG_XILINX_ZDMA) += xilinx-zdma.o
 diff --git a/drivers/dma/xilinx-zdma.c b/drivers/dma/xilinx-zdma.c
 new file mode 100644
-index 0000000000..13be2d9a3f
+index 0000000000..a9d2650f9a
 --- /dev/null
 +++ b/drivers/dma/xilinx-zdma.c
-@@ -0,0 +1,130 @@
+@@ -0,0 +1,131 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Xilinx ZDMA controller
@@ -65,7 +65,8 @@ index 0000000000..13be2d9a3f
 +#include <asm/io.h>
 +#include <common.h>
 +
-+#define ADMA_CH0_BASEADDR      0xFFA80000U
++/* LPD at 0xFFA80000U FPD at 0xFD500000U */
++#define ADMA_CH0_BASEADDR      0xFD500000U
 +
 +#define ADMA_CH0_ZDMA_CH_STATUS    (ADMA_CH0_BASEADDR + 0x0000011CU)
 +#define ADMA_CH0_ZDMA_CH_STATUS_STATE_MASK    0x00000003U
