@@ -1,0 +1,165 @@
+From d46215727d512ad3ba355b856ebb5a914d6c9641 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Kundr=C3=A1t?= <jan.kundrat@cesnet.cz>
+Date: Thu, 7 Mar 2019 14:38:04 +0100
+Subject: [PATCH 2/4] pinctrl: mcp23s08: debugfs: remove custom printer
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The comment for this dbg_show says that it is supposed to return more
+than what the generic code is showing, including de-glitching. That's
+wrong because:
+
+- this chip does not support deglitching,
+- the code does not print anything extra compared to the generic
+handler,
+- its behavior is different because it skips unrequested GPIOs; the
+generic code prints their names if they're assigned
+
+There is an important difference, though. Previously, dbg_show would
+re-check some registers to see if they still match what the regmap
+thinks should be in there. This was semi-useful when develpoing the HW
+board because it immediately pointed to SPI wiring problem if a CS
+connection was missing (0xffs are easy to see). However, I do not think
+that this makes much sense -- and one could always do this in some other
+way if needed.
+
+Signed-off-by: Jan Kundrát <jan.kundrat@cesnet.cz>
+Cc: Phil Reid <preid@electromag.com.au>
+Cc: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ drivers/pinctrl/pinctrl-mcp23s08.c | 110 -----------------------------
+ 1 file changed, 110 deletions(-)
+
+diff --git a/drivers/pinctrl/pinctrl-mcp23s08.c b/drivers/pinctrl/pinctrl-mcp23s08.c
+index d667e3c8de52..7d60fd6c1bd4 100644
+--- a/drivers/pinctrl/pinctrl-mcp23s08.c
++++ b/drivers/pinctrl/pinctrl-mcp23s08.c
+@@ -656,115 +656,6 @@ static int mcp23s08_irqchip_setup(struct mcp23s08 *mcp)
+ 
+ /*----------------------------------------------------------------------*/
+ 
+-#ifdef CONFIG_DEBUG_FS
+-
+-#include <linux/seq_file.h>
+-
+-/*
+- * This compares the chip's registers with the register
+- * cache and corrects any incorrectly set register. This
+- * can be used to fix state for MCP23xxx, that temporary
+- * lost its power supply.
+- */
+-#define MCP23S08_CONFIG_REGS 7
+-static int __check_mcp23s08_reg_cache(struct mcp23s08 *mcp)
+-{
+-	int cached[MCP23S08_CONFIG_REGS];
+-	int err = 0, i;
+-
+-	/* read cached config registers */
+-	for (i = 0; i < MCP23S08_CONFIG_REGS; i++) {
+-		err = mcp_read(mcp, i, &cached[i]);
+-		if (err)
+-			goto out;
+-	}
+-
+-	regcache_cache_bypass(mcp->regmap, true);
+-
+-	for (i = 0; i < MCP23S08_CONFIG_REGS; i++) {
+-		int uncached;
+-		err = mcp_read(mcp, i, &uncached);
+-		if (err)
+-			goto out;
+-
+-		if (uncached != cached[i]) {
+-			dev_err(mcp->dev, "restoring reg 0x%02x from 0x%04x to 0x%04x (power-loss?)\n",
+-				i, uncached, cached[i]);
+-			mcp_write(mcp, i, cached[i]);
+-		}
+-	}
+-
+-out:
+-	if (err)
+-		dev_err(mcp->dev, "read error: reg=%02x, err=%d", i, err);
+-	regcache_cache_bypass(mcp->regmap, false);
+-	return err;
+-}
+-
+-/*
+- * This shows more info than the generic gpio dump code:
+- * pullups, deglitching, open drain drive.
+- */
+-static void mcp23s08_dbg_show(struct seq_file *s, struct gpio_chip *chip)
+-{
+-	struct mcp23s08	*mcp;
+-	char		bank;
+-	int		t;
+-	unsigned	mask;
+-	int iodir, gpio, gppu;
+-
+-	mcp = gpiochip_get_data(chip);
+-
+-	/* NOTE: we only handle one bank for now ... */
+-	bank = '0' + ((mcp->addr >> 1) & 0x7);
+-
+-	mutex_lock(&mcp->lock);
+-
+-	t = __check_mcp23s08_reg_cache(mcp);
+-	if (t) {
+-		seq_printf(s, " I/O Error\n");
+-		goto done;
+-	}
+-	t = mcp_read(mcp, MCP_IODIR, &iodir);
+-	if (t) {
+-		seq_printf(s, " I/O Error\n");
+-		goto done;
+-	}
+-	t = mcp_read(mcp, MCP_GPIO, &gpio);
+-	if (t) {
+-		seq_printf(s, " I/O Error\n");
+-		goto done;
+-	}
+-	t = mcp_read(mcp, MCP_GPPU, &gppu);
+-	if (t) {
+-		seq_printf(s, " I/O Error\n");
+-		goto done;
+-	}
+-
+-	for (t = 0, mask = BIT(0); t < chip->ngpio; t++, mask <<= 1) {
+-		const char *label;
+-
+-		label = gpiochip_is_requested(chip, t);
+-		if (!label)
+-			continue;
+-
+-		seq_printf(s, " gpio-%-3d P%c.%d (%-12s) %s %s %s\n",
+-			   chip->base + t, bank, t, label,
+-			   (iodir & mask) ? "in " : "out",
+-			   (gpio & mask) ? "hi" : "lo",
+-			   (gppu & mask) ? "up" : "  ");
+-		/* NOTE:  ignoring the irq-related registers */
+-	}
+-done:
+-	mutex_unlock(&mcp->lock);
+-}
+-
+-#else
+-#define mcp23s08_dbg_show	NULL
+-#endif
+-
+-/*----------------------------------------------------------------------*/
+-
+ static int mcp23s08_probe_one(struct mcp23s08 *mcp, struct device *dev,
+ 			      void *data, unsigned addr, unsigned type,
+ 			      unsigned int base, int cs)
+@@ -785,7 +676,6 @@ static int mcp23s08_probe_one(struct mcp23s08 *mcp, struct device *dev,
+ 	mcp->chip.get = mcp23s08_get;
+ 	mcp->chip.direction_output = mcp23s08_direction_output;
+ 	mcp->chip.set = mcp23s08_set;
+-	mcp->chip.dbg_show = mcp23s08_dbg_show;
+ #ifdef CONFIG_OF_GPIO
+ 	mcp->chip.of_gpio_n_cells = 2;
+ 	mcp->chip.of_node = dev->of_node;
+-- 
+2.17.1
+

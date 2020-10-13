@@ -1,0 +1,47 @@
+From f496ae07e493cf5b2685d31c9e2dc1c15a5ecdc1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Kundr=C3=A1t?= <jan.kundrat@cesnet.cz>
+Date: Thu, 7 Mar 2019 14:16:51 +0100
+Subject: [PATCH 3/4] pinctrl: mcp23s08: Do not complain about unsupported
+ params
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+It is expected that some of these operations won't work on each and
+every HW. Previously, even a simple `cat
+/sys/kernel/debug/pinctrl/spi1.1/pinconf-pins` caused excessive dmesg
+output.
+
+Signed-off-by: Jan Kundrát <jan.kundrat@cesnet.cz>
+Cc: Phil Reid <preid@electromag.com.au>
+Cc: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
+Cc: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ drivers/pinctrl/pinctrl-mcp23s08.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/pinctrl/pinctrl-mcp23s08.c b/drivers/pinctrl/pinctrl-mcp23s08.c
+index 7d60fd6c1bd4..1affa3e0dba9 100644
+--- a/drivers/pinctrl/pinctrl-mcp23s08.c
++++ b/drivers/pinctrl/pinctrl-mcp23s08.c
+@@ -266,7 +266,6 @@ static int mcp_pinconf_get(struct pinctrl_dev *pctldev, unsigned int pin,
+ 		status = (data & BIT(pin)) ? 1 : 0;
+ 		break;
+ 	default:
+-		dev_err(mcp->dev, "Invalid config param %04x\n", param);
+ 		return -ENOTSUPP;
+ 	}
+ 
+@@ -293,7 +292,7 @@ static int mcp_pinconf_set(struct pinctrl_dev *pctldev, unsigned int pin,
+ 			ret = mcp_set_bit(mcp, MCP_GPPU, pin, arg);
+ 			break;
+ 		default:
+-			dev_err(mcp->dev, "Invalid config param %04x\n", param);
++			dev_dbg(mcp->dev, "Invalid config param %04x\n", param);
+ 			return -ENOTSUPP;
+ 		}
+ 	}
+-- 
+2.17.1
+
