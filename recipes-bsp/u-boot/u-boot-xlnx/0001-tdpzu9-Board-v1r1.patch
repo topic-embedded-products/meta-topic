@@ -1,0 +1,310 @@
+From d0d38323a9f8e13b5fe5d35f0eb4455085e8b992 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 13 Oct 2020 15:58:28 +0200
+Subject: [PATCH] tdpzu9: Board v1r1
+
+Enable USB3 on both controllers
+Use refclk0 at 100MHz for USB3 GT lanes
+Remove displayport remnants
+
+Set SD card detect to "always present". Don't use the built-in card detect,
+it makes it impossible to ignore the signal. The WiFi chip only works if
+some random SD card is inserted into the slot. We'll use GPIO card detect
+when needed.
+---
+ .../zynqmp/zynqmp-topic-tdpzu9/psu_init_gpl.c | 128 +++++++++---------
+ 1 file changed, 63 insertions(+), 65 deletions(-)
+
+diff --git a/board/topic/zynqmp/zynqmp-topic-tdpzu9/psu_init_gpl.c b/board/topic/zynqmp/zynqmp-topic-tdpzu9/psu_init_gpl.c
+index cfde1cd366..0afd844dfa 100644
+--- a/board/topic/zynqmp/zynqmp-topic-tdpzu9/psu_init_gpl.c
++++ b/board/topic/zynqmp/zynqmp-topic-tdpzu9/psu_init_gpl.c
+@@ -49,7 +49,6 @@ static unsigned long psu_pll_init_data(void)
+ 	mask_poll(0xFD1A0044, 0x00000004U);
+ 	psu_mask_write(0xFD1A0038, 0x00000008U, 0x00000000U);
+ 	psu_mask_write(0xFD1A0050, 0x00003F00U, 0x00000300U);
+-	psu_mask_write(0xFD1A0040, 0x8000FFFFU, 0x8000003BU);
+ 
+ 	return 1;
+ }
+@@ -67,7 +66,6 @@ static unsigned long psu_clock_init_data(void)
+ 	psu_mask_write(0xFF5E0070, 0x013F3F07U, 0x01010502U);
+ 	psu_mask_write(0xFF18030C, 0x00020003U, 0x00000000U);
+ 	psu_mask_write(0xFF5E0074, 0x013F3F07U, 0x01010F00U);
+-	psu_mask_write(0xFF5E0078, 0x013F3F07U, 0x01010F00U);
+ 	psu_mask_write(0xFF5E0120, 0x013F3F07U, 0x01010F00U);
+ 	psu_mask_write(0xFF5E0124, 0x013F3F07U, 0x01010F00U);
+ 	psu_mask_write(0xFF5E007C, 0x013F3F07U, 0x01010502U);
+@@ -87,9 +85,6 @@ static unsigned long psu_clock_init_data(void)
+ 	psu_mask_write(0xFF5E0104, 0x00000007U, 0x00000000U);
+ 	psu_mask_write(0xFF5E0128, 0x01003F07U, 0x01000F00U);
+ 	psu_mask_write(0xFD1A00B4, 0x01003F07U, 0x01000200U);
+-	psu_mask_write(0xFD1A0070, 0x013F3F07U, 0x01010500U);
+-	psu_mask_write(0xFD1A0074, 0x013F3F07U, 0x01013C00U);
+-	psu_mask_write(0xFD1A007C, 0x013F3F07U, 0x01013800U);
+ 	psu_mask_write(0xFD1A0060, 0x03003F07U, 0x03000102U);
+ 	psu_mask_write(0xFD1A0068, 0x01003F07U, 0x01000200U);
+ 	psu_mask_write(0xFD1A0080, 0x00003F07U, 0x00000200U);
+@@ -427,18 +422,18 @@ static unsigned long psu_mio_init_data(void)
+ 	psu_mask_write(0xFF180074, 0x000000FEU, 0x00000040U);
+ 	psu_mask_write(0xFF180078, 0x000000FEU, 0x000000C0U);
+ 	psu_mask_write(0xFF18007C, 0x000000FEU, 0x000000C0U);
+-	psu_mask_write(0xFF180080, 0x000000FEU, 0x000000C0U);
+-	psu_mask_write(0xFF180084, 0x000000FEU, 0x000000C0U);
+-	psu_mask_write(0xFF180088, 0x000000FEU, 0x00000018U);
+-	psu_mask_write(0xFF18008C, 0x000000FEU, 0x00000018U);
+-	psu_mask_write(0xFF180090, 0x000000FEU, 0x00000018U);
+-	psu_mask_write(0xFF180094, 0x000000FEU, 0x00000018U);
++	psu_mask_write(0xFF180080, 0x000000FEU, 0x00000000U);
++	psu_mask_write(0xFF180084, 0x000000FEU, 0x00000000U);
++	psu_mask_write(0xFF180088, 0x000000FEU, 0x00000040U);
++	psu_mask_write(0xFF18008C, 0x000000FEU, 0x00000040U);
++	psu_mask_write(0xFF180090, 0x000000FEU, 0x00000000U);
++	psu_mask_write(0xFF180094, 0x000000FEU, 0x00000000U);
+ 	psu_mask_write(0xFF180098, 0x000000FEU, 0x00000000U);
+ 	psu_mask_write(0xFF18009C, 0x000000FEU, 0x00000000U);
+ 	psu_mask_write(0xFF1800A0, 0x000000FEU, 0x00000000U);
+ 	psu_mask_write(0xFF1800A4, 0x000000FEU, 0x00000000U);
+-	psu_mask_write(0xFF1800A8, 0x000000FEU, 0x00000040U);
+-	psu_mask_write(0xFF1800AC, 0x000000FEU, 0x00000040U);
++	psu_mask_write(0xFF1800A8, 0x000000FEU, 0x00000000U);
++	psu_mask_write(0xFF1800AC, 0x000000FEU, 0x00000000U);
+ 	psu_mask_write(0xFF1800B0, 0x000000FEU, 0x00000010U);
+ 	psu_mask_write(0xFF1800B4, 0x000000FEU, 0x00000010U);
+ 	psu_mask_write(0xFF1800B8, 0x000000FEU, 0x00000010U);
+@@ -474,19 +469,19 @@ static unsigned long psu_mio_init_data(void)
+ 	psu_mask_write(0xFF180130, 0x000000FEU, 0x000000A0U);
+ 	psu_mask_write(0xFF180134, 0x000000FEU, 0x000000A0U);
+ 	psu_mask_write(0xFF180204, 0xFFFFFFFFU, 0x40000000U);
+-	psu_mask_write(0xFF180208, 0xFFFFFFFFU, 0x00B0302AU);
++	psu_mask_write(0xFF180208, 0xFFFFFFFFU, 0x00B03000U);
+ 	psu_mask_write(0xFF18020C, 0x00003FFFU, 0x0000000BU);
+ 	psu_mask_write(0xFF180138, 0x03FFFFFFU, 0x03FFFFFFU);
+ 	psu_mask_write(0xFF18013C, 0x03FFFFFFU, 0x03FFFFFFU);
+ 	psu_mask_write(0xFF180140, 0x03FFFFFFU, 0x00000000U);
+-	psu_mask_write(0xFF180148, 0x03FFFFFFU, 0x03FFEFFEU);
++	psu_mask_write(0xFF180148, 0x03FFFFFFU, 0x01FFEFFEU);
+ 	psu_mask_write(0xFF18014C, 0x03FFFFFFU, 0x00000000U);
+-	psu_mask_write(0xFF180144, 0x03FFEFFEU, 0x03FFEFFEU);
++	psu_mask_write(0xFF180144, 0x01FFEFFEU, 0x01FFEFFEU);
+ 	psu_mask_write(0xFF180154, 0x03FFFFFFU, 0x03FFFFFFU);
+ 	psu_mask_write(0xFF180158, 0x03FFFFFFU, 0x03FFFFFFU);
+ 	psu_mask_write(0xFF18015C, 0x03FFFFFFU, 0x00000000U);
+-	psu_mask_write(0xFF180160, 0x01FFFF9FU, 0x01FFFF9FU);
+-	psu_mask_write(0xFF180164, 0x03FFFFFFU, 0x03F9F7FFU);
++	psu_mask_write(0xFF180160, 0x01FEDFDFU, 0x01FEDFDFU);
++	psu_mask_write(0xFF180164, 0x03FFFFFFU, 0x01FDF7FBU);
+ 	psu_mask_write(0xFF180168, 0x03FFFFFFU, 0x00000000U);
+ 	psu_mask_write(0xFF180170, 0x03FFFFFFU, 0x03FFFFFFU);
+ 	psu_mask_write(0xFF180174, 0x03FFFFFFU, 0x03FFFFFFU);
+@@ -509,7 +504,7 @@ static unsigned long psu_peripherals_pre_init_data(void)
+ 
+ static unsigned long psu_peripherals_init_data(void)
+ {
+-	psu_mask_write(0xFD1A0100, 0x000F807CU, 0x00000000U);
++	psu_mask_write(0xFD1A0100, 0x000E807CU, 0x00000000U);
+ 	psu_mask_write(0xFF5E0238, 0x001A0000U, 0x00000000U);
+ 	psu_mask_write(0xFF5E023C, 0x0093C018U, 0x00000000U);
+ 	psu_mask_write(0xFF5E0230, 0x00000004U, 0x00000000U);
+@@ -529,15 +524,11 @@ static unsigned long psu_peripherals_init_data(void)
+ 	psu_mask_write(0xFF5E0238, 0x00008000U, 0x00000000U);
+ 	psu_mask_write(0xFF5E0238, 0x00000018U, 0x00000000U);
+ 	psu_mask_write(0xFF5E0238, 0x00007800U, 0x00000000U);
+-	psu_mask_write(0xFF5E0238, 0x00000006U, 0x00000000U);
++	psu_mask_write(0xFF5E0238, 0x00000002U, 0x00000000U);
+ 	psu_mask_write(0xFF000034, 0x000000FFU, 0x00000005U);
+ 	psu_mask_write(0xFF000018, 0x0000FFFFU, 0x0000008FU);
+ 	psu_mask_write(0xFF000000, 0x000001FFU, 0x00000017U);
+ 	psu_mask_write(0xFF000004, 0x000003FFU, 0x00000020U);
+-	psu_mask_write(0xFF010034, 0x000000FFU, 0x00000005U);
+-	psu_mask_write(0xFF010018, 0x0000FFFFU, 0x0000008FU);
+-	psu_mask_write(0xFF010000, 0x000001FFU, 0x00000017U);
+-	psu_mask_write(0xFF010004, 0x000003FFU, 0x00000020U);
+ 	psu_mask_write(0xFF5E0238, 0x00040000U, 0x00000000U);
+ 	psu_mask_write(0xFF4B0024, 0x000000FFU, 0x000000FFU);
+ 	psu_mask_write(0xFFCA5000, 0x00001FFFU, 0x00000000U);
+@@ -545,21 +536,14 @@ static unsigned long psu_peripherals_init_data(void)
+ 	psu_mask_write(0xFFA60040, 0x80000000U, 0x80000000U);
+ 	psu_mask_write(0xFF260020, 0xFFFFFFFFU, 0x05F5DD18U);
+ 	psu_mask_write(0xFF260000, 0x00000001U, 0x00000001U);
+-	psu_mask_write(0xFF0A0244, 0x03FFFFFFU, 0x00009000U);
+-	psu_mask_write(0xFF0A0248, 0x03FFFFFFU, 0x00009000U);
+-	psu_mask_write(0xFF0A0008, 0xFFFFFFFFU, 0x7FFF8000U);
+-	mask_delay(1);
+-	psu_mask_write(0xFF0A0008, 0xFFFFFFFFU, 0x7FFF0000U);
+-	mask_delay(5);
+-	psu_mask_write(0xFF0A0008, 0xFFFFFFFFU, 0x7FFF8000U);
+-	psu_mask_write(0xFF0A0244, 0x03FFFFFFU, 0x00009000U);
+-	psu_mask_write(0xFF0A0248, 0x03FFFFFFU, 0x00009000U);
++	psu_mask_write(0xFF0A0244, 0x03FFFFFFU, 0x00001000U);
++	psu_mask_write(0xFF0A0248, 0x03FFFFFFU, 0x00001000U);
+ 	psu_mask_write(0xFF0A0008, 0xFFFFFFFFU, 0xEFFF1000U);
+ 	mask_delay(1);
+ 	psu_mask_write(0xFF0A0008, 0xFFFFFFFFU, 0xEFFF0000U);
+ 	mask_delay(5);
+-	psu_mask_write(0xFF0A0244, 0x03FFFFFFU, 0x00009000U);
+-	psu_mask_write(0xFF0A0248, 0x03FFFFFFU, 0x00009000U);
++	psu_mask_write(0xFF0A0244, 0x03FFFFFFU, 0x00001000U);
++	psu_mask_write(0xFF0A0248, 0x03FFFFFFU, 0x00001000U);
+ 	psu_mask_write(0xFF0A0008, 0xFFFFFFFFU, 0xEFFF0000U);
+ 
+ 	return 1;
+@@ -568,31 +552,35 @@ static unsigned long psu_peripherals_init_data(void)
+ static unsigned long psu_serdes_init_data(void)
+ {
+ 	psu_mask_write(0xFD410000, 0x0000001FU, 0x0000000DU);
+-	psu_mask_write(0xFD410004, 0x0000001FU, 0x00000009U);
++	psu_mask_write(0xFD410004, 0x0000001FU, 0x0000000DU);
+ 	psu_mask_write(0xFD410008, 0x0000001FU, 0x0000000FU);
+-	psu_mask_write(0xFD41000C, 0x0000001FU, 0x00000008U);
++	psu_mask_write(0xFD41000C, 0x0000001FU, 0x0000000DU);
+ 	psu_mask_write(0xFD402860, 0x00000080U, 0x00000080U);
+-	psu_mask_write(0xFD402864, 0x00000084U, 0x00000004U);
++	psu_mask_write(0xFD402864, 0x00000081U, 0x00000001U);
+ 	psu_mask_write(0xFD402868, 0x00000082U, 0x00000002U);
+-	psu_mask_write(0xFD40286C, 0x00000080U, 0x00000080U);
++	psu_mask_write(0xFD40286C, 0x00000081U, 0x00000001U);
++	psu_mask_write(0xFD406094, 0x00000010U, 0x00000010U);
+ 	psu_mask_write(0xFD40E094, 0x00000010U, 0x00000010U);
+-	psu_mask_write(0xFD40E368, 0x000000FFU, 0x00000038U);
+-	psu_mask_write(0xFD40E36C, 0x00000007U, 0x00000003U);
+-	psu_mask_write(0xFD406368, 0x000000FFU, 0x00000058U);
+-	psu_mask_write(0xFD40636C, 0x00000007U, 0x00000003U);
+-	psu_mask_write(0xFD406370, 0x000000FFU, 0x0000007CU);
+-	psu_mask_write(0xFD406374, 0x000000FFU, 0x00000033U);
+-	psu_mask_write(0xFD406378, 0x000000FFU, 0x00000002U);
++	psu_mask_write(0xFD40E368, 0x000000FFU, 0x00000022U);
++	psu_mask_write(0xFD40E36C, 0x00000007U, 0x00000004U);
++	psu_mask_write(0xFD406368, 0x000000FFU, 0x00000022U);
++	psu_mask_write(0xFD40636C, 0x00000007U, 0x00000004U);
++	psu_mask_write(0xFD406370, 0x000000FFU, 0x000000EDU);
++	psu_mask_write(0xFD406374, 0x000000FFU, 0x00000055U);
++	psu_mask_write(0xFD406378, 0x000000FFU, 0x00000001U);
+ 	psu_mask_write(0xFD40637C, 0x00000033U, 0x00000030U);
+-	psu_mask_write(0xFD40E370, 0x000000FFU, 0x000000F4U);
+-	psu_mask_write(0xFD40E374, 0x000000FFU, 0x00000031U);
+-	psu_mask_write(0xFD40E378, 0x000000FFU, 0x00000002U);
++	psu_mask_write(0xFD40E370, 0x000000FFU, 0x000000EDU);
++	psu_mask_write(0xFD40E374, 0x000000FFU, 0x00000055U);
++	psu_mask_write(0xFD40E378, 0x000000FFU, 0x00000001U);
+ 	psu_mask_write(0xFD40E37C, 0x00000033U, 0x00000030U);
++	psu_mask_write(0xFD40506C, 0x00000003U, 0x00000003U);
++	psu_mask_write(0xFD4040F4, 0x00000003U, 0x00000003U);
+ 	psu_mask_write(0xFD40906C, 0x0000000FU, 0x0000000FU);
+ 	psu_mask_write(0xFD4080F4, 0x0000000BU, 0x0000000BU);
+ 	psu_mask_write(0xFD40D06C, 0x00000003U, 0x00000003U);
+ 	psu_mask_write(0xFD40C0F4, 0x00000003U, 0x00000003U);
+ 	psu_mask_write(0xFD4010CC, 0x00000020U, 0x00000020U);
++	psu_mask_write(0xFD4050CC, 0x00000020U, 0x00000020U);
+ 	psu_mask_write(0xFD40D0CC, 0x00000020U, 0x00000020U);
+ 	psu_mask_write(0xFD401074, 0x00000010U, 0x00000010U);
+ 	psu_mask_write(0xFD405074, 0x00000010U, 0x00000010U);
+@@ -612,6 +600,19 @@ static unsigned long psu_serdes_init_data(void)
+ 	psu_mask_write(0xFD401940, 0x000000FFU, 0x000000F7U);
+ 	psu_mask_write(0xFD401944, 0x00000001U, 0x00000001U);
+ 	psu_mask_write(0xFD401994, 0x00000007U, 0x00000007U);
++	psu_mask_write(0xFD40589C, 0x00000080U, 0x00000080U);
++	psu_mask_write(0xFD4058F8, 0x000000FFU, 0x00000064U);
++	psu_mask_write(0xFD4058FC, 0x000000FFU, 0x00000064U);
++	psu_mask_write(0xFD405990, 0x000000FFU, 0x00000010U);
++	psu_mask_write(0xFD405924, 0x000000FFU, 0x000000FEU);
++	psu_mask_write(0xFD405928, 0x000000FFU, 0x00000000U);
++	psu_mask_write(0xFD405900, 0x000000FFU, 0x00000064U);
++	psu_mask_write(0xFD40592C, 0x000000FFU, 0x00000000U);
++	psu_mask_write(0xFD405980, 0x000000FFU, 0x000000FFU);
++	psu_mask_write(0xFD405914, 0x000000FFU, 0x000000F7U);
++	psu_mask_write(0xFD405918, 0x00000001U, 0x00000001U);
++	psu_mask_write(0xFD405940, 0x000000FFU, 0x000000F7U);
++	psu_mask_write(0xFD405944, 0x00000001U, 0x00000001U);
+ 	psu_mask_write(0xFD405994, 0x00000007U, 0x00000007U);
+ 	psu_mask_write(0xFD40989C, 0x00000080U, 0x00000080U);
+ 	psu_mask_write(0xFD4098F8, 0x000000FFU, 0x0000007DU);
+@@ -628,12 +629,12 @@ static unsigned long psu_serdes_init_data(void)
+ 	psu_mask_write(0xFD409944, 0x00000001U, 0x00000001U);
+ 	psu_mask_write(0xFD409994, 0x00000007U, 0x00000007U);
+ 	psu_mask_write(0xFD40D89C, 0x00000080U, 0x00000080U);
+-	psu_mask_write(0xFD40D8F8, 0x000000FFU, 0x0000001AU);
+-	psu_mask_write(0xFD40D8FC, 0x000000FFU, 0x0000001AU);
++	psu_mask_write(0xFD40D8F8, 0x000000FFU, 0x00000064U);
++	psu_mask_write(0xFD40D8FC, 0x000000FFU, 0x00000064U);
+ 	psu_mask_write(0xFD40D990, 0x000000FFU, 0x00000010U);
+ 	psu_mask_write(0xFD40D924, 0x000000FFU, 0x000000FEU);
+ 	psu_mask_write(0xFD40D928, 0x000000FFU, 0x00000000U);
+-	psu_mask_write(0xFD40D900, 0x000000FFU, 0x0000001AU);
++	psu_mask_write(0xFD40D900, 0x000000FFU, 0x00000064U);
+ 	psu_mask_write(0xFD40D92C, 0x000000FFU, 0x00000000U);
+ 	psu_mask_write(0xFD40D980, 0x000000FFU, 0x000000FFU);
+ 	psu_mask_write(0xFD40D914, 0x000000FFU, 0x000000F7U);
+@@ -666,14 +667,10 @@ static unsigned long psu_serdes_init_data(void)
+ 	psu_mask_write(0xFD409978, 0x00000010U, 0x00000010U);
+ 	psu_mask_write(0xFD40D978, 0x00000010U, 0x00000010U);
+ 	psu_mask_write(0xFD3D001C, 0xFFFFFFFFU, 0x00000001U);
+-	psu_mask_write(0xFD410010, 0x00000077U, 0x00000041U);
++	psu_mask_write(0xFD410010, 0x00000077U, 0x00000031U);
+ 	psu_mask_write(0xFD410014, 0x00000077U, 0x00000035U);
+-	psu_mask_write(0xFD404CB4, 0x00000037U, 0x00000037U);
+-	psu_mask_write(0xFD4041D8, 0x00000001U, 0x00000001U);
+ 	psu_mask_write(0xFD410040, 0x00000030U, 0x00000000U);
+ 	psu_mask_write(0xFD410044, 0x00000030U, 0x00000000U);
+-	psu_mask_write(0xFD404CC0, 0x0000001FU, 0x00000000U);
+-	psu_mask_write(0xFD404048, 0x000000FFU, 0x00000000U);
+ 
+ 	return 1;
+ }
+@@ -682,7 +679,7 @@ static unsigned long psu_resetout_init_data(void)
+ {
+ 	psu_mask_write(0xFF5E023C, 0x00000400U, 0x00000000U);
+ 	psu_mask_write(0xFF9D0080, 0x00000001U, 0x00000001U);
+-	psu_mask_write(0xFF9D007C, 0x00000001U, 0x00000001U);
++	psu_mask_write(0xFF9D007C, 0x00000001U, 0x00000000U);
+ 	psu_mask_write(0xFF5E023C, 0x00000140U, 0x00000000U);
+ 	psu_mask_write(0xFF5E023C, 0x00000800U, 0x00000000U);
+ 	psu_mask_write(0xFF9E0080, 0x00000001U, 0x00000001U);
+@@ -690,12 +687,9 @@ static unsigned long psu_resetout_init_data(void)
+ 	psu_mask_write(0xFF5E023C, 0x00000280U, 0x00000000U);
+ 	psu_mask_write(0xFF5E0230, 0x00000004U, 0x00000000U);
+ 	psu_mask_write(0xFD1A0100, 0x000C0000U, 0x00000000U);
+-	psu_mask_write(0xFD1A0100, 0x00010000U, 0x00000000U);
+-	psu_mask_write(0xFD4A0200, 0x00000002U, 0x00000000U);
+-	psu_mask_write(0xFD4A0238, 0x0000000FU, 0x00000000U);
+ 	psu_mask_write(0xFE20C200, 0x00023FFFU, 0x00022457U);
+ 	psu_mask_write(0xFE20C630, 0x003FFF00U, 0x00000000U);
+-	psu_mask_write(0xFE20C11C, 0x00000400U, 0x00000400U);
++	psu_mask_write(0xFE20C11C, 0x00000600U, 0x00000600U);
+ 	psu_mask_write(0xFE20C12C, 0x00004000U, 0x00004000U);
+ 	psu_mask_write(0xFE30C200, 0x00023FFFU, 0x00022457U);
+ 	psu_mask_write(0xFE30C630, 0x003FFF00U, 0x00000000U);
+@@ -761,9 +755,6 @@ static unsigned long psu_resetin_init_data(void)
+ 	psu_mask_write(0xFF5E023C, 0x00000A80U, 0x00000A80U);
+ 	psu_mask_write(0xFF5E0230, 0x00000004U, 0x00000004U);
+ 	psu_mask_write(0xFD1A0100, 0x000E0000U, 0x000E0000U);
+-	psu_mask_write(0xFD4A0238, 0x0000000FU, 0x0000000AU);
+-	psu_mask_write(0xFD4A0200, 0x00000002U, 0x00000002U);
+-	psu_mask_write(0xFD1A0100, 0x00010000U, 0x00010000U);
+ 
+ 	return 1;
+ }
+@@ -1030,6 +1021,12 @@ static void init_peripheral(void)
+ 	psu_mask_write(0xFD5F0018, 0x8000001FU, 0x8000001FU);
+ }
+ 
++static void topic_fixups(void)
++{
++	/* Set SD cards to be always present regardless of card detect state */
++	psu_mask_write(0xFF18035C, 0x00010001U, 0x00010001U);
++}
++
+ int psu_init(void)
+ {
+ 	int status = 1;
+@@ -1041,6 +1038,7 @@ int psu_init(void)
+ 	status &= psu_ddr_init_data();
+ 	status &= psu_ddr_phybringup_data();
+ 	status &= psu_peripherals_init_data();
++	topic_fixups();
+ 	status &= init_serdes();
+ 	init_peripheral();
+ 
+-- 
+2.17.1
+

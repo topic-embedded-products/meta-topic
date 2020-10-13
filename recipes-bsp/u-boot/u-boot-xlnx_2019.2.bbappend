@@ -30,6 +30,8 @@ SRC_URI_append = "\
 	file://0001-xdp-Set-DDR-to-2400-MT-s.patch \
 	file://0001-topic-miamiplusmp-Enable-I2C-support-on-module.patch \
 	file://0001-topic-miamimp-xilinx-xdp-Enable-CAN-controllers.patch \
+	file://0001-tdpzu9-Board-v1r1.patch \
+	file://0001-ttpzu9-psu_init-Use-100MHz-refclk-for-USB3.patch \
 	"
 
 # Glitches on serial input interrupt the boot sequence on some boards, use

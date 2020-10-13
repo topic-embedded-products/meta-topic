@@ -15,4 +15,4 @@ COMPATIBLE_MACHINE_ttpzu9 = ".*"
 SRC_URI_append_ttpzu9 = " file://${MACHINE}.dts"
 
 COMPATIBLE_MACHINE_tdpzu9 = ".*"
-SRC_URI_append_tdpzu9 = " file://${MACHINE}.dts file://${MACHINE}-usbp.dts"
+SRC_URI_append_tdpzu9 = " file://${MACHINE}.dts file://${MACHINE}-wifi.dts"

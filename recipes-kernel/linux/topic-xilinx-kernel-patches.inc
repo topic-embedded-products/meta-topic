@@ -61,7 +61,10 @@ SRC_URI_append = "\
 	file://0001-usb-dwc3-Add-support-for-VBUS-power-control.patch \
 	file://0001-zynqmp-topic-miamiplusmp.dts-Support-hardware-revisi.patch \
 	file://0001-gpio-pca953x-Add-support-for-the-NXP-PCAL9554B-C.patch \
-	file://0001-zynqmp-topic-miamiplusmp.dts-enable-interrupt-and-Sy.patch \
+	file://mcp23s08/0001-pinctrl-mcp23s08-Allocate-irq_chip-dynamic.patch \
+	file://mcp23s08/0002-pinctrl-mcp23s08-debugfs-remove-custom-printer.patch \
+	file://mcp23s08/0003-pinctrl-mcp23s08-Do-not-complain-about-unsupported-p.patch \
+	file://mcp23s08/0004-pinctrl-mcp23s08-Reset-all-pins-to-input-at-probe.patch \
 	"
 
 # Compile overlay-capable devicetrees

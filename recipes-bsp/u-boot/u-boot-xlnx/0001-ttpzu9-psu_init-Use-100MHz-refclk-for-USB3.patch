@@ -1,0 +1,56 @@
+From 0f8deb5954e32c6fd0f560a4b9cab5349c74a73c Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 30 Oct 2020 18:21:01 +0100
+Subject: [PATCH] ttpzu9/psu_init: Use 100MHz refclk for USB3
+
+---
+ .../zynqmp/zynqmp-topic-ttpzu9/psu_init_gpl.c  | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/board/topic/zynqmp/zynqmp-topic-ttpzu9/psu_init_gpl.c b/board/topic/zynqmp/zynqmp-topic-ttpzu9/psu_init_gpl.c
+index 857aab95e1..05eda01fb6 100644
+--- a/board/topic/zynqmp/zynqmp-topic-ttpzu9/psu_init_gpl.c
++++ b/board/topic/zynqmp/zynqmp-topic-ttpzu9/psu_init_gpl.c
+@@ -559,17 +559,17 @@ static unsigned long psu_serdes_init_data(void)
+ 	psu_mask_write(0xFD410000, 0x0000001FU, 0x0000000DU);
+ 	psu_mask_write(0xFD410004, 0x0000001FU, 0x0000000DU);
+ 	psu_mask_write(0xFD410008, 0x0000001FU, 0x0000000FU);
+-	psu_mask_write(0xFD41000C, 0x0000001FU, 0x00000008U);
++	psu_mask_write(0xFD41000C, 0x0000001FU, 0x0000000DU);
+ 	psu_mask_write(0xFD402860, 0x00000080U, 0x00000080U);
+ 	psu_mask_write(0xFD402864, 0x00000081U, 0x00000001U);
+ 	psu_mask_write(0xFD402868, 0x00000082U, 0x00000002U);
+ 	psu_mask_write(0xFD40286C, 0x00000080U, 0x00000080U);
+ 	psu_mask_write(0xFD40E094, 0x00000010U, 0x00000010U);
+-	psu_mask_write(0xFD40E368, 0x000000FFU, 0x00000038U);
+-	psu_mask_write(0xFD40E36C, 0x00000007U, 0x00000003U);
+-	psu_mask_write(0xFD40E370, 0x000000FFU, 0x000000F4U);
+-	psu_mask_write(0xFD40E374, 0x000000FFU, 0x00000031U);
+-	psu_mask_write(0xFD40E378, 0x000000FFU, 0x00000002U);
++	psu_mask_write(0xFD40E368, 0x000000FFU, 0x00000022U);
++	psu_mask_write(0xFD40E36C, 0x00000007U, 0x00000004U);
++	psu_mask_write(0xFD40E370, 0x000000FFU, 0x000000EDU);
++	psu_mask_write(0xFD40E374, 0x000000FFU, 0x00000055U);
++	psu_mask_write(0xFD40E378, 0x000000FFU, 0x00000001U);
+ 	psu_mask_write(0xFD40E37C, 0x00000033U, 0x00000030U);
+ 	psu_mask_write(0xFD40906C, 0x0000000FU, 0x0000000FU);
+ 	psu_mask_write(0xFD4080F4, 0x0000000BU, 0x0000000BU);
+@@ -625,12 +625,12 @@ static unsigned long psu_serdes_init_data(void)
+ 	psu_mask_write(0xFD409944, 0x00000001U, 0x00000001U);
+ 	psu_mask_write(0xFD409994, 0x00000007U, 0x00000007U);
+ 	psu_mask_write(0xFD40D89C, 0x00000080U, 0x00000080U);
+-	psu_mask_write(0xFD40D8F8, 0x000000FFU, 0x0000001AU);
+-	psu_mask_write(0xFD40D8FC, 0x000000FFU, 0x0000001AU);
++	psu_mask_write(0xFD40D8F8, 0x000000FFU, 0x00000064U);
++	psu_mask_write(0xFD40D8FC, 0x000000FFU, 0x00000064U);
+ 	psu_mask_write(0xFD40D990, 0x000000FFU, 0x00000010U);
+ 	psu_mask_write(0xFD40D924, 0x000000FFU, 0x000000FEU);
+ 	psu_mask_write(0xFD40D928, 0x000000FFU, 0x00000000U);
+-	psu_mask_write(0xFD40D900, 0x000000FFU, 0x0000001AU);
++	psu_mask_write(0xFD40D900, 0x000000FFU, 0x00000064U);
+ 	psu_mask_write(0xFD40D92C, 0x000000FFU, 0x00000000U);
+ 	psu_mask_write(0xFD40D980, 0x000000FFU, 0x000000FFU);
+ 	psu_mask_write(0xFD40D914, 0x000000FFU, 0x000000F7U);
+-- 
+2.17.1
+
