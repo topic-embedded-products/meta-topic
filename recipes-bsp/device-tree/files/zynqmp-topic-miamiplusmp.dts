@@ -1,0 +1,407 @@
+/*
+ * dts file for Topic Miami MPSoC
+ *
+ * (C) Copyright 2017, Topic Embedded Products BV
+ * Mike Looijmans <mike.looijmans@topic.nl>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ */
+
+/dts-v1/;
+
+#include "zynqmp.dtsi"
+#include "zynqmp-clk-ccf.dtsi"
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/pinctrl/pinctrl-zynqmp.h>
+#include <dt-bindings/phy/phy.h>
+
+/ {
+	model = "Topic Miami Plus MPSoC";
+	compatible = "topic,miamiplusmp", "xlnx,zynqmp";
+
+	aliases {
+		ethernet0 = &gem2;
+		gpio0 = &gpio;
+		i2c0 = &i2c0;
+		i2c1 = &i2c1;
+		mmc0 = &sdhci0;
+		mmc1 = &sdhci1;
+		rtc0 = &rtc;
+		serial0 = &uart0;
+		serial1 = &uart1;
+		spi0 = &qspi;
+		usb0 = &usb0;
+		usb1 = &usb1;
+	};
+
+	chosen {
+		bootargs = "earlycon root=/dev/mmcblk1p2 rw rootfstype=ext4 rootwait";
+		stdout-path = "serial0:115200n8";
+	};
+
+	memory {
+		device_type = "memory";
+		reg = <0x0 0x0 0x0 0x80000000>;
+	};
+
+	/* Represents the 3v3 supply on the SOM. */
+	reg_3v3_miami: regulator_3v3_miami {
+		compatible = "regulator-fixed";
+		regulator-name = "3v3-miami";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
+	/* Represents the 1v8 supply on the SOM. */
+	reg_1v8_miami: regulator_1v8_miami {
+		compatible = "regulator-fixed";
+		regulator-name = "1v8-miami";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+
+	/* Heartbeat led. Use separate instance to make it probe quickly */
+	leds-mio {
+		compatible = "gpio-leds";
+		heartbeat_led {
+			label = "heartbeat:green";
+			gpios = <&gpio 25 1>;
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
+	/* LEDs connected to GPIO expanders and such */
+	leds: leds {
+		compatible = "gpio-leds";
+		user_led_2 {
+			label = "user2:green";
+			gpios = <&gpioex 0 1>;
+		};
+	};
+
+	/* XTAL for Si5345 */
+	xtal50MHz: xtal_50_clock {
+		compatible = "fixed-clock";
+		#clock-cells = <0x0>;
+		clock-frequency = <50000000>;
+	};
+
+	/* Make temperature readouts show up in hwmon applications */
+	iio-hwmon-ams-temp {
+		compatible = "iio-hwmon";
+		io-channels = <&xilinx_ams 7>, <&xilinx_ams 8>, <&xilinx_ams 20>;
+		io-channel-names = "ps_temp", "remote_temp", "pl_temp";
+	};
+};
+
+&gpio {
+	status = "okay";
+};
+
+&gpu {
+	status = "okay";
+};
+
+&i2c1 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	/* GPIO expander */
+	gpioex: pcal9554@20 {
+		compatible = "nxp,pcal9554b";
+		vcc-supply = <&reg_1v8_miami>;
+		reg = <0x20>;
+		gpio-line-names = "USERLED", "", "ETH_RESET_N", "USB0_RESET_N", "USB1_RESET_N", "CLK_SW_CNTRL", "", "";
+		gpio-controller;
+		#gpio-cells = <2>;
+		eth-clk-sw-ctrl {
+			gpio-hog;
+			gpios = <5 0>;
+			output-low;
+			line-name = "eth_clk_sw_ctrl";
+		};
+	};
+
+	/* EEPROM */
+	eeprom: eeprom@51 {
+		compatible = "atmel,24c32";
+		reg = <0x51>;
+		pagesize = <32>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		gem2_mac: mac@0 {
+			reg = <0x0 6>;
+		};
+	};
+
+	/* Programmable clock (for logic) */
+	si5345: si5345@68 {
+		reg = <0x68>;
+		compatible = "silabs,si5345";
+		#clock-cells = <2>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		clocks = <&xtal50MHz>;
+		clock-names = "xtal";
+		/* Interrupt connected to MIO26 (not actually used) */
+		interrupt-parent = <&gpio>;
+		interrupts = <26 IRQ_TYPE_LEVEL_LOW>;
+
+		silabs,pll-m-num = <280>; /* PLL at 280x50M = 14.0 GHz */
+		silabs,pll-m-den = <1>;
+
+		/*
+		 * Clock tree for the ttpzu9 and tdpzu9, with one PLL running at
+		 * 1000MHz we can create 25, 100, 125 and 250 using even
+		 * dividers.
+		 */
+		assigned-clocks = <&si5345 1 0>,
+				  <&si5345 1 1>,
+				  <&si5345 1 2>,
+				  <&si5345 1 3>,
+				  <&si5345 1 4>,
+				  <&si5345 0 0>,
+				  <&si5345 0 1>,
+				  <&si5345 0 2>,
+				  <&si5345 0 3>,
+				  <&si5345 0 4>,
+				  <&si5345 0 5>,
+				  <&si5345 0 6>,
+				  <&si5345 0 7>,
+				  <&si5345 0 8>,
+				  <&si5345 0 9>;
+		assigned-clock-parents = <0>, <0>, <0>, <0>, <0>,
+					<&si5345 1 0>, /* out 0 */
+					<&si5345 1 0>,
+					<&si5345 1 0>,
+					<&si5345 1 0>,
+					<&si5345 1 0>,
+					<&si5345 1 0>, /* out 5 */
+					<&si5345 1 0>,
+					<&si5345 1 0>,
+					<&si5345 1 0>,
+					<&si5345 1 0>;
+		assigned-clock-rates =	<1000000000>, /* synth 0 */
+					<0>,
+					<0>,
+					<0>,
+					<0>,
+					<100000000>, /* out 0 */
+					<100000000>,
+					<125000000>,
+					<100000000>,
+					<100000000>,
+					< 25000000>, /* out 5 (ethernet) */
+					<100000000>,
+					<250000000>,
+					<100000000>, /* out 8 (PS refclk3) */
+					<100000000>;
+
+		out@0 {
+			/* MGT_D_REFCLK_0 */
+			reg = <0>;
+			silabs,format = <1>; /* LVDS 3v3 */
+			silabs,common-mode = <3>;
+			silabs,amplitude = <3>;
+		};
+		out@1 {
+			/* MGT_D_REFCLK_2 */
+			reg = <1>;
+			silabs,format = <1>; /* LVDS 3v3 */
+			silabs,common-mode = <3>;
+			silabs,amplitude = <3>;
+		};
+		out@2 {
+			/* PS_MGT_D_REFCLK_1 */
+			reg = <2>;
+			silabs,format = <1>; /* LVDS 3v3 */
+			silabs,common-mode = <3>;
+			silabs,amplitude = <3>;
+			always-on;
+		};
+		out@3 {
+			/* PS_MGT_D_REFCLK_0 */
+			reg = <3>;
+			silabs,format = <1>; /* LVDS 3v3 */
+			silabs,common-mode = <3>;
+			silabs,amplitude = <3>;
+			always-on;
+		};
+		out@4 {
+			/* MGT_D_REFCLK_6 */
+			reg = <4>;
+			silabs,format = <1>; /* LVDS 3v3 */
+			silabs,common-mode = <3>;
+			silabs,amplitude = <3>;
+		};
+		out@5 {
+			/* Ethernet PHY clock */
+			reg = <5>;
+			silabs,format = <4>; /* CMOS */
+			silabs,common-mode = <3>; /* TODO: Correct values... */
+			silabs,amplitude = <3>; /* TODO: Correct values... */
+			always-on;
+		};
+		out@6 {
+			/* MGT_D_REFCLK_4 */
+			reg = <6>;
+			silabs,format = <1>; /* LVDS 3v3 */
+			silabs,common-mode = <3>;
+			silabs,amplitude = <3>;
+		};
+
+		out@7 {
+			/* CLOCK_FPGA0 - 250MHz for TSU */
+			reg = <7>;
+			silabs,format = <1>; /* LVDS 1v8 */
+			silabs,common-mode = <13>;
+			silabs,amplitude = <3>;
+		};
+
+		out@8 {
+			/* PS_MGT_D_REFCLK_3 */
+			reg = <8>;
+			silabs,format = <1>; /* LVDS 1v8 */
+			silabs,common-mode = <13>;
+			silabs,amplitude = <3>;
+			always-on;
+		};
+
+		out@9 {
+			/* CLOCK_FPGA1 */
+			reg = <9>;
+			silabs,format = <1>; /* LVDS 1v8 */
+			silabs,common-mode = <13>;
+			silabs,amplitude = <3>;
+		};
+	};
+};
+
+&qspi {
+	status = "okay";
+	is-dual = <1>;
+	flash@0 {
+		compatible = "st,m25p80", "n25q256a";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0x0>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <4>;
+		spi-max-frequency = <166000000>;
+		is-dual = <1>;
+		partition@qspi-boot-bin {
+			label = "qspi-boot-bin";
+			reg = <0x00000 0x60000>;
+		};
+		partition@qspi-u-boot-itb {
+			label = "qspi-u-boot-itb";
+			reg = <0x60000 0x100000>;
+		};
+		partition@qspi-u-boot-env {
+			label = "qspi-u-boot-env";
+			reg = <0x160000 0x20000>;
+		};
+		partition@qspi-rootfs {
+			label = "qspi-rootfs";
+			reg = <0x180000 0xFE80000>;
+		};
+		/* Everything */
+		partition@qspi-all {
+			label = "qspi-all";
+			reg = <0x0 0x10000000>;
+		};
+	};
+};
+
+/* eMMC device */
+&sdhci0 {
+	status = "okay";
+	non-removable;
+	disable-wp; /* We don't have a write-protect detection */
+	bus-width = <8>;
+	xlnx,mio_bank = <0>;
+};
+
+/* SD1 */
+&sdhci1 {
+	status = "okay";
+	bus-width = <4>;
+	xlnx,mio_bank = <1>;
+	disable-wp; /* We don't have a write-protect detection */
+};
+
+&serdes {
+	status = "okay";
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&watchdog0 {
+	status = "okay";
+	reset-on-timeout;
+	timeout-sec = <5>;
+};
+
+&xilinx_ams {
+	status = "okay";
+};
+
+&ams_ps {
+	status = "okay";
+};
+
+&ams_pl {
+	status = "okay";
+};
+
+&gem2 {
+	status = "okay";
+	phy-handle = <&miamiphy>;
+	phy-mode = "sgmii";
+	nvmem-cells = <&gem2_mac>;
+	nvmem-cell-names = "mac-address";
+	phys = <&lane2 PHY_TYPE_SGMII 2 1 125000000>; /* Lane 2 refclk 1 */
+	/* Need 25MHz and 125MHz clocks (Xilinx drivers lack proper clk support) */
+	assigned-clocks      = <&si5345 0 5>, <&si5345 0 2>, <&si5345 0 7>;
+	assigned-clock-rates =    <25000000>,   <125000000>,   <250000000>;
+
+	/* Change TSU clock to external input (copied from zynqmp-clk-ccf.dtsi) */
+	clocks = <&zynqmp_clk LPD_LSBUS>, <&zynqmp_clk GEM2_REF>, <&zynqmp_clk GEM2_TX>,
+		 <&zynqmp_clk GEM2_RX>, <&si5345 0 7>;
+	clock-names = "pclk", "hclk", "tx_clk", "rx_clk", "tsu_clk";
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reset-gpios = <&gpioex 2 1>; /* Active low, on port 2 of GPIO expander */
+		/* Datasheet: 10 ms reset pulse, wait 50 ms for register access */
+		reset-delay-us = <10000>;
+		reset-post-delay-us = <50000>;
+
+		miamiphy: ethernet-phy@1 {
+			/* PHY on the board */
+			device_type = "ethernet-phy";
+			reg = <0x1>;
+			interrupt-parent = <&gpio>;
+			interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
+			marvell,reg-init =
+				/* Output 125MHz sync-E clock */
+				<2 0x10 0xf3fc 0x1c01>, /* Reg 2,16 enable RCLK */
+				/* LED[0:2] irq (hi-z), MODE4 */
+				<3 0x10 0 0x061f>,
+				/* Adjust LED drive to 50% */
+				<3 0x11 0 0x4400>;
+		};
+	};
+};

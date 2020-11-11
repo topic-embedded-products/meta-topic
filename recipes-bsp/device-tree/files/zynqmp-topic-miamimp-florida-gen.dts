@@ -1,0 +1,282 @@
+/*
+ * dts file for Topic Miami MPSoC
+ *
+ * (C) Copyright 2017, Topic Embedded Products BV
+ * Mike Looijmans <mike.looijmans@topic.nl>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ */
+
+#include "zynqmp-topic-miamimp.dts"
+
+/ {
+	/* Regulator for the 5V USB VBUS power line. This is connected
+	 * to the second output of the GPIO expander. */
+	reg_usb0_vbus: regulator_usb {
+		compatible = "regulator-fixed";
+		regulator-name = "usb0-vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpioexf 1 0>;
+		enable-active-high;
+	};
+
+	xtal_27Mhz: clock_xtal_27Mhz {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <27000000>;
+	};
+
+	gpio_keys: gpio-keys {
+		compatible = "gpio-keys";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		power {
+			label = "power";
+			gpios = <&gpioexf 2 1>; /* Input 2, active low */
+			linux,code = <116>; /* KEY_POWER */
+			gpio-key,wakeup;
+		};
+	};
+
+	gpio-poweroff {
+		compatible = "gpio-poweroff";
+		gpios = <&gpioexf 5 1>; /* Output 5, active low */
+		input;
+		force-pm-power-off; /* Replace the PSCI power-off callback */
+	};
+
+	charger: battery-charger {
+		compatible = "gpio-charger";
+		charger-type = "mains";
+		gpios = <&gpioexf 6 1>; /* Pin 6 of IO expander, active low */
+	};
+};
+
+&leds {
+	traffic_led_d4 { /* Red */
+		label = "d4:red";
+		gpios = <&gpio 82 0>; /* EMIO 4 */
+		linux,default-trigger = "mmc1";
+	};
+	traffic_led_d3 { /* Orange */
+		label = "d3:orange";
+		gpios = <&gpio 81 0>; /* EMIO 3 */
+		linux,default-trigger = "mmc0";
+	};
+	traffic_led_d2 { /* Green */
+		label = "d2:green";
+		gpios = <&gpio 80 0>; /* EMIO 2 */
+	};
+	traffic_led_d6 { /* Green */
+		label = "d6:green";
+		gpios = <&gpio 79 0>; /* EMIO 1 */
+	};
+	traffic_led_d5 { /* Green */
+		label = "d5:green";
+		gpios = <&gpio 78 0>; /* EMIO 0 */
+	};
+};
+
+/* SD card with level shifter */
+&sdhci1 {
+	status = "okay";
+	xlnx,mio_bank = <1>;
+	no-1-8-v; /* No high-speed capability */
+	disable-wp; /* We don't have a write-protect detection */
+};
+
+&uart1 {
+	status = "okay";
+};
+
+/* Setup for SATA serdes clock */
+&si514s {
+	assigned-clock-rates = <150000000>;
+};
+
+/* I2C bus layout */
+&i2c0 {
+	i2cmux: i2cswitch@70 {
+		compatible = "nxp,pca9546";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x70>;
+
+		i2cmux_0: i2c@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+			/* Clock generator TI I2C chip, 27MHz . */
+			clockgen: cdce925pw@64 {
+				compatible = "ti,cdce925";
+				reg = <0x64>;
+				clocks = <&xtal_27Mhz>;
+				xtal-load-pf = <5>; /* Crystal load-capacitor value */
+				#clock-cells = <1>;
+				/* PLL options, optional. For example to get SSC 1%
+				 * centered, supply the following extra data:
+				 *PLL2 {
+				 *	spread-spectrum = <4>;
+				 *	spread-spectrum-center;
+				 *};
+				 */
+			};
+		};
+		i2cmux_1: i2c@1 {
+			/* HDMI O - Connects directly to HDMI connector */
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <1>;
+		};
+		i2cmux_2: i2c@2 {
+			/* GEN */
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <2>;
+			/* GPIO expander */
+			gpioexf: pca953x@20 {
+				compatible = "nxp,pca9534";
+				reg = <0x20>;
+				vcc-supply = <&reg_3v3_miami>;
+				gpio-line-names = "USB_OTG_OC_N", "USB_OTG_EN_N", "POWER_BTN", "HDMI_IN_HPD",
+					"", "POWER_KILL_N", "MAIN_POWER", "";
+				gpio-controller;
+				#gpio-cells = <2>;
+				interrupt-controller;
+				/* IRQ line connected to MIO ??? */
+				interrupt-parent = <&gpio>;
+				interrupts = <36 0x8>; /* GPIO 36, IRQ_TYPE_LEVEL_LOW */
+			};
+			/* Touch */
+			touch: ad7879@2f {
+				status = "disabled"; /* No display panel support, so touch is pointless */
+				compatible = "ad7879";
+				reg = <0x2F>;
+				interrupt-parent = <&gpio>;
+				interrupts = <94 0x2>; /* GPIO 78+16 (EMIO 16), falling edge */
+				touchscreen-swapped-x-y;
+				adi,resistance-plate-x = <620>;
+				touchscreen-max-pressure = <4096>;
+				adi,first-conversion-delay = /bits/ 8 <3>;
+				adi,acquisition-time = /bits/ 8 <1>;
+				adi,median-filter-size = /bits/ 8 <2>;
+				adi,averaging = /bits/ 8 <1>;
+				adi,conversion-interval = /bits/ 8 <255>;
+			};
+			/* EEPROM */
+			eepromc: eepromc@50 {
+				compatible = "at24,24c04";
+				reg = <0x50>;
+			};
+			/* Programmable clock */
+			si514c: si514@55 {
+				reg = <0x55>;
+				#clock-cells = <0>;
+				compatible = "silabs,si514";
+			};
+			/* Battery gauge */
+			fuelgauge: battery-gauge@64 {
+				compatible = "ltc2943";
+				reg = <0x64>;
+				lltc,resistor-sense = <15>; /* 15 mOhm */
+				lltc,prescaler-exponent = <5>; /* 2^(2*5) = 1024 */
+				power-supplies = <&charger>;
+			};
+		};
+		i2cmux_3: i2c@3 {
+			/* HDMI IN */
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <3>;
+		};
+	};
+};
+
+/* USB connected through MIO and GPIO expander */
+&usb0 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usb0_default>;
+	/* see: https://forums.xilinx.com/t5/Embedded-Linux/Zynqmp-USB2-0/td-p/790522/page/2 */
+	/delete-property/ clocks;
+	/delete-property/ clock-names;
+	clocks = <&zynqmp_clk USB0_BUS_REF>;
+	clock-names = "bus_clk";
+};
+
+&dwc3_0 {
+	status = "okay";
+	dr_mode = "otg"; /* "host", "peripheral" or "otg" */
+	vbus-supply = <&reg_usb0_vbus>;
+	maximum-speed = "high-speed"; /* super-speed not available on carrier */
+	/* see: https://forums.xilinx.com/t5/Embedded-Linux/Zynqmp-USB2-0/td-p/790522/page/2 */
+	snps,dis_u2_susphy_quirk;
+	snps,dis_u3_susphy_quirk;
+	/delete-property/ phy-names;
+	/delete-property/ phys;
+	usb-phy = <&usb_phy0>;
+	ulpi {
+		phy {
+			compatible = "smsc,usb3340";
+		};
+	};
+};
+
+&pinctrl0 {
+	status = "okay";
+
+	pinctrl_sdhci1_default: sdhci1-default {
+		mux {
+			groups = "sdio1_4bit_0_1_grp";
+			function = "sdio1";
+		};
+
+		conf {
+			groups = "sdio1_4bit_0_1_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+			bias-disable;
+		};
+
+		mux-cd {
+			groups = "sdio1_0_cd_grp";
+			function = "sdio1_cd";
+		};
+
+		conf-cd {
+			groups = "sdio1_0_cd_grp";
+			bias-high-impedance;
+			bias-pull-up;
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+	};
+
+	pinctrl_usb0_default: usb0-default {
+		mux {
+			groups = "usb0_0_grp";
+			function = "usb0";
+		};
+
+		conf {
+			groups = "usb0_0_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+
+		conf-rx {
+			pins = "MIO52", "MIO53", "MIO55";
+			bias-high-impedance;
+		};
+
+		conf-tx {
+			pins = "MIO54", "MIO56", "MIO57", "MIO58", "MIO59",
+			       "MIO60", "MIO61", "MIO62", "MIO63";
+			bias-disable;
+		};
+	};
+};

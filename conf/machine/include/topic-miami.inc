@@ -44,3 +44,7 @@ MKUBIFS_ARGS = "-m 1 -e 65408 -c 496 -x zlib"
 UBINIZE_ARGS = "-m 1 -p 64KiB"
 UBI_VOLNAME = "qspi-rootfs"
 
+# Out of kernel devicetree
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree"
+
+DEVICETREE ??= "topic-miami.dtb"

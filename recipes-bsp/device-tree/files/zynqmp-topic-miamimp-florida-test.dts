@@ -1,0 +1,187 @@
+/*
+ * dts file for Topic Miami MPSoC
+ *
+ * (C) Copyright 2017, Topic Embedded Products BV
+ * Mike Looijmans <mike.looijmans@topic.nl>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ */
+
+#include "zynqmp-topic-miamimp.dts"
+
+/* Common components for MIO parts of Florida boards. These are
+ * accessible even without programming any logic. */
+/ {
+	/* Regulator for the 5V USB VBUS power line. This is connected
+	 * to the second output of the GPIO expander. */
+	reg_usb0_vbus: regulator_usb {
+		compatible = "regulator-fixed";
+		regulator-name = "usb0-vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpioexf 1 0>;
+		enable-active-high;
+		regulator-always-on; /* USB host mode */
+	};
+
+	gpio_keys: gpio-keys {
+		compatible = "gpio-keys";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		power {
+			label = "power";
+			gpios = <&gpioexf 2 1>; /* Input 2, active low */
+			linux,code = <116>; /* KEY_POWER */
+			gpio-key,wakeup;
+		};
+		/* On-board push buttons in reference design */
+		s2 {
+			label = "s2";
+			gpios = <&gpio 95 1>; /* EMIO 17, active low */
+			linux,code = <60>; /* KEY_F2 */
+			gpio-key,wakeup;
+		};
+		s3 {
+			label = "s3";
+			gpios = <&gpio 96 1>; /* EMIO 18, active low */
+			linux,code = <61>; /* KEY_F3 */
+			gpio-key,wakeup;
+		};
+	};
+
+	gpio-poweroff {
+		compatible = "gpio-poweroff";
+		gpios = <&gpioexf 5 1>; /* Output 5, active low */
+		input;
+	};
+};
+
+/* SD card with level shifter */
+&sdhci1 {
+	status = "okay";
+	no-1-8-v;	/* for 1.0 silicon */
+	xlnx,mio_bank = <1>;
+	disable-wp; /* We don't have a write-protect detection */
+};
+
+&serdes {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};
+
+/* I2C bus layout */
+&i2c0 {
+	/* GPIO expander 3v3 */
+	gpioexf: pca953x@20 {
+		compatible = "nxp,pca9534";
+		reg = <0x20>;
+		/* 0=USB_OTG_OC_N 1=USB_OTG_EN_N 2=n.c. ...*/
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		interrupt-parent = <&gpio>;
+	};
+
+	/* Programmable clock, to clock-capable pins on FPGA */
+	si514c: si514@carrier {
+		reg = <0x55>;
+		#clock-cells = <0>;
+		compatible = "silabs,si514";
+		clock-output-names = "si514carrier";
+	};
+
+	/* GPIO expanders 1v8 */
+	gpiotst1: pca953x@21 {
+		compatible = "nxp,pca9534";
+		reg = <0x21>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+	gpiotst2: pca953x@22 {
+		compatible = "nxp,pca9534";
+		reg = <0x22>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+	gpiotst3: pca953x@23 {
+		compatible = "nxp,pca9534";
+		reg = <0x23>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+};
+
+/* USB connected through MIO and GPIO expander */
+&usb0 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usb0_default>;
+};
+&dwc3_0 {
+	status = "okay";
+	dr_mode = "host"; /* "host", "peripheral" or "otg" */
+	maximum-speed = "high-speed"; /* super-speed not available on carrier */
+	vbus-supply = <&reg_usb0_vbus>; /* This apparently no longer works */
+	usb-phy = <&usb_phy0>;
+};
+
+&pinctrl0 {
+	status = "okay";
+
+	pinctrl_sdhci1_default: sdhci1-default {
+		mux {
+			groups = "sdio1_4bit_0_1_grp";
+			function = "sdio1";
+		};
+
+		conf {
+			groups = "sdio1_4bit_0_1_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+			bias-disable;
+		};
+
+		mux-cd {
+			groups = "sdio1_0_cd_grp";
+			function = "sdio1_cd";
+		};
+
+		conf-cd {
+			groups = "sdio1_0_cd_grp";
+			bias-high-impedance;
+			bias-pull-up;
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+	};
+
+	pinctrl_usb0_default: usb0-default {
+		mux {
+			groups = "usb0_0_grp";
+			function = "usb0";
+		};
+
+		conf {
+			groups = "usb0_0_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+
+		conf-rx {
+			pins = "MIO52", "MIO53", "MIO55";
+			bias-high-impedance;
+		};
+
+		conf-tx {
+			pins = "MIO54", "MIO56", "MIO57", "MIO58", "MIO59",
+			       "MIO60", "MIO61", "MIO62", "MIO63";
+			bias-disable;
+		};
+	};
+};

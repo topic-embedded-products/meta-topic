@@ -1,0 +1,331 @@
+/include/ "zynq-7000.dtsi"
+
+/* Remove broken I2C driver and replace with bitbang GPIO */
+/delete-node/ &i2c0;
+/delete-node/ &i2c1;
+
+/ {
+	model = "Topic Zynq Miami";
+
+	interrupt-parent = <&intc>;
+
+	/* Arrange that UART0 is ttyPS0 */
+	aliases: aliases {
+		serial0 = &uart0;
+		serial1 = &uart1;
+		ethernet0 = &gem0;
+		mmc0 = &sdhci0;
+		mmc1 = &sdhci1;
+	};
+
+	memory {
+		device_type = "memory";
+		reg = <0x000000000 0x20000000>;
+	};
+
+	chosen {
+		/* Boot using squashfs system, nice for QSPI NOR flash */
+		bootargs = "console=ttyPS0,115200 root=/dev/mtdblock5 ro rootfstype=squashfs rootwait quiet";
+		/* bootargs = "console=ttyPS0,115200 ubi.mtd=qspi-rootfs root=ubi0:qspi-rootfs rw rootfstype=ubifs rootwait"; */
+		linux,stdout-path = "/amba@0/uart@e0000000";
+	};
+
+	/* Represents the 3v3 supply on the Miami SOM. */
+	reg_3v3_miami: regulator_3v3_miami {
+		compatible = "regulator-fixed";
+		regulator-name = "3v3-miami";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
+	leds: leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_leds_default>;
+		led_alive: alive {
+			label = "alive:green";
+			gpios = <&gpio0 25 0>;
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
+	i2c0: gpios-i2c@50 {
+		bus-id = <0>;
+		compatible = "i2c-gpio";
+		gpios = <&gpio0 51 0 /* sda */
+			 &gpio0 50 0 /* scl */
+			>;
+		i2c-gpio,delay-us = <3>;	/* 333 kHz (?) */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_i2c0_default>;
+	};
+
+	i2c1: gpios-i2c@52 {
+		bus-id = <1>;
+		compatible = "i2c-gpio";
+		gpios = <&gpio0 53 0 /* sda */
+			 &gpio0 52 0 /* scl */
+			>;
+		i2c-gpio,delay-us = <3>;	/* 333 kHz (?) */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_i2c1_default>;
+	};
+};
+
+/* Disable the ARM timer. This clocksource does not compensate for frequency
+   scaling. The TTC timer does this, but has a lower rating so it would not
+   get selected as system clocksource.
+   Alternatives to disabling this clock are setting the source in sysfs or
+   adding clocksource=ttc_clocksource to the kernel bootargs */
+&global_timer {
+	status = "disabled";
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&sdhci0 {
+	disable-wp; /* We don't have a write-protect detection */
+	status = "okay";
+};
+
+
+&i2c1 {
+	/* AD converter for voltage monitoring */
+	monitorvolt: ad799x@29 {
+		compatible = "ad7999";
+		reg = <0x29>;
+		vcc-supply = <&reg_3v3_miami>;
+		vref-supply = <&reg_3v3_miami>;
+	};
+	/* GPIO expander */
+	gpioex: pca953x@41 {
+		compatible = "nxp,pca9536";
+		reg = <0x41>;
+		gpio-line-names = "USB_RESET", "VTT_SHDWN_N", "V_PRESENT", "DEBUG_PRESENT";
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+	/* Current monitoring chip */
+	monitorcurrent: ltc2990@4c {
+		compatible = "lltc,ltc2990";
+		reg = <0x4c>;
+		lltc,meas-mode = <6 3>; /* Current sensor mode */
+	};
+	/* EEPROM */
+	eeprom: eeprom@50 {
+		compatible = "at24,24c04";
+		reg = <0x50>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		/* NVMEM entries */
+		gem0_mac: mac@1e8 {
+			reg = <0x1e8 6>;
+		};
+		gem1_mac: mac@1ee {
+			reg = <0x1ee 6>;
+		};
+		miamiserial: serial@1f4 {
+			reg = <0x1f4 4>;
+		};
+		dyplolicense: dyplolicense@1f8 {
+			reg = <0x1f8 8>;
+		};
+	};
+	/* IO Voltage controller */
+	ltc3562: ltc3562@65 {
+		compatible = "lltc,ltc3562";
+		reg = <0x65>; /* 0b1100101 */
+		regulators {
+			R400B_reg: R400B {
+				/* Supplies VCCO2 to bank 34 */
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <1800000>;
+				regulator-boot-on;
+				regulator-always-on;
+				lltc,operating-mode = <1>;
+			};
+			R600B_reg: R600B {
+				/* Supplies VCCO0 to Bank 13 */
+				regulator-min-microvolt = <3300000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+			/* R400A Not connected */
+			R600A_reg: R600A {
+				/* Supplies VCCO1 to bank 35 */
+				/* We actually want 1v8, but the wiring of
+				 * the regulator is weird so you can only get
+				 * 1768mV */
+				regulator-min-microvolt = <1768000>;
+				regulator-max-microvolt = <1768000>;
+				lltc,fb-voltage-divider = <316 100>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+		};
+	};
+};
+
+&nand0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_smc0_nand_default>;
+
+	/* Micron MT29F2G16ABBFAH4 timings */
+	arm,nand-cycle-t0 = <0x4>;
+	arm,nand-cycle-t1 = <0x4>;
+	arm,nand-cycle-t2 = <0x1>;
+	arm,nand-cycle-t3 = <0x2>;
+	arm,nand-cycle-t4 = <0x2>;
+	arm,nand-cycle-t5 = <0x2>;
+	arm,nand-cycle-t6 = <0x4>;
+
+	#address-cells = <0x1>;
+	#size-cells = <0x1>;
+	partition@nand-all {
+		label = "nand-all";
+		reg = <0x0 0x10000000>; /* 256 MB */
+	};
+	/* to mount as UBI:
+	   ubiattach /dev/ubi_ctrl -m 0
+	   ubimkvol /dev/ubi0 -N nand -m
+	   mkdir /media/nand
+	   mount -t ubifs /dev/ubi0_0 /media/nand
+	 */
+};
+
+&usb0 {
+	dr_mode = "otg";
+};
+
+&qspi {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_qspi0_default>;
+	is-dual = <0>;
+	num-cs = <1>;
+	primary_flash: ps7-qspi@0 {
+		compatible = "jedec,spi-nor";
+		/* Max frequency for quad read is 108MHz according to data sheet */
+		spi-max-frequency = <108000000>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <4>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0x0>;
+		partition@qspi-u-boot-spl {
+			label = "qspi-u-boot-spl";
+			reg = <0x00000 0x20000>;
+		};
+		partition@qspi-u-boot-img {
+			label = "qspi-u-boot-img";
+			reg = <0x20000 0xC0000>;
+		};
+		partition@qspi-u-boot-env {
+			label = "qspi-u-boot-env";
+			reg = <0xE0000 0x20000>;
+		};
+		partition@qspi-rootfs {
+			label = "qspi-rootfs";
+			reg = <0x100000 0x1F00000>;
+		};
+		/* Everything */
+		partition@qspi-all {
+			label = "qspi-all";
+			reg = <0x0 0x2000000>;
+		};
+	};
+};
+
+&watchdog0 {
+	reset-on-timeout;
+};
+
+&gem0 {
+	/* MAC address stored in NVMEM */
+	nvmem-cells = <&gem0_mac>;
+	nvmem-cell-names = "mac-address";
+};
+
+&gem1 {
+	/* MAC address stored in NVMEM */
+	nvmem-cells = <&gem1_mac>;
+	nvmem-cell-names = "mac-address";
+};
+
+&pinctrl0 {
+	pinctrl_qspi0_default: qspi0_default {
+		mux {
+			groups = "qspi0_0_grp";
+			function = "qspi0";
+		};
+		mux-fbclk {
+			groups = "qspi_fbclk_grp";
+			function = "qspi_fbclk";
+		};
+		conf {
+			groups = "qspi0_0_grp", "qspi_fbclk_grp";
+			slew-rate = <0>;
+			io-standard = <1>;
+			bias-disable;
+		};
+	};
+
+	pinctrl_smc0_nand_default: smc0_nand_default {
+		mux {
+			groups = "smc0_nand_grp";
+			function = "smc0_nand";
+		};
+	};
+
+	pinctrl_leds_default: leds-default {
+		mux {
+			groups = "gpio0_25_grp";
+			function = "gpio0";
+		};
+
+		conf {
+			groups = "gpio0_25_grp";
+			slew-rate = <0>;
+			io-standard = <1>;
+		};
+	};
+
+	pinctrl_i2c0_default: i2c0-default {
+		mux {
+			groups = "gpio0_50_grp", "gpio0_51_grp";
+			function = "gpio0";
+		};
+
+		conf {
+			groups = "gpio0_50_grp", "gpio0_51_grp";
+			bias-pull-up;
+			slew-rate = <0>;
+			io-standard = <1>;
+		};
+	};
+
+	pinctrl_i2c1_default: i2c1-default {
+		mux {
+			groups = "gpio0_52_grp", "gpio0_53_grp";
+			function = "gpio0";
+		};
+
+		conf {
+			groups = "gpio0_52_grp", "gpio0_53_grp";
+			bias-pull-up;
+			slew-rate = <0>;
+			io-standard = <1>;
+		};
+	};
+};
