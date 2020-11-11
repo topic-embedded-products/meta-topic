@@ -1,0 +1,155 @@
+/include/ "topic-miami.dtsi"
+
+/* Common components for MIO parts of Florida boards. These are
+ * accessible even without programming any logic. */
+
+/ {
+	/* Regulator for the 5V USB VBUS power line. This is connected
+	 * to the second output of the GPIO expander. */
+	reg_usb0_vbus: regulator_usb {
+		compatible = "regulator-fixed";
+		regulator-name = "usb0-vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpioexf 1 0>;
+		enable-active-high;
+	};
+
+	/* USB PHY and reset IO pin */
+	usb_phy0: phy0 {
+		compatible = "usb-nop-xceiv";
+		#phy-cells = <0>;
+		reset-gpios = <&gpioex 0 1>;
+	};
+
+	xtal_27Mhz: clock_xtal_27Mhz {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <27000000>;
+	};
+
+	gpio_keys: gpio-keys {
+		compatible = "gpio-keys";
+		power {
+			label = "power";
+			gpios = <&gpioexf 2 1>; /* Input 2, active low */
+			linux,code = <116>; /* KEY_POWER */
+			gpio-key,wakeup;
+		};
+	};
+
+	gpio-poweroff {
+		compatible = "gpio-poweroff";
+		gpios = <&gpioexf 5 1>; /* Output 5, active low */
+		input;
+	};
+};
+
+/* I2C bus layout */
+&i2c0 {
+	i2cmux: i2cswitch@70 {
+		compatible = "nxp,pca9546";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x70>;
+
+		i2cmux_0: i2c@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+			/* Clock generator TI I2C chip, 27MHz . */
+			clockgen: cdce925pw@64 {
+				compatible = "ti,cdce925";
+				reg = <0x64>;
+				clocks = <&xtal_27Mhz>;
+				xtal-load-pf = <5>; /* Crystal load-capacitor value */
+				#clock-cells = <1>;
+				/* PLL options, optional. For example to get SSC 1%
+				 * centered, supply the following extra data:
+				 *PLL2 {
+				 *	spread-spectrum = <4>;
+				 *	spread-spectrum-center;
+				 *};
+				 */
+			};
+		};
+		i2cmux_1: i2c@1 {
+			/* HDMI O - Connects directly to HDMI connector */
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <1>;
+		};
+		i2cmux_2: i2c@2 {
+			/* GEN */
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <2>;
+			/* GPIO expander */
+			gpioexf: pca953x@20 {
+				compatible = "nxp,pca9534";
+				reg = <0x20>;
+				gpio-line-names = "USB_OTG_OC_N", "USB_OTG_EN_N", "POWER_BTN", "HDMI_IN_HPD",
+					"", "POWER_KILL_N", "MAIN_POWER", "";
+				gpio-controller;
+				#gpio-cells = <2>;
+				interrupt-controller;
+				/* IRQ line connected to MIO 15 */
+				interrupt-parent = <&gpio0>;
+				interrupts = <15 0x8>; /* GPIO 15, IRQ_TYPE_LEVEL_LOW */
+			};
+			/* EEPROM (v3r1 board)*/
+			eepromc: eepromc@50 {
+				compatible = "at24,24c04";
+				reg = <0x50>;
+			};
+			/* Programmable clock */
+			si514: si514@55 {
+				reg = <0x55>;
+				#clock-cells = <0>;
+				compatible = "silabs,si514";
+			};
+		};
+		i2cmux_3: i2c@3 {
+			/* HDMI IN */
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <3>;
+		};
+	};
+};
+
+/* USB connected through MIO and GPIO expander */
+&usb0 {
+	status = "okay";
+	vbus-supply = <&reg_usb0_vbus>;
+	dr_mode = "otg";
+	usb-phy = <&usb_phy0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usb0_default>;
+};
+
+&pinctrl0 {
+	pinctrl_usb0_default: usb0-default {
+		mux {
+			groups = "usb0_0_grp";
+			function = "usb0";
+		};
+
+		conf {
+			groups = "usb0_0_grp";
+			slew-rate = <0>;
+			io-standard = <1>;
+		};
+
+		conf-rx {
+			pins = "MIO29", "MIO31", "MIO36";
+			bias-high-impedance;
+		};
+
+		conf-tx {
+			pins = "MIO28", "MIO30", "MIO32", "MIO33", "MIO34",
+			       "MIO35", "MIO37", "MIO38", "MIO39";
+			bias-disable;
+		};
+	};
+};

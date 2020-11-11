@@ -1,0 +1,377 @@
+/*
+ * dts file for Topic Miami MPSoC
+ *
+ * (C) Copyright 2017, Topic Embedded Products BV
+ * Mike Looijmans <mike.looijmans@topic.nl>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ */
+
+/dts-v1/;
+
+#include "zynqmp.dtsi"
+#include "zynqmp-clk-ccf.dtsi"
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/pinctrl-zynqmp.h>
+#include <dt-bindings/phy/phy.h>
+
+/ {
+	model = "Topic Miami MPSoC";
+	compatible = "topic,miamimp", "xlnx,zynqmp";
+
+	aliases {
+		ethernet0 = &gem3;
+		gpio0 = &gpio;
+		i2c0 = &i2c0;
+		i2c1 = &i2c1;
+		mmc0 = &sdhci0;
+		mmc1 = &sdhci1;
+		rtc0 = &rtc;
+		serial0 = &uart0;
+		serial1 = &uart1;
+		spi0 = &qspi;
+		usb0 = &usb0;
+	};
+
+	chosen {
+		bootargs = "earlycon root=/dev/mmcblk1p2 rw rootfstype=ext4 rootwait";
+		stdout-path = "serial0:115200n8";
+	};
+
+	memory {
+		device_type = "memory";
+		reg = <0x0 0x0 0x0 0x80000000>;
+	};
+
+	/* Represents the 3v3 supply on the Miami SOM. */
+	reg_3v3_miami: regulator_3v3_miami {
+		compatible = "regulator-fixed";
+		regulator-name = "3v3-miami";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
+	leds: leds {
+		compatible = "gpio-leds";
+		heartbeat_led {
+			label = "heartbeat:green";
+			gpios = <&gpio 35 0>;
+			linux,default-trigger = "heartbeat";
+		};
+		user_led_2 {
+			label = "user2:green";
+			gpios = <&gpioex 3 0>;
+		};
+	};
+
+	/* USB PHY reset IO pin. Carrier board's USB PHY can use this. */
+	usb_phy0: phy0 {
+		compatible = "usb-nop-xceiv";
+		#phy-cells = <0>;
+		vcc-supply = <&reg_3v3_miami>;
+		reset-gpios = <&gpioex 0 GPIO_ACTIVE_LOW>;
+	};
+
+	/* Make temperature readouts show up in hwmon applications */
+	iio-hwmon-ams-temp {
+		compatible = "iio-hwmon";
+		io-channels = <&xilinx_ams 7>, <&xilinx_ams 8>, <&xilinx_ams 20>;
+		io-channel-names = "ps_temp", "remote_temp", "pl_temp";
+	};
+};
+
+&gpio {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio_default>;
+};
+
+&gpu {
+	status = "okay";
+};
+
+
+&i2c0 {
+	status = "okay";
+	clock-frequency = <400000>;
+	pinctrl-names = "default", "gpio";
+	pinctrl-0 = <&pinctrl_i2c0_default>;
+	pinctrl-1 = <&pinctrl_i2c0_gpio>;
+	scl-gpios = <&gpio 26 GPIO_ACTIVE_HIGH>;
+	sda-gpios = <&gpio 27 GPIO_ACTIVE_HIGH>;
+};
+
+&i2c1 {
+	status = "okay";
+	clock-frequency = <400000>;
+	pinctrl-names = "default", "gpio";
+	pinctrl-0 = <&pinctrl_i2c1_default>;
+	pinctrl-1 = <&pinctrl_i2c1_gpio>;
+	scl-gpios = <&gpio 32 GPIO_ACTIVE_HIGH>;
+	sda-gpios = <&gpio 33 GPIO_ACTIVE_HIGH>;
+
+	/* GPIO expander */
+	gpioex: pca953x@41 {
+		compatible = "nxp,pca9536";
+		reg = <0x41>;
+		vcc-supply = <&reg_3v3_miami>;
+		gpio-line-names = "USB_RESET", "VTT_SHDWN_N", "V_PRESENT", "LED2";
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+	/* EEPROM */
+	eeprom: eeprom@50 {
+		compatible = "at24,24c04";
+		reg = <0x50>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		gem0_mac: mac@1e8 {
+			reg = <0x1e8 6>;
+		};
+		gem1_mac: mac@1ee {
+			reg = <0x1ee 6>;
+		};
+		miamiserial: serial@1f4 {
+			reg = <0x1f4 4>;
+		};
+		dyplolicense: dyplolicense@1f8 {
+			reg = <0x1f8 8>;
+		};
+	};
+	/* Programmable clock (for logic) */
+	si514s: si514@55 {
+		reg = <0x55>;
+		#clock-cells = <0>;
+		compatible = "silabs,si514";
+		clock-output-names = "si514miami";
+	};
+	/* AD converter for voltage monitoring */
+	monitorvolt: ad799x@21 {
+		compatible = "ad7997";
+		reg = <0x21>;
+		vcc-supply = <&reg_3v3_miami>;
+		vref-supply = <&reg_3v3_miami>;
+	};
+};
+
+&qspi {
+	status = "okay";
+	is-dual = <1>;
+	multi-die = <1>;
+	flash@0 {
+		compatible = "st,m25p80", "n25q256a";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0x0>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <4>;
+		spi-max-frequency = <166000000>;
+		is-dual = <1>;
+		multi-die = <1>;
+		partition@qspi-boot-bin {
+			label = "qspi-boot-bin";
+			reg = <0x00000 0x60000>;
+		};
+		partition@qspi-u-boot-itb {
+			label = "qspi-u-boot-itb";
+			reg = <0x60000 0x100000>;
+		};
+		partition@qspi-u-boot-env {
+			label = "qspi-u-boot-env";
+			reg = <0x160000 0x20000>;
+		};
+		partition@qspi-rootfs {
+			label = "qspi-rootfs";
+			reg = <0x180000 0x7e80000>;
+		};
+		/* Everything */
+		partition@qspi-all {
+			label = "qspi-all";
+			reg = <0x0 0x8000000>;
+		};
+	};
+};
+
+&rtc {
+	status = "disabled"; /* Doesn't work unless you connect VBAT */
+};
+
+/* eMMC device */
+&sdhci0 {
+	status = "okay";
+	non-removable;
+	disable-wp; /* We don't have a write-protect detection */
+	bus-width = <8>;
+	xlnx,mio_bank = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sdhci0_default>;
+};
+
+&serdes {
+	status = "okay";
+};
+
+&uart0 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart0_default>;
+};
+
+&watchdog0 {
+	status = "okay";
+	timeout-sec = <5>;
+	reset-on-timeout;
+};
+
+&xilinx_ams {
+	status = "okay";
+};
+
+&ams_ps {
+	status = "okay";
+};
+
+&ams_pl {
+	status = "okay";
+};
+
+&pinctrl0 {
+	status = "okay";
+
+	pinctrl_i2c0_default: i2c0-default {
+		mux {
+			groups = "i2c0_6_grp";
+			function = "i2c0";
+		};
+
+		conf {
+			groups = "i2c0_6_grp";
+			bias-pull-up;
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+	};
+
+	pinctrl_i2c0_gpio: i2c0-gpio {
+		mux {
+			groups = "gpio0_26_grp", "gpio0_27_grp";
+			function = "gpio0";
+		};
+
+		conf {
+			groups = "gpio0_26_grp", "gpio0_27_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+	};
+
+	pinctrl_i2c1_default: i2c1-default {
+		mux {
+			groups = "i2c1_8_grp";
+			function = "i2c1";
+		};
+
+		conf {
+			groups = "i2c1_8_grp";
+			bias-pull-up;
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+	};
+
+	pinctrl_i2c1_gpio: i2c1-gpio {
+		mux {
+			groups = "gpio0_32_grp", "gpio0_33_grp";
+			function = "gpio0";
+		};
+
+		conf {
+			groups = "gpio0_32_grp", "gpio0_33_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+	};
+
+	pinctrl_uart0_default: uart0-default {
+		mux {
+			groups = "uart0_7_grp";
+			function = "uart0";
+		};
+
+		conf {
+			groups = "uart0_7_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+
+		conf-rx {
+			pins = "MIO30";
+			bias-high-impedance;
+		};
+
+		conf-tx {
+			pins = "MIO31";
+			bias-disable;
+		};
+	};
+
+	pinctrl_sdhci0_default: sdhci0-default {
+		mux {
+			groups = "sdio0_0_grp";
+			function = "sdio0";
+		};
+
+		conf {
+			groups = "sdio0_0_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+			bias-disable;
+		};
+
+		mux-cd {
+			groups = "sdio0_cd_0_grp";
+			function = "sdio0_cd";
+		};
+
+		conf-cd {
+			groups = "sdio0_cd_0_grp";
+			bias-high-impedance;
+			bias-pull-up;
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+	};
+
+	pinctrl_gpio_default: gpio-default {
+		mux-sw {
+			function = "gpio0";
+			groups = "gpio0_35_grp";
+		};
+
+		conf-sw {
+			groups = "gpio0_35_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+
+		mux-msp {
+			function = "gpio0";
+			groups = "gpio0_35_grp";
+		};
+
+		conf-msp {
+			groups = "gpio0_35_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+
+		conf-pull-none {
+			pins = "MIO35";
+			bias-disable;
+		};
+	};
+};

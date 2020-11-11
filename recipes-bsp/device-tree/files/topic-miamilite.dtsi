@@ -1,0 +1,51 @@
+/* The "lite" version has less I/O pins and less periferals */
+
+/* Remove missing periferals */
+/delete-node/ &monitorcurrent;
+/delete-node/ &monitorvolt;
+/delete-node/ &ltc3562;
+/delete-node/ &gpioex;
+
+/* Alive LED is on MIO9 */
+&led_alive {
+	gpios = <&gpio0 9 1>; /* Active low */
+};
+
+&pinctrl_leds_default {
+	mux {
+		groups = "gpio0_9_grp";
+		function = "gpio0";
+	};
+	conf {
+		groups = "gpio0_9_grp";
+		slew-rate = <0>;
+		io-standard = <1>;
+	};
+};
+
+/* I2C bus 1 using pins 48+49 */
+&i2c1 {
+	gpios = <&gpio0 49 0 /* sda */
+		 &gpio0 48 0 /* scl */
+		>;
+   
+	/* 32Kb EEPROM */
+	eeprom: eeprom@50 {
+		compatible = "at24,24c32";
+		reg = <0x50>;
+	};
+};
+
+&pinctrl_i2c1_default {
+	mux {
+		groups = "gpio0_48_grp", "gpio0_49_grp";
+		function = "gpio0";
+	};
+
+	conf {
+		groups = "gpio0_48_grp", "gpio0_49_grp";
+		bias-pull-up;
+		slew-rate = <0>;
+		io-standard = <1>;
+	};
+};

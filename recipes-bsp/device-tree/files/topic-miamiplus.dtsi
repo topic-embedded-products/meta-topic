@@ -1,0 +1,97 @@
+/* the "plus" version has much more I/O pins, but lacks some periferals,
+ * and the NAND was replaced by a dual-QSPI NOR setup. */
+
+/* The miamiplus contains a speedgrade-2 device and runs at 800MHz */
+&cpu0 {
+	operating-points = <
+		/* kHz    uV */
+		800000  1000000
+		400000  1000000
+	>;
+};
+
+/* Remove missing periferals */
+/delete-node/ &monitorcurrent;
+/delete-node/ &ltc3562;
+
+/* Different voltage monitoring IC */
+&monitorvolt {
+	compatible = "ad7997";
+	reg = <0x21>;
+	/* TODO: gpios */
+};
+
+/* Dual QSPI configuration */
+&qspi {
+	is-dual = <1>;
+};
+
+/* Dual flash, also double the capacity so adjust rootfs and "all" partitions */
+&primary_flash {
+	partition@qspi-rootfs {
+		label = "qspi-rootfs";
+		reg = <0x500000 0x3b00000>;
+	};
+	partition@qspi-all {
+		label = "qspi-all";
+		reg = <0x0 0x4000000>;
+	};
+};
+
+/* The plus SOMs have a programmable clock for the high-speed tranceivers */
+&i2c1 {
+	si514s: si514@55 {
+		reg = <0x55>;
+		#clock-cells = <0>;
+		compatible = "silabs,si514";
+		clock-output-names = "si514miami";
+	};
+	max31760: max31760@57 {
+		reg = <0x57>; /* Address pins "111" hence address 1010111b */
+		compatible = "maxim,max31760";
+	};
+};
+
+/* Extra user board LED on GPIO expander */
+&leds {
+	led_user2: user2 {
+		label = "user2:green";
+		gpios = <&gpioex 3 0>;
+	};
+};
+/* Alive LED is on MIO7 instead of 25 */
+&led_alive {
+	gpios = <&gpio0 7 0>;
+};
+&pinctrl_leds_default {
+	mux {
+		groups = "gpio0_7_grp";
+		function = "gpio0";
+	};
+	conf {
+		groups = "gpio0_7_grp";
+		slew-rate = <0>;
+		io-standard = <1>;
+	};
+};
+
+/* I2C bus 1 using pins 48+49 */
+&i2c1 {
+	gpios = <&gpio0 49 0 /* sda */
+		 &gpio0 48 0 /* scl */
+		>;
+};
+
+&pinctrl_i2c1_default {
+	mux {
+		groups = "gpio0_48_grp", "gpio0_49_grp";
+		function = "gpio0";
+	};
+
+	conf {
+		groups = "gpio0_48_grp", "gpio0_49_grp";
+		bias-pull-up;
+		slew-rate = <0>;
+		io-standard = <1>;
+	};
+};
