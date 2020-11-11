@@ -63,8 +63,6 @@ SRC_URI_append = "\
 	file://0007-drm-xlnx-pl_disp-fix-missing-xlnx_crtc_unregister.patch \
 	file://0008-usb-dwc3-Add-support-for-VBUS-power-control.patch \
 	file://0009-drm-introduce-helper-for-accessing-EDID-blob-in-drm_.patch \
-	file://0010-Add-topic-miami-devicetrees.patch \
-	file://0011-zynqmp-topic-miamiplusmp.dts-Support-hardware-revisi.patch \
 	file://0012-gpio-pca953x-Add-support-for-the-NXP-PCAL9554B-C.patch \
 	file://mcp23s08/0004-pinctrl-mcp23s08-Reset-all-pins-to-input-at-probe.patch \
 	file://0001-net-mdiobus-add-reset-post-delay-us-handling.patch \

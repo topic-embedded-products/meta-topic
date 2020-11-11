@@ -1,0 +1,27 @@
+/include/ "topic-miami-florida-mio.dtsi"
+
+/* Common components for ALL florida boards */
+
+/* Ethernet PHY via EMIO. Logic contains a GMII to RGMII conversion, so
+ * the emac should see a GMII interface */
+&gem0 {
+	status = "okay";
+	phy-handle = <&gmiitorgmii>;
+	phy-mode = "gmii";
+
+	phy3: phy@3 {
+		/* PHY on the board */
+		device_type = "ethernet-phy";
+		reg = <0x3>;
+		interrupt-parent = <&gpio0>;
+		interrupts = <65 0x8>; /* GPIO 65 (EMIO 11), IRQ_TYPE_LEVEL_LOW */
+		rxc-skew-ps = <1080>; /* Skew RX clock pad by 180 ps */
+		txc-skew-ps = <840>;  /* Skew TX clock pad by -60 ps */
+	};
+
+	gmiitorgmii: gmiitorgmii@8 {
+		compatible = "xlnx,gmii-to-rgmii-1.0";
+		reg = <0x8>;
+		phy-handle = <&phy3>;
+	};
+};

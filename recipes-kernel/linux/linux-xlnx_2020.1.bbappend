@@ -19,20 +19,3 @@ SRC_URI_append = "\
 	${TOPICBSPCONFIG} \
 	${@bb.utils.contains("MACHINE_FEATURES", "rtc", "file://zynqmp-rtc.cfg", "", d)} \
 	"
-
-KERNEL_DEVICETREE_topic-miamilite = "\
-	topic-miamilite.dtb \
-	"
-KERNEL_DEVICETREE_topic-miami = "\
-	topic-miami.dtb \
-	topic-miami-florida-mio.dtb \
-	"
-KERNEL_DEVICETREE_topic-miamiplus = "\
-	topic-miamiplus.dtb \
-	"
-KERNEL_DEVICETREE_topic-miamimp = "\
-	xilinx/zynqmp-topic-miamimp.dtb \
-	xilinx/zynqmp-topic-miamiplusmp.dtb \
-	xilinx/zynqmp-topic-miamimp-florida-gen.dtb \
-	xilinx/zynqmp-topic-miamimp-florida-test.dtb \
-	"
