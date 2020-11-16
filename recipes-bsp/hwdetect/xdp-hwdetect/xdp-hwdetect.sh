@@ -52,7 +52,7 @@ then
 	#Demosaic IP
 	media-ctl -d /dev/media0 -V "\"a0140000.demosaic\":0  [fmt:SRGGB8_1X8/1920x1080 field:none]"
 	media-ctl -d /dev/media0 -V "\"a0140000.demosaic\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
-
+	#Color space conversion
 	media-ctl -d /dev/media0 -V "\"a0100000.v_proc_ss_csc\":0  [fmt:RBG888_1X24/1920x1080 field:none]"
 	media-ctl -d /dev/media0 -V "\"a0100000.v_proc_ss_csc\":1  [fmt:VYYUYY8_1X24/1920x1080 field:none]"
 fi
@@ -61,16 +61,16 @@ fi
 if yavta -w '0x0098c981 4' /dev/v4l-subdev6
 then
 	#SONY IMX274 Sensor
-	media-ctl -d /dev/media0 -V "\"IMX274_1\":0  [fmt:SRGGB10_1X10/1920x1080 field:none]"
+	media-ctl -d /dev/media1 -V "\"IMX274_0\":0  [fmt:SRGGB10_1X10/1920x1080 field:none]"
 	#MIPI CSI2-Rx Subsystem
-	media-ctl -d /dev/media0 -V "\"a0180000.csiss\":1  [fmt:SRGGB10_1X10/1920x1080 field:none]"
-	media-ctl -d /dev/media0 -V "\"a0180000.csiss\":0  [fmt:SRGGB8_1X8/1920x1080 field:none]"
+	media-ctl -d /dev/media1 -V "\"a0180000.csiss\":1  [fmt:SRGGB10_1X10/1920x1080 field:none]"
+	media-ctl -d /dev/media1 -V "\"a0180000.csiss\":0  [fmt:SRGGB8_1X8/1920x1080 field:none]"
 	#Demosaic IP
-	media-ctl -d /dev/media0 -V "\"a01c0000.demosaic\":0  [fmt:SRGGB8_1X8/1920x1080 field:none]"
-	media-ctl -d /dev/media0 -V "\"a01c0000.demosaic\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
-
-	media-ctl -d /dev/media0 -V "\"a0040000.v_proc_ss\":0  [fmt:RBG888_1X24/1920x1080 field:none]"
-	media-ctl -d /dev/media0 -V "\"a0040000.v_proc_ss\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
+	media-ctl -d /dev/media1 -V "\"a01c0000.demosaic\":0  [fmt:SRGGB8_1X8/1920x1080 field:none]"
+	media-ctl -d /dev/media1 -V "\"a01c0000.demosaic\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
+	#Color space conversion
+	media-ctl -d /dev/media1 -V "\"a0040000.v_proc_ss_csc\":0  [fmt:RBG888_1X24/1920x1080 field:none]"
+	media-ctl -d /dev/media1 -V "\"a0040000.v_proc_ss_csc\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
 fi
 
 #Set the color correction correctly
