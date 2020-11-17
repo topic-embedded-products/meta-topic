@@ -2,6 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI_append = "\
 	file://pmu-firmware-zynqmp-pmu.bin.xz \
+	file://0001-arm64-zynq_sdhci-Resolve-failed-mmc-tuning-due-to-gc.patch \
 	file://0001-mach-zynqmp-spl.c-Remove-1-second-delay-at-boot.patch \
 	file://0001-blk-Increase-cache-element-size.patch \
 	file://0001-board-topic-Detect-RAM-size-at-boot.patch \
