@@ -9,18 +9,9 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 # Patches created using this command:
 #   git format-patch -o /tmp/ xlnx_rebase_v4.19_2019.2..HEAD
 
-
-# For the ZynqMP, revert the commits that break the MMC high-speed modes. 
-EXTRAPATCHES = ""
-EXTRAPATCHES_zynqmp = "\
-	file://0001-Revert-mmc-host-sdhci-of-arasan-Use-SDHCI-framework-.patch \
-	file://0002-Revert-mmc-sdhci-of-arasan-Update-Tap-Delays-for-Ver.patch \
-	file://0003-Revert-sdhci-arasan-Add-support-for-Versal-Tap-Delay.patch \
-	"
-
 SRC_URI_append = "\
 	file://enable-kexec-support.cfg \
-	${EXTRAPATCHES} \
+	file://0001-mmc-sdhci-of-arasan-Resolve-failed-sd-mmc-tuning-due.patch \
 	file://0001-iio-accel-Add-support-for-the-Bosch-Sensortec-BMI088.patch \
 	file://0001-Add-ltc3562-voltage-regulator-driver.patch \
 	file://0002-drm-introduce-helper-for-accessing-EDID-blob-in-drm_.patch \
