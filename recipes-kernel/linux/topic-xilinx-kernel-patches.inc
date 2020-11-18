@@ -53,6 +53,7 @@ ADIHDMISUPPORT = "\
 SRC_URI_append = "\
 	${MDEVSUPPORT} \
 	file://enable-kexec-support.cfg \
+	file://0001-mmc-sdhci-of-arasan-Resolve-failed-sd-mmc-tuning-due.patch \
 	file://0001-iio-accel-Add-support-for-the-Bosch-Sensortec-BMI088.patch \
 	file://0002-iio-gyro-bmg160-Add-support-for-BMI088-chip.patch \
 	file://0003-clk-clk-si5341-Support-multiple-input-ports.patch \
