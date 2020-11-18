@@ -2,9 +2,9 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 
 # Brings the Xilinx kernel up to date with our fork at:
 #   https://github.com/topic-embedded-products/linux
-# branch: topic-miami-xlnx-rebase-4.19-x2019.2
-# To start development, you'd type this:
-#   git clone -b topic-miami-xlnx-rebase-4.19-x2019.2 git@github.com:topic-embedded-products/linux.git
+# branch: topic-miami-xlnx-rebase-5.4-x2020.1
+# To start development:
+#   git clone -b topic-miami-xlnx-rebase-5.4-x2020.1 git@github.com:topic-embedded-products/linux.git
 #
 # Patches created using this command:
 #   git format-patch -o /tmp/ xlnx_rebase_v5.4_2020.1..HEAD
@@ -51,6 +51,7 @@ ADIHDMISUPPORT = "\
 	"
 
 SRC_URI_append = "\
+	${MDEVSUPPORT} \
 	file://enable-kexec-support.cfg \
 	file://0001-wireless-brcmfmac-Disable-power-save-mode.patch \
 	file://0001-mmc-sdhci-of-arasan-Resolve-failed-sd-mmc-tuning-due.patch \
