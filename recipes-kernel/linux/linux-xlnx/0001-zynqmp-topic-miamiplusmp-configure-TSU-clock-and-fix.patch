@@ -1,0 +1,64 @@
+From 46a5566eec23762216ac2608962809c006ed0501 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 24 Nov 2020 11:07:00 +0100
+Subject: [PATCH] zynqmp-topic-miamiplusmp: configure TSU clock and fix Sync-E
+
+Configure and route 250MHz clock (through FPGA) to use as timestamping
+clock for the ethernet MAC.
+
+Fix Marvell PHY settings for 125MHz RCLK, some bits were shifted in the
+register setting
+---
+ .../boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts  | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
+index 0b525d2b6549..cdf62dab41d0 100644
+--- a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
++++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
+@@ -202,7 +202,7 @@
+ 					<100000000>,
+ 					< 25000000>, /* out 5 (ethernet) */
+ 					<100000000>,
+-					<100000000>,
++					<250000000>,
+ 					<100000000>, /* out 8 (PS refclk3) */
+ 					<100000000>;
+ 
+@@ -260,7 +260,7 @@
+ 		};
+ 
+ 		out@7 {
+-			/* CLOCK_FPGA0 */
++			/* CLOCK_FPGA0 - 250MHz for TSU */
+ 			reg = <7>;
+ 			silabs,format = <1>; /* LVDS 1v8 */
+ 			silabs,common-mode = <13>;
+@@ -377,8 +377,13 @@
+ 	nvmem-cell-names = "mac-address";
+ 	phys = <&lane2 PHY_TYPE_SGMII 2 1 125000000>; /* Lane 2 refclk 1 */
+ 	/* Need 25MHz and 125MHz clocks (Xilinx drivers lack proper clk support) */
+-	assigned-clocks      = <&si5345 0 5>, <&si5345 0 2>;
+-	assigned-clock-rates =    <25000000>,   <125000000>;
++	assigned-clocks      = <&si5345 0 5>, <&si5345 0 2>, <&si5345 0 7>;
++	assigned-clock-rates =    <25000000>,   <125000000>,   <250000000>;
++
++	/* Change TSU clock to external input (copied from zynqmp-clk-ccf.dtsi) */
++	clocks = <&zynqmp_clk LPD_LSBUS>, <&zynqmp_clk GEM2_REF>, <&zynqmp_clk GEM2_TX>,
++		 <&zynqmp_clk GEM2_RX>, <&si5345 0 7>;
++	clock-names = "pclk", "hclk", "tx_clk", "rx_clk", "tsu_clk";
+ 
+ 	mdio {
+ 		#address-cells = <1>;
+@@ -393,7 +398,7 @@
+ 			interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
+ 			marvell,reg-init =
+ 				/* Output 125MHz sync-E clock */
+-				<2 0x10 0xf1fc 0x0e01>, /* Reg 2,16 enable RCLK */
++				<2 0x10 0xf3fc 0x1c01>, /* Reg 2,16 enable RCLK, 125MHz */
+ 				/* LED[0:2] irq (hi-z), MODE4 */
+ 				<3 0x10 0 0x061f>,
+ 				/* Adjust LED drive to 50% */
+-- 
+2.17.1
+
