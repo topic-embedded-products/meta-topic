@@ -1,0 +1,77 @@
+From 0ee061cff7d53aec756b0c468484cd2e9badbad3 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 26 Nov 2020 16:32:02 +0100
+Subject: [PATCH] mmc/sdhci: Disable UHS SDR104 and SDR50 modes for ZynqMP
+
+The controller or driver works fine with eMMC cards but UHS cards don't
+work reliably. Disable these modes until this is found and fixed.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/mmc/host/sdhci-of-arasan.c | 8 ++++++++
+ drivers/mmc/host/sdhci.c           | 8 ++++++--
+ drivers/mmc/host/sdhci.h           | 4 ++++
+ 3 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/mmc/host/sdhci-of-arasan.c b/drivers/mmc/host/sdhci-of-arasan.c
+index ae9f9117d9ce..be51bd785ba6 100644
+--- a/drivers/mmc/host/sdhci-of-arasan.c
++++ b/drivers/mmc/host/sdhci-of-arasan.c
+@@ -1053,6 +1053,14 @@ static int sdhci_arasan_probe(struct platform_device *pdev)
+ 		 */
+ 		if (!IS_ERR(soc_rev))
+ 			kfree(soc_rev);
++
++		/*
++		 * The SDR50 and SDR104 modes don't work reliably on the ZynqMP
++		 * but HS200 works fine. So disable the non-working modes.
++		 */
++		host_quirks2 |= SDHCI_QUIRK2_BROKEN_SDR50;
++		host_quirks2 |= SDHCI_QUIRK2_BROKEN_SDR104;
++
+ 	}
+ 
+ 	host = sdhci_pltfm_init(pdev, pdata, sizeof(*sdhci_arasan));
+diff --git a/drivers/mmc/host/sdhci.c b/drivers/mmc/host/sdhci.c
+index c8458e3c8bbb..1cbaaa6dae53 100644
+--- a/drivers/mmc/host/sdhci.c
++++ b/drivers/mmc/host/sdhci.c
+@@ -3785,14 +3785,18 @@ int sdhci_setup_host(struct sdhci_host *host)
+ 
+ 	/* SDR104 supports also implies SDR50 support */
+ 	if (host->caps1 & SDHCI_SUPPORT_SDR104) {
+-		mmc->caps |= MMC_CAP_UHS_SDR104 | MMC_CAP_UHS_SDR50;
++		if (!(host->quirks2 & SDHCI_QUIRK2_BROKEN_SDR104))
++			mmc->caps |= MMC_CAP_UHS_SDR104;
++		if (!(host->quirks2 & SDHCI_QUIRK2_BROKEN_SDR50))
++			mmc->caps |= MMC_CAP_UHS_SDR50;
+ 		/* SD3.0: SDR104 is supported so (for eMMC) the caps2
+ 		 * field can be promoted to support HS200.
+ 		 */
+ 		if (!(host->quirks2 & SDHCI_QUIRK2_BROKEN_HS200))
+ 			mmc->caps2 |= MMC_CAP2_HS200;
+ 	} else if (host->caps1 & SDHCI_SUPPORT_SDR50) {
+-		mmc->caps |= MMC_CAP_UHS_SDR50;
++		if (!(host->quirks2 & SDHCI_QUIRK2_BROKEN_SDR50))
++			mmc->caps |= MMC_CAP_UHS_SDR50;
+ 	}
+ 
+ 	if (host->quirks2 & SDHCI_QUIRK2_CAPS_BIT63_FOR_HS400 &&
+diff --git a/drivers/mmc/host/sdhci.h b/drivers/mmc/host/sdhci.h
+index f35a9a232f6c..e2b4c8f03f54 100644
+--- a/drivers/mmc/host/sdhci.h
++++ b/drivers/mmc/host/sdhci.h
+@@ -452,6 +452,10 @@ struct sdhci_host {
+ #define SDHCI_QUIRK2_DISABLE_HW_TIMEOUT			(1<<17)
+ /* Broken Clock between 19MHz-25MHz */
+ #define SDHCI_QUIRK2_CLOCK_STANDARD_25_BROKEN		(1<<18)
++/* Controller does not support SDR50 */
++#define SDHCI_QUIRK2_BROKEN_SDR50			(1<<19)
++/* Controller does not support SDR104 */
++#define SDHCI_QUIRK2_BROKEN_SDR104			(1<<20)
+ 
+ 	int irq;		/* Device IRQ */
+ 	void __iomem *ioaddr;	/* Mapped address */
+-- 
+2.17.1
+
