@@ -53,20 +53,20 @@ ADIHDMISUPPORT = "\
 SRC_URI_append = "\
 	${MDEVSUPPORT} \
 	file://enable-kexec-support.cfg \
-	file://0001-mmc-sdhci-of-arasan-Resolve-failed-sd-mmc-tuning-due.patch \
 	file://0001-iio-accel-Add-support-for-the-Bosch-Sensortec-BMI088.patch \
 	file://0002-iio-gyro-bmg160-Add-support-for-BMI088-chip.patch \
 	file://0003-clk-clk-si5341-Support-multiple-input-ports.patch \
 	file://0004-clk-clk-si5341-Add-support-for-the-Si5345-series.patch \
 	file://0005-Add-ltc3562-voltage-regulator-driver.patch \
 	file://0006-gpio-poweroff-Implement-force-pm-power-off-flag.patch \
-	file://0007-drm-xlnx-pl_disp-fix-missing-xlnx_crtc_unregister.patch \
 	file://0008-usb-dwc3-Add-support-for-VBUS-power-control.patch \
 	file://0009-drm-introduce-helper-for-accessing-EDID-blob-in-drm_.patch \
 	file://0012-gpio-pca953x-Add-support-for-the-NXP-PCAL9554B-C.patch \
 	file://mcp23s08/0004-pinctrl-mcp23s08-Reset-all-pins-to-input-at-probe.patch \
 	${ADIHDMISUPPORT} \
 	"
+#file://0001-mmc-sdhci-of-arasan-Resolve-failed-sd-mmc-tuning-due.patch 
+#file://0007-drm-xlnx-pl_disp-fix-missing-xlnx_crtc_unregister.patch
 
 # Compile overlay-capable devicetrees
 EXTRA_OEMAKE_append = " DTC_FLAGS="-p 1024 -@""
