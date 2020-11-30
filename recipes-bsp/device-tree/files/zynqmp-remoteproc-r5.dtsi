@@ -1,0 +1,24 @@
+
+&amba {
+	zynqmp-r5-remoteproc@0 {
+		compatible = "xlnx,zynqmp-r5-remoteproc-1.0";
+		core_conf = "lockstep";
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+		r5@0 {
+			#address-cells = <2>;
+			#size-cells = <2>;
+			ranges;
+			pnode-id = <0x7>;
+			tcm@0 {
+				reg = <0x0 0xFFE00000 0x0 0x10000>;
+				pnode-id = <0xf>;
+			};
+			tcm@1 {
+				reg = <0x0 0xFFE20000 0x0 0x10000>;
+				pnode-id = <0x10>;
+			};
+		};
+	};
+};

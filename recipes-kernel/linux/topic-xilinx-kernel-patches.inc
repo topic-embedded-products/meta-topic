@@ -65,6 +65,7 @@ SRC_URI_append = "\
 	file://0009-drm-introduce-helper-for-accessing-EDID-blob-in-drm_.patch \
 	file://0012-gpio-pca953x-Add-support-for-the-NXP-PCAL9554B-C.patch \
 	file://mcp23s08/0004-pinctrl-mcp23s08-Reset-all-pins-to-input-at-probe.patch \
+	file://0001-remoteproc-debug.patch \
 	${ADIHDMISUPPORT} \
 	"
 
