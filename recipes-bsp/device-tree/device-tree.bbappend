@@ -46,3 +46,17 @@ COMPATIBLE_MACHINE_tdkz15 = ".*"
 COMPATIBLE_MACHINE_tdkz30 = ".*"
 SRC_URI_append_tdkz15 = "${TDKZ_SOURCES}"
 SRC_URI_append_tdkz30 = "${TDKZ_SOURCES}"
+
+DEFAULT_DTS = ""
+DEFAULT_DTS_xdpzu7 = "zynqmp-topic-miamimp-xilinx-xdp.dtb"
+
+do_configure_append_petalinux (){
+	cp ${WORKDIR}/*.dts ${DT_FILES_PATH}/
+}
+do_install_prepend_petalinux () {
+	install -d ${D}/boot/devicetree/
+	install ${B}/*.dtb ${D}/boot/devicetree/
+	mv ${B}/${DEFAULT_DTS} ${B}/system-top.dtb_keep
+	rm ${B}/*.dtb
+	mv ${B}/system-top.dtb_keep ${B}/system-top.dtb
+}
