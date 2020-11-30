@@ -1,0 +1,50 @@
+From bb11b079183a6a2ebc0685af01ef0ba970dbda7b Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 30 Nov 2020 11:43:24 +0100
+Subject: [PATCH] remoteproc debug
+
+---
+ drivers/remoteproc/remoteproc_core.c       | 1 +
+ drivers/remoteproc/remoteproc_elf_loader.c | 1 +
+ drivers/remoteproc/zynqmp_r5_remoteproc.c  | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/drivers/remoteproc/remoteproc_core.c b/drivers/remoteproc/remoteproc_core.c
+index f77a42f6a8aa..e70f21c60596 100644
+--- a/drivers/remoteproc/remoteproc_core.c
++++ b/drivers/remoteproc/remoteproc_core.c
+@@ -21,6 +21,7 @@
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  */
++#define DEBUG
+ 
+ #define pr_fmt(fmt)    "%s: " fmt, __func__
+ 
+diff --git a/drivers/remoteproc/remoteproc_elf_loader.c b/drivers/remoteproc/remoteproc_elf_loader.c
+index b17d72ec8603..1dcc11a29532 100644
+--- a/drivers/remoteproc/remoteproc_elf_loader.c
++++ b/drivers/remoteproc/remoteproc_elf_loader.c
+@@ -22,6 +22,7 @@
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  */
++#define DEBUG
+ 
+ #define pr_fmt(fmt)    "%s: " fmt, __func__
+ 
+diff --git a/drivers/remoteproc/zynqmp_r5_remoteproc.c b/drivers/remoteproc/zynqmp_r5_remoteproc.c
+index c0e6d0950d4e..3b4156d55a6b 100644
+--- a/drivers/remoteproc/zynqmp_r5_remoteproc.c
++++ b/drivers/remoteproc/zynqmp_r5_remoteproc.c
+@@ -12,6 +12,7 @@
+  * Copyright (C) 2011 Texas Instruments, Inc.
+  * Copyright (C) 2011 Google, Inc.
+  */
++#define DEBUG
+ 
+ #include <linux/atomic.h>
+ #include <linux/cpu.h>
+-- 
+2.17.1
+

@@ -58,6 +58,7 @@ SRC_URI_append = "\
 	file://mcp23s08/0002-pinctrl-mcp23s08-debugfs-remove-custom-printer.patch \
 	file://mcp23s08/0003-pinctrl-mcp23s08-Do-not-complain-about-unsupported-p.patch \
 	file://mcp23s08/0004-pinctrl-mcp23s08-Reset-all-pins-to-input-at-probe.patch \
+	file://0001-remoteproc-debug.patch \
 	"
 
 # Compile overlay-capable devicetrees
