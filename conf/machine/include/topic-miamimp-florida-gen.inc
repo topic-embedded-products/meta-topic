@@ -1,5 +1,9 @@
 require conf/machine/include/topic-miamimp.inc
 
+# Should be "ev" but the video stuff is not working yet and the mali
+# support breaks the build, so just claim it isn't there.
+SOC_VARIANT = ""
+
 BOARD_PL_REFERENCE = "dtb-miami-florida-gen-reference"
 
 KERNEL_MODULE_AUTOLOAD += "g_ether spi-cadence mali"
@@ -9,21 +13,16 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-adi-axi-hdmi \
 	kernel-module-adv7604 \
 	kernel-module-axi-hdmi-rx \
-	kernel-module-bitblit \
 	kernel-module-dma-axi-dmac \
 	kernel-module-g-ether \
 	kernel-module-g-mass-storage \
-	kernel-module-u-ether \
 	kernel-module-usb-f-ecm \
 	kernel-module-usb-f-ecm-subset \
-	kernel-module-usb-f-mass-storage \
 	kernel-module-usb-f-rndis \
-	kernel-module-videobuf2-core \
 	kernel-module-videobuf2-dma-contig \
 	kernel-module-videobuf2-memops \
 	kernel-module-videobuf2-vmalloc \
 	kernel-module-xilinx-dma \
-	kernel-module-mali \
 	firmware-imageon-edid \
 	"
 
@@ -32,9 +31,12 @@ module_autoload_adi_axi_hdmi = "xilinx_dma adi_axi_hdmi snd_soc_adi_axi_spdif sn
 KERNEL_MODULE_AUTOLOAD += "axi-hdmi-rx"
 module_autoload_axi-hdmi-rx = "adv7604 dma-axi-dmac axi-hdmi-rx"
 
-MACHINE_FEATURES += "usbhost usbgadget screen"
+MACHINE_FEATURES += "usbhost usbgadget screen ethernet"
 
 # Out of kernel devicetree
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree"
 
 DEVICETREE ?= "zynqmp-topic-miamimp-florida-gen.dtb"
+DEVICETREELINKS = "\
+	system.dtb devicetree/${DEVICETREE} \
+"

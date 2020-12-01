@@ -48,7 +48,11 @@ SRC_URI_append_tdkz15 = "${TDKZ_SOURCES}"
 SRC_URI_append_tdkz30 = "${TDKZ_SOURCES}"
 
 DEFAULT_DTS = ""
-DEFAULT_DTS_xdpzu7 = "zynqmp-topic-miamimp-xilinx-xdp.dtb"
+DEFAULT_DTS_xdpzu7  = "zynqmp-topic-miamimp-xilinx-xdp.dtb"
+DEFAULT_DTS_tdkzu6  = "zynqmp-topic-miamimp-florida-gen.dtb"
+DEFAULT_DTS_tdkzu9  = "zynqmp-topic-miamimp-florida-gen.dtb"
+DEFAULT_DTS_tdkzu15 = "zynqmp-topic-miamimp-florida-gen.dtb"
+
 
 do_configure_append_petalinux (){
 	cp ${WORKDIR}/*.dts ${DT_FILES_PATH}/
