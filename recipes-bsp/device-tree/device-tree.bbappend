@@ -52,6 +52,7 @@ DEFAULT_DTS_xdpzu7  = "zynqmp-topic-miamimp-xilinx-xdp.dtb"
 DEFAULT_DTS_tdkzu6  = "zynqmp-topic-miamimp-florida-gen.dtb"
 DEFAULT_DTS_tdkzu9  = "zynqmp-topic-miamimp-florida-gen.dtb"
 DEFAULT_DTS_tdkzu15 = "zynqmp-topic-miamimp-florida-gen.dtb"
+DEFAULT_DTS_tdpzu9  = "zynqmp-topic-miamiplusmp.dtb"
 
 
 do_configure_append_petalinux (){
