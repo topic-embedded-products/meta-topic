@@ -50,8 +50,11 @@ UBOOT_MACHINE = "topic_miamimp_config"
 SPL_BINARY = "spl/boot.bin"
 SPL_SYMLINK = "BOOT.bin"
 UBOOT_SUFFIX = "itb"
+
+UBOOT_SUFFIX_petalinux = "bin"
 # Since Xilinx defines UBOOT_SUFFIX_zynqmp somewhere, fix that here
 UBOOT_SUFFIX_zynqmp = "itb"
+UBOOT_SUFFIX_petalinux = "bin"
 UBOOT_LOADADDRESS = "0x8000000"
 UBOOT_ENTRYPOINT = "0x8000000"
 HAS_PLATFORM_INIT_append = "\
@@ -62,6 +65,7 @@ HAS_PLATFORM_INIT_append = "\
 # We provide the firmware through the URI, u-boot-xlnx overrides CONFIG_PMUFW_INIT_FILE
 PMU_FIRMWARE_DEPLOY_DIR = "${WORKDIR}"
 PMU_FIRMWARE_IMAGE_NAME = "pmu-firmware-zynqmp-pmu"
+
 
 SERIAL_CONSOLE = "115200 ttyPS0"
 # We only want to run getty on the console.
@@ -87,5 +91,6 @@ UBI_VOLNAME = "qspi-rootfs"
 DEVICETREE ??= "zynqmp-topic-miamimp.dtb"
 WKS_FILE = "sdimage-swu.wks"
 IMAGE_BOOT_FILES = "boot.bin u-boot.itb"
+IMAGE_BOOT_FILES_petalinux = "boot.bin u-boot.bin"
 IMAGE_OVERHEAD_FACTOR="1.1"
 do_image_wic[depends] += "mtools-native:do_populate_sysroot dosfstools-native:do_populate_sysroot virtual/bootloader:do_deploy"

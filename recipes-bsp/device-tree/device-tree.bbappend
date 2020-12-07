@@ -58,10 +58,4 @@ DEFAULT_DTS_tdpzu9  = "zynqmp-topic-miamiplusmp.dtb"
 do_configure_append_petalinux (){
 	cp ${WORKDIR}/*.dts ${DT_FILES_PATH}/
 }
-do_install_prepend_petalinux () {
-	install -d ${D}/boot/devicetree/
-	install ${B}/*.dtb ${D}/boot/devicetree/
-	mv ${B}/${DEFAULT_DTS} ${B}/system-top.dtb_keep
-	rm ${B}/*.dtb
-	mv ${B}/system-top.dtb_keep ${B}/system-top.dtb
-}
+
