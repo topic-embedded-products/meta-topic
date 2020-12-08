@@ -35,6 +35,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 # 	file://topic_miamimp_xilinx_xdp_defconfig \
 # 	"
 SRC_URI_append = " file://topic_miamimp_xilinx_xdp_defconfig "
+SRC_URI_append = " file://topic_tdpzu9_defconfig "
 # file://0001-arm64-zynq_sdhci-Resolve-failed-mmc-tuning-due-to-gc.patch \
 #	file://0013-topic-miamimp-Support-UBIFS.patch \
 # file://0021-Fix-Makefiles-for-topic-boards.patch \
@@ -47,7 +48,7 @@ EXTRACOMPILEDEPENDS_zynqmp = "arm-trusted-firmware:do_deploy"
 
 do_configure_prepend() {
     cp ${WORKDIR}/topic_miamimp_xilinx_xdp_defconfig ${S}/configs/topic_miamimp_xilinx_xdp_defconfig
-    
+    cp ${WORKDIR}/topic_tdpzu9_defconfig ${S}/configs/topic_tdpzu9_defconfig
 }
 # Add PMU and ATF
 do_compile[depends] += "${EXTRACOMPILEDEPENDS}"
