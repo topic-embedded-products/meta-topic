@@ -79,6 +79,7 @@
 	cd-gpios = <&gpio 45 GPIO_ACTIVE_LOW>;
 	/* Power supply to set IO voltage */
 	vqmmc-supply = <&reg_sd_sel>;
+	/delete-property/ disable-wp;
 };
 
 &i2c0 {
