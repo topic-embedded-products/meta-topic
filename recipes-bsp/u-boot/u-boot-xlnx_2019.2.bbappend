@@ -33,6 +33,7 @@ SRC_URI_append = "\
 	file://0001-topic-miamimp-xilinx-xdp-Enable-CAN-controllers.patch \
 	file://0001-tdpzu9-Board-v1r1.patch \
 	file://0001-ttpzu9-psu_init-Use-100MHz-refclk-for-USB3.patch \
+	file://0001-zynqmp-topic-boards-Don-t-start-the-RTC-clock-at-ear.patch \
 	"
 
 # Glitches on serial input interrupt the boot sequence on some boards, use

@@ -1,0 +1,106 @@
+From 1a2c19dce6980b25c1df07774e11e29482aba4e7 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 14 Dec 2020 15:26:56 +0100
+Subject: [PATCH] zynqmp-topic boards: Don't start the RTC clock at early boot
+
+The bootloader starts the RTC clock regardless of whether there's actually a battery present.
+This makes it impossible for the driver to decide whether the RTC time is valid or not. So do
+not start the RTC but wait for the driver to do that. Once enabled, it will keep running as
+long as the battery is present, so there's no need to turn it on at early boot. Also keeps the
+RTC in power-down until it is really configured.
+---
+ .../psu_init_gpl.c                            | 20 -------------------
+ .../zynqmp-topic-miamimp/psu_init_gpl.c       | 20 -------------------
+ .../zynqmp/zynqmp-topic-tdpzu9/psu_init_gpl.c |  1 -
+ .../zynqmp/zynqmp-topic-ttpzu9/psu_init_gpl.c |  1 -
+ 4 files changed, 42 deletions(-)
+
+diff --git a/board/topic/zynqmp/zynqmp-topic-miamimp-xilinx-xdp/psu_init_gpl.c b/board/topic/zynqmp/zynqmp-topic-miamimp-xilinx-xdp/psu_init_gpl.c
+index 00c42a42ad..6cad71e591 100644
+--- a/board/topic/zynqmp/zynqmp-topic-miamimp-xilinx-xdp/psu_init_gpl.c
++++ b/board/topic/zynqmp/zynqmp-topic-miamimp-xilinx-xdp/psu_init_gpl.c
+@@ -16821,26 +16821,6 @@ unsigned long psu_peripherals_init_data(void)
+ 	PSU_Mask_Write(APU_ACE_CTRL_OFFSET, 0x000F000FU, 0x00000000U);
+ /*##################################################################### */
+ 
+-    /*
+-    * ENABLES RTC SWITCH TO BATTERY WHEN VCC_PSAUX IS NOT AVAILABLE
+-    */
+-    /*
+-    * Register : CONTROL @ 0XFFA60040
+-
+-    * Enables the RTC. By writing a 0 to this bit, RTC will be powered off and
+-    *  the only module that potentially draws current from the battery will be
+-    *  BBRAM. The value read through this bit does not necessarily reflect whe
+-    * ther RTC is enabled or not. It is expected that RTC is enabled every tim
+-    * e it is being configured. If RTC is not used in the design, FSBL will di
+-    * sable it by writing a 0 to this bit.
+-    *  PSU_RTC_CONTROL_BATTERY_DISABLE                             0X1
+-
+-    * This register controls various functionalities within the RTC
+-    * (OFFSET, MASK, VALUE)      (0XFFA60040, 0x80000000U ,0x80000000U)
+-    */
+-	PSU_Mask_Write(RTC_CONTROL_OFFSET, 0x80000000U, 0x80000000U);
+-/*##################################################################### */
+-
+     /*
+     * TIMESTAMP COUNTER
+     */
+diff --git a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
+index 94e26f8667..563f9561c8 100644
+--- a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
++++ b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
+@@ -16901,26 +16901,6 @@ unsigned long psu_peripherals_init_data(void)
+ 	PSU_Mask_Write(APU_ACE_CTRL_OFFSET, 0x000F000FU, 0x00000000U);
+ /*##################################################################### */
+ 
+-    /*
+-    * ENABLES RTC SWITCH TO BATTERY WHEN VCC_PSAUX IS NOT AVAILABLE
+-    */
+-    /*
+-    * Register : CONTROL @ 0XFFA60040
+-
+-    * Enables the RTC. By writing a 0 to this bit, RTC will be powered off and
+-    *  the only module that potentially draws current from the battery will be
+-    *  BBRAM. The value read through this bit does not necessarily reflect whe
+-    * ther RTC is enabled or not. It is expected that RTC is enabled every tim
+-    * e it is being configured. If RTC is not used in the design, FSBL will di
+-    * sable it by writing a 0 to this bit.
+-    *  PSU_RTC_CONTROL_BATTERY_DISABLE                             0X1
+-
+-    * This register controls various functionalities within the RTC
+-    * (OFFSET, MASK, VALUE)      (0XFFA60040, 0x80000000U ,0x80000000U)
+-    */
+-	PSU_Mask_Write(RTC_CONTROL_OFFSET, 0x80000000U, 0x80000000U);
+-/*##################################################################### */
+-
+     /*
+     * TIMESTAMP COUNTER
+     */
+diff --git a/board/topic/zynqmp/zynqmp-topic-tdpzu9/psu_init_gpl.c b/board/topic/zynqmp/zynqmp-topic-tdpzu9/psu_init_gpl.c
+index 0afd844dfa..f3095c83d2 100644
+--- a/board/topic/zynqmp/zynqmp-topic-tdpzu9/psu_init_gpl.c
++++ b/board/topic/zynqmp/zynqmp-topic-tdpzu9/psu_init_gpl.c
+@@ -533,7 +533,6 @@ static unsigned long psu_peripherals_init_data(void)
+ 	psu_mask_write(0xFF4B0024, 0x000000FFU, 0x000000FFU);
+ 	psu_mask_write(0xFFCA5000, 0x00001FFFU, 0x00000000U);
+ 	psu_mask_write(0xFD5C0060, 0x000F000FU, 0x00000000U);
+-	psu_mask_write(0xFFA60040, 0x80000000U, 0x80000000U);
+ 	psu_mask_write(0xFF260020, 0xFFFFFFFFU, 0x05F5DD18U);
+ 	psu_mask_write(0xFF260000, 0x00000001U, 0x00000001U);
+ 	psu_mask_write(0xFF0A0244, 0x03FFFFFFU, 0x00001000U);
+diff --git a/board/topic/zynqmp/zynqmp-topic-ttpzu9/psu_init_gpl.c b/board/topic/zynqmp/zynqmp-topic-ttpzu9/psu_init_gpl.c
+index 05eda01fb6..aab55805cf 100644
+--- a/board/topic/zynqmp/zynqmp-topic-ttpzu9/psu_init_gpl.c
++++ b/board/topic/zynqmp/zynqmp-topic-ttpzu9/psu_init_gpl.c
+@@ -538,7 +538,6 @@ static unsigned long psu_peripherals_init_data(void)
+ 	psu_mask_write(0xFF4B0024, 0x000000FFU, 0x000000FFU);
+ 	psu_mask_write(0xFFCA5000, 0x00001FFFU, 0x00000000U);
+ 	psu_mask_write(0xFD5C0060, 0x000F000FU, 0x00000000U);
+-	psu_mask_write(0xFFA60040, 0x80000000U, 0x80000000U);
+ 	psu_mask_write(0xFF260020, 0xFFFFFFFFU, 0x05F5DD18U);
+ 	psu_mask_write(0xFF260000, 0x00000001U, 0x00000001U);
+ 	psu_mask_write(0xFF0A0244, 0x03FFFFFFU, 0x00000400U);
+-- 
+2.17.1
+
