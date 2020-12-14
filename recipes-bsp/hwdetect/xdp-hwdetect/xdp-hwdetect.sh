@@ -73,6 +73,13 @@ then
 	media-ctl -d /dev/media1 -V "\"a0040000.v_proc_ss_csc\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
 fi
 
+# Fixup permissions for stream_start node
+if [ -e '/sys/devices/platform/amba/amba:topic_mediactl@1/stream_start' ]
+then
+	chgrp video '/sys/devices/platform/amba/amba:topic_mediactl@1/stream_start'
+	chmod 660 '/sys/devices/platform/amba/amba:topic_mediactl@1/stream_start'
+fi
+
 #Set the color correction correctly
 if [ -e /dev/v4l-subdev0 ]
 then
