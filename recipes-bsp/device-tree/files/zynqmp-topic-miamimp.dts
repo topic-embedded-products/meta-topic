@@ -197,7 +197,7 @@
 };
 
 &rtc {
-	status = "disabled"; /* Doesn't work unless you connect VBAT */
+	status = "okay"; 
 };
 
 /* eMMC device */
