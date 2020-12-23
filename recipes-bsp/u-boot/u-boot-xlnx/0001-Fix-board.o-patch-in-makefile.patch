@@ -1,0 +1,24 @@
+From e1d8d9d8eed1c7041c80a3d963cbc163c988cc88 Mon Sep 17 00:00:00 2001
+From: Marc Brakels <marc.brakels@topic.nl>
+Date: Wed, 23 Dec 2020 10:30:34 +0100
+Subject: [PATCH] Fix board.o patch in makefile
+
+---
+ board/topic/zynqmp/Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/board/topic/zynqmp/Makefile b/board/topic/zynqmp/Makefile
+index 534907baab..7ef962ca34 100644
+--- a/board/topic/zynqmp/Makefile
++++ b/board/topic/zynqmp/Makefile
+@@ -6,6 +6,7 @@
+ #
+ 
+ obj-y := zynqmp.o
++obj-y	+= ../../xilinx/common/board.o
+ 
+ hw-platform-y := $(shell echo $(CONFIG_DEFAULT_DEVICE_TREE))
+ 
+-- 
+2.17.1
+
