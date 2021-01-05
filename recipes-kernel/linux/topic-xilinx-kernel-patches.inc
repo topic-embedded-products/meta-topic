@@ -57,6 +57,8 @@ SRC_URI_append = "\
 	file://0002-iio-gyro-bmg160-Add-support-for-BMI088-chip.patch \
 	file://0003-clk-clk-si5341-Support-multiple-input-ports.patch \
 	file://0004-clk-clk-si5341-Add-support-for-the-Si5345-series.patch \
+	file://0001-clk-si5341-Support-NVM-programming-through-sysfs.patch \
+	file://0002-clk-si5341-Add-output_mask-attribute.patch \
 	file://0005-Add-ltc3562-voltage-regulator-driver.patch \
 	file://0006-gpio-poweroff-Implement-force-pm-power-off-flag.patch \
 	file://0008-usb-dwc3-Add-support-for-VBUS-power-control.patch \
