@@ -55,6 +55,8 @@ SRC_URI_append = "\
 	file://0001-zynqmp-topic-miamiplusmp-configure-TSU-clock-and-fix.patch \
 	file://0001-zynqmp-topic-miamiplusmp.dts-Proper-PHY-reset-timing.patch \
 	file://0001-gpio-pca953x-Add-support-for-the-NXP-PCAL9554B-C.patch \
+	file://0001-clk-si5341-Support-NVM-programming-through-sysfs.patch \
+	file://0002-clk-si5341-Add-output_mask-attribute.patch \
 	file://mcp23s08/0001-pinctrl-mcp23s08-Allocate-irq_chip-dynamic.patch \
 	file://mcp23s08/0002-pinctrl-mcp23s08-debugfs-remove-custom-printer.patch \
 	file://mcp23s08/0003-pinctrl-mcp23s08-Do-not-complain-about-unsupported-p.patch \
