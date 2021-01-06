@@ -4,6 +4,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425
 
 PV = "3"
 SRC_URI = "file://init file://${BPN}.service file://${BPN}.sh"
+SRC_URI_petalinux = "file://init file://${BPN}.service file://${BPN}-peta.sh"
 S = "${WORKDIR}"
 
 inherit allarch update-rc.d systemd
@@ -20,6 +21,10 @@ do_compile() {
 }
 
 FILES_${PN} = "${bindir} ${sysconfdir} ${systemd_unitdir}"
+
+do_install_prepend_petalinux() {
+	mv ${WORKDIR}/${BPN}-peta.sh ${WORKDIR}/${BPN}.sh
+}
 
 do_install() {
 	install -d ${D}${bindir}
