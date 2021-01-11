@@ -1,0 +1,44 @@
+
+/ {
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+		rproc_0_reserved: rproc@3ed00000 {
+			no-map;
+			reg = <0 0x3ed00000 0 0x10000>;
+		};
+	};
+
+	zynqmp-r5-remoteproc@0 {
+		compatible = "xlnx,zynqmp-r5-remoteproc-1.0";
+		core_conf = "lockstep";
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+		reg = <0x0 0xFF9A0000 0x0 0x10000>;
+		r5@0 {
+			#address-cells = <2>;
+			#size-cells = <2>;
+			ranges;
+			memory-region = <&rproc_0_reserved>;
+			pnode-id = <0x7>;
+			tcm@0 {
+				reg = <0x0 0xFFE00000 0x0 0x10000>;
+				pnode-id = <0xf>;
+			};
+			tcm@1 {
+				reg = <0x0 0xFFE20000 0x0 0x10000>;
+				pnode-id = <0x10>;
+			};
+		};
+	};
+};
+
+/*
+modprobe zynqmp_r5_remoteproc
+cd /sys/class/remoteproc/remoteproc0
+echo blinky.elf > firmware 
+echo start > state
+devmem 0xFFE0f000
+*/

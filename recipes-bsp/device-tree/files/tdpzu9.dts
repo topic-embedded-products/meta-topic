@@ -10,6 +10,7 @@
  */
 
 #include "zynqmp-topic-miamiplusmp.dts"
+#include "zynqmp-remoteproc-r5.dtsi"
 
 / {
 	gpio-poweroff {

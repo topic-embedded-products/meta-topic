@@ -14,12 +14,14 @@ SRC_URI_append_xdpzu7 = " \
 COMPATIBLE_MACHINE_ttpzu9 = ".*"
 SRC_URI_append_ttpzu9 = "\
 	file://zynqmp-topic-miamiplusmp.dts \
+	file://zynqmp-remoteproc-r5.dtsi \
 	file://${MACHINE}.dts \
 	"
 
 COMPATIBLE_MACHINE_tdpzu9 = ".*"
 SRC_URI_append_tdpzu9 = "\
 	file://zynqmp-topic-miamiplusmp.dts \
+	file://zynqmp-remoteproc-r5.dtsi \
 	file://${MACHINE}.dts \
 	file://${MACHINE}-wifi.dts \
 	"
