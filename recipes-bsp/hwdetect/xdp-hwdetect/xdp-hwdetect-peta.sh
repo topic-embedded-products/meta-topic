@@ -33,7 +33,13 @@ stty -F /dev/ttyPS1 9600 -echo
 echo 97 > /sys/class/gpio/export
 echo out > /sys/class/gpio/gpio97/direction
 # To actually enable GPS:
-# echo 1 > /sys/class/gpio/gpio97/value
+echo 1 > /sys/class/gpio/gpio97/value
+
+#reset BLE
+echo 84 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio84/direction
+echo 0 > /sys/class/gpio/gpio84/value
+echo 1 > /sys/class/gpio/gpio84/value
 
 # Setup BLE UART
 stty -F /dev/ttyS0 115200 crtscts
@@ -72,6 +78,13 @@ then
 	#Color space conversion
 	media-ctl -d /dev/media1 -V "\"a0040000.v_proc_ss_csc\":0  [fmt:RBG888_1X24/1920x1080 field:none]"
 	media-ctl -d /dev/media1 -V "\"a0040000.v_proc_ss_csc\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
+fi
+
+# Fixup permissions for stream_start node
+if [ -e '/sys/devices/platform/amba/amba:topic_mediactl@1/stream_start' ]
+then
+	chgrp video '/sys/devices/platform/amba/amba:topic_mediactl@1/stream_start'
+	chmod 660 '/sys/devices/platform/amba/amba:topic_mediactl@1/stream_start'
 fi
 
 #Set the color correction correctly
