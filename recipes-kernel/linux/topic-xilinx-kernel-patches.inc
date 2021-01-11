@@ -12,7 +12,6 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 SRC_URI_append = "\
 	file://enable-kexec-support.cfg \
 	file://0001-mmc-sdhci-of-arasan-Resolve-failed-sd-mmc-tuning-due.patch \
-	file://0001-mmc-sdhci-Disable-UHS-SDR104-and-SDR50-modes-for-Zyn.patch \
 	file://0001-iio-accel-Add-support-for-the-Bosch-Sensortec-BMI088.patch \
 	file://0001-Add-ltc3562-voltage-regulator-driver.patch \
 	file://0002-drm-introduce-helper-for-accessing-EDID-blob-in-drm_.patch \
