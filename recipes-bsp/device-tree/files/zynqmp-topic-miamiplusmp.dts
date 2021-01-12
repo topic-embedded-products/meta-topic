@@ -390,6 +390,9 @@
 			device_type = "ethernet-phy";
 			reg = <0x1>;
 			reset-gpios = <&gpioex 2 1>; /* Active low, on port 2 of GPIO expander */
+			/* Datasheet: 10 ms reset pulse, wait 50 ms for register access */
+			reset-assert-us = <10000>;
+			reset-deassert-us = <50000>;
 			interrupt-parent = <&gpio>;
 			interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
 			marvell,reg-init =
