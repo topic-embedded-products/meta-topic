@@ -1,4 +1,4 @@
-From 7572272dc00ad6ed7733c4ad6084e0f8ea1d5006 Mon Sep 17 00:00:00 2001
+From bfd7c4ead049a1ee00782fbe10ca2ecfbb076740 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 4 Jul 2019 13:13:57 +0200
 Subject: [PATCH] Add support for manual control of tx-refclk-rdy signal
@@ -8,12 +8,13 @@ running after it. If there's no logic in the PL to assert the
 tx_refclk_rdy signal to the VPHY, use GPIO calls to manually control
 this signal after each change to the clock frequency.
 
+%% original patch: 0001-Add-support-for-manual-control-of-tx-refclk-rdy-sign.patch
 ---
  hdmi/xilinx_drm_hdmi.c | 17 +++++++++++++++++
  1 file changed, 17 insertions(+)
 
 diff --git a/hdmi/xilinx_drm_hdmi.c b/hdmi/xilinx_drm_hdmi.c
-index 86b5c4b..097e054 100644
+index 09176da..53f097a 100644
 --- a/hdmi/xilinx_drm_hdmi.c
 +++ b/hdmi/xilinx_drm_hdmi.c
 @@ -29,6 +29,7 @@
@@ -24,7 +25,7 @@ index 86b5c4b..097e054 100644
  #include <linux/module.h>
  #include <linux/mutex.h>
  #include <linux/component.h>
-@@ -132,6 +133,8 @@ struct xlnx_drm_hdmi {
+@@ -134,6 +135,8 @@ struct xlnx_drm_hdmi {
  	struct clk *tmds_clk;
  	/* retimer that we configure by setting a clock rate */
  	struct clk *retimer_clk;
@@ -33,16 +34,16 @@ index 86b5c4b..097e054 100644
  
  	/* HDMI TXSS interrupt */
  	int irq;
-@@ -1341,6 +1344,8 @@ static void xlnx_drm_hdmi_encoder_atomic_mode_set(struct drm_encoder *encoder,
+@@ -1564,6 +1567,8 @@ static void xlnx_drm_hdmi_encoder_atomic_mode_set(struct drm_encoder *encoder,
  
  	dev_dbg(xhdmi->dev,"adjusted_mode->clock = %u Hz\n", adjusted_mode->clock);
  
 +	gpiod_set_value_cansleep(xhdmi->tx_refclk_rdy_gpio, 0);
 +
  	/* request required tmds clock rate */
- 	ret = clk_set_rate(xhdmi->tmds_clk, adjusted_mode->clock * 1000);
- 	if (ret) {
-@@ -1367,6 +1372,8 @@ static void xlnx_drm_hdmi_encoder_atomic_mode_set(struct drm_encoder *encoder,
+ 	ret = clk_set_rate(xhdmi->tmds_clk,
+ 			   adjusted_mode->clock * (unsigned long)1000);
+@@ -1591,6 +1596,8 @@ static void xlnx_drm_hdmi_encoder_atomic_mode_set(struct drm_encoder *encoder,
  		}
  	}
  
@@ -51,7 +52,7 @@ index 86b5c4b..097e054 100644
  	xhdmi->tx_audio_data->tmds_clk = clk_get_rate(xhdmi->tmds_clk);
  	/* if the mode is HDMI 2.0, use a multiplier value of 4 */
  	if (HdmiTxSsPtr->HdmiTxPtr->Stream.TMDSClockRatio) {
-@@ -2540,6 +2547,14 @@ static int xlnx_drm_hdmi_probe(struct platform_device *pdev)
+@@ -2829,6 +2836,14 @@ static int xlnx_drm_hdmi_probe(struct platform_device *pdev)
  	XTmrCtr_ConfigTable[instance * 2 + 1].SysClockFreqHz = axi_clk_rate;
  	XV_HdmiTx_ConfigTable[instance].AxiLiteClkFreq = axi_clk_rate;
  
@@ -66,7 +67,7 @@ index 86b5c4b..097e054 100644
  	/* acquire Tmds clock for output resolution */
  	xhdmi->tmds_clk = devm_clk_get(&pdev->dev, "txref-clk");
  	if (IS_ERR(xhdmi->tmds_clk)) {
-@@ -2558,6 +2573,8 @@ static int xlnx_drm_hdmi_probe(struct platform_device *pdev)
+@@ -2847,6 +2862,8 @@ static int xlnx_drm_hdmi_probe(struct platform_device *pdev)
  		return ret;
  	}
  
@@ -75,3 +76,6 @@ index 86b5c4b..097e054 100644
  	xhdmi->tx_audio_data->tmds_clk = clk_get_rate(xhdmi->tmds_clk);
  	/* support to drive an external retimer IC on the TX path, depending on TX clock line rate */
  	xhdmi->retimer_clk = devm_clk_get(&pdev->dev, "retimer-clk");
+-- 
+2.17.1
+
