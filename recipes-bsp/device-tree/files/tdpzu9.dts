@@ -261,7 +261,7 @@
 
 &dwc3_0 {
 	status = "okay";
-	dr_mode = "host"; /* "host", "peripheral" or "otg" */
+	dr_mode = "peripheral"; /* "host", "peripheral" or "otg" */
 	/* refclk0 from clock synth */
 	assigned-clocks = <&si5345 0 3>;
 	assigned-clock-rates = <100000000>;
@@ -270,9 +270,6 @@
 	maximum-speed = "super-speed";
 	snps,usb3_lpm_capable;
 	usb-phy = <&usb_phy0>;
-	snps,dis-u1-entry-quirk;
-	snps,dis-u2-entry-quirk;
-	
 	port {
 		usb3_0_role_switch: endpoint {
 			remote-endpoint = <&hd3ss3220_0_ep>;
@@ -295,8 +292,6 @@
 	maximum-speed = "super-speed";
 	snps,usb3_lpm_capable;
 	usb-phy = <&usb_phy1>;
-	snps,dis-u1-entry-quirk;
-	snps,dis-u2-entry-quirk;
 	port {
 		usb3_1_role_switch: endpoint {
 			remote-endpoint = <&hd3ss3220_1_ep>;
