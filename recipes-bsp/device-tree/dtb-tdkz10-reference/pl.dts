@@ -1,0 +1,50 @@
+/* Overlay devicetree for the programmable logic part of the florida-gen board */
+/dts-v1/;
+/plugin/;
+
+/ {
+	/* This fragment causes the FPGA image to load */
+	fragment@0 {
+		target = <&fpga_full>;
+		__overlay__ {
+			firmware-name = "fpga.bin.fpga-image-tdkz10-reference";
+		};
+	};
+
+	/* Only devices on X23 */
+	/* S2/S3, d2,d3: nope. */
+	fragment@1 {
+		target-path = "/";
+		__overlay__ {
+			leds-emio {
+				compatible = "gpio-leds";
+				emio-led-user {
+					label = "user:green";
+					gpios = <&gpio0 54 0>; /* EMIO 0 */
+					linux,default-trigger = "mtd0";
+				};
+				emio-led-d4 {
+					label = "d4:green";
+					gpios = <&gpio0 55 0>; /* EMIO 1 */
+					linux,default-trigger = "mmc0";
+				};
+				emio-led-d5 {
+					label = "d5:green";
+					gpios = <&gpio0 56 0>; /* EMIO 2 */
+				};
+				emio-led-d6 {
+					label = "d6:green";
+					gpios = <&gpio0 57 0>; /* EMIO 3 */
+				};
+			};
+		};
+	};
+
+	/* UART1 connects to second port on FTDI chip */
+	fragment@2 {
+		target = <&uart1>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+};
