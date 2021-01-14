@@ -1,0 +1,7 @@
+/dts-v1/;
+/include/ "topic-miami.dtsi"
+/include/ "topic-miamilite.dtsi"
+
+&usb0 {
+	xlnx,phy-reset-gpio = <&gpio0 0 0>;
+};
