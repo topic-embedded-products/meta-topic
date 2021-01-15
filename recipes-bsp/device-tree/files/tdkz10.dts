@@ -1,7 +1,13 @@
 /dts-v1/;
-/include/ "topic-miami.dtsi"
+/include/ "topic-miami-florida-mio.dtsi"
 /include/ "topic-miamilite.dtsi"
 
-&usb0 {
-	xlnx,phy-reset-gpio = <&gpio0 0 0>;
+/* Fix up signals on florida */
+
+&gpioexf {
+	interrupts = <46 0x8>; /* GPIO 46, IRQ_TYPE_LEVEL_LOW */
+};
+
+&usb_phy0 {
+	reset-gpios = <&gpio0 0 1>;
 };
