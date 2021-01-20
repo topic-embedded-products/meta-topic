@@ -55,6 +55,7 @@ ADIHDMISUPPORT = "\
 SRC_URI_append = "\
 	${MDEVSUPPORT} \
 	file://enable-kexec-support.cfg \
+	file://0001-wireless-brcmfmac-Disable-power-save-mode.patch \
 	file://0001-spi-nor-Skip-4BAIT-parsing-on-Xilinx-Zynq-QSPI-contr.patch \
 	file://0001-overlay-Reduce-memory-leak-warning-to-debug-level.patch \
 	file://0001-iio-accel-Add-support-for-the-Bosch-Sensortec-BMI088.patch \
