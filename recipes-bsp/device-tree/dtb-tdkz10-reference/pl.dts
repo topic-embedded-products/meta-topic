@@ -7,7 +7,7 @@
 	fragment@0 {
 		target = <&fpga_full>;
 		__overlay__ {
-			firmware-name = "fpga.bin.fpga-image-tdkz10-reference";
+			firmware-name = "fpga.bin.fpga-image-tdk-reference";
 		};
 	};
 
