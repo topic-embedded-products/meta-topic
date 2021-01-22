@@ -8,6 +8,9 @@ PV = "2"
 inherit uboot_bootscript
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+FILESEXTRAPATHS_prepend_tdkz15 := "${THISDIR}/bootscript/tdkz:"
+FILESEXTRAPATHS_prepend_tdkz30 := "${THISDIR}/bootscript/tdkz:"
+
 SRC_URI = "file://boot.scr"
 
 S = "${WORKDIR}"

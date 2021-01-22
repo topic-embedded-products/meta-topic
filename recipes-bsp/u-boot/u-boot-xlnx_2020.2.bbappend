@@ -37,6 +37,7 @@ SRC_URI_append_topic-distro = "\
 SRC_URI_append_petalinux = " file://topic_miamimp_xilinx_xdp_defconfig "
 SRC_URI_append_petalinux = " file://topic_tdpzu9_defconfig "
 SRC_URI_append_petalinux = " file://topic_tdkzu_defconfig "
+SRC_URI_append_petalinux = " file://topic_tdkz_defconfig "
 SRC_URI_append_topic-distro = " file://xdp-spl-config-uboot "
 
 # file://0001-arm64-zynq_sdhci-Resolve-failed-mmc-tuning-due-to-gc.patch \
@@ -45,6 +46,7 @@ SRC_URI_append_topic-distro = " file://xdp-spl-config-uboot "
 # Glitches on serial input interrupt the boot sequence on some boards, use
 # a particular key (space) to stop autoboot instead of any key.
 SRC_URI_append_topic-miamimp = " file://must-press-space-to-stop-autoboot.cfg"
+SRC_URI_append_topic-miami = " file://must-press-space-to-stop-autoboot.cfg"
 
 EXTRACOMPILEDEPENDS = ""
 EXTRACOMPILEDEPENDS_zynqmp = "arm-trusted-firmware:do_deploy"
@@ -57,6 +59,7 @@ do_configure_prepend_petalinux() {
     cp ${WORKDIR}/topic_miamimp_xilinx_xdp_defconfig ${S}/configs/topic_miamimp_xilinx_xdp_defconfig
     cp ${WORKDIR}/topic_tdpzu9_defconfig ${S}/configs/topic_tdpzu9_defconfig
     cp ${WORKDIR}/topic_tdkzu_defconfig ${S}/configs/topic_tdkzu_defconfig
+    cp ${WORKDIR}/topic_tdkz_defconfig ${S}/configs/topic_miami_defconfig
 }
 # Add PMU and ATF
 do_compile[depends] += "${EXTRACOMPILEDEPENDS}"

@@ -23,6 +23,7 @@ MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 FPGA_MNGR_RECONFIG_ENABLE = "1"
 
 # u-boot configuration
+PREFERRED_PROVIDER_virtual/bootloader = "u-boot-xlnx"
 UBOOT_MACHINE = "topic_miami_config"
 UBOOT_SUFFIX = "img"
 SPL_BINARY = "spl/boot.bin"
@@ -38,6 +39,13 @@ KERNEL_MODULE_AUTOLOAD += "g_ether spi-cadence"
 MACHINE_EXTRA_RRECOMMENDS += "\
 	topic-miami-monitor-lib \
 	"
+	
+EXTRA_IMAGEDEPENDS += " \
+		u-boot-zynq-uenv \
+		virtual/boot-bin \
+		virtual/bootloader \
+		u-boot-zynq-scr \
+		"
 
 # Use QSPI flash with 64k sector size
 MKUBIFS_ARGS = "-m 1 -e 65408 -c 496 -x zlib"
@@ -48,3 +56,7 @@ UBI_VOLNAME = "qspi-rootfs"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree"
 
 DEVICETREE ??= "topic-miami.dtb"
+
+DEVICETREELINKS = "\
+	system.dtb  devicetree/${DEVICETREE} \n \
+	"
