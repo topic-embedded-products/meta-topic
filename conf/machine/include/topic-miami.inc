@@ -60,3 +60,8 @@ DEVICETREE ??= "topic-miami.dtb"
 DEVICETREELINKS = "\
 	system.dtb  devicetree/${DEVICETREE} \n \
 	"
+WKS_FILE = "sdimage-swu.wks"
+IMAGE_BOOT_FILES = "boot.bin u-boot.itb"
+IMAGE_BOOT_FILES_petalinux = "boot.bin u-boot.bin"
+IMAGE_OVERHEAD_FACTOR="1.1"
+do_image_wic[depends] += "mtools-native:do_populate_sysroot dosfstools-native:do_populate_sysroot virtual/bootloader:do_deploy"
