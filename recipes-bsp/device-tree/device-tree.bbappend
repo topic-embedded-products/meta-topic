@@ -4,7 +4,13 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 DTC_BFLAGS_append = " -@"
 
 COMPATIBLE_MACHINE_tdkz10 = ".*"
-SRC_URI_append_tdkz10 = " file://${MACHINE}.dts"
+SRC_URI_append_tdkz10 = "\
+	file://topic-miami-florida-mio.dtsi \
+	file://topic-miami-florida.dtsi \
+	file://topic-miami.dtsi \
+	file://topic-miamilite.dtsi \
+	file://${MACHINE}.dts \
+	"
 
 COMPATIBLE_MACHINE_xdpzu7 = ".*"
 SRC_URI_append_xdpzu7 = " \
