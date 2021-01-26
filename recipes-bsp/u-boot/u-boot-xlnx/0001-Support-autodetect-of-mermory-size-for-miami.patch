@@ -1,0 +1,75 @@
+From 5db222670947d6d70bd74c5c8164b5608d7a88c4 Mon Sep 17 00:00:00 2001
+From: Marc Brakels <marc.brakels@topic.nl>
+Date: Tue, 26 Jan 2021 16:49:14 +0100
+Subject: [PATCH] Support autodetect of mermory size for miami
+
+---
+ board/xilinx/zynq/board.c | 42 +++++++++++++++++++++++++++++++++++----
+ 1 file changed, 38 insertions(+), 4 deletions(-)
+
+diff --git a/board/xilinx/zynq/board.c b/board/xilinx/zynq/board.c
+index f98497eb73..e444cf16da 100644
+--- a/board/xilinx/zynq/board.c
++++ b/board/xilinx/zynq/board.c
+@@ -18,9 +18,46 @@
+ #include <asm/arch/hardware.h>
+ #include <asm/arch/sys_proto.h>
+ #include "../common/board.h"
++#include <fdt_support.h>
+ 
+ DECLARE_GLOBAL_DATA_PTR;
+ 
++/*
++ * Miami boards can have memory sizes of 256M, 512M or 1GB. To prevent needing
++ * separate bootloaders for each variant, just detect the RAM size at boot time
++ * instead of relying on the devicetree information.
++ */
++#define CONFIG_SYS_SDRAM_BASE	0
++#define CONFIG_SYS_SDRAM_SIZE	topic_get_sdram_size()
++#define CONFIG_SYS_SDRAM_SIZE_MAX 0x40000000u
++
++static unsigned int topic_get_sdram_size(void);
++
++
++int ft_board_setup(void *blob, bd_t *bd)
++{
++	fdt_fixup_memory(blob, (u64)CONFIG_SYS_SDRAM_BASE, (u64)gd->ram_size);
++
++	return 0;
++}
++
++int dram_init_banksize(void)
++{
++	gd->bd->bi_dram[0].start = CONFIG_SYS_SDRAM_BASE;
++	gd->bd->bi_dram[0].size = gd->ram_size;
++
++	return 0;
++}
++
++unsigned int topic_get_sdram_size(void)
++{
++	/* Detect and fix ram size */
++	return get_ram_size((void *)CONFIG_SYS_SDRAM_BASE,
++					   CONFIG_SYS_SDRAM_SIZE_MAX);
++}
++
++
++
+ int board_init(void)
+ {
+ 	return 0;
+@@ -89,10 +126,7 @@ int board_late_init(void)
+ }
+ 
+ #if !defined(CONFIG_SYS_SDRAM_BASE) && !defined(CONFIG_SYS_SDRAM_SIZE)
+-int dram_init_banksize(void)
+-{
+-	return fdtdec_setup_memory_banksize();
+-}
++
+ 
+ int dram_init(void)
+ {
+-- 
+2.17.1
+

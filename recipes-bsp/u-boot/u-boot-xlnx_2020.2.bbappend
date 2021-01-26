@@ -38,6 +38,8 @@ SRC_URI_append_petalinux = " file://topic_miamimp_xilinx_xdp_defconfig "
 SRC_URI_append_petalinux = " file://topic_tdpzu9_defconfig "
 SRC_URI_append_petalinux = " file://topic_tdkzu_defconfig "
 SRC_URI_append_petalinux = " file://topic_tdkz_defconfig "
+SRC_URI_append_tdkz15 = " file://0001-Support-autodetect-of-mermory-size-for-miami.patch "
+SRC_URI_append_tdkz30 = " file://0001-Support-autodetect-of-mermory-size-for-miami.patch "
 SRC_URI_append_topic-distro = " file://xdp-spl-config-uboot "
 
 # file://0001-arm64-zynq_sdhci-Resolve-failed-mmc-tuning-due-to-gc.patch \
