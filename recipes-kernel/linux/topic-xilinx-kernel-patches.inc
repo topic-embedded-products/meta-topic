@@ -62,6 +62,7 @@ SRC_URI_append = "\
 	file://mcp23s08/0003-pinctrl-mcp23s08-Do-not-complain-about-unsupported-p.patch \
 	file://mcp23s08/0004-pinctrl-mcp23s08-Reset-all-pins-to-input-at-probe.patch \
 	file://0001-net-mdiobus-add-reset-post-delay-us-handling.patch \
+	file://0001-net-mdiobus-Prevent-spike-on-MDIO-bus-reset-signal.patch \
 	file://0001-zynqmp-topic-miamiplusmp-Move-ethernet-PHY-reset-to-.patch \
 	"
 
