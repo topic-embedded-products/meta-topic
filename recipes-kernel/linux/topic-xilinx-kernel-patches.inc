@@ -65,9 +65,9 @@ SRC_URI_append = "\
 	file://0012-gpio-pca953x-Add-support-for-the-NXP-PCAL9554B-C.patch \
 	file://mcp23s08/0004-pinctrl-mcp23s08-Reset-all-pins-to-input-at-probe.patch \
 	file://0001-net-mdiobus-add-reset-post-delay-us-handling.patch \
+	file://0001-net-mdiobus-Prevent-spike-on-MDIO-bus-reset-signal.patch \
 	${ADIHDMISUPPORT} \
 	"
-
 # Removed for 2020.2:
 # file://0001-mmc-sdhci-of-arasan-Resolve-failed-sd-mmc-tuning-due.patch
 # file://0007-drm-xlnx-pl_disp-fix-missing-xlnx_crtc_unregister.patch
