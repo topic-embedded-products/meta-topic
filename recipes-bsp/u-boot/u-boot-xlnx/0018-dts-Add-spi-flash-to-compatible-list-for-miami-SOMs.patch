@@ -1,7 +1,7 @@
-From 395a6a826adea98560ca44f0a2645190cc49dd08 Mon Sep 17 00:00:00 2001
+From f757b847eb38eb72159694cdf3bf6af938e75869 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 26 May 2020 07:48:38 +0200
-Subject: [PATCH 18/26] dts: Add "spi-flash" to compatible list for miami SOMs
+Subject: [PATCH 18/34] dts: Add "spi-flash" to compatible list for miami SOMs
 
 The compatible list for a SPI flash device must contain "spi-flash" for the
 spi-flash driver to recognize it. Without this, the driver may fall back to

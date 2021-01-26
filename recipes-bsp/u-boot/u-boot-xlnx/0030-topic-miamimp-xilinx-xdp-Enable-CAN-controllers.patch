@@ -1,7 +1,7 @@
-From 92cb1ff8b86c18477a57ee3d57bb56b44e2f6a52 Mon Sep 17 00:00:00 2001
+From 668e81fb1dec062d1d3eef89afb01f47aa8e452e Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 2 Oct 2020 10:42:47 +0200
-Subject: [PATCH] topic-miamimp-xilinx-xdp: Enable CAN controllers
+Subject: [PATCH 30/34] topic-miamimp-xilinx-xdp: Enable CAN controllers
 
 Allow CAN controllers to be used (routed to EMIO)
 ---

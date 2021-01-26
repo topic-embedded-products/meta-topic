@@ -1,8 +1,8 @@
-From 0b5396dfaf260f04d08e9747f79d2af42b83a118 Mon Sep 17 00:00:00 2001
+From 5d0ea4595e699e6e7789ae4404447d22c6dccde6 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 11 Aug 2020 16:56:34 +0200
-Subject: [PATCH] dts/zynqmp-topic*: Use jedec,spi-nor compatible instead of
- spi-flash
+Subject: [PATCH 28/34] dts/zynqmp-topic*: Use jedec,spi-nor compatible instead
+ of spi-flash
 
 ---
  arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts | 2 +-

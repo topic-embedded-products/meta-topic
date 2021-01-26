@@ -1,12 +1,12 @@
-From 6a72024dd3ff583844028803c4650f02e5ce06dd Mon Sep 17 00:00:00 2001
+From fe036c19608c8545144226f25a3a6e52ecdd0523 Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Wed, 5 Feb 2020 10:05:39 +0100
-Subject: [PATCH 13/26] topic-miamimp: Support UBIFS
+Subject: [PATCH 13/34] topic-miamimp: Support UBIFS
 
 ---
  include/configs/topic_miamimp.h | 10 +++++++++-
- include/configs/xilinx_zynqmp.h | 10 ++++++----
- 2 files changed, 15 insertions(+), 5 deletions(-)
+ include/configs/xilinx_zynqmp.h |  3 +++
+ 2 files changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/include/configs/topic_miamimp.h b/include/configs/topic_miamimp.h
 index ff9b892ee7..94e55f326a 100644
@@ -30,22 +30,27 @@ index ff9b892ee7..94e55f326a 100644
  #include "xilinx_zynqmp.h"
  
 diff --git a/include/configs/xilinx_zynqmp.h b/include/configs/xilinx_zynqmp.h
-index a3461214c9..fa4a29e390 100644
+index db990c8704..d11c5525f2 100644
 --- a/include/configs/xilinx_zynqmp.h
 +++ b/include/configs/xilinx_zynqmp.h
-@@ -160,10 +160,12 @@
+@@ -47,6 +47,7 @@
+ # define CONFIG_SYS_NAND_ONFI_DETECTION
+ #endif
+ 
++
+ #if defined(CONFIG_SPL_BUILD)
+ #define CONFIG_ZYNQMP_PSU_INIT_ENABLED
+ #endif
+@@ -154,11 +155,13 @@
  # define BOOT_TARGET_DEVICES_NAND(func)
  #endif
  
--#define BOOTENV_DEV_QSPI(devtypeu, devtypel, instance) \
--	"bootcmd_" #devtypel #instance "=sf probe " #instance " 0 0 && " \
--		       "sf read $scriptaddr $script_offset_f $script_size_f && " \
--		       "source ${scriptaddr}; echo SCRIPT FAILED: continuing...;\0"
 +#ifndef BOOTENV_DEV_QSPI
-+	#define BOOTENV_DEV_QSPI(devtypeu, devtypel, instance) \
-+		"bootcmd_" #devtypel #instance "=sf probe " #instance " 0 0 && " \
-+				"sf read $scriptaddr $script_offset_f $script_size_f && " \
-+				"source ${scriptaddr}; echo SCRIPT FAILED: continuing...;\0"
+ #define BOOTENV_DEV_QSPI(devtypeu, devtypel, instance) \
+ 	"bootcmd_" #devtypel #instance "=sf probe " #instance " 0 0 && " \
+ 		       "sf read $scriptaddr $script_offset_f $script_size_f && " \
+ 		       "echo QSPI: Trying to boot script at ${scriptaddr} && " \
+ 		       "source ${scriptaddr}; echo QSPI: SCRIPT FAILED: continuing...;\0"
 +#endif
  
  #define BOOTENV_DEV_NAME_QSPI(devtypeu, devtypel, instance) \

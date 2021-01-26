@@ -29,13 +29,13 @@ SRC_URI_append = "\
 	file://0025-xdp-Set-DDR-to-2400-MT-s.patch \
 	file://0026-arch-arm-dts-Makefile-Fix-topic-board-errors.patch \
 	file://0027-topic_miamimp-Move-CONFIG_SYS_SPI_U_BOOT_OFFS-to-def.patch \
-	file://0001-dts-zynqmp-topic-Use-jedec-spi-nor-compatible-instea.patch \
-	file://0001-topic-miamiplusmp-Enable-I2C-support-on-module.patch \
-	file://0001-topic-miamimp-xilinx-xdp-Enable-CAN-controllers.patch \
-	file://0001-tdpzu9-Board-v1r1.patch \
-	file://0001-ttpzu9-psu_init-Use-100MHz-refclk-for-USB3.patch \
-	file://0001-tdpzu9-ttpzu9-Add-initial-delay-to-allow-clock-chip-.patch \
-	file://0001-configs-topic_miami-lite-Fix-boot-order-and-disable-.patch \
+	file://0028-dts-zynqmp-topic-Use-jedec-spi-nor-compatible-instea.patch \
+	file://0029-topic-miamiplusmp-Enable-I2C-support-on-module.patch \
+	file://0030-topic-miamimp-xilinx-xdp-Enable-CAN-controllers.patch \
+	file://0031-tdpzu9-Board-v1r1.patch \
+	file://0032-ttpzu9-psu_init-Use-100MHz-refclk-for-USB3.patch \
+	file://0033-tdpzu9-ttpzu9-Add-initial-delay-to-allow-clock-chip-.patch \
+	file://0034-configs-topic_miami-lite-Fix-boot-order-and-disable-.patch \
 	"
 
 # Glitches on serial input interrupt the boot sequence on some boards, use

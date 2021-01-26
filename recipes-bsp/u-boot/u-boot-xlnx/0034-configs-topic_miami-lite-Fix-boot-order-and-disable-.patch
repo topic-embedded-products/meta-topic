@@ -1,7 +1,7 @@
-From 48ef77d0d74f15256ea9c53d5ab9a67651420eb2 Mon Sep 17 00:00:00 2001
+From 2fda19c4b867b22792199d147e7f3b241c1570d5 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 18 Jan 2021 08:30:11 +0100
-Subject: [PATCH] configs, topic_miami[lite]: Fix boot order and disable
+Subject: [PATCH 34/34] configs, topic_miami[lite]: Fix boot order and disable
  BOARD_LATE_INIT
 
 The BOARD_LATE_INIT option for the Xilinx zynq prepends the boot_targets with
@@ -19,34 +19,34 @@ Fix boot order, "qspi0" should be "qpsi", don't try JTAG first, and remove
  3 files changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
-index 077aa6746a..ab23ca9111 100644
+index 350b9ac74e..1c3483d5f5 100644
 --- a/configs/topic_miami_defconfig
 +++ b/configs/topic_miami_defconfig
-@@ -9,6 +9,7 @@ CONFIG_DEBUG_UART_CLOCK=100000000
- CONFIG_SPL_STACK_R_ADDR=0x200000
+@@ -11,6 +11,7 @@ CONFIG_DEBUG_UART_BASE=0xe0000000
+ CONFIG_DEBUG_UART_CLOCK=100000000
  CONFIG_BOOT_INIT_FILE="board/topic/zynq/zynq-topic-miami/ps7_regs.txt"
  CONFIG_DEBUG_UART=y
 +# CONFIG_BOARD_LATE_INIT is not set
  CONFIG_DISTRO_DEFAULTS=y
- CONFIG_BOOTDELAY=0
- CONFIG_SPL_STACK_R=y
+ CONFIG_SYS_CUSTOM_LDSCRIPT=y
+ CONFIG_SYS_LDSCRIPT="arch/arm/mach-zynq/u-boot.lds"
 diff --git a/configs/topic_miamilite_defconfig b/configs/topic_miamilite_defconfig
-index 7122eec7f8..850516ded4 100644
+index e2a977226f..a34446ecde 100644
 --- a/configs/topic_miamilite_defconfig
 +++ b/configs/topic_miamilite_defconfig
-@@ -9,6 +9,7 @@ CONFIG_DEBUG_UART_CLOCK=100000000
- CONFIG_SPL_STACK_R_ADDR=0x200000
+@@ -11,6 +11,7 @@ CONFIG_DEBUG_UART_BASE=0xe0000000
+ CONFIG_DEBUG_UART_CLOCK=100000000
  CONFIG_BOOT_INIT_FILE="board/topic/zynq/zynq-topic-miamilite/ps7_regs.txt"
  CONFIG_DEBUG_UART=y
 +# CONFIG_BOARD_LATE_INIT is not set
  CONFIG_DISTRO_DEFAULTS=y
- CONFIG_BOOTDELAY=0
- CONFIG_SPL_STACK_R=y
+ CONFIG_SYS_CUSTOM_LDSCRIPT=y
+ CONFIG_SYS_LDSCRIPT="arch/arm/mach-zynq/u-boot.lds"
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
-index 911f3e65b9..939fe63294 100644
+index 669ecab26c..7d1fb99384 100644
 --- a/include/configs/topic_miami.h
 +++ b/include/configs/topic_miami.h
-@@ -102,7 +102,7 @@
+@@ -90,7 +90,7 @@
  	"boot_a_script=load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; source ${scriptaddr}\0" \
  	"boot_prefixes=/ /boot/\0" \
  	"boot_scripts=boot.scr\0" \

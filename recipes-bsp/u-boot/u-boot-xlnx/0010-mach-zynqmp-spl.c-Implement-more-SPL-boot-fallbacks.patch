@@ -1,7 +1,7 @@
-From 20b5450f90ac24a367557e183a7eed5877b1ff1c Mon Sep 17 00:00:00 2001
+From 44832a57c5ff376859867b71f33f48ff855bde02 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 16 Dec 2019 16:25:02 +0100
-Subject: [PATCH 10/26] mach-zynqmp/spl.c: Implement more SPL boot fallbacks
+Subject: [PATCH 10/34] mach-zynqmp/spl.c: Implement more SPL boot fallbacks
 
 Try harder to boot. If QSPI won't provide a proper u-boot, pass on to
 MMC2 (the SD card) and MMC1 (eMMC device) in that order. Increases the

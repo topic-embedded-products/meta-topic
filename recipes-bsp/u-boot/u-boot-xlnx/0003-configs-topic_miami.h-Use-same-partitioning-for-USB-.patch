@@ -1,7 +1,7 @@
-From b4db667d53a2f66321c429373194e12cdf573a7e Mon Sep 17 00:00:00 2001
+From 0ff48dd120077cac0fd68eac973a499b70edc856 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 20 Oct 2017 13:01:54 +0200
-Subject: [PATCH 03/26] configs/topic_miami.h: Use same partitioning for USB
+Subject: [PATCH 03/34] configs/topic_miami.h: Use same partitioning for USB
  boot as for SD
 
 Use the same partitioning as the SD card by default. This allows to

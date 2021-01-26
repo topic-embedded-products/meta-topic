@@ -1,7 +1,7 @@
-From 4308c5ae02c0eea3218ae6cec8c5b1f22e91232a Mon Sep 17 00:00:00 2001
+From a3ffb3c899a586cb82826d3f4ace413455c51ee7 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 22 Apr 2020 16:27:19 +0200
-Subject: [PATCH 17/26] board: topic-miami: Set FCLK1 to 150MHz
+Subject: [PATCH 17/34] board: topic-miami: Set FCLK1 to 150MHz
 
 In all reference designs the FCLK1 runs at 150MHz, but the bootloader
 doesn't set it up like that. Set the divider to 8 to generate the

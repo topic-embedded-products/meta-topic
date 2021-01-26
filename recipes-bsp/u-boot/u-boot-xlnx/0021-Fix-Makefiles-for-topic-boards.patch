@@ -1,22 +1,20 @@
-From 6167f0ec511a8ec840c2156f2b32495b5ae63e29 Mon Sep 17 00:00:00 2001
+From bc835cd628dbe3d8554287160365acf01414caed Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 19 Jun 2020 11:38:10 +0200
-Subject: [PATCH 21/26] Fix Makefiles for topic boards
+Subject: [PATCH 21/34] Fix Makefiles for topic boards
 
 ---
- board/topic/zynq/Makefile   | 14 ++++++++++++--
+ board/topic/zynq/Makefile   | 13 +++++++++++--
  board/topic/zynqmp/Makefile |  7 ++++++-
- 2 files changed, 18 insertions(+), 3 deletions(-)
+ 2 files changed, 17 insertions(+), 3 deletions(-)
 
 diff --git a/board/topic/zynq/Makefile b/board/topic/zynq/Makefile
-index becadd2ca7..77437138a7 100644
+index cc100b0f42..77437138a7 100644
 --- a/board/topic/zynq/Makefile
 +++ b/board/topic/zynq/Makefile
-@@ -1,8 +1,18 @@
- # SPDX-License-Identifier: GPL-2.0+
- 
+@@ -3,7 +3,16 @@
  obj-y	:= board.o
-+obj-y	+= ../../xilinx/common/board.o
+ obj-y	+= ../../xilinx/common/board.o
  
 -# Remove quotes
 -hw-platform-y :=$(shell echo $(CONFIG_DEFAULT_DEVICE_TREE))

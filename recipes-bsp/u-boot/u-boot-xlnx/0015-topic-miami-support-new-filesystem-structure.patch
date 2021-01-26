@@ -1,7 +1,7 @@
-From 71d7d3aa87c638582abfce690fb64424cf77d887 Mon Sep 17 00:00:00 2001
+From e23e8671ab4e7af720bd82c13c31f1c4182328d3 Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Tue, 25 Feb 2020 17:25:24 +0100
-Subject: [PATCH 15/26] topic-miami: support new filesystem structure
+Subject: [PATCH 15/34] topic-miami: support new filesystem structure
 
 Add MTD and UBI support and boot from QSPI using UBI filesystem
 ---
@@ -45,7 +45,7 @@ index e50ae58a23..463eab21f0 100644
  	};
  };
 diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
-index 5f3d2fa9c9..e20d8b61a7 100644
+index 708a05f74f..350b9ac74e 100644
 --- a/configs/topic_miami_defconfig
 +++ b/configs/topic_miami_defconfig
 @@ -28,6 +28,12 @@ CONFIG_CMD_DFU=y
@@ -70,7 +70,7 @@ index 5f3d2fa9c9..e20d8b61a7 100644
  CONFIG_SF_DEFAULT_MODE=0
  CONFIG_SF_DEFAULT_SPEED=108000000
  CONFIG_SPI_FLASH_STMICRO=y
-@@ -65,3 +73,12 @@ CONFIG_USB_GADGET_PRODUCT_NUM=0x0300
+@@ -66,3 +74,12 @@ CONFIG_USB_GADGET_PRODUCT_NUM=0x0300
  CONFIG_CI_UDC=y
  CONFIG_USB_GADGET_DOWNLOAD=y
  CONFIG_USB_FUNCTION_THOR=y
@@ -84,7 +84,7 @@ index 5f3d2fa9c9..e20d8b61a7 100644
 +# CONFIG_ALTERA_QSPI is not set
 +# CONFIG_MTD_SPI_NAND is not set
 diff --git a/configs/topic_miamilite_defconfig b/configs/topic_miamilite_defconfig
-index 76d2d2e5d8..6698f15f9f 100644
+index 45c2f93ae9..e2a977226f 100644
 --- a/configs/topic_miamilite_defconfig
 +++ b/configs/topic_miamilite_defconfig
 @@ -26,6 +26,12 @@ CONFIG_CMD_DFU=y
@@ -110,7 +110,7 @@ index 76d2d2e5d8..6698f15f9f 100644
  CONFIG_SF_DEFAULT_MODE=0
  CONFIG_SF_DEFAULT_SPEED=108000000
  CONFIG_SPI_FLASH_STMICRO=y
-@@ -60,3 +69,12 @@ CONFIG_USB_GADGET_PRODUCT_NUM=0x0300
+@@ -61,3 +70,12 @@ CONFIG_USB_GADGET_PRODUCT_NUM=0x0300
  CONFIG_CI_UDC=y
  CONFIG_USB_GADGET_DOWNLOAD=y
  CONFIG_USB_FUNCTION_THOR=y
@@ -124,7 +124,7 @@ index 76d2d2e5d8..6698f15f9f 100644
 +# CONFIG_ALTERA_QSPI is not set
 +# CONFIG_MTD_SPI_NAND is not set
 diff --git a/configs/topic_miamiplus_defconfig b/configs/topic_miamiplus_defconfig
-index d7896b2899..64e44cbdc3 100644
+index 44481cf1cf..96de2eb501 100644
 --- a/configs/topic_miamiplus_defconfig
 +++ b/configs/topic_miamiplus_defconfig
 @@ -26,6 +26,12 @@ CONFIG_CMD_DFU=y
@@ -150,7 +150,7 @@ index d7896b2899..64e44cbdc3 100644
  CONFIG_SF_DEFAULT_MODE=0
  CONFIG_SF_DEFAULT_SPEED=108000000
  CONFIG_SPI_FLASH_STMICRO=y
-@@ -60,3 +69,12 @@ CONFIG_USB_GADGET_PRODUCT_NUM=0x0300
+@@ -61,3 +70,12 @@ CONFIG_USB_GADGET_PRODUCT_NUM=0x0300
  CONFIG_CI_UDC=y
  CONFIG_USB_GADGET_DOWNLOAD=y
  CONFIG_USB_FUNCTION_THOR=y

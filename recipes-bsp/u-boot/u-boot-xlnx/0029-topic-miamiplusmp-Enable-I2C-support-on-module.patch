@@ -1,7 +1,7 @@
-From 2d34b88bcfe471bcd3e6b72fc70b797ef77ba6b4 Mon Sep 17 00:00:00 2001
+From 29c72a071dafb70818d6cd99b97157d8af2909d0 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 28 Sep 2020 11:22:23 +0200
-Subject: [PATCH] topic-miamiplusmp: Enable I2C support on module
+Subject: [PATCH 29/34] topic-miamiplusmp: Enable I2C support on module
 
 The I2C bus on the module itself can be used to detect board revision
 and read/write the eeprom on it.
@@ -34,7 +34,7 @@ index 105f7254c9..46de44b462 100644
  	};
  };
 diff --git a/configs/topic_tdpzu9_defconfig b/configs/topic_tdpzu9_defconfig
-index 94212bf041..b8376ab0e2 100644
+index 3f047316a8..77d52da3af 100644
 --- a/configs/topic_tdpzu9_defconfig
 +++ b/configs/topic_tdpzu9_defconfig
 @@ -70,8 +70,6 @@ CONFIG_DM_GPIO=y
@@ -47,7 +47,7 @@ index 94212bf041..b8376ab0e2 100644
  CONFIG_LED_GPIO=y
  CONFIG_MISC=y
 diff --git a/configs/topic_ttpzu9_defconfig b/configs/topic_ttpzu9_defconfig
-index 06f8382692..efd0b385b2 100644
+index 8fbefad673..ecf0c1b4d5 100644
 --- a/configs/topic_ttpzu9_defconfig
 +++ b/configs/topic_ttpzu9_defconfig
 @@ -70,8 +70,6 @@ CONFIG_DM_GPIO=y

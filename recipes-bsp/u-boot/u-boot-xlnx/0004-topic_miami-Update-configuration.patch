@@ -1,7 +1,7 @@
-From c533069b0c86833c7bd961ef9202ea7cdb1fab6b Mon Sep 17 00:00:00 2001
+From 14c762c96332737a10188e752581932c68cb2ed3 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 9 Oct 2019 10:26:37 +0200
-Subject: [PATCH 04/26] topic_miami: Update configuration
+Subject: [PATCH 04/34] topic_miami: Update configuration
 
 Remove unused "NET" support and make a slightly smaller SPL
 ---
@@ -9,7 +9,7 @@ Remove unused "NET" support and make a slightly smaller SPL
  1 file changed, 5 insertions(+)
 
 diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
-index c58924be2f..5f3d2fa9c9 100644
+index d273a4c3bb..708a05f74f 100644
 --- a/configs/topic_miami_defconfig
 +++ b/configs/topic_miami_defconfig
 @@ -17,6 +17,8 @@ CONFIG_SYS_LDSCRIPT="arch/arm/mach-zynq/u-boot.lds"
