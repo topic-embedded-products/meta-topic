@@ -8,3 +8,4 @@ BIF_PARTITION_ATTR[init] ?= "init"
 BIF_PARTITION_IMAGE[init] ?= "${WORKDIR}/regs.init"
 BIF_PARTITION_DEPENDS[init] ?= "arm-trusted-firmware:do_deploy"
 
+BIF_PARTITION_ATTR_zynq ?= "fsbl u-boot"
