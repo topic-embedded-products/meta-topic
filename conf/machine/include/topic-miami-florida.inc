@@ -36,4 +36,4 @@ module_autoload_axi-hdmi-rx = "adv7604 dma-axi-dmac axi-hdmi-rx"
 
 MACHINE_FEATURES += "usbhost usbgadget screen touchscreen wifi alsa ethernet"
 
-DEVICETREE = "topic-miami-florida-mio.dtb"
+DEVICETREE = "devicetree/topic-miami-florida-mio.dtb"

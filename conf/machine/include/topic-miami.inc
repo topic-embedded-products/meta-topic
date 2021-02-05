@@ -47,4 +47,4 @@ UBI_VOLNAME = "qspi-rootfs"
 # Out of kernel devicetree
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree"
 
-DEVICETREE ??= "topic-miami.dtb"
+DEVICETREE ??= "devicetree/topic-miami.dtb"

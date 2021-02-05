@@ -37,4 +37,4 @@ MACHINE_FEATURES += "usbhost usbgadget screen"
 # Out of kernel devicetree
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree"
 
-DEVICETREE ?= "zynqmp-topic-miamimp-florida-gen.dtb"
+DEVICETREE ?= "devicetree/zynqmp-topic-miamimp-florida-gen.dtb"
