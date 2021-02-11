@@ -64,6 +64,7 @@ SRC_URI_append = "\
 	file://0001-net-mdiobus-add-reset-post-delay-us-handling.patch \
 	file://0001-net-mdiobus-Prevent-spike-on-MDIO-bus-reset-signal.patch \
 	file://0001-zynqmp-topic-miamiplusmp-Move-ethernet-PHY-reset-to-.patch \
+	file://0001-devicetree-topic-miamilite.dtsi-Correct-QSPI-NOR-siz.patch \
 	"
 
 # Compile overlay-capable devicetrees

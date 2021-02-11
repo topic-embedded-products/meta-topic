@@ -1,0 +1,37 @@
+From 066374bfa12d02e94aeb9c2159e0c4113ea71c06 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 11 Feb 2021 14:25:22 +0100
+Subject: [PATCH] devicetree: topic-miamilite.dtsi: Correct QSPI NOR size to
+ 64MB
+
+---
+ arch/arm/boot/dts/topic-miamilite.dtsi | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/arch/arm/boot/dts/topic-miamilite.dtsi b/arch/arm/boot/dts/topic-miamilite.dtsi
+index 8b352dda67bc..364014bf3bac 100644
+--- a/arch/arm/boot/dts/topic-miamilite.dtsi
++++ b/arch/arm/boot/dts/topic-miamilite.dtsi
+@@ -11,6 +11,19 @@
+ 	gpios = <&gpio0 9 1>; /* Active low */
+ };
+ 
++/* Fixup QSPI partition size, the miamilite has 64MB of NOR flash */
++&primary_flash {
++	partition@qspi-rootfs {
++		label = "qspi-rootfs";
++		reg = <0x100000 0x3F00000>;
++	};
++	/* Everything */
++	partition@qspi-all {
++		label = "qspi-all";
++		reg = <0x0 0x4000000>;
++	};
++};
++
+ &pinctrl_leds_default {
+ 	mux {
+ 		groups = "gpio0_9_grp";
+-- 
+2.17.1
+
