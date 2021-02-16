@@ -38,6 +38,7 @@ SRC_URI_append_petalinux = " file://topic_miamimp_xilinx_xdp_defconfig "
 SRC_URI_append_petalinux = " file://topic_tdpzu9_defconfig "
 SRC_URI_append_petalinux = " file://topic_tdkzu_defconfig "
 SRC_URI_append_petalinux = " file://topic_tdkz_defconfig "
+SRC_URI_append_petalinux = " file://topic_tdkzl_defconfig "
 SRC_URI_append_tdkz15 = " file://0001-Support-autodetect-of-mermory-size-for-miami.patch "
 SRC_URI_append_tdkz30 = " file://0001-Support-autodetect-of-mermory-size-for-miami.patch "
 SRC_URI_append_topic-distro = " file://xdp-spl-config-uboot "
@@ -62,6 +63,7 @@ do_configure_prepend_petalinux() {
     cp ${WORKDIR}/topic_tdpzu9_defconfig ${S}/configs/topic_tdpzu9_defconfig
     cp ${WORKDIR}/topic_tdkzu_defconfig ${S}/configs/topic_tdkzu_defconfig
     cp ${WORKDIR}/topic_tdkz_defconfig ${S}/configs/topic_miami_defconfig
+		cp ${WORKDIR}/topic_tdkzl_defconfig ${S}/configs/topic_miamilite_defconfig
 }
 # Add PMU and ATF
 do_compile[depends] += "${EXTRACOMPILEDEPENDS}"

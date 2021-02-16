@@ -11,6 +11,9 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 FILESEXTRAPATHS_prepend_tdkz15 := "${THISDIR}/bootscript/tdkz:"
 FILESEXTRAPATHS_prepend_tdkz30 := "${THISDIR}/bootscript/tdkz:"
 
+FILESEXTRAPATHS_prepend_tdkz07 := "${THISDIR}/bootscript/tdkz:"
+FILESEXTRAPATHS_prepend_tdkz10 := "${THISDIR}/bootscript/tdkz:"
+
 SRC_URI = "file://boot.scr"
 
 S = "${WORKDIR}"

@@ -47,6 +47,17 @@ COMPATIBLE_MACHINE_tdkz30 = ".*"
 SRC_URI_append_tdkz15 = "${TDKZ_SOURCES}"
 SRC_URI_append_tdkz30 = "${TDKZ_SOURCES}"
 
+TDKZL_SOURCES = "\
+	file://${MACHINE}.dts \
+	file://topic-miami-florida-mio.dtsi \
+	file://topic-miamilite.dtsi \
+	file://topic-miami.dtsi \
+	"
+COMPATIBLE_MACHINE_tdkz07 = ".*"
+COMPATIBLE_MACHINE_tdkz10 = ".*"
+SRC_URI_append_tdkz07 = "${TDKZL_SOURCES}"
+SRC_URI_append_tdkz10 = "${TDKZL_SOURCES}"
+
 DEFAULT_DTS = ""
 DEFAULT_DTS_xdpzu7  = "zynqmp-topic-miamimp-xilinx-xdp.dtb"
 DEFAULT_DTS_tdkzu6  = "zynqmp-topic-miamimp-florida-gen.dtb"
