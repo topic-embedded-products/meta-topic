@@ -35,6 +35,7 @@ SRC_URI_append = "\
 	file://0001-ttpzu9-psu_init-Use-100MHz-refclk-for-USB3.patch \
 	file://0001-tdpzu9-ttpzu9-Add-initial-delay-to-allow-clock-chip-.patch \
 	file://0001-configs-topic_miami-lite-Fix-boot-order-and-disable-.patch \
+	file://0001-board-topic-miamiplus-Do-not-toggle-pin-46-at-boot.patch \
 	"
 
 # Glitches on serial input interrupt the boot sequence on some boards, use
