@@ -1,0 +1,35 @@
+From 613c5002fbffdc99eec93e1f1e8aaa279f19d83d Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 18 Feb 2021 11:48:14 +0100
+Subject: [PATCH] devicetree: topic-miamiplus: Adjust QSPI flash size to 128MB
+
+---
+ arch/arm/boot/dts/topic-miamiplus.dtsi | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/boot/dts/topic-miamiplus.dtsi b/arch/arm/boot/dts/topic-miamiplus.dtsi
+index c63b30266fa3..41e53e2f8ed1 100644
+--- a/arch/arm/boot/dts/topic-miamiplus.dtsi
++++ b/arch/arm/boot/dts/topic-miamiplus.dtsi
+@@ -26,15 +26,15 @@
+ 	is-dual = <1>;
+ };
+ 
+-/* Dual flash, also double the capacity so adjust rootfs and "all" partitions */
++/* Dual flash, 128MB total, adjust rootfs and "all" partitions */
+ &primary_flash {
+ 	partition@qspi-rootfs {
+ 		label = "qspi-rootfs";
+-		reg = <0x500000 0x3b00000>;
++		reg = <0x500000 0x7b00000>;
+ 	};
+ 	partition@qspi-all {
+ 		label = "qspi-all";
+-		reg = <0x0 0x4000000>;
++		reg = <0x0 0x8000000>;
+ 	};
+ };
+ 
+-- 
+2.17.1
+
