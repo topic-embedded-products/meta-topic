@@ -1,0 +1,34 @@
+From 824ac8e8ac5378251513e2f5f74a3f71cbbd5502 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 18 Feb 2021 11:08:12 +0100
+Subject: [PATCH] board/topic-miamiplus: Do not toggle pin 46 at boot
+
+The initialization code toggles MIO 46 for no apparent reason. This may
+cause some boards to fail to work properly, and causes issues when the
+pin is to be used as input later on.
+---
+ board/topic/zynq/zynq-topic-miamiplus/ps7_init_gpl.c | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/board/topic/zynq/zynq-topic-miamiplus/ps7_init_gpl.c b/board/topic/zynq/zynq-topic-miamiplus/ps7_init_gpl.c
+index d90a350d3f..5861ed4454 100644
+--- a/board/topic/zynq/zynq-topic-miamiplus/ps7_init_gpl.c
++++ b/board/topic/zynq/zynq-topic-miamiplus/ps7_init_gpl.c
+@@ -182,14 +182,6 @@ static unsigned long ps7_peripherals_init_data_3_0[] = {
+ 	EMIT_MASKWRITE(0XE000D000, 0x000800FFU, 0x000800C1U),
+ 	EMIT_MASKWRITE(0XF8007000, 0x20000000U, 0x00000000U),
+ 	EMIT_MASKDELAY(0XF8F00200, 1),
+-	EMIT_MASKWRITE(0XE000A244, 0x003FFFFFU, 0x00004000U),
+-	EMIT_MASKWRITE(0XE000A008, 0xFFFFFFFFU, 0xBFFF4000U),
+-	EMIT_MASKWRITE(0XE000A248, 0x003FFFFFU, 0x00004000U),
+-	EMIT_MASKWRITE(0XE000A008, 0xFFFFFFFFU, 0xBFFF0000U),
+-	EMIT_MASKDELAY(0XF8F00200, 1),
+-	EMIT_MASKWRITE(0XE000A008, 0xFFFFFFFFU, 0xBFFF4000U),
+-	EMIT_MASKDELAY(0XF8F00200, 1),
+-	EMIT_MASKDELAY(0XF8F00200, 1),
+ 	EMIT_EXIT(),
+ };
+ 
+-- 
+2.17.1
+
