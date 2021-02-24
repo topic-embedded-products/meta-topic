@@ -377,7 +377,7 @@
 		conf {
 			groups = "sdio1_2_grp";
 			slew-rate = <SLEW_RATE_FAST>;
-			io-standard = <IO_STANDARD_LVCMOS33>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 			bias-disable;
 		};
 
@@ -390,7 +390,7 @@
 			groups = "gpio0_45_grp";
 			bias-high-impedance;
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS33>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 			bias-pull-up;
 		};
 
