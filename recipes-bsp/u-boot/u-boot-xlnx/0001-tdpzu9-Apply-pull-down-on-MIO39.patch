@@ -1,0 +1,26 @@
+From 04d8c4d60b08ed2ea725893955e6e408766db3ac Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 6 Apr 2021 16:53:40 +0200
+Subject: [PATCH] tdpzu9: Apply pull-down on MIO39
+
+MIO39 is the SD SEL pin which must be low by default, selecting 3v3 IO.
+---
+ board/topic/zynqmp/zynqmp-topic-tdpzu9/psu_init_gpl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/board/topic/zynqmp/zynqmp-topic-tdpzu9/psu_init_gpl.c b/board/topic/zynqmp/zynqmp-topic-tdpzu9/psu_init_gpl.c
+index c6775bfc51..f74f07583b 100644
+--- a/board/topic/zynqmp/zynqmp-topic-tdpzu9/psu_init_gpl.c
++++ b/board/topic/zynqmp/zynqmp-topic-tdpzu9/psu_init_gpl.c
+@@ -480,7 +480,7 @@ static unsigned long psu_mio_init_data(void)
+ 	psu_mask_write(0xFF180154, 0x03FFFFFFU, 0x03FFFFFFU);
+ 	psu_mask_write(0xFF180158, 0x03FFFFFFU, 0x03FFFFFFU);
+ 	psu_mask_write(0xFF18015C, 0x03FFFFFFU, 0x00000000U);
+-	psu_mask_write(0xFF180160, 0x01FEDFDFU, 0x01FEDFDFU);
++	psu_mask_write(0xFF180160, 0x01FEFFDFU, 0x01FEDFDFU);
+ 	psu_mask_write(0xFF180164, 0x03FFFFFFU, 0x01FDF7FBU);
+ 	psu_mask_write(0xFF180168, 0x03FFFFFFU, 0x00000000U);
+ 	psu_mask_write(0xFF180170, 0x03FFFFFFU, 0x03FFFFFFU);
+-- 
+2.17.1
+
