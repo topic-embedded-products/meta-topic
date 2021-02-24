@@ -3,6 +3,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 # We want overlay support, so sompile everything with "symbols".
 DTC_BFLAGS_append = " -@"
 
+
 COMPATIBLE_MACHINE_xdpzu7 = ".*"
 SRC_URI_append_xdpzu7 = " \
 		file://zynqmp-topic-miamimp-xilinx-xdp.dts \
@@ -21,7 +22,8 @@ COMPATIBLE_MACHINE_tdpzu9 = ".*"
 SRC_URI_append_tdpzu9 = "\
 	file://zynqmp-topic-miamiplusmp.dts \
 	file://${MACHINE}.dts \
-	file://${MACHINE}-wifi.dts \
+	file://${MACHINE}-v1r1.dts \
+	file://${MACHINE}-v1r1-wifi.dts \
 	"
 
 TDKZU_SOURCES = "\

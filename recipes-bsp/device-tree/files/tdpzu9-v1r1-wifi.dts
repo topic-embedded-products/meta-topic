@@ -9,7 +9,7 @@
  * the License, or (at your option) any later version.
  */
 
-#include "tdpzu9.dts"
+#include "tdpzu9-v1r1.dts"
 
 / {
 	sdio_wifi_pwrseq: sdio_wifi_pwrseq {
