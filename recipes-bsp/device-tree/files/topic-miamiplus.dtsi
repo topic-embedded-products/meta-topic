@@ -30,11 +30,11 @@
 &primary_flash {
 	partition@qspi-rootfs {
 		label = "qspi-rootfs";
-		reg = <0x500000 0x3b00000>;
+		reg = <0x500000 0x7b00000>;
 	};
 	partition@qspi-all {
 		label = "qspi-all";
-		reg = <0x0 0x4000000>;
+		reg = <0x0 0x8000000>;
 	};
 };
 

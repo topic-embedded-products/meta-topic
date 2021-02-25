@@ -11,6 +11,19 @@
 	gpios = <&gpio0 9 1>; /* Active low */
 };
 
+/* Fixup QSPI partition size, the miamilite has 64MB of NOR flash */
+&primary_flash {
+	partition@qspi-rootfs {
+		label = "qspi-rootfs";
+		reg = <0x100000 0x3F00000>;
+	};
+	/* Everything */
+	partition@qspi-all {
+		label = "qspi-all";
+		reg = <0x0 0x4000000>;
+	};
+};
+
 &pinctrl_leds_default {
 	mux {
 		groups = "gpio0_9_grp";
