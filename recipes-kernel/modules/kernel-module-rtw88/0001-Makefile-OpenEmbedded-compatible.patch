@@ -1,0 +1,35 @@
+From db39f788bd12398d1a7a7bbae937a5eb9c4a4e60 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 1 Mar 2021 12:50:02 +0100
+Subject: [PATCH] Makefile: OpenEmbedded compatible
+
+Use KERNEL_SRC variable
+Implement modules_install target
+---
+ Makefile | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index de3b173..4401ae0 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,5 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
+-KERNELDIR ?= /lib/modules/$(shell uname -r)/build
++KERNEL_SRC ?= "/lib/modules/$(shell uname -r)/build"
++KERNELDIR ?= $(KERNEL_SRC)
+ PWD       := $(shell pwd)
+ 
+ CONFIG_RTW88_CORE=m
+@@ -147,6 +148,8 @@ install:
+ 	@echo
+ 	@echo "rtw88-usb drivers installed"
+ 
++modules_install:
++	$(MAKE) -C $(KERNEL_SRC) M=$(PWD) modules_install
+ 
+ 
+ cscope:
+-- 
+2.17.1
+
