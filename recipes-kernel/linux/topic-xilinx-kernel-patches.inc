@@ -12,6 +12,8 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 SRC_URI_append = "\
 	file://enable-kexec-support.cfg \
 	file://0001-wireless-brcmfmac-Disable-power-save-mode.patch \
+	file://0001-Bluetooth-btrtl-Add-support-for-RTL8822C-with-USB-in.patch \
+	file://0002-Bluetooth-btrtl-Restore-old-logic-to-assume-firmware.patch \
 	file://0001-mmc-sdhci-of-arasan-Resolve-failed-sd-mmc-tuning-due.patch \
 	file://0001-iio-accel-Add-support-for-the-Bosch-Sensortec-BMI088.patch \
 	file://0001-Add-ltc3562-voltage-regulator-driver.patch \
