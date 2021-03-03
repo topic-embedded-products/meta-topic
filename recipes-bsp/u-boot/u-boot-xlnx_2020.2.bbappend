@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 FILESEXTRAPATHS_prepend_petalinux := "${THISDIR}/${BPN}/petalinux:"
 
-SRC_URI_append_petalinux = " file://topic_miamimp_xilinx_xdp_defconfig "
+
 SRC_URI_append_petalinux = " file://topic_tdkzl_defconfig "
 
 SRC_URI_append_tdkz15 = " file://0001-Support-autodetect-of-mermory-size-for-miami.patch "
