@@ -225,19 +225,19 @@
 		reg = <0x0>;
 		partition@qspi-u-boot-spl {
 			label = "qspi-u-boot-spl";
-			reg = <0x00000 0x20000>;
+			reg = <0x00000 0x100000>;
 		};
 		partition@qspi-u-boot-img {
 			label = "qspi-u-boot-img";
-			reg = <0x20000 0xC0000>;
+			reg = <0x100000 0x20000>;
 		};
 		partition@qspi-u-boot-env {
 			label = "qspi-u-boot-env";
-			reg = <0xE0000 0x20000>;
+			reg = <0x12000 0x20000>;
 		};
 		partition@qspi-rootfs {
 			label = "qspi-rootfs";
-			reg = <0x100000 0x1F00000>;
+			reg = <0x140000 0x1fc0000>;
 		};
 		/* Everything */
 		partition@qspi-all {
