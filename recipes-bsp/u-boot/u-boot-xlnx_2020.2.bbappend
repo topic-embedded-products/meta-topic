@@ -51,6 +51,11 @@ SRC_URI_append_topic-distro = " file://xdp-spl-config-uboot "
 SRC_URI_append_topic-miamimp = " file://must-press-space-to-stop-autoboot.cfg"
 SRC_URI_append_topic-miami = " file://must-press-space-to-stop-autoboot.cfg"
 
+SRC_URI_append_tdpzu9 = " file://topic_zynqmp.cfg"
+SRC_URI_append_tdpzu9 = " file://topic_tdpzu9.cfg"
+SRC_URI_append_petalinux = " file://fastboot.cfg"
+SRC_URI_append_petalinux = " file://boot.h"
+
 EXTRACOMPILEDEPENDS = ""
 EXTRACOMPILEDEPENDS_zynqmp = "arm-trusted-firmware:do_deploy"
 do_configure_prepend_topic-distro() {
@@ -59,21 +64,8 @@ do_configure_prepend_topic-distro() {
 }
 
 do_configure_prepend_petalinux() {
-    cp ${WORKDIR}/topic_miamimp_xilinx_xdp_defconfig ${S}/configs/topic_miamimp_xilinx_xdp_defconfig
-    cp ${WORKDIR}/topic_tdpzu9_defconfig ${S}/configs/topic_tdpzu9_defconfig
-    cp ${WORKDIR}/topic_tdkzu_defconfig ${S}/configs/topic_tdkzu_defconfig
-    cp ${WORKDIR}/topic_tdkz_defconfig ${S}/configs/topic_miami_defconfig
-		cp ${WORKDIR}/topic_tdkzl_defconfig ${S}/configs/topic_miamilite_defconfig
+    cat ${WORKDIR}/boot.h >> ${S}/include/configs/xilinx_zynqmp.h
 }
 # Add PMU and ATF
 do_compile[depends] += "${EXTRACOMPILEDEPENDS}"
-do_compile_prepend_zynqmp_topic-distro() {
-	cp ${WORKDIR}/pmu-firmware-zynqmp-pmu.bin ${S}/board/topic/zynqmp/pmufw.bin
-	cp ${DEPLOY_DIR_IMAGE}/arm-trusted-firmware.bin ${B}/arm-trusted-firmware.bin
-}
-
-do_compile_append_zynqmp_topic-distro() {
-	cp ${S}/board/topic/zynqmp/fit_spl_atf.its ${B}/fit_spl_atf.its
-	${B}/tools/mkimage -f ${B}/fit_spl_atf.its ${B}/u-boot.itb
-}
 
