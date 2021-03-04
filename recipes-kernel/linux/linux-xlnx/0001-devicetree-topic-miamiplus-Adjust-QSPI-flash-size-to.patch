@@ -21,7 +21,7 @@ index c63b30266fa3..41e53e2f8ed1 100644
  	partition@qspi-rootfs {
  		label = "qspi-rootfs";
 -		reg = <0x500000 0x3b00000>;
-+		reg = <0x500000 0x7b00000>;
++		reg = <0x100000 0x7f00000>;
  	};
  	partition@qspi-all {
  		label = "qspi-all";
