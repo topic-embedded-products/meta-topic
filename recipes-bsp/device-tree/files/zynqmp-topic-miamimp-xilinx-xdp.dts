@@ -162,17 +162,9 @@
 			label = "qspi-boot-bin";
 			reg = <0x00000 0x1c0000>;
 		};
-		partition@qspi-u-boot-itb {
-			label = "qspi-u-boot-itb";
-			reg = <0x1c0000 0x20000>;
-		};
-		partition@qspi-u-boot-env {
-			label = "qspi-u-boot-env";
-			reg = <0x1e0000 0x20000>;
-		};
 		partition@qspi-rootfs {
 			label = "qspi-rootfs";
-			reg = <0x200000 0x3e00000>;
+			reg = <0x1c0000 0x3e40000>;
 		};
 		/* Everything */
 		partition@qspi-all {
