@@ -241,7 +241,7 @@
 
 	/* I2C mux to select one of the two FMCs. */
 	i2cmux_fmc: i2cswitch@70 {
-		compatible = "nxp,pca9546";
+		compatible = "nxp,pca9543";
 		#address-cells = <1>;
 		#size-cells = <0>;
 		reg = <0x70>;
