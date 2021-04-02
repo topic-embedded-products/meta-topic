@@ -237,7 +237,27 @@
 			};
 		};
 	};
+
+	/* I2C mux to select one of the two FMCs. */
+	i2cmux_fmc: i2cswitch@70 {
+		compatible = "nxp,pca9546";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x70>;
+	};
 };
+
+/* EEPROM on carrier is connected to bus 0 */
+&i2c1 {
+	carrier_eeprom: m24c32@50 {
+		compatible = "atmel,24c32";
+		reg = <0x50>;
+		pagesize = <32>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+	};
+};
+
 
 &uart1 {
 	status = "disabled";
