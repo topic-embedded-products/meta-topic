@@ -59,6 +59,7 @@
 		leds-eth2 {
 			label = "ethled2:green";
 			gpios = <&tdp_gpioex24 0 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "ff0d0000.ethernet-ffffffff:01:link";
 		};
 	};
 };
