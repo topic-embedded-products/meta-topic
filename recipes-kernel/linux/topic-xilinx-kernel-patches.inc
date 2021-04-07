@@ -9,6 +9,8 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 # Patches created using this command:
 #   git format-patch -o /tmp/ xlnx_rebase_v5.4_2020.1..HEAD
 
+# petalinux distro does not explicitly set this, so have a sane default here
+VIRTUAL-RUNTIME_dev_manager ??= 'busybox-mdev'
 # When using mdev, this solves the following error on new kernels:
 #   can't create /proc/sys/kernel/hotplug: nonexistent directory
 MDEVSUPPORT = "${@bb.utils.contains('VIRTUAL-RUNTIME_dev_manager', 'busybox-mdev', 'file://enable-mdev-hotplug.cfg', '', d)}"
