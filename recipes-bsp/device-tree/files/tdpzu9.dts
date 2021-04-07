@@ -399,5 +399,17 @@
 			slew-rate = <SLEW_RATE_SLOW>;
 			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
+
+		/* Voltage select pin */
+		mux-sel {
+			groups = "gpio0_39_grp";
+			function = "gpio0";
+		};
+		conf-sel {
+			groups = "gpio0_39_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+			bias-pull-down;
+		};
 	};
 };
