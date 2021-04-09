@@ -1,4 +1,4 @@
-setenv bootargs $bootargs coherent_pool=512k reset_reason=${reset_reason}
+setenv bootargs $bootargs coherent_pool=512k reset_reason=${reset_reason} quiet
 if test "${devtype}" = "mmc"; then
 	echo "Loading kernel from mmc ${devnum}:${devplist}..."
 	if ext4load ${devtype} ${devnum}:${devplist} $fdt_addr_r /boot/system.dtb && ext4load ${devtype} ${devnum}:${devplist} $kernel_addr_r /boot/Image; then
