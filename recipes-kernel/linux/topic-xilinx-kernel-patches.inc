@@ -70,6 +70,9 @@ SRC_URI_append = "\
 	file://mcp23s08/0004-pinctrl-mcp23s08-Reset-all-pins-to-input-at-probe.patch \
 	file://0001-net-mdiobus-add-reset-post-delay-us-handling.patch \
 	${ADIHDMISUPPORT} \
+	file://0001-Support-DMA-resolution-adjustment.patch \
+	file://0002-media-xilinx-vip-Fix-wrong-entry-for-RGGB-format.patch \
+	file://0003-media-xilinx-vpss-csc-Keep-settings-when-changing-re.patch \
 	"
 
 # Compile overlay-capable devicetrees

@@ -1,0 +1,28 @@
+From da1d3f32c5f203fa40974daee45b3092ecedb62e Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 19 Apr 2021 11:23:32 +0200
+Subject: [PATCH 2/3] media/xilinx-vip: Fix wrong entry for RGGB format
+
+Probably a typo in the table. Has already been fixed upstream.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/media/platform/xilinx/xilinx-vip.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/media/platform/xilinx/xilinx-vip.c b/drivers/media/platform/xilinx/xilinx-vip.c
+index 4c8603064a74..f3677d0c883f 100644
+--- a/drivers/media/platform/xilinx/xilinx-vip.c
++++ b/drivers/media/platform/xilinx/xilinx-vip.c
+@@ -97,7 +97,7 @@ static const struct xvip_video_format xvip_video_formats[] = {
+ 	{ XVIP_VF_Y_GREY, 16, NULL, MEDIA_BUS_FMT_Y16_1X16,
+ 	  2, 16, V4L2_PIX_FMT_Y16, 1, 1, 1, 1 },
+ 	{ XVIP_VF_MONO_SENSOR, 8, "rggb", MEDIA_BUS_FMT_SRGGB8_1X8,
+-	  1, 8, V4L2_PIX_FMT_SGRBG8, 1, 1, 1, 1 },
++	  1, 8, V4L2_PIX_FMT_SRGGB8, 1, 1, 1, 1 },
+ 	{ XVIP_VF_MONO_SENSOR, 8, "grbg", MEDIA_BUS_FMT_SGRBG8_1X8,
+ 	  1, 8, V4L2_PIX_FMT_SGRBG8, 1, 1, 1, 1 },
+ 	{ XVIP_VF_MONO_SENSOR, 8, "gbrg", MEDIA_BUS_FMT_SGBRG8_1X8,
+-- 
+2.17.1
+
