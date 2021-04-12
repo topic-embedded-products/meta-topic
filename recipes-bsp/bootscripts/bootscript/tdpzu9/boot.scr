@@ -1,9 +1,9 @@
 setenv fdtname system.dtb
 if i2c dev 0; then
 	if i2c probe 70; then
-		echo "ttpzu9 v1r2"
+		echo "tdpzu9 v1r2"
 	else
-		echo "ttpzu9 v1r1"
+		echo "tdpzu9 v1r1"
 		setenv fdtname system-v1r1.dtb
 	fi
 fi
