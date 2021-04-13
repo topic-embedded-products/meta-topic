@@ -54,7 +54,7 @@ then
 	media-ctl -d /dev/media0 -V "\"a0140000.demosaic\":1  [fmt:RBG888_1X24/1920x1080 field:none]"
 	#Color space conversion
 	media-ctl -d /dev/media0 -V "\"a0100000.v_proc_ss_csc\":0  [fmt:RBG888_1X24/1920x1080 field:none]"
-	media-ctl -d /dev/media0 -V "\"a0100000.v_proc_ss_csc\":1  [fmt:VYYUYY8_1X24/1920x1080 field:none]"
+	media-ctl -d /dev/media0 -V "\"a0100000.v_proc_ss_csc\":1  [fmt:UYVY8_1X16/1920x1080 field:none]"
 fi
 
 # Load the settings for camera 1
