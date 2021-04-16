@@ -68,7 +68,7 @@ fi
 if yavta -w '0x0098c981 4' /dev/v4l-subdev6
 then
 	#SONY IMX274 Sensor
-	media-ctl -d /dev/media1 -V "\"IMX274_0\":0  [fmt:SRGGB10_1X10/1920x1080 field:none]"
+	media-ctl -d /dev/media1 -V "\"IMX274 3-001a\":0  [fmt:SRGGB10_1X10/1920x1080 field:none]"
 	#MIPI CSI2-Rx Subsystem
 	media-ctl -d /dev/media1 -V "\"a0180000.csiss\":1  [fmt:SRGGB10_1X10/1920x1080 field:none]"
 	media-ctl -d /dev/media1 -V "\"a0180000.csiss\":0  [fmt:SRGGB8_1X8/1920x1080 field:none]"
