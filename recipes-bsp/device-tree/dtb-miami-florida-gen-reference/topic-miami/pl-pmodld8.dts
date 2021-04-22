@@ -1,0 +1,47 @@
+/* Overlay devicetree PMODLD8 (adds LEDs to PMOD) */
+/dts-v1/;
+/plugin/;
+  
+/ {
+	fragment@0 {
+		/* LEDs connected to GPIO controller that controls PMOD1/2 */
+		target-path = "/";
+		__overlay__ {
+			leds-pmod {
+				compatible = "gpio-leds";
+				pmod-ld0 {
+					label = "pmod-ld0:green";
+					gpios = <&axi_gpio_0 1 0 0>;
+				};
+				pmod-ld1 {
+					label = "pmod-ld1:green";
+					gpios = <&axi_gpio_0 1 1 0>;
+				};
+				pmod-ld2 {
+					label = "pmod-ld2:green";
+					gpios = <&axi_gpio_0 1 2 0>;
+				};
+				pmod-ld3 {
+					label = "pmod-ld3:green";
+					gpios = <&axi_gpio_0 1 3 0>;
+				};
+				pmod-ld4 {
+					label = "pmod-ld4:green";
+					gpios = <&axi_gpio_0 1 4 0>;
+				};
+				pmod-ld5 {
+					label = "pmod-ld5:green";
+					gpios = <&axi_gpio_0 1 5 0>;
+				};
+				pmod-ld6 {
+					label = "pmod-ld6:green";
+					gpios = <&axi_gpio_0 1 6 0>;
+				};
+				pmod-ld7 {
+					label = "pmod-ld7:green";
+					gpios = <&axi_gpio_0 1 7 0>;
+				};
+			};
+		};
+	};
+};
