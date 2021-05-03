@@ -1,8 +1,9 @@
-From c588833abe9231c05acbfbec5d3fdbd52b13bbb9 Mon Sep 17 00:00:00 2001
+From 721db0b1d55c779c68e370a8903914bd5384ef6b Mon Sep 17 00:00:00 2001
 From: Marc Brakels <marc.brakels@topic.nl>
 Date: Fri, 5 Mar 2021 15:52:44 +0100
 Subject: [PATCH 2/2] tdkz for ubi set hardcode flash size
 
+%% original patch: 0002-tdkz-for-ubi-set-hardcode-flash-size.patch
 ---
  drivers/mtd/ubi/build.c | 7 ++++---
  1 file changed, 4 insertions(+), 3 deletions(-)

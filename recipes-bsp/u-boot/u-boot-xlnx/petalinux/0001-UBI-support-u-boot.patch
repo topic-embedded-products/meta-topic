@@ -1,61 +1,49 @@
-From 68c2ffa65eeae939beaa6cf7f803155fecad25c8 Mon Sep 17 00:00:00 2001
+From 98dad63453925d41beccee1bbcbc5f8e069a6580 Mon Sep 17 00:00:00 2001
 From: Marc Brakels <marc.brakels@topic.nl>
 Date: Fri, 5 Mar 2021 15:47:49 +0100
 Subject: [PATCH 1/2] UBI support u-boot
 
+%% original patch: 0001-UBI-support-u-boot.patch
 ---
- Kconfig                       |  3 +++
- include/configs/zynq-common.h | 26 ++++++++++++++++++++++++++
- 2 files changed, 29 insertions(+)
+ include/configs/zynq-common.h | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/Kconfig b/Kconfig
-index d80be6e218..d5d2ed8c2f 100644
---- a/Kconfig
-+++ b/Kconfig
-@@ -571,6 +571,9 @@ config SYS_TEXT_BASE
- 	help
- 	  The address in memory that U-Boot will be running from, initially.
- 
-+config KERNEL_ARGS
-+	string "Extra bootargs options"
-+	default " " 
- 
- 
- config SYS_CLK_FREQ
 diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
-index d0614d8da4..06af9b307d 100644
+index d0614d8da4..0106776ab4 100644
 --- a/include/configs/zynq-common.h
 +++ b/include/configs/zynq-common.h
-@@ -283,3 +283,29 @@
- #define CONFIG_SYS_UBOOT_START	CONFIG_SYS_TEXT_BASE
+@@ -147,10 +147,11 @@
+ #endif
  
- #endif /* __CONFIG_ZYNQ_COMMON_H */
-+
-+#ifndef CONFIG_KERNEL_ARGS
-+#define CONFIG_KERNEL_ARGS ""
-+#endif
-+
-+
-+#undef CONFIG_EXTRA_ENV_SETTINGS
-+#define CONFIG_EXTRA_ENV_SETTINGS	\
-+	"scriptaddr=0x20000\0"	\
-+	"script_size_f=0x40000\0"	\
-+	"fdt_addr_r=0x1f00000\0"        \
-+	"pxefile_addr_r=0x2000000\0"    \
-+	"kernel_addr_r=0x2000000\0"     \
-+	"scriptaddr=0x3000000\0"        \
-+	"ramdisk_addr_r=0x3100000\0"    \
-+	DFU_ALT_INFO \
-+	BOOTENV \
-+	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0" \
-+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0" \
-+	"kernelargs=" CONFIG_KERNEL_ARGS "\0" \
-+	"bootcmd_ubi=run ubi_mount && ubifsload ${scriptaddr} /boot/boot.scr && source ${scriptaddr}\0"    \
-+  "scriptaddr=0x1900000\0"   \
+ #define BOOTENV_DEV_QSPI(devtypeu, devtypel, instance) \
+-	"bootcmd_qspi=sf probe 0 0 0 && " \
+-		      "sf read ${scriptaddr} ${script_offset_f} ${script_size_f} && " \
+-		      "echo QSPI: Trying to boot script at ${scriptaddr} && " \
+-		      "source ${scriptaddr}; echo QSPI: SCRIPT FAILED: continuing...;\0"
++	"bootcmd_ubi=run ubi_mount && ubifsload ${scriptaddr} /boot/boot.scr && source ${scriptaddr}\0" \
 +	"ubi_mount=sf probe && ubi part qspi-rootfs && ubifsmount ubi0:qspi-rootfs && setenv devtype ubi\0" \
 +	"bootubipart=qspi-rootfs\0" \
 +	"bootubivol=qspi-rootfs\0" \
-+	"bootcmd_qspi=run bootcmd_ubi\0"
++	"bootcmd_qspi=run bootcmd_ubi; echo QSPI: UBI FAILED: continuing...;\0"
+ 
+ #define BOOTENV_DEV_NAME_QSPI(devtypeu, devtypel, instance) \
+ 	"qspi "
+@@ -200,13 +201,14 @@
+ #define CONFIG_EXTRA_ENV_SETTINGS	\
+ 	"fdt_high=0x20000000\0"		\
+ 	"initrd_high=0x20000000\0"	\
+-	"scriptaddr=0x20000\0"	\
+ 	"script_size_f=0x40000\0"	\
+ 	"fdt_addr_r=0x1f00000\0"        \
+ 	"pxefile_addr_r=0x2000000\0"    \
+ 	"kernel_addr_r=0x2000000\0"     \
+ 	"scriptaddr=0x3000000\0"        \
+ 	"ramdisk_addr_r=0x3100000\0"    \
++	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0" \
++	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0" \
+ 	DFU_ALT_INFO \
+ 	BOOTENV
+ #endif
 -- 
 2.17.1
 
