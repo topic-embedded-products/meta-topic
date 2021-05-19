@@ -223,18 +223,18 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0x0>;
-		partition@qspi-u-boot-spl {
+		partition@qspi-boot-bin {
 			label = "qspi-boot-bin";
-			reg = <0x00000 0x140000>;
+			reg = <0x00000 0x100000>;
 		};
 		partition@qspi-rootfs {
 			label = "qspi-rootfs";
-			reg = <0x140000 0x1e00000>;
+			reg = <0x100000 0x3f00000>;
 		};
 		/* Everything */
 		partition@qspi-all {
 			label = "qspi-all";
-			reg = <0x0 0x2000000>;
+			reg = <0x0 0x4000000>;
 		};
 	};
 };

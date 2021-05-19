@@ -9,9 +9,6 @@ SRC_URI_append_tdkz30 = " file://0001-Support-autodetect-of-mermory-size-for-mia
 
 SRC_URI_append_zynq = " file://0001-UBI-support-u-boot.patch "
 
-SRC_URI_append_tdkz15 = " file://0002-tdkz-for-ubi-set-hardcode-flash-size.patch "
-SRC_URI_append_tdkz30 = " file://0002-tdkz-for-ubi-set-hardcode-flash-size.patch "
-
 # file://0001-arm64-zynq_sdhci-Resolve-failed-mmc-tuning-due-to-gc.patch \
 # file://0021-Fix-Makefiles-for-topic-boards.patch \
 # Glitches on serial input interrupt the boot sequence on some boards, use
