@@ -23,6 +23,7 @@ SRC_URI_append_tdpzu9 = " file://topic_tdpzu9.cfg"
 SRC_URI_append_tdkz15 = " file://topic_tdkz.cfg"
 SRC_URI_append_tdkz30 = " file://topic_tdkz.cfg"
 
+SRC_URI_append_tdkzu6 = " file://topic_tdkzu.cfg"
 SRC_URI_append_tdkzu9 = " file://topic_tdkzu.cfg"
 SRC_URI_append_tdkzu15 = " file://topic_tdkzu.cfg"
 
