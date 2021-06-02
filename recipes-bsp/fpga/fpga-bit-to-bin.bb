@@ -9,13 +9,10 @@ BBCLASSEXTEND = "native"
 SRC_URI = "file://fpga-bit-to-bin.py"
 
 S = "${WORKDIR}"
-PV = "3.1"
+PV = "4"
 
-# Patch the script to use the OE-provided Python interpreter
 do_compile() {
-	mv ${WORKDIR}/fpga-bit-to-bin.py ${WORKDIR}/fpga-bit-to-bin.py.tmp
-	echo "#!${PYTHON}" > ${WORKDIR}/fpga-bit-to-bin.py
-	grep -v '^#' ${WORKDIR}/fpga-bit-to-bin.py.tmp >> ${WORKDIR}/fpga-bit-to-bin.py
+	true
 }
 
 FILES_${PN} = "${bindir}"
