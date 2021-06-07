@@ -1,0 +1,169 @@
+From 4c63819b93d5d3b0e3cbc3a5635d002a51cfd888 Mon Sep 17 00:00:00 2001
+From: Bob Veringa <bob.veringa@topic.nl>
+Date: Wed, 21 Apr 2021 16:22:49 +0200
+Subject: [PATCH 4/7] media: imx274: improve v4l2-compliance
+
+1) Fix incorrect return of get_fmt when fmt->which is set
+to V4L2_SUBDEV_FORMAT_TRY. get_fmt always returns the active format,
+but should return the pad configuration when V4L2_SUBDEV_FORMAT_TRY
+is requested.
+
+2) Fix set_fmt not functioning correctly when fmt->which is set to
+V4L2_SUBDEV_FORMAT_TRY, by implementing 'init_cfg'.
+
+3) Add support for enumerating media bus formats
+via VIDIOC_SUBDEV_ENUM_MBUS_CODE.
+
+4) Add  support for enumerating frame sizes
+via VIDIOC_SUBDEV_ENUM_FRAME_SIZE.
+
+5) Fix v4l2-compliance error 'VIDIOC_(UN)SUBSCRIBE_EVENT/DQEVENT: FAIL'
+by implementing v4l2_subdev_core_ops struct with default functions.
+
+Signed-off-by: Bob Veringa <bob.veringa@topic.nl>
+Acked-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/media/i2c/imx274.c | 77 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 74 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/media/i2c/imx274.c b/drivers/media/i2c/imx274.c
+index d9849d34f39f..52ca9bdf0066 100644
+--- a/drivers/media/i2c/imx274.c
++++ b/drivers/media/i2c/imx274.c
+@@ -28,6 +28,7 @@
+ #include <media/v4l2-ctrls.h>
+ #include <media/v4l2-device.h>
+ #include <media/v4l2-subdev.h>
++#include <media/v4l2-event.h>
+ 
+ /*
+  * See "SHR, SVR Setting" in datasheet
+@@ -72,6 +73,7 @@
+ #define IMX274_MAX_FRAME_RATE			(120)
+ #define IMX274_MIN_FRAME_RATE			(5)
+ #define IMX274_DEF_FRAME_RATE			(60)
++#define IMX274_DEFAULT_MEDIA_FORMAT		MEDIA_BUS_FMT_SRGGB10_1X10
+ 
+ /*
+  * register SHR is limited to (SVR value + 1) x VMAX value - 4
+@@ -1072,11 +1074,23 @@ static int imx274_get_fmt(struct v4l2_subdev *sd,
+ 			  struct v4l2_subdev_format *fmt)
+ {
+ 	struct stimx274 *imx274 = to_imx274(sd);
++	int ret = 0;
+ 
+ 	mutex_lock(&imx274->lock);
+-	fmt->format = imx274->format;
++
++	switch (fmt->which) {
++	case V4L2_SUBDEV_FORMAT_TRY:
++		fmt->format = *v4l2_subdev_get_try_format(sd, cfg, fmt->pad);
++		break;
++	case V4L2_SUBDEV_FORMAT_ACTIVE:
++		fmt->format = imx274->format;
++		break;
++	default:
++		ret = -EINVAL;
++	}
++
+ 	mutex_unlock(&imx274->lock);
+-	return 0;
++	return ret;
+ }
+ 
+ /**
+@@ -1274,6 +1288,53 @@ static int imx274_set_selection(struct v4l2_subdev *sd,
+ 	return -EINVAL;
+ }
+ 
++static int imx274_enum_frame_size(struct v4l2_subdev *sd,
++				  struct v4l2_subdev_pad_config *cfg,
++				  struct v4l2_subdev_frame_size_enum *fse)
++{
++	u32 width, height;
++
++	if (fse->index >= ARRAY_SIZE(imx274_modes))
++		return -EINVAL;
++
++	width = IMX274_MAX_WIDTH / imx274_modes[fse->index].wbin_ratio;
++	height = IMX274_MAX_HEIGHT / imx274_modes[fse->index].hbin_ratio;
++
++	fse->code = IMX274_DEFAULT_MEDIA_FORMAT;
++	fse->min_width = width;
++	fse->max_width = width;
++	fse->min_height = height;
++	fse->max_height = height;
++	return 0;
++}
++
++static int imx274_enum_mbus_code(struct v4l2_subdev *sd,
++				 struct v4l2_subdev_pad_config *cfg,
++				 struct v4l2_subdev_mbus_code_enum *code)
++{
++	if (code->index > 0)
++		return -EINVAL;
++
++	code->code = IMX274_DEFAULT_MEDIA_FORMAT;
++
++	return 0;
++}
++
++static int imx274_init_cfg(struct v4l2_subdev *sd,
++			   struct v4l2_subdev_pad_config *cfg)
++{
++	struct imx274_mode *mode = &imx274_modes[0];
++
++	cfg->try_crop.width = IMX274_MAX_WIDTH;
++	cfg->try_crop.height = IMX274_MAX_HEIGHT;
++
++	cfg->try_fmt.width = cfg->try_crop.width / mode->wbin_ratio;
++	cfg->try_fmt.height = cfg->try_crop.height / mode->hbin_ratio;
++	cfg->try_fmt.field = V4L2_FIELD_NONE;
++	cfg->try_fmt.code = IMX274_DEFAULT_MEDIA_FORMAT;
++	cfg->try_fmt.colorspace = V4L2_COLORSPACE_SRGB;
++}
++
+ static int imx274_apply_trimming(struct stimx274 *imx274)
+ {
+ 	u32 h_start;
+@@ -1903,11 +1964,20 @@ static int imx274_set_frame_interval(struct stimx274 *priv,
+ 	return err;
+ }
+ 
++static const struct v4l2_subdev_core_ops imx274_core_ops = {
++	.log_status = v4l2_ctrl_subdev_log_status,
++	.subscribe_event = v4l2_ctrl_subdev_subscribe_event,
++	.unsubscribe_event = v4l2_event_subdev_unsubscribe,
++};
++
+ static const struct v4l2_subdev_pad_ops imx274_pad_ops = {
+ 	.get_fmt = imx274_get_fmt,
+ 	.set_fmt = imx274_set_fmt,
+ 	.get_selection = imx274_get_selection,
+ 	.set_selection = imx274_set_selection,
++	.enum_mbus_code = imx274_enum_mbus_code,
++	.enum_frame_size = imx274_enum_frame_size,
++	.init_cfg = imx274_init_cfg,
+ };
+ 
+ static const struct v4l2_subdev_video_ops imx274_video_ops = {
+@@ -1917,6 +1987,7 @@ static const struct v4l2_subdev_video_ops imx274_video_ops = {
+ };
+ 
+ static const struct v4l2_subdev_ops imx274_subdev_ops = {
++	.core = &imx274_core_ops,
+ 	.pad = &imx274_pad_ops,
+ 	.video = &imx274_video_ops,
+ };
+@@ -1968,7 +2039,7 @@ static int imx274_probe(struct i2c_client *client)
+ 	imx274->format.width = imx274->crop.width / imx274->mode->wbin_ratio;
+ 	imx274->format.height = imx274->crop.height / imx274->mode->hbin_ratio;
+ 	imx274->format.field = V4L2_FIELD_NONE;
+-	imx274->format.code = MEDIA_BUS_FMT_SRGGB10_1X10;
++	imx274->format.code = IMX274_DEFAULT_MEDIA_FORMAT;
+ 	imx274->format.colorspace = V4L2_COLORSPACE_SRGB;
+ 	imx274->frame_interval.numerator = 1;
+ 	imx274->frame_interval.denominator = IMX274_DEF_FRAME_RATE;
+-- 
+2.17.1
+

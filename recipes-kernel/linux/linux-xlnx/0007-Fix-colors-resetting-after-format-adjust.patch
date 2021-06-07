@@ -1,0 +1,157 @@
+From 70b469b703069d4a3f2ae99ed7812b0d69fb8577 Mon Sep 17 00:00:00 2001
+From: Bob Veringa <bob.veringa@topic.nl>
+Date: Thu, 27 May 2021 15:04:20 +0200
+Subject: [PATCH 7/7] Fix colors resetting after format adjust
+
+Fix colors gain settings resetting after adjusting format.
+---
+ .../media/platform/xilinx/xilinx-vpss-csc.c   | 91 +++++++++----------
+ 1 file changed, 42 insertions(+), 49 deletions(-)
+
+diff --git a/drivers/media/platform/xilinx/xilinx-vpss-csc.c b/drivers/media/platform/xilinx/xilinx-vpss-csc.c
+index 51c7440bf617..0194ddfd4dbe 100644
+--- a/drivers/media/platform/xilinx/xilinx-vpss-csc.c
++++ b/drivers/media/platform/xilinx/xilinx-vpss-csc.c
+@@ -608,8 +608,6 @@ static void xcsc_set_brightness(struct xcsc_dev *xcsc)
+ 		__func__,
+ 		((xcsc->brightness - 20) / 2),
+ 		((xcsc->brightness_active - 20) / 2));
+-	if (xcsc->brightness == xcsc->brightness_active)
+-		return;
+ 	for (i = 0; i < XV_CSC_K_MAX_ROWS; i++) {
+ 		for (j = 0; j < XV_CSC_K_MAX_COLUMNS; j++) {
+ 			xcsc->shadow_coeff[i][j] = (xcsc->shadow_coeff[i][j] *
+@@ -632,8 +630,6 @@ static void xcsc_set_contrast(struct xcsc_dev *xcsc)
+ 		"%s : Contrast Difference %d scale = %d",
+ 		__func__, contrast, scale);
+ 	/* Avoid updates if same */
+-	if (!contrast)
+-		return;
+ 	/* Update RGB Offsets */
+ 	xcsc->shadow_coeff[0][3] += contrast * scale;
+ 	xcsc->shadow_coeff[1][3] += contrast * scale;
+@@ -650,20 +646,18 @@ static void xcsc_set_red_gain(struct xcsc_dev *xcsc)
+ 		(xcsc->red_gain - 20) / 2,
+ 		(xcsc->red_gain_active - 20) / 2);
+ 
+-	if (xcsc->red_gain != xcsc->red_gain_active) {
+-		xcsc->shadow_coeff[0][0] = (xcsc->shadow_coeff[0][0] *
+-					    xcsc->red_gain) /
+-					    xcsc->red_gain_active;
+-		xcsc->shadow_coeff[0][1] = (xcsc->shadow_coeff[0][1] *
+-					    xcsc->red_gain) /
+-					    xcsc->red_gain_active;
+-		xcsc->shadow_coeff[0][2] = (xcsc->shadow_coeff[0][2] *
+-					    xcsc->red_gain) /
+-					    xcsc->red_gain_active;
+-		xcsc->red_gain_active = xcsc->red_gain;
+-		xcsc_correct_coeff(xcsc, xcsc->shadow_coeff);
+-		xcsc_write_coeff(xcsc);
+-	}
++	xcsc->shadow_coeff[0][0] = (xcsc->shadow_coeff[0][0] *
++					xcsc->red_gain) /
++					xcsc->red_gain_active;
++	xcsc->shadow_coeff[0][1] = (xcsc->shadow_coeff[0][1] *
++					xcsc->red_gain) /
++					xcsc->red_gain_active;
++	xcsc->shadow_coeff[0][2] = (xcsc->shadow_coeff[0][2] *
++					xcsc->red_gain) /
++					xcsc->red_gain_active;
++	xcsc->red_gain_active = xcsc->red_gain;
++	xcsc_correct_coeff(xcsc, xcsc->shadow_coeff);
++	xcsc_write_coeff(xcsc);
+ }
+ 
+ static void xcsc_set_green_gain(struct xcsc_dev *xcsc)
+@@ -673,20 +667,18 @@ static void xcsc_set_green_gain(struct xcsc_dev *xcsc)
+ 		 (xcsc->green_gain - 20) / 2,
+ 		 (xcsc->green_gain_active - 20) / 2);
+ 
+-	if (xcsc->green_gain != xcsc->green_gain_active) {
+-		xcsc->shadow_coeff[1][0] = (xcsc->shadow_coeff[1][0] *
+-					    xcsc->green_gain) /
+-					    xcsc->green_gain_active;
+-		xcsc->shadow_coeff[1][1] = (xcsc->shadow_coeff[1][1] *
+-					    xcsc->green_gain) /
+-					    xcsc->green_gain_active;
+-		xcsc->shadow_coeff[1][2] = (xcsc->shadow_coeff[1][2] *
+-					    xcsc->green_gain) /
+-					    xcsc->green_gain_active;
+-		xcsc->green_gain_active = xcsc->green_gain;
+-		xcsc_correct_coeff(xcsc, xcsc->shadow_coeff);
+-		xcsc_write_coeff(xcsc);
+-	}
++	xcsc->shadow_coeff[1][0] = (xcsc->shadow_coeff[1][0] *
++					xcsc->green_gain) /
++					xcsc->green_gain_active;
++	xcsc->shadow_coeff[1][1] = (xcsc->shadow_coeff[1][1] *
++					xcsc->green_gain) /
++					xcsc->green_gain_active;
++	xcsc->shadow_coeff[1][2] = (xcsc->shadow_coeff[1][2] *
++					xcsc->green_gain) /
++					xcsc->green_gain_active;
++	xcsc->green_gain_active = xcsc->green_gain;
++	xcsc_correct_coeff(xcsc, xcsc->shadow_coeff);
++	xcsc_write_coeff(xcsc);
+ }
+ 
+ static void xcsc_set_blue_gain(struct xcsc_dev *xcsc)
+@@ -696,20 +688,18 @@ static void xcsc_set_blue_gain(struct xcsc_dev *xcsc)
+ 		 (xcsc->blue_gain - 20) / 2,
+ 		 (xcsc->blue_gain_active - 20) / 2);
+ 
+-	if (xcsc->blue_gain != xcsc->blue_gain_active) {
+-		xcsc->shadow_coeff[2][0] = (xcsc->shadow_coeff[2][0] *
+-					    xcsc->blue_gain) /
+-					     xcsc->blue_gain_active;
+-		xcsc->shadow_coeff[2][1] = (xcsc->shadow_coeff[2][1] *
+-					    xcsc->blue_gain) /
+-					     xcsc->blue_gain_active;
+-		xcsc->shadow_coeff[2][2] = (xcsc->shadow_coeff[2][2] *
+-					    xcsc->blue_gain) /
+-					     xcsc->blue_gain_active;
+-		xcsc->blue_gain_active = xcsc->blue_gain;
+-		xcsc_correct_coeff(xcsc, xcsc->shadow_coeff);
+-		xcsc_write_coeff(xcsc);
+-	}
++	xcsc->shadow_coeff[2][0] = (xcsc->shadow_coeff[2][0] *
++					xcsc->blue_gain) /
++					xcsc->blue_gain_active;
++	xcsc->shadow_coeff[2][1] = (xcsc->shadow_coeff[2][1] *
++					xcsc->blue_gain) /
++					xcsc->blue_gain_active;
++	xcsc->shadow_coeff[2][2] = (xcsc->shadow_coeff[2][2] *
++					xcsc->blue_gain) /
++					xcsc->blue_gain_active;
++	xcsc->blue_gain_active = xcsc->blue_gain;
++	xcsc_correct_coeff(xcsc, xcsc->shadow_coeff);
++	xcsc_write_coeff(xcsc);
+ }
+ 
+ static void xcsc_set_size(struct xcsc_dev *xcsc)
+@@ -785,6 +775,7 @@ static int xcsc_set_format(struct v4l2_subdev *subdev,
+ 	struct xcsc_dev *xcsc = to_csc(subdev);
+ 	struct v4l2_mbus_framefmt *__format;
+ 	struct v4l2_mbus_framefmt *__propagate;
++	int err = 0;
+ 
+ 	__format = __xcsc_get_pad_format(xcsc, cfg, fmt->pad, fmt->which);
+ 	if (!__format)
+@@ -825,9 +816,11 @@ static int xcsc_set_format(struct v4l2_subdev *subdev,
+ 
+ 	fmt->format = *__format;
+ 	xcsc_update_formats(xcsc);
+-	xcsc_set_control_defaults(xcsc);
+-	xcsc_set_v4l2_ctrl_defaults(xcsc);
+-	dev_info(xcsc->xvip.dev, "VPSS CSC color controls reset to defaults");
++	err = __v4l2_ctrl_handler_setup(&xcsc->ctrl_handler);
++	if (err) {
++		dev_err(xcsc->xvip.dev, "Error %d setup controls\n", err);
++		return err;
++	}
+ 	return 0;
+ }
+ 
+-- 
+2.17.1
+

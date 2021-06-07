@@ -52,6 +52,16 @@ ADIHDMISUPPORT = "\
 	file://adi-hdmi-rx/0016-media-axi-hdmi-rx-Initialize-bus_type.patch \
 	"
 
+XILINX_V4L2_FIXES = "\
+	file://0001-Support-DMA-resolution-adjustment.patch \
+	file://0002-media-imx274-update-to-5.12-kernel-version.patch \
+	file://0003-media-imx274-remove-dev_pm_ops-to-avoid-register-wri.patch \
+	file://0004-media-imx274-improve-v4l2-compliance.patch \
+	file://0005-media-imx274-remove-imx274_load_default.patch \
+	file://0006-Improve-resolution-control.patch \
+	file://0007-Fix-colors-resetting-after-format-adjust.patch \
+	"
+
 SRC_URI_append = "\
 	${MDEVSUPPORT} \
 	file://enable-kexec-support.cfg \
@@ -72,6 +82,7 @@ SRC_URI_append = "\
 	file://mcp23s08/0004-pinctrl-mcp23s08-Reset-all-pins-to-input-at-probe.patch \
 	file://0001-net-mdiobus-add-reset-post-delay-us-handling.patch \
 	${ADIHDMISUPPORT} \
+	${XILINX_V4L2_FIXES} \
 	"
 
 # Compile overlay-capable devicetrees
