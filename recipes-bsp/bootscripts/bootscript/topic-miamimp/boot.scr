@@ -12,7 +12,7 @@ elif test "${devtype}" = "ubi"; then
 	echo "Loading kernel from UBIFS..."
 	if ubifsload $fdt_addr_r /boot/system.dtb && ubifsload $kernel_addr_r /boot/Image; then
 		echo "Load from UBIFS succeeded"
-		setenv bootargs $bootargs ubi.mtd=3 root=ubi0:qspi-rootfs rootfstype=ubifs rw rootwait
+		setenv bootargs $bootargs ubi.mtd=qspi-rootfs root=ubi0:qspi-rootfs rootfstype=ubifs rw rootwait
 		booti $kernel_addr_r - $fdt_addr_r
 	else
 		echo "Load from UBIFS failed, aborting UBIFS boot..."

@@ -149,7 +149,7 @@
 	is-dual = <1>;
 	multi-die = <1>;
 	flash@0 {
-		compatible = "st,m25p80", "n25q256a";
+		compatible = "jedec,spi-nor";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0x0>;
@@ -160,11 +160,11 @@
 		multi-die = <1>;
 		partition@qspi-boot-bin {
 			label = "qspi-boot-bin";
-			reg = <0x00000 0x1c0000>;
+			reg = <0x00000 0x180000>;
 		};
 		partition@qspi-rootfs {
 			label = "qspi-rootfs";
-			reg = <0x1c0000 0x3e40000>;
+			reg = <0x180000 0x3e80000>;
 		};
 		/* Everything */
 		partition@qspi-all {
