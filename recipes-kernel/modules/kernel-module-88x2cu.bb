@@ -6,3 +6,5 @@ PV = "5.9.0.1+${SRCPV}"
 PKGV = "5.9.0.1+${GITPKGV}"
 
 SRCREV = "3a543cf227dfd0a5fa4c0ced3be0c38203dda091"
+
+RRECOMMENDS_${PN} += "realtek-firmware-bt-rtl8822cu"
