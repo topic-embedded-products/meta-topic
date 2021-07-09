@@ -34,6 +34,14 @@
 		gpio = <&ttp_gpioex 4 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 	};
+	reg_usb1_vbus: regulator_usb {
+		compatible = "regulator-fixed";
+		regulator-name = "usb0-vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&ttp_gpioex 2 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
 
 	/* USB PHY reset IO pin */
 	usb_phy0: usb2phy0 {
@@ -94,7 +102,7 @@
 		compatible = "nxp,pca9534";
 		reg = <0x27>;
 		vcc-supply = <&reg_3v3_miami>;
-		gpio-line-names = "SW_RST_N", "SOM_RST_N_MIAM", "GEN_IRQ", "VBAT_EN", "USB_OTG_EN", "USB_OTG_OC_N", "PEWAKE0", "N_PWR_KILL";
+		gpio-line-names = "USB_HOST_OC_N", "SOM_RST_N_MIAM", "USB_HOST_EN", "VBAT_EN", "USB_OTG_EN", "USB_OTG_OC_N", "PEWAKE0", "N_PWR_KILL";
 		gpio-controller;
 		#gpio-cells = <2>;
 	};
@@ -286,6 +294,7 @@
 	maximum-speed = "super-speed";
 	snps,usb3_lpm_capable;
 	usb-phy = <&usb_phy1>;
+	vbus-supply = <&reg_usb1_vbus>;
 	connector {
 		compatible = "usb-b-connector";
 		label = "USB3";
