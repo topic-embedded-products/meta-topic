@@ -218,7 +218,15 @@
 	};
 };
 
+/* Batch with 38.88 XTAL */
+&xtal50MHz {
+	clock-frequency = <38880000>;
+};
+
 &si5345 {
+	silabs,pll-m-num = <1400000>; /* PLL at 14.0 GHz */
+	silabs,pll-m-den = <   3888>;
+
 	out@0 {
 		always-on;
 	};
@@ -323,7 +331,7 @@
 	eth-clk-switch-ctrl {
 		gpio-hog;
 		gpios = <89 0>; /* EMIO 11 */
-		output-low;
+		output-high;
 		line-name = "eth_clk_switch_ctrl";
 	};
 };
@@ -340,4 +348,12 @@
 /* Carrier provides VBAT for RTC */
 &rtc {
 	status = "okay";
+};
+
+/* Clock mux changed polarity */
+&gpioex {
+	eth-clk-sw-ctrl {
+		/delete-property/ output-low;
+		output-high;
+	};
 };

@@ -352,9 +352,25 @@
 	status = "okay";
 };
 
+/* Batch with 38.88 XTAL */
+&xtal50MHz {
+	clock-frequency = <38880000>;
+};
+
 &si5345 {
+	silabs,pll-m-num = <1400000>; /* PLL at 14.0 GHz */
+	silabs,pll-m-den = <   3888>;
+
 	out@8 {
 		/delete-property/ always-on;
+	};
+};
+
+/* Clock mux changed polarity */
+&gpioex {
+	eth-clk-sw-ctrl {
+		/delete-property/ output-low;
+		output-high;
 	};
 };
 
