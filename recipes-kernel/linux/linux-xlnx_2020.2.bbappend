@@ -19,3 +19,6 @@ SRC_URI_append = "\
 	${TOPICBSPCONFIG} \
 	${@bb.utils.contains("MACHINE_FEATURES", "rtc", "file://zynqmp-rtc.cfg", "", d)} \
 	"
+
+# Make it compile with phosphor distro...
+KERNEL_FEATURES_remove = "phosphor-gpio-keys"
