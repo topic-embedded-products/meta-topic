@@ -19,6 +19,11 @@ BOARD_PL_REFERENCE ??= ""
 # just set BOARD_PL_REFERENCE="" in your my-image derived image recipe.
 IMAGE_INSTALL_MACHINE_EXTRAS = "packagegroup-machine-base ${BOARD_PL_REFERENCE}"
 
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "\
+	bootscript \
+	${BOARD_PL_REFERENCE} \
+"
+
 # XILINX tool locations (for in your site.conf) and input files
 # Override them in local.conf to suit your system
 # Use the "32" or "64" toolchain
@@ -71,7 +76,7 @@ PREFERRED_PROVIDER_virtual/kernel = "linux-xlnx"
 PREFERRED_PROVIDER_virtual/bootloader = "u-boot-xlnx"
 
 # Workaround for broken check on IMAGE_FEATURES in kernel recipe
-FPGA_MNGR_RECONFIG_ENABLE = "1"
+# FPGA_MNGR_RECONFIG_ENABLE = "1"
 
 EXTRA_IMAGEDEPENDS += " \
 		virtual/bootloader \
