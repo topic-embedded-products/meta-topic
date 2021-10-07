@@ -1,0 +1,42 @@
+From 5846192ac9ed670ec1807750e0abba0cfb03f233 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 31 Aug 2021 08:52:45 +0200
+Subject: [PATCH] clk: clk-gpio: Implement input-only mode
+
+clk-gpio normally only controls the output. This patch enables the driver to
+read the current state of the GPIO pin and use that as a default. The GPIO value
+can be preset by a bootloader or pull-up resistor for example.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/clk/clk-gpio.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/clk/clk-gpio.c b/drivers/clk/clk-gpio.c
+index 40af4fbab4d2..4bb0cf781c55 100644
+--- a/drivers/clk/clk-gpio.c
++++ b/drivers/clk/clk-gpio.c
+@@ -212,6 +212,7 @@ static int gpio_clk_driver_probe(struct platform_device *pdev)
+ 	struct gpio_desc *gpiod;
+ 	struct clk *clk;
+ 	bool is_mux;
++	bool is_input;
+ 	int ret;
+ 
+ 	num_parents = of_clk_get_parent_count(node);
+@@ -227,9 +228,11 @@ static int gpio_clk_driver_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	is_mux = of_device_is_compatible(node, "gpio-mux-clock");
++	is_input = of_property_read_bool(node, "input");
+ 
+ 	gpio_name = is_mux ? "select" : "enable";
+-	gpiod = devm_gpiod_get(&pdev->dev, gpio_name, GPIOD_OUT_LOW);
++	gpiod = devm_gpiod_get(&pdev->dev, gpio_name,
++			is_input ? GPIOD_IN: GPIOD_OUT_LOW);
+ 	if (IS_ERR(gpiod)) {
+ 		ret = PTR_ERR(gpiod);
+ 		if (ret == -EPROBE_DEFER)
+-- 
+2.17.1
+

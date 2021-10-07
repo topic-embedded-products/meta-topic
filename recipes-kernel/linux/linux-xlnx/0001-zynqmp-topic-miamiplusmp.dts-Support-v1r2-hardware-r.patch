@@ -1,0 +1,71 @@
+From 365a773ad59974c077fb9c540a973b6c45568adc Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 7 Oct 2021 07:42:59 +0200
+Subject: [PATCH] zynqmp-topic-miamiplusmp.dts: Support v1r2 hardware revision
+
+Use a GPIO pin to determine the input clock frequency for the Si5345 clock chip,
+to support both 50MHz and 38.88MHz versions of the module. Remove the PLL configuration
+to make the driver default to a 14GHz TCO frequency.
+
+On the v1r2 revision of the module, the eth_clk_sw_ctrl polarity has been reversed,
+so the signal must be high to route the 25MHz clock to the ethernet PHY.
+The signal has a pull-up on the v1r2 boards and an internal pull-down on the v1r1,
+so the hardware default is okay and the forced "low" signal no longer applies.
+If this prevents ethernet from working on a v1r1, probably the pull-up resistor is
+still present and must be removed.
+---
+ .../dts/xilinx/zynqmp-topic-miamiplusmp.dts   | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
+index 089a5ed3fbf3..ee8f50cffd7e 100644
+--- a/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
++++ b/arch/arm64/boot/dts/xilinx/zynqmp-topic-miamiplusmp.dts
+@@ -90,6 +90,18 @@
+ 		#clock-cells = <0x0>;
+ 		clock-frequency = <50000000>;
+ 	};
++	xtal38MHz: xtal_38_clock {
++		compatible = "fixed-clock";
++		#clock-cells = <0x0>;
++		clock-frequency = <38880000>;
++	};
++	xtalmux: xtal_mux {
++		compatible = "gpio-mux-clock";
++		clocks = <&xtal38MHz>, <&xtal50MHz>;
++		#clock-cells = <0>;
++		select-gpios = <&gpioex 7 GPIO_ACTIVE_HIGH>;
++		input;
++	};
+ 
+ 	/* Make temperature readouts show up in hwmon applications */
+ 	iio-hwmon-ams-temp {
+@@ -126,7 +138,7 @@
+ 		eth-clk-sw-ctrl {
+ 			gpio-hog;
+ 			gpios = <5 0>;
+-			output-low;
++			input; /* Hardware pull-up or pull-down sets default */
+ 			line-name = "eth_clk_sw_ctrl";
+ 		};
+ 	};
+@@ -150,15 +162,12 @@
+ 		#clock-cells = <2>;
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+-		clocks = <&xtal50MHz>;
++		clocks = <&xtalmux>;
+ 		clock-names = "xtal";
+ 		/* Interrupt connected to MIO26 (not actually used) */
+ 		interrupt-parent = <&gpio>;
+ 		interrupts = <26 IRQ_TYPE_LEVEL_LOW>;
+ 
+-		silabs,pll-m-num = <280>; /* PLL at 280x50M = 14.0 GHz */
+-		silabs,pll-m-den = <1>;
+-
+ 		/*
+ 		 * Clock tree for the ttpzu9 and tdpzu9, with one PLL running at
+ 		 * 1000MHz we can create 25, 100, 125 and 250 using even
+-- 
+2.17.1
+

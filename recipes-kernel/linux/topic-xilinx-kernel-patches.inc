@@ -66,6 +66,8 @@ SRC_URI_append = "\
 	file://0001-zynqmp-topic-miamiplusmp-Move-ethernet-PHY-reset-to-.patch \
 	file://0001-devicetree-topic-miamilite.dtsi-Correct-QSPI-NOR-siz.patch \
 	file://0001-devicetree-topic-miamiplus-Adjust-QSPI-flash-size-to.patch \
+	file://0001-clk-clk-gpio-Implement-input-only-mode.patch \
+	file://0001-zynqmp-topic-miamiplusmp.dts-Support-v1r2-hardware-r.patch \
 	"
 
 # Compile overlay-capable devicetrees
