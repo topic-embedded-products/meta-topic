@@ -988,7 +988,7 @@ index 000000000000..35f0e0f6e531
 +	status = "okay";
 +	dr_mode = "otg"; /* "host", "peripheral" or "otg" */
 +	maximum-speed = "high-speed"; /* super-speed not available on carrier */
-+	/* see: https://forums.xilinx.com/t5/Embedded-Linux/Zynqmp-USB2-0/td-p/790522/page/2 */
++	snps,transceiver_delay_quirk; /* USB3340 PHY needs extra delay */
 +	snps,dis_u2_susphy_quirk;
 +	snps,dis_u3_susphy_quirk;
 +	/delete-property/ phy-names;

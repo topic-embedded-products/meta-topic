@@ -51,6 +51,7 @@ SRC_URI_append = "\
 	file://0001-miamiplusmp-update-board-model-correct-qspi-size.patch \
 	file://0001-devicetree-miamimp-control-VBUS-power.patch \
 	file://0001-usb-dwc3-Add-support-for-VBUS-power-control.patch \
+	file://0001-usb-dwc3-core-add-transceiver-delay-for-required-UTM.patch \
 	file://0001-zynqmp-topic-miamiplusmp.dts-Support-hardware-revisi.patch \
 	file://0001-zynqmp-topic-miamiplusmp-configure-TSU-clock-and-fix.patch \
 	file://0001-zynqmp-topic-miamiplusmp.dts-Proper-PHY-reset-timing.patch \
