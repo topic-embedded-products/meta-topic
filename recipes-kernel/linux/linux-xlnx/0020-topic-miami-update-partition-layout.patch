@@ -34,7 +34,7 @@ index 4a50728a20fd..3661b5b9a68b 100644
  		partition@qspi-rootfs {
  			label = "qspi-rootfs";
 -			reg = <0x580000 0x1A80000>;
-+			reg = <0x100000 0x1F00000>;
++			reg = <0x100000 0>; /* MTDPART_SIZ_FULL */
  		};
  		/* Everything */
  		partition@qspi-all {

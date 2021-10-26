@@ -505,7 +505,7 @@ index 000000000000..4a50728a20fd
 +		/* Everything */
 +		partition@qspi-all {
 +			label = "qspi-all";
-+			reg = <0x0 0x2000000>;
++			reg = <0x0 0>; /* MTDPART_SIZ_FULL */
 +		};
 +	};
 +};
