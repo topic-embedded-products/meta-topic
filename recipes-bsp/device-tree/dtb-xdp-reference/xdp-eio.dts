@@ -122,50 +122,6 @@
 				xlnx,video-width = <8>;
 			};
 
-			hdmi_out_v_hdmi_tx_ss_0: v_hdmi_tx_ss@a0160000 {
-				compatible = "xlnx,v-hdmi-tx-ss-3.1";
-				reg = <0x0 0xa0160000 0x0 0x20000>;
-
-				clock-names = "s_axi_cpu_aclk", "s_axis_video_aclk", "txref-clk", "retimer-clk";
-				clocks = <&zynqmp_clk PL0_REF>, <&zynqmp_clk PL1_REF>, <&si5341 0 3>, <&hdmi_out_sn65dp159>;
-
-				tx-refclk-rdy-gpios = <&gpio 85 0>;
-				phy-names = "hdmi-phy0", "hdmi-phy1", "hdmi-phy2";
-				phys = <&vphy_lane0 0 1 1 1>, <&vphy_lane1 0 1 1 1>, <&vphy_lane2 0 1 1 1>;
-				interrupt-names = "hdmitx";
-				interrupt-parent = <&gic>;
-				interrupts = <0 109 4>;
-
-				xlnx,input-pixels-per-clock = <2>;
-				xlnx,max-bits-per-component = <8>;
-
-				ports {
-					#address-cells = <1>;
-					#size-cells = <0>;
-					encoder_hdmi_port: port@0 {
-						reg = <0>;
-						hdmi_encoder: endpoint {
-							remote-endpoint = <&dmaengine_crtc>;
-						};
-					};
-				};
-			};
-
-			v_drm_dmaengine_drv: drm-dmaengine-drv {
-				compatible = "xlnx,pl-disp";
-				dmas = <&hdmi_out_v_frmbuf_rd_0 0>;
-				dma-names = "dma0";
-				xlnx,vformat = "AR24";
-				#address-cells = <1>;
-				#size-cells = <0>;
-				dmaengine_port: port@0 {
-					reg = <0>;
-					dmaengine_crtc: endpoint {
-						remote-endpoint = <&hdmi_encoder>;
-					};
-				};
-			};
-
 			hdmi_out_vid_phy_controller_0: vid_phy_controller@a01a0000 {
 				compatible = "xlnx,vid-phy-controller-2.2", "xlnx,vid-phy-controller-2.1";
 				interrupt-names = "irq";
@@ -203,6 +159,51 @@
 				};
 				vphy_lane3: vphy_lane3 {
 					#phy-cells = <4>;
+				};
+			};
+
+			hdmi_out_v_hdmi_tx_ss_0: v_hdmi_tx_ss@a0160000 {
+				compatible = "xlnx,v-hdmi-tx-ss-3.1";
+				reg = <0x0 0xa0160000 0x0 0x20000>;
+
+				clock-names = "s_axi_cpu_aclk", "s_axis_video_aclk", "txref-clk", "retimer-clk";
+				clocks = <&zynqmp_clk PL0_REF>, <&zynqmp_clk PL1_REF>, <&si5341 0 3>, <&hdmi_out_sn65dp159>;
+
+				tx-refclk-rdy-gpios = <&gpio 85 0>;
+				phy-names = "hdmi-phy0", "hdmi-phy1", "hdmi-phy2";
+				phys = <&vphy_lane0 0 1 1 1>, <&vphy_lane1 0 1 1 1>, <&vphy_lane2 0 1 1 1>;
+				interrupt-names = "hdmitx";
+				interrupt-parent = <&gic>;
+				interrupts = <0 109 4>;
+
+				xlnx,input-pixels-per-clock = <2>;
+				xlnx,max-bits-per-component = <8>;
+				xlnx,vid-interface = <0>; /* AXI_STREAM */
+
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					encoder_hdmi_port: port@0 {
+						reg = <0>;
+						hdmi_encoder: endpoint {
+							remote-endpoint = <&dmaengine_crtc>;
+						};
+					};
+				};
+			};
+
+			v_drm_dmaengine_drv: drm-dmaengine-drv {
+				compatible = "xlnx,pl-disp";
+				dmas = <&hdmi_out_v_frmbuf_rd_0 0>;
+				dma-names = "dma0";
+				xlnx,vformat = "AR24";
+				#address-cells = <1>;
+				#size-cells = <0>;
+				dmaengine_port: port@0 {
+					reg = <0>;
+					dmaengine_crtc: endpoint {
+						remote-endpoint = <&hdmi_encoder>;
+					};
 				};
 			};
 		};

@@ -1,0 +1,192 @@
+From c5f7e788ac5f26dbfb9b04af05fb586860ed74aa Mon Sep 17 00:00:00 2001
+From: Bob Veringa <bob.veringa@topic.nl>
+Date: Sat, 15 May 2021 15:12:32 +0200
+Subject: [PATCH 6/7] Improve resolution control
+
+This commit improves the resolution control of the pipeline
+adjustment. If an invalid resolution is given the resolution is
+changed to a resolution that is supported.
+---
+ drivers/media/platform/xilinx/xilinx-dma.c | 102 +++++++++++++++------
+ 1 file changed, 74 insertions(+), 28 deletions(-)
+
+diff --git a/drivers/media/platform/xilinx/xilinx-dma.c b/drivers/media/platform/xilinx/xilinx-dma.c
+index c294c3951a57..f47cfd00565f 100644
+--- a/drivers/media/platform/xilinx/xilinx-dma.c
++++ b/drivers/media/platform/xilinx/xilinx-dma.c
+@@ -802,36 +802,19 @@ xvip_dma_get_format(struct file *file, void *fh, struct v4l2_format *format)
+ 	return 0;
+ }
+ 
+-/**
+- * @brief Adjust the pipeline resolution
+- *
+- * @param dma DMA channel used
+- * @param format The V4L2 format to adjust the pipeline with
+- * @param try Trying a pipeline
+- * @return int 0 on succes
+- */
+ static int
+ __adjust_pipeline_resolution(struct xvip_dma *dma,
+-		      struct v4l2_format *format,
+-			  bool try)
++			     u32 *new_width,
++			     u32 *new_height,
++			     bool try)
+ {
+ 	struct xvip_pipeline *pipe;
+ 	struct media_graph graph;
+ 	struct media_entity *entity = &dma->video.entity;
+ 	struct media_device *mdev = entity->graph_obj.mdev;
+-	__u32 new_width, new_height;
+ 	int ret;
+ 	int i;
+ 
+-	/* Set the new hgith depending on the V4L2 TYPE */
+-	if (V4L2_TYPE_IS_MULTIPLANAR(dma->format.type)) {
+-		new_width = format->fmt.pix_mp.width;
+-		new_height = format->fmt.pix_mp.height;
+-	} else {
+-		new_width = format->fmt.pix.width;
+-		new_height = format->fmt.pix.height;
+-	}
+-
+ 	pipe = dma->video.entity.pipe
+ 		 ? to_xvip_pipeline(&dma->video.entity) : &dma->pipe;
+ 
+@@ -860,8 +843,8 @@ __adjust_pipeline_resolution(struct xvip_dma *dma,
+ 		/* If the entity is not a subdev it cannot be adjusted */
+ 		if (!is_media_entity_v4l2_subdev(entity)) {
+ 			dev_dbg(dma->xdev->dev,
+-						"%s: Entity '%s' is not a subdev",
+-						__func__, entity->name);
++				"%s: Entity '%s' is not a subdev",
++				__func__, entity->name);
+ 			/* The entity was not a subdev but the pipeline
+ 			 * can still be valid continuing
+ 			 * with the adjustement.
+@@ -873,6 +856,18 @@ __adjust_pipeline_resolution(struct xvip_dma *dma,
+ 		subdev = media_entity_to_v4l2_subdev(entity);
+ 
+ 		for (i = 0; i < entity->num_pads; i++) {
++			/* Configure subdev pad config */
++			ret = v4l2_subdev_call(subdev, pad, init_cfg, cfg);
++
++			/* Do not fail if the ioctl didn't exist */
++			if (ret < 0 && ret != -ENOIOCTLCMD) {
++				dev_dbg(dma->xdev->dev,
++					"%s: init_cfg! '%s' ret = %d",
++					__func__, subdev->name, ret);
++				ret = -EINVAL;
++				goto unlock;
++			}
++
+ 			sdfmt.pad = i;
+ 
+ 			/*
+@@ -899,8 +894,8 @@ __adjust_pipeline_resolution(struct xvip_dma *dma,
+ 			sdfmt.pad = i;
+ 
+ 			/* Changing resolution of format */
+-			sdfmt.format.width = new_width;
+-			sdfmt.format.height = new_height;
++			sdfmt.format.width = *new_width;
++			sdfmt.format.height = *new_height;
+ 			sdfmt.which = try
+ 			   ? V4L2_SUBDEV_FORMAT_TRY : V4L2_SUBDEV_FORMAT_ACTIVE;
+ 
+@@ -954,15 +949,17 @@ __adjust_pipeline_resolution(struct xvip_dma *dma,
+ 					sdfmt.format.height);
+ 
+ 			/* Check if the configuration was applied correctly */
+-			if (sdfmt.format.width != new_width ||
+-				sdfmt.format.height != new_height) {
++			if (sdfmt.format.width != *new_width ||
++				sdfmt.format.height != *new_height) {
+ 				/* If it does not match, the set resolution
+ 				 *  was invalid and a change is required
+ 				 */
+ 				dev_dbg(dma->xdev->dev,
+ 					"%s: Pad resolution did not match!",
+ 						__func__);
+-				ret = -EINVAL;
++				*new_width = sdfmt.format.width;
++				*new_height = sdfmt.format.height;
++				ret = 1;
+ 				goto unlock;
+ 			}
+ 		}
+@@ -979,6 +976,34 @@ __adjust_pipeline_resolution(struct xvip_dma *dma,
+ 	return ret;
+ }
+ 
++static int
++__adjust_pipeline_resolution_closest(struct xvip_dma *dma,
++				     u32 *new_width,
++				     u32 *new_height,
++				     bool try,
++				     int max_attempts)
++{
++	int ret = -EINVAL;
++	size_t i;
++
++	for (i = 0; i < max_attempts; i++) {
++		ret = __adjust_pipeline_resolution(dma,
++						   new_width,
++						   new_height,
++						   try);
++		if (ret == 0)
++			break;
++		dev_dbg(dma->xdev->dev,
++			"%s: Subdev suggested %ux%u",
++			__func__,
++			*new_width,
++			*new_height);
++
++	}
++
++	return ret;
++}
++
+ static int
+ __xvip_dma_try_format(struct xvip_dma *dma,
+ 		      struct v4l2_format *format,
+@@ -999,13 +1024,34 @@ __xvip_dma_try_format(struct xvip_dma *dma,
+ 	struct v4l2_subdev *subdev;
+ 	int ret;
+ 	bool trying;
++	u32 new_width, new_height;
++
++
+ 
+ 	trying = fmtinfo == NULL;
+ 
+-	ret = __adjust_pipeline_resolution(dma, format, trying);
++	/* Set the new hgith depending on the V4L2 TYPE */
++	if (V4L2_TYPE_IS_MULTIPLANAR(dma->format.type)) {
++		new_width = format->fmt.pix_mp.width;
++		new_height = format->fmt.pix_mp.height;
++	} else {
++		new_width = format->fmt.pix.width;
++		new_height = format->fmt.pix.height;
++	}
++
++	ret = __adjust_pipeline_resolution_closest(dma, &new_width, &new_height, trying, 4);
+ 	if (ret < 0)
+ 		return ret;
+ 
++	/* Set the new hgith depending on the V4L2 TYPE */
++	if (V4L2_TYPE_IS_MULTIPLANAR(dma->format.type)) {
++		format->fmt.pix_mp.width = new_width;
++		format->fmt.pix_mp.height = new_height;
++	} else {
++		format->fmt.pix.width = new_width;
++		format->fmt.pix.height = new_height;
++	}
++
+ 	subdev = xvip_dma_remote_subdev(&dma->pad, &fmt.pad);
+ 	if (!subdev)
+ 		return -EINVAL;
+-- 
+2.17.1
+

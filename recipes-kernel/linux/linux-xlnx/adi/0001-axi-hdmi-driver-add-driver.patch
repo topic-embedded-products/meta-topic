@@ -1,7 +1,7 @@
-From dd1ed3ce95f58a7b84b0b4daba5da385ae3662b2 Mon Sep 17 00:00:00 2001
+From 1058f11e4e39f3cd392c9010b290a7faa26643c9 Mon Sep 17 00:00:00 2001
 From: Lars-Peter Clausen <lars@metafoo.de>
 Date: Mon, 11 Feb 2013 18:43:56 +0100
-Subject: [PATCH 01/12] axi-hdmi-driver: add driver
+Subject: [PATCH 1/8] axi-hdmi-driver: add driver
 
 Signed-off-by: Lars-Peter Clausen <lars@metafoo.de>
 ---
@@ -22,10 +22,10 @@ Signed-off-by: Lars-Peter Clausen <lars@metafoo.de>
  create mode 100644 drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
 
 diff --git a/drivers/gpu/drm/Kconfig b/drivers/gpu/drm/Kconfig
-index f916fe70415f..a5cd4429ef7b 100644
+index 147d61b9674e..147deefc7c2e 100644
 --- a/drivers/gpu/drm/Kconfig
 +++ b/drivers/gpu/drm/Kconfig
-@@ -245,6 +245,8 @@ source "drivers/gpu/drm/nouveau/Kconfig"
+@@ -275,6 +275,8 @@ source "drivers/gpu/drm/nouveau/Kconfig"
  
  source "drivers/gpu/drm/i915/Kconfig"
  
@@ -35,10 +35,10 @@ index f916fe70415f..a5cd4429ef7b 100644
  	tristate "Virtual GEM provider"
  	depends on DRM
 diff --git a/drivers/gpu/drm/Makefile b/drivers/gpu/drm/Makefile
-index cf24122becc5..3c0a93bd40b0 100644
+index 81569009f884..655bbb11fa77 100644
 --- a/drivers/gpu/drm/Makefile
 +++ b/drivers/gpu/drm/Makefile
-@@ -88,6 +88,7 @@ obj-$(CONFIG_DRM_ARMADA) += armada/
+@@ -90,6 +90,7 @@ obj-$(CONFIG_DRM_ARMADA) += armada/
  obj-$(CONFIG_DRM_ATMEL_HLCDC)	+= atmel-hlcdc/
  obj-y			+= rcar-du/
  obj-$(CONFIG_DRM_SHMOBILE) +=shmobile/

@@ -1,0 +1,28 @@
+From 8acdddda70ec0fc906b259a0b775727e6de6b90b Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 6 Jul 2021 09:17:53 +0200
+Subject: [PATCH 5/7] drm: axi_hdmi_encoder.c: Fix adv7511.h include path
+
+adv7511.h is now at ../bridge/adv7511/adv7511.h
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
+index e6a3bc565d6c..d12bc017c07b 100644
+--- a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
++++ b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
+@@ -25,7 +25,7 @@
+ 
+ #include "axi_hdmi_drv.h"
+ 
+-#include "../i2c/adv7511.h"
++#include "../bridge/adv7511/adv7511.h"
+ 
+ #define AXI_HDMI_STATUS_VMDA_UNDERFLOW	BIT(4)
+ #define AXI_HDMI_STATUS_VMDA_OVERFLOW	BIT(3)
+-- 
+2.17.1
+

@@ -1,0 +1,60 @@
+From c01816fee94363109bfeb7be7fb56a20897425d7 Mon Sep 17 00:00:00 2001
+From: Alexandru Ardelean <alexandru.ardelean@analog.com>
+Date: Wed, 11 Mar 2020 14:24:35 +0200
+Subject: [PATCH 8/8] drm: adv7511: do 4 regmap_bulk_read() calls for EDID
+
+Previously, 4 x i2c_transfer() calls used to be done, to read the EDID.
+This does the same thing using regmap_bulk_read().
+
+The i2c-cadence driver can only do 252 bytes, and some i2c controllers can
+do 64-byte transfer-sizes.
+
+The issue that is visible [without this change] is that the resolution
+[read-back from the monitor] is reduced to a minimal [640x480].
+
+I tried to see whether we can extend that 252-byte-transfer limit, but that
+is a bit too difficult, because it requires too many i2c framework changes
+that wouldn't make sense.
+The i2c controller is configured to issue an i2c transfer, then an
+interrupt shoots to notify that it completed.
+
+Fixes 6a8388035cff0b: ("drm: bridge: adv7511: Implement regmap for EDID memory map")
+Signed-off-by: Alexandru Ardelean <alexandru.ardelean@analog.com>
+(cherry picked from commit a5f6da0f6c348ed564084a830f121a5011a679ea)
+---
+ drivers/gpu/drm/bridge/adv7511/adv7511_drv.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/gpu/drm/bridge/adv7511/adv7511_drv.c b/drivers/gpu/drm/bridge/adv7511/adv7511_drv.c
+index 8bf927c5f37e..2f423f5086b9 100644
+--- a/drivers/gpu/drm/bridge/adv7511/adv7511_drv.c
++++ b/drivers/gpu/drm/bridge/adv7511/adv7511_drv.c
+@@ -527,7 +527,7 @@ static int adv7511_get_edid_block(void *data, u8 *buf, unsigned int block,
+ 				  size_t len)
+ {
+ 	struct adv7511 *adv7511 = data;
+-	int ret;
++	int ret, off;
+ 
+ 	if (len > 128)
+ 		return -EINVAL;
+@@ -549,10 +549,12 @@ static int adv7511_get_edid_block(void *data, u8 *buf, unsigned int block,
+ 				return ret;
+ 		}
+ 
+-		ret = regmap_bulk_read(adv7511->regmap_edid, 0,
+-				       adv7511->edid_buf, 256);
+-		if (ret < 0)
+-			return ret;
++		for (off = 0; off < 256; off+= 64) {
++			ret = regmap_bulk_read(adv7511->regmap_edid, off,
++					       &adv7511->edid_buf[off], 64);
++			if (ret < 0)
++				return ret;
++		}
+ 
+ 		adv7511->current_edid_segment = block / 2;
+ 	}
+-- 
+2.17.1
+

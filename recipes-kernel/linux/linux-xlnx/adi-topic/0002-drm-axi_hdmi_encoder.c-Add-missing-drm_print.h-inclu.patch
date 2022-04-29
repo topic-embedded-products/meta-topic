@@ -1,7 +1,7 @@
-From b70ea1e6f6be601e176aec20bbaa3e5901152403 Mon Sep 17 00:00:00 2001
+From 7cb820a36f42c50f5ea586eece4c2077dc9dc94c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 12 Aug 2020 15:31:54 +0200
-Subject: [PATCH 2/4] drm: axi_hdmi_encoder.c: Add missing drm_print.h include
+Subject: [PATCH 2/7] drm: axi_hdmi_encoder.c: Add missing drm_print.h include
 
 Missing drm_print.h include causes build failure
 

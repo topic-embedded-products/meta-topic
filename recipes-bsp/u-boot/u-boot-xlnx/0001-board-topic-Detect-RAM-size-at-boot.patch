@@ -1,7 +1,7 @@
-From a00b0a3d169c0c3b0f480d31989aaa67f6e1dcbc Mon Sep 17 00:00:00 2001
+From 22f1e4a5a580533f133908456bb54bf98f2ffc97 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 17 Nov 2016 15:20:32 +0100
-Subject: [PATCH 01/34] board: topic: Detect RAM size at boot
+Subject: [PATCH 01/35] board: topic: Detect RAM size at boot
 
 Miami boards can have memory sizes of 256M, 512M or 1GB. To prevent requiring
 separate bootloaders for each variant, just detect the RAM size at boot time
@@ -9,14 +9,14 @@ instead of relying on the devicetree information.
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 ---
- board/topic/zynq/board.c | 41 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ board/topic/zynq/board.c | 42 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
 diff --git a/board/topic/zynq/board.c b/board/topic/zynq/board.c
-index a95c9d1eff..ece7dbec16 100644
+index a95c9d1eff..b0cea21beb 100644
 --- a/board/topic/zynq/board.c
 +++ b/board/topic/zynq/board.c
-@@ -1 +1,42 @@
+@@ -1 +1,43 @@
 +/*
 + * (C) Copyright 2016 Topic Embedded Products
 + *
@@ -38,9 +38,10 @@ index a95c9d1eff..ece7dbec16 100644
 +
 +#include <fdt_support.h>
 +
-+int ft_board_setup(void *blob, bd_t *bd)
++int ft_board_setup(void *blob, struct bd_info *bd)
 +{
-+	fdt_fixup_memory(blob, (u64)CONFIG_SYS_SDRAM_BASE, (u64)gd->ram_size);
++	fdt_fixup_memory(blob,
++		(u64)CONFIG_SYS_SDRAM_BASE, (u64)bd->bi_dram[0].size);
 +
 +	return 0;
 +}

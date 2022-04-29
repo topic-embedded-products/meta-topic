@@ -1,7 +1,7 @@
-From 55a71688f3587d5627212a6d3b6fb84a70330b0e Mon Sep 17 00:00:00 2001
+From 90c416aca617e4d190cc36754be1a04c33262171 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 14 Jun 2018 12:58:38 +0200
-Subject: [PATCH 05/12] Add ltc3562 voltage regulator driver
+Subject: [PATCH 5/8] Add ltc3562 voltage regulator driver
 
 The ltc3562 is an I2C controlled regulator supporting 4 independent
 outputs.
@@ -80,10 +80,10 @@ index 000000000000..d73c865d79a3
 +		};
 +	};
 diff --git a/drivers/regulator/Kconfig b/drivers/regulator/Kconfig
-index 3ee63531f6d5..e0718c82f026 100644
+index 453b5e1826d9..3abf824f2e0c 100644
 --- a/drivers/regulator/Kconfig
 +++ b/drivers/regulator/Kconfig
-@@ -431,6 +431,13 @@ config REGULATOR_LP8788
+@@ -492,6 +492,13 @@ config REGULATOR_LP8788
  	help
  	  This driver supports LP8788 voltage regulator chip.
  
@@ -98,10 +98,10 @@ index 3ee63531f6d5..e0718c82f026 100644
  	tristate "LTC3589 8-output voltage regulator"
  	depends on I2C
 diff --git a/drivers/regulator/Makefile b/drivers/regulator/Makefile
-index 2210ba56f9bd..d889e461bf4a 100644
+index 6096862a1d60..b6204d02e55d 100644
 --- a/drivers/regulator/Makefile
 +++ b/drivers/regulator/Makefile
-@@ -56,6 +56,7 @@ obj-$(CONFIG_REGULATOR_LP87565) += lp87565-regulator.o
+@@ -61,6 +61,7 @@ obj-$(CONFIG_REGULATOR_LP87565) += lp87565-regulator.o
  obj-$(CONFIG_REGULATOR_LP8788) += lp8788-buck.o
  obj-$(CONFIG_REGULATOR_LP8788) += lp8788-ldo.o
  obj-$(CONFIG_REGULATOR_LP8755) += lp8755.o

@@ -1,0 +1,49 @@
+From acfd5545cd61c131a25a5a219217d6f309620d10 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 16 Dec 2019 16:25:02 +0100
+Subject: [PATCH 09/35] mach-zynqmp/spl.c: Implement more SPL boot fallbacks
+
+Try harder to boot. If QSPI won't provide a proper u-boot, pass on to
+MMC2 (the SD card) and MMC1 (eMMC device) in that order. Increases the
+chances of actually booting considerably.
+Also allows for a cheap SD/eMMC boot: Program only the SPL into QSPI
+flash and it will boot from SD card if one is provided, and from eMMC
+otherwise.
+---
+ arch/arm/mach-zynqmp/spl.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/mach-zynqmp/spl.c b/arch/arm/mach-zynqmp/spl.c
+index 861b713084..4c5f799d00 100644
+--- a/arch/arm/mach-zynqmp/spl.c
++++ b/arch/arm/mach-zynqmp/spl.c
+@@ -56,12 +56,22 @@ void board_boot_order(u32 *spl_boot_list)
+ {
+ 	spl_boot_list[0] = spl_boot_device();
+ 
+-	if (spl_boot_list[0] == BOOT_DEVICE_MMC1)
++	switch (spl_boot_list[0]) {
++	case BOOT_DEVICE_SPI:
+ 		spl_boot_list[1] = BOOT_DEVICE_MMC2;
+-	if (spl_boot_list[0] == BOOT_DEVICE_MMC2)
+-		spl_boot_list[1] = BOOT_DEVICE_MMC1;
++		spl_boot_list[2] = BOOT_DEVICE_MMC1;
++		break;
++	case BOOT_DEVICE_MMC1:
++		spl_boot_list[1] = BOOT_DEVICE_MMC2;
++		spl_boot_list[2] = BOOT_DEVICE_SPI;
++		break;
++	case BOOT_DEVICE_MMC2:
++		spl_boot_list[1] = BOOT_DEVICE_SPI;
++		spl_boot_list[2] = BOOT_DEVICE_MMC1;
++		break;
++	}
+ 
+-	spl_boot_list[2] = BOOT_DEVICE_RAM;
++	spl_boot_list[3] = BOOT_DEVICE_RAM;
+ }
+ 
+ u32 spl_boot_device(void)
+-- 
+2.17.1
+

@@ -111,6 +111,9 @@
 					port@2 {
 						reg = <2>;
 						/* Audio link */
+						adv7511_audio_endpoint: endpoint {
+							remote-endpoint = <&spdif_endpoint>;
+						};
 					};
 				};
 			};
@@ -199,6 +202,12 @@
 				clocks = <&clkc 15>, <&clockgen 1>, <&clockgen 1>;
 				clock-names = "axi", "ref", "spdif";
 				#sound-dai-cells = <0>;
+				port {
+					/* Audio link */
+					spdif_endpoint: endpoint {
+						remote-endpoint = <&adv7511_audio_endpoint>;
+					};
+				};
 			};
 
 			axi_dmac: dmac@43c00000 {
@@ -243,46 +252,6 @@
 				};
 			};
 
-			axi_vdma_1: axivdma@43010000 {
-				compatible = "xlnx,axi-vdma-1.00.a";
-				#address-cells = <1>;
-				#size-cells = <1>;
-				#dma-cells = <1>;
-				#dma-channels = <1>;
-				reg = <0x43010000 0x1000>;
-				dma-ranges = <0x00000000 0x00000000 0x40000000>;
-				xlnx,num-fstores = <3>;
-				xlnx,flush-fsync = <1>;
-				xlnx,addrwidth = <32>;
-				clocks = <&clkc 15>; /* FCLK0 */
-				clock-names = "s_axi_lite_aclk";
-				dma-channel@43000000 {
-					compatible = "xlnx,axi-vdma-mm2s-channel";
-					interrupts = <0 55 0x4>;
-					xlnx,datawidth = <64>;
-					xlnx,genlock-mode = <0x0>;
-					xlnx,include-dre = <0x0>;
-				};
-			};
-
-			axi_vdma_vga: axi_vdma_vga@7e000000 {
-				compatible = "topic,vdma-fb";
-				reg = <0x7e000000 0x10000>;
-				dmas = <&axi_vdma_1 0>;
-				dma-names = "video";
-				num-fstores = <3>;
-				width = <1024>;
-				height = <600>;
-				horizontal-sync = <136>;
-				horizontal-front-porch = <24>;
-				horizontal-back-porch = <160>;
-				horizontal-polarity = <0>;
-				vertical-sync = <8>;
-				vertical-front-porch = <4>;
-				vertical-back-porch = <23>;
-				vertical-polarity = <0>;
-			};
-
 			dyplo: dyplo@64400000 {
 				compatible = "topic,dyplo-1.00.a";
 				reg = <0x64400000 0x200000>;
@@ -301,7 +270,7 @@
 		__overlay__ {
 			status = "okay";
 			phy-handle = <&phy3>;
-			phy-mode = "gmii";
+			phy-mode = "rgmii";
 
 			mdio {
 				#address-cells = <1>;

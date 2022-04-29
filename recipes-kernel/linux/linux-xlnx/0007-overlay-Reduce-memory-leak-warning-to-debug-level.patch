@@ -1,0 +1,30 @@
+From 6de8848a821f5e016093e4455a48ef5bafa02531 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Wed, 14 Apr 2021 11:55:17 +0200
+Subject: [PATCH 7/8] overlay: Reduce memory leak warning to debug level
+
+The kernel spams messages like:
+  OF: overlay: WARNING: memory leak will occur if overlay removed, property: /fpga-full/firmware-name
+This issue was present in previous kernels but was never reported
+explicitly. There's nothing "we" can do about it at the moment, so
+reduce the log level and keep the spam out of the error level logs.
+---
+ drivers/of/overlay.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/of/overlay.c b/drivers/of/overlay.c
+index 50bbe0edf538..db7e348fba18 100644
+--- a/drivers/of/overlay.c
++++ b/drivers/of/overlay.c
+@@ -362,7 +362,7 @@ static int add_changeset_property(struct overlay_changeset *ovcs,
+ 	}
+ 
+ 	if (!of_node_check_flag(target->np, OF_OVERLAY))
+-		pr_err("WARNING: memory leak will occur if overlay removed, property: %pOF/%s\n",
++		pr_debug("WARNING: memory leak will occur if overlay removed, property: %pOF/%s\n",
+ 		       target->np, new_prop->name);
+ 
+ 	if (ret) {
+-- 
+2.17.1
+

@@ -1,0 +1,31 @@
+From 9f10756663add8214675757581a121d661a19ae7 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 6 Jul 2021 09:38:35 +0200
+Subject: [PATCH 6/7] drm: axi_hdmi_drv.c: Replace drmP.h
+
+drmP.h is obsolete, remove it and replace with other includes.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c
+index b0090ce8f587..cb128de779d5 100644
+--- a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c
++++ b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c
+@@ -17,8 +17,10 @@
+ #include <linux/of_graph.h>
+ #include <linux/clk.h>
+ 
+-#include <drm/drmP.h>
+ #include <drm/drm.h>
++#include <drm/drm_file.h>
++#include <drm/drm_drv.h>
++#include <drm/drm_device.h>
+ #include <drm/drm_atomic_helper.h>
+ #include <drm/drm_crtc_helper.h>
+ #include <drm/drm_fb_helper.h>
+-- 
+2.17.1
+

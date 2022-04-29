@@ -67,8 +67,10 @@
 	disable-wp; /* We don't have a write-protect detection */
 };
 
-&serdes {
+&psgtr {
 	status = "okay";
+	clock-names = "ref0", "ref1", "ref2", "ref3";
+	/* TODO: clocks = ... */
 };
 
 &uart1 {
@@ -127,8 +129,7 @@
 	status = "okay";
 	dr_mode = "host"; /* "host", "peripheral" or "otg" */
 	maximum-speed = "high-speed"; /* super-speed not available on carrier */
-	vbus-supply = <&reg_usb0_vbus>; /* This apparently no longer works */
-	usb-phy = <&usb_phy0>;
+	vbus-supply = <&reg_usb0_vbus>;
 };
 
 &pinctrl0 {

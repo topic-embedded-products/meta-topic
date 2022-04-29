@@ -1,0 +1,42 @@
+From acaf9df0e6c948217ff2a50b35717dac2c17ad20 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Wed, 20 Nov 2019 14:56:47 +0100
+Subject: [PATCH 8/8] gpio-poweroff: Implement force-pm-power-off flag
+
+Implement a devicetree property to forcibly set the pm_power_off variable.
+
+Some drivers, most noticably PCSI, implement a pm_power_off call even though it
+cannot possibly work, and they do so unconditionally. To provide a means of
+overriding the power-off behavior of a system, allow this driver to replace
+the pm_power_off call, also unconditionally.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/power/reset/gpio-poweroff.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/power/reset/gpio-poweroff.c b/drivers/power/reset/gpio-poweroff.c
+index c5067eb75370..d683c942554d 100644
+--- a/drivers/power/reset/gpio-poweroff.c
++++ b/drivers/power/reset/gpio-poweroff.c
+@@ -53,10 +53,13 @@ static int gpio_poweroff_probe(struct platform_device *pdev)
+ 
+ 	/* If a pm_power_off function has already been added, leave it alone */
+ 	if (pm_power_off != NULL) {
+-		dev_err(&pdev->dev,
+-			"%s: pm_power_off function already registered\n",
+-		       __func__);
+-		return -EBUSY;
++		if (!device_property_read_bool(&pdev->dev,
++					       "force-pm-power-off")) {
++			dev_err(&pdev->dev,
++				"%s: pm_power_off function already registered\n",
++			       __func__);
++			return -EBUSY;
++		}
+ 	}
+ 
+ 	input = device_property_read_bool(&pdev->dev, "input");
+-- 
+2.17.1
+

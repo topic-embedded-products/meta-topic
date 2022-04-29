@@ -1,7 +1,7 @@
-From cbf03a075b45b3e4b2f8416efcbb6098306160d4 Mon Sep 17 00:00:00 2001
+From 46f6eb10e6cdaa2ecbd442210f9a4792af5b7c72 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 16 Oct 2017 10:18:31 +0200
-Subject: [PATCH 1/4] drm: axi_hdmi_crtc.c: Skip DMA_INTERLEAVE check
+Subject: [PATCH 1/7] drm: axi_hdmi_crtc.c: Skip DMA_INTERLEAVE check
 
 The mainline and xilinx versions of the xilinx_dma driver do not report
 the DMA_INTERLEAVE capability, but are compatible with this driver.

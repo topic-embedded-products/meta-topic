@@ -1,0 +1,504 @@
+From b8a5b0749954c897a5ad3ccbf81a917d51eea013 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 26 Jun 2020 13:41:10 +0200
+Subject: [PATCH 21/35] zynqmp-topic-miamimp/psu_init_gpl: New DDR chips
+
+New chips are single rank, old were dual-rank, but same capacity.
+
+To detect at runtime which type is installed, initialize as single
+rank first. On dual-rank chips, this causes the addressing to wrap
+around at 1GB. Test if that happens, and if so, re-initialize the
+RAM on these devices in dual-rank mode.
+---
+ .../zynqmp-topic-miamimp/psu_init_gpl.c       | 163 +++++++++---------
+ .../zynqmp-topic-miamimp/psu_init_gpl.h       |  24 +++
+ 2 files changed, 106 insertions(+), 81 deletions(-)
+
+diff --git a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
+index 53f1aad798..94e26f8667 100644
+--- a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
++++ b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
+@@ -1772,7 +1772,7 @@ unsigned long psu_clock_init_data(void)
+ 
+ 	return 1;
+ }
+-unsigned long psu_ddr_init_data(void)
++unsigned long psu_ddr_init_data(int is_dual_rank)
+ {
+     /*
+     * DDR INITIALIZATION
+@@ -1809,7 +1809,7 @@ unsigned long psu_ddr_init_data(void)
+     * ing combinations are legal: - 01 - One rank - 11 - Two ranks - Others -
+     * Reserved. For 4 ranks following combinations are legal: - 0001 - One ran
+     * k - 0011 - Two ranks - 1111 - Four ranks
+-    *  PSU_DDRC_MSTR_ACTIVE_RANKS                                  0x3
++    *  PSU_DDRC_MSTR_ACTIVE_RANKS                                  0x1
+ 
+     * SDRAM burst length used: - 0001 - Burst length of 2 (only supported for
+     * mDDR) - 0010 - Burst length of 4 - 0100 - Burst length of 8 - 1000 - Bur
+@@ -1882,9 +1882,10 @@ unsigned long psu_ddr_init_data(void)
+     *  PSU_DDRC_MSTR_DDR3                                          0x0
+ 
+     * Master Register
+-    * (OFFSET, MASK, VALUE)      (0XFD070000, 0xE30FBE3DU ,0xC3081020U)
++    * (OFFSET, MASK, VALUE)      (0XFD070000, 0xE30FBE3DU ,0xC1081020U)
+     */
+-	PSU_Mask_Write(DDRC_MSTR_OFFSET, 0xE30FBE3DU, 0xC3081020U);
++	PSU_Mask_Write(DDRC_MSTR_OFFSET, 0xE30FBE3DU, is_dual_rank ? 0xC3081020U : 0xC1081020U);
++
+ /*##################################################################### */
+ 
+     /*
+@@ -2234,12 +2235,12 @@ unsigned long psu_ddr_init_data(void)
+     * d the device density. The user should program the appropriate value from
+     *  the spec based on the 'refresh_mode' and the device density that is use
+     * d. Unit: Clocks.
+-    *  PSU_DDRC_RFSHTMG_T_RFC_MIN                                  0x61
++    *  PSU_DDRC_RFSHTMG_T_RFC_MIN                                  0x96
+ 
+     * Refresh Timing Register
+-    * (OFFSET, MASK, VALUE)      (0XFD070064, 0x0FFF83FFU ,0x00418061U)
++    * (OFFSET, MASK, VALUE)      (0XFD070064, 0x0FFF83FFU ,0x00418096U)
+     */
+-	PSU_Mask_Write(DDRC_RFSHTMG_OFFSET, 0x0FFF83FFU, 0x00418061U);
++	PSU_Mask_Write(DDRC_RFSHTMG_OFFSET, 0x0FFF83FFU, is_dual_rank ? 0x00418061U : 0x00418096U);
+ /*##################################################################### */
+ 
+     /*
+@@ -2840,12 +2841,12 @@ unsigned long psu_ddr_init_data(void)
+     * PDDR3/LPDDR4 operation. For configurations with MEMC_FREQ_RATIO=2, divid
+     * e the value calculated using the above equation by 2, and round it up to
+     *  next integer.
+-    *  PSU_DDRC_DRAMTMG2_WR2RD                                     0x13
++    *  PSU_DDRC_DRAMTMG2_WR2RD                                     0x10
+ 
+     * SDRAM Timing Register 2
+-    * (OFFSET, MASK, VALUE)      (0XFD070108, 0x3F3F3F3FU ,0x060C1A13U)
++    * (OFFSET, MASK, VALUE)      (0XFD070108, 0x3F3F3F3FU ,0x060C1A10U)
+     */
+-	PSU_Mask_Write(DDRC_DRAMTMG2_OFFSET, 0x3F3F3F3FU, 0x060C1A13U);
++	PSU_Mask_Write(DDRC_DRAMTMG2_OFFSET, 0x3F3F3F3FU, is_dual_rank ? 0x060C1A13U : 0x060C1A10U);
+ /*##################################################################### */
+ 
+     /*
+@@ -3040,18 +3041,18 @@ unsigned long psu_ddr_init_data(void)
+     * urations with MEMC_FREQ_RATIO=2, program this to the above value divided
+     *  by 2 and round up to next integer value. Unit: Multiples of 32 clocks.
+     * Note: Used only for DDR2, DDR3 and DDR4 SDRAMs.
+-    *  PSU_DDRC_DRAMTMG8_T_XS_DLL_X32                              0x5
++    *  PSU_DDRC_DRAMTMG8_T_XS_DLL_X32                              0x6
+ 
+     * tXS: Exit Self Refresh to commands not requiring a locked DLL. For confi
+     * gurations with MEMC_FREQ_RATIO=2, program this to the above value divide
+     * d by 2 and round up to next integer value. Unit: Multiples of 32 clocks.
+     *  Note: Used only for DDR2, DDR3 and DDR4 SDRAMs.
+-    *  PSU_DDRC_DRAMTMG8_T_XS_X32                                  0x5
++    *  PSU_DDRC_DRAMTMG8_T_XS_X32                                  0x6
+ 
+     * SDRAM Timing Register 8
+-    * (OFFSET, MASK, VALUE)      (0XFD070120, 0x7F7F7F7FU ,0x04040505U)
++    * (OFFSET, MASK, VALUE)      (0XFD070120, 0x7F7F7F7FU ,0x04040606U)
+     */
+-	PSU_Mask_Write(DDRC_DRAMTMG8_OFFSET, 0x7F7F7F7FU, 0x04040505U);
++	PSU_Mask_Write(DDRC_DRAMTMG8_OFFSET, 0x7F7F7F7FU, is_dual_rank ? 0x04040505U : 0x04040606U);
+ /*##################################################################### */
+ 
+     /*
+@@ -3543,12 +3544,12 @@ unsigned long psu_ddr_init_data(void)
+     * o 27, and 31 Internal Base: 6 The selected HIF address bit is determined
+     *  by adding the internal base to the value of this field. If set to 31, r
+     * ank address bit 0 is set to 0.
+-    *  PSU_DDRC_ADDRMAP0_ADDRMAP_CS_BIT0                           0x15
++    *  PSU_DDRC_ADDRMAP0_ADDRMAP_CS_BIT0                           0x1f
+ 
+     * Address Map Register 0
+-    * (OFFSET, MASK, VALUE)      (0XFD070200, 0x0000001FU ,0x00000015U)
++    * (OFFSET, MASK, VALUE)      (0XFD070200, 0x0000001FU ,0x0000001FU)
+     */
+-	PSU_Mask_Write(DDRC_ADDRMAP0_OFFSET, 0x0000001FU, 0x00000015U);
++	PSU_Mask_Write(DDRC_ADDRMAP0_OFFSET, 0x0000001FU, is_dual_rank ? 0x00000015U : 0x0000001FU);
+ /*##################################################################### */
+ 
+     /*
+@@ -3762,7 +3763,7 @@ unsigned long psu_ddr_init_data(void)
+     * o 11, and 15 Internal Base: 21 The selected HIF address bit is determine
+     * d by adding the internal base to the value of this field. If set to 15,
+     * row address bit 15 is set to 0.
+-    *  PSU_DDRC_ADDRMAP6_ADDRMAP_ROW_B15                           0xf
++    *  PSU_DDRC_ADDRMAP6_ADDRMAP_ROW_B15                           0x6
+ 
+     * Selects the HIF address bit used as row address bit 14. Valid Range: 0 t
+     * o 11, and 15 Internal Base: 20 The selected HIF address bit is determine
+@@ -3783,9 +3784,9 @@ unsigned long psu_ddr_init_data(void)
+     *  PSU_DDRC_ADDRMAP6_ADDRMAP_ROW_B12                           0x6
+ 
+     * Address Map Register 6
+-    * (OFFSET, MASK, VALUE)      (0XFD070218, 0x8F0F0F0FU ,0x0F060606U)
++    * (OFFSET, MASK, VALUE)      (0XFD070218, 0x8F0F0F0FU ,0x06060606U)
+     */
+-	PSU_Mask_Write(DDRC_ADDRMAP6_OFFSET, 0x8F0F0F0FU, 0x0F060606U);
++	PSU_Mask_Write(DDRC_ADDRMAP6_OFFSET, 0x8F0F0F0FU, is_dual_rank ? 0x0F060606U : 0x06060606U);
+ /*##################################################################### */
+ 
+     /*
+@@ -6020,12 +6021,12 @@ unsigned long psu_ddr_init_data(void)
+     *  PSU_DDR_PHY_DTPR2_RESERVED_15_10                            0x0
+ 
+     * Self refresh exit delay
+-    *  PSU_DDR_PHY_DTPR2_TXS                                       0xc9
++    *  PSU_DDR_PHY_DTPR2_TXS                                       0x133
+ 
+     * DRAM Timing Parameters Register 2
+-    * (OFFSET, MASK, VALUE)      (0XFD080118, 0xFFFFFFFFU ,0x000F00C9U)
++    * (OFFSET, MASK, VALUE)      (0XFD080118, 0xFFFFFFFFU ,0x000F0133U)
+     */
+-	PSU_Mask_Write(DDR_PHY_DTPR2_OFFSET, 0xFFFFFFFFU, 0x000F00C9U);
++	PSU_Mask_Write(DDR_PHY_DTPR2_OFFSET, 0xFFFFFFFFU, is_dual_rank ? 0x000F00C9U : 0x000F0133U);
+ /*##################################################################### */
+ 
+     /*
+@@ -6071,7 +6072,7 @@ unsigned long psu_ddr_init_data(void)
+     *  PSU_DDR_PHY_DTPR4_RESERVED_27_26                            0x0
+ 
+     * Refresh-to-Refresh
+-    *  PSU_DDR_PHY_DTPR4_TRFC                                      0xc1
++    *  PSU_DDR_PHY_DTPR4_TRFC                                      0x12b
+ 
+     * Reserved. Return zeroes on reads.
+     *  PSU_DDR_PHY_DTPR4_RESERVED_15_14                            0x0
+@@ -6086,9 +6087,9 @@ unsigned long psu_ddr_init_data(void)
+     *  PSU_DDR_PHY_DTPR4_TXP                                       0xc
+ 
+     * DRAM Timing Parameters Register 4
+-    * (OFFSET, MASK, VALUE)      (0XFD080120, 0xFFFFFFFFU ,0x00C12B0CU)
++    * (OFFSET, MASK, VALUE)      (0XFD080120, 0xFFFFFFFFU ,0x012B2B0CU)
+     */
+-	PSU_Mask_Write(DDR_PHY_DTPR4_OFFSET, 0xFFFFFFFFU, 0x00C12B0CU);
++	PSU_Mask_Write(DDR_PHY_DTPR4_OFFSET, 0xFFFFFFFFU, is_dual_rank ? 0x00C12B0CU : 0x012B2B0CU);
+ /*##################################################################### */
+ 
+     /*
+@@ -6697,7 +6698,7 @@ unsigned long psu_ddr_init_data(void)
+     *  PSU_DDR_PHY_DTCR0_RESERVED_27_26                            0x0
+ 
+     * Data Training Debug Rank Select
+-    *  PSU_DDR_PHY_DTCR0_DTDRS                                     0x1
++    *  PSU_DDR_PHY_DTCR0_DTDRS                                     0x0
+ 
+     * Data Training with Early/Extended Gate
+     *  PSU_DDR_PHY_DTCR0_DTEXG                                     0x0
+@@ -6739,9 +6740,9 @@ unsigned long psu_ddr_init_data(void)
+     *  PSU_DDR_PHY_DTCR0_DTRPTN                                    0x7
+ 
+     * Data Training Configuration Register 0
+-    * (OFFSET, MASK, VALUE)      (0XFD080200, 0xFFFFFFFFU ,0x810091C7U)
++    * (OFFSET, MASK, VALUE)      (0XFD080200, 0xFFFFFFFFU ,0x800091C7U)
+     */
+-	PSU_Mask_Write(DDR_PHY_DTCR0_OFFSET, 0xFFFFFFFFU, 0x810091C7U);
++	PSU_Mask_Write(DDR_PHY_DTCR0_OFFSET, 0xFFFFFFFFU, is_dual_rank ? 0x810091C7U : 0x800091C7U);
+ /*##################################################################### */
+ 
+     /*
+@@ -6751,7 +6752,7 @@ unsigned long psu_ddr_init_data(void)
+     *  PSU_DDR_PHY_DTCR1_RANKEN_RSVD                               0x0
+ 
+     * Rank Enable.
+-    *  PSU_DDR_PHY_DTCR1_RANKEN                                    0x3
++    *  PSU_DDR_PHY_DTCR1_RANKEN                                    0x1
+ 
+     * Reserved. Return zeroes on reads.
+     *  PSU_DDR_PHY_DTCR1_RESERVED_15_14                            0x0
+@@ -6784,9 +6785,9 @@ unsigned long psu_ddr_init_data(void)
+     *  PSU_DDR_PHY_DTCR1_BSTEN                                     0x0
+ 
+     * Data Training Configuration Register 1
+-    * (OFFSET, MASK, VALUE)      (0XFD080204, 0xFFFFFFFFU ,0x00030236U)
++    * (OFFSET, MASK, VALUE)      (0XFD080204, 0xFFFFFFFFU ,0x00010236U)
+     */
+-	PSU_Mask_Write(DDR_PHY_DTCR1_OFFSET, 0xFFFFFFFFU, 0x00030236U);
++	PSU_Mask_Write(DDR_PHY_DTCR1_OFFSET, 0xFFFFFFFFU, is_dual_rank ? 0x00030236U : 0x00010236U);
+ /*##################################################################### */
+ 
+     /*
+@@ -8309,15 +8310,15 @@ unsigned long psu_ddr_init_data(void)
+     *  PSU_DDR_PHY_DX2GCR4_RESERVED_7_6                            0x0
+ 
+     * VREF Enable control for DQ IO (Single Ended) buffers of a byte lane.
+-    *  PSU_DDR_PHY_DX2GCR4_DXREFIEN                                0x3
++    *  PSU_DDR_PHY_DX2GCR4_DXREFIEN                                0x1
+ 
+     * VRMON control for DQ IO (Single Ended) buffers of a byte lane.
+     *  PSU_DDR_PHY_DX2GCR4_DXREFIMON                               0x0
+ 
+     * DATX8 n General Configuration Register 4
+-    * (OFFSET, MASK, VALUE)      (0XFD080910, 0xFFFFFFFFU ,0x0E00F50CU)
++    * (OFFSET, MASK, VALUE)      (0XFD080910, 0xFFFFFFFFU ,0x0E00F504U)
+     */
+-	PSU_Mask_Write(DDR_PHY_DX2GCR4_OFFSET, 0xFFFFFFFFU, 0x0E00F50CU);
++	PSU_Mask_Write(DDR_PHY_DX2GCR4_OFFSET, 0xFFFFFFFFU, is_dual_rank ? 0x0E00F50CU : 0x0E00F504U);
+ /*##################################################################### */
+ 
+     /*
+@@ -8586,15 +8587,15 @@ unsigned long psu_ddr_init_data(void)
+     *  PSU_DDR_PHY_DX3GCR4_RESERVED_7_6                            0x0
+ 
+     * VREF Enable control for DQ IO (Single Ended) buffers of a byte lane.
+-    *  PSU_DDR_PHY_DX3GCR4_DXREFIEN                                0x3
++    *  PSU_DDR_PHY_DX3GCR4_DXREFIEN                                0x1
+ 
+     * VRMON control for DQ IO (Single Ended) buffers of a byte lane.
+     *  PSU_DDR_PHY_DX3GCR4_DXREFIMON                               0x0
+ 
+     * DATX8 n General Configuration Register 4
+-    * (OFFSET, MASK, VALUE)      (0XFD080A10, 0xFFFFFFFFU ,0x0E00F50CU)
++    * (OFFSET, MASK, VALUE)      (0XFD080A10, 0xFFFFFFFFU ,0x0E00F504U)
+     */
+-	PSU_Mask_Write(DDR_PHY_DX3GCR4_OFFSET, 0xFFFFFFFFU, 0x0E00F50CU);
++	PSU_Mask_Write(DDR_PHY_DX3GCR4_OFFSET, 0xFFFFFFFFU, is_dual_rank ? 0x0E00F50CU : 0x0E00F504U);
+ /*##################################################################### */
+ 
+     /*
+@@ -20892,6 +20893,19 @@ unsigned long psu_afi_config(void)
+ 	PSU_Mask_Write(AFIFM3_AFIFM_RDCTRL_OFFSET, 0x00000003U, 0x00000000U);
+ /*##################################################################### */
+ 
++    /*
++    * Register : AFIFM_WRCTRL @ 0XFD360014
++
++    * Configures the Write Channel Fabric interface width. 2'b11 : Reserved 2'
++    * b10 : 32-bit Fabric 2'b01 : 64-bit enabled 2'b00 : 128-bit enabled
++    *  PSU_AFIFM0_AFIFM_WRCTRL_FABRIC_WIDTH                        0x0
++
++    * Write Channel Control Register
++    * (OFFSET, MASK, VALUE)      (0XFD360014, 0x00000003U ,0x00000000U)
++    */
++	PSU_Mask_Write(AFIFM0_AFIFM_WRCTRL_OFFSET, 0x00000003U, 0x00000000U);
++/*##################################################################### */
++
+     /*
+     * Register : AFIFM_WRCTRL @ 0XFD380014
+ 
+@@ -21020,11 +21034,8 @@ unsigned long psu_ps_pl_reset_config_data(void)
+ 	return 1;
+ }
+ 
+-unsigned long psu_ddr_phybringup_data(void)
++unsigned long psu_ddr_phybringup_data(int is_dual_rank)
+ {
+-	unsigned int tmp_regval = 0;
+-
+-
+ 	unsigned int regval = 0;
+ 
+ 	for (int tp = 0; tp < 20; tp++)
+@@ -21119,8 +21130,7 @@ unsigned long psu_ddr_phybringup_data(void)
+ 
+ 	}
+ 
+-
+-	Xil_Out32(0xFD070010U, 0x80000038U);
++	Xil_Out32(0xFD070010U, 0x80000018U);
+ 	Xil_Out32(0xFD0701B0U, 0x00000005U);
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	while ((regval & 0x1) != 0x0) {
+@@ -21139,7 +21149,7 @@ unsigned long psu_ddr_phybringup_data(void)
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	Xil_Out32(0xFD070014U, 0x00000331U);
+-	Xil_Out32(0xFD070010U, 0x80000038U);
++	Xil_Out32(0xFD070010U, is_dual_rank ? 0x80000038U : 0x80000018U);
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	while ((regval & 0x1) != 0x0) {
+ 	/***MRSTAT***/
+@@ -21157,7 +21167,7 @@ unsigned long psu_ddr_phybringup_data(void)
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	Xil_Out32(0xFD070014U, 0x00000B36U);
+-	Xil_Out32(0xFD070010U, 0x80000038U);
++	Xil_Out32(0xFD070010U, is_dual_rank ? 0x80000038U : 0x80000018U);
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	while ((regval & 0x1) != 0x0) {
+ 	/***MRSTAT***/
+@@ -21175,7 +21185,7 @@ unsigned long psu_ddr_phybringup_data(void)
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	Xil_Out32(0xFD070014U, 0x00000C21U);
+-	Xil_Out32(0xFD070010U, 0x80000038U);
++	Xil_Out32(0xFD070010U, is_dual_rank ? 0x80000038U : 0x80000018U);
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	while ((regval & 0x1) != 0x0) {
+ 	/***MRSTAT***/
+@@ -21193,7 +21203,7 @@ unsigned long psu_ddr_phybringup_data(void)
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	Xil_Out32(0xFD070014U, 0x00000E19U);
+-	Xil_Out32(0xFD070010U, 0x80000038U);
++	Xil_Out32(0xFD070010U, is_dual_rank ? 0x80000038U : 0x80000018U);
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	while ((regval & 0x1) != 0x0) {
+ 	/***MRSTAT***/
+@@ -21211,8 +21221,8 @@ unsigned long psu_ddr_phybringup_data(void)
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	Xil_Out32(0xFD070014U, 0x00001616U);
+-	Xil_Out32(0xFD070010U, 0x80000038U);
+-	Xil_Out32(0xFD070010U, 0x80000030U);
++	Xil_Out32(0xFD070010U, is_dual_rank ? 0x80000038U : 0x80000018U);
++	Xil_Out32(0xFD070010U, is_dual_rank ? 0x80000030U : 0x80000010U);
+ 	Xil_Out32(0xFD0701B0U, 0x00000005U);
+ 	Xil_Out32(0xFD070320U, 0x00000001U);
+ 	while ((Xil_In32(0xFD070004U) & 0x0000000FU) != 0x00000001U) {
+@@ -21294,7 +21304,7 @@ dpll_prog(cur_div2,cur_fbdiv, DPLL_CFG_LOCK_DLY, DPLL_CFG_LOCK_CNT,
+ 	}
+ 
+ /*Disabling REF before dqs2dq training - DTCR0.RFSHDT=0*/
+-	Xil_Out32(0xFD080200U, 0x010091C7U);
++	Xil_Out32(0xFD080200U, is_dual_rank ? 0x010091C7U: 0x000091C7U);
+ 	regval = Xil_In32(0xFD080030); /*PUB_PGSR0*/
+ 	while (regval != 0x80008FFF) {
+ 	/*PUB_PGSR0*/
+@@ -21302,14 +21312,14 @@ dpll_prog(cur_div2,cur_fbdiv, DPLL_CFG_LOCK_DLY, DPLL_CFG_LOCK_CNT,
+ 	}
+ 
+ /*Enabling REF after dqs2dq training - DTCR0.RFSHDT=8*/
+-	Xil_Out32(0xFD080200U, 0x810091C7U);
++	Xil_Out32(0xFD080200U, is_dual_rank ? 0x810091C7U : 0x800091C7U);
+ 	regval = ((Xil_In32(0xFD080030) & 0x1FFF0000) >>18);
+ 	if(regval != 0) {
+ 		return(0);
+ 	}
+ 
+ /* Run Vref training in static read mode*/
+-	Xil_Out32(0xFD080200U, 0x810091C7U);
++	Xil_Out32(0xFD080200U, is_dual_rank ? 0x810091C7U : 0x800091C7U);
+ 	int cur_R006_tREFPRD;
+ 
+ 	cur_R006_tREFPRD = (Xil_In32(0xFD080018U) & 0x0003FFFFU) >> 0x00000000U;
+@@ -21337,7 +21347,7 @@ dpll_prog(cur_div2,cur_fbdiv, DPLL_CFG_LOCK_DLY, DPLL_CFG_LOCK_CNT,
+ 	prog_reg(0xFD0814ECU, 0x00000030U, 0x00000004U, 0x00000000U);
+ 	prog_reg(0xFD08152CU, 0x00000030U, 0x00000004U, 0x00000000U);
+ /*Vref training is complete, disabling static read mode*/
+-	Xil_Out32(0xFD080200U, 0x810091C7U);
++	Xil_Out32(0xFD080200U, is_dual_rank ? 0x810091C7U : 0x800091C7U);
+ 	prog_reg(0xFD080018, 0x3FFFF, 0x0, cur_R006_tREFPRD);
+ 
+ 
+@@ -21841,8 +21851,14 @@ int psu_protection(void)
+ 	return 0;
+ }
+ 
+-int
+-psu_init(void)
++static int check_ram_wraparound()
++{
++	Xil_Out32(0x01000000, 0x12345678);
++	Xil_Out32(0x41000000, 0x87654321);
++	return Xil_In32(0x01000000) != 0x12345678;
++}
++
++int psu_init(void)
+ {
+ 	int status = 1;
+ 
+@@ -21850,30 +21866,19 @@ psu_init(void)
+ 	status &=  psu_peripherals_pre_init_data();
+ 	status &=   psu_pll_init_data();
+ 	status &=   psu_clock_init_data();
+-	status &=  psu_ddr_init_data();
+-	status &=  psu_ddr_phybringup_data();
+-	status &=  psu_peripherals_init_data();
+-	status &=  init_serdes();
+-	init_peripheral();
+-
+-	status &=  psu_peripherals_powerdwn_data();
+-	status &=    psu_afi_config();
+-	psu_ddr_qos_init_data();
+-
+-	if (status == 0)
+-		return 1;
+-	return 0;
+-}
+ 
+-int psu_init_ddr_self_refresh(void) {
++	psu_ddr_init_data(0);
++	psu_ddr_phybringup_data(0);
+ 
+-    int status = 1;
++	/*
++	 * Older chips are dual-rank, results in a "wrap-around". If that
++	 * is the case, re-initialize the DDR with dual-rank parameters
++	 */
++	if (check_ram_wraparound()) {
++		psu_ddr_init_data(1);
++		psu_ddr_phybringup_data(1);
++	}
+ 
+-	status &= psu_mio_init_data();
+-	status &=  psu_peripherals_pre_init_data();
+-	status &=   psu_pll_init_data();
+-	status &=   psu_clock_init_data();
+-	status &=  psu_ddr_init_data();
+ 	status &=  psu_peripherals_init_data();
+ 	status &=  init_serdes();
+ 	init_peripheral();
+@@ -21885,8 +21890,4 @@ int psu_init_ddr_self_refresh(void) {
+ 	if (status == 0)
+ 		return 1;
+ 	return 0;
+-
+-
+ }
+-
+-
+diff --git a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h
+index 9a37356c07..57ac820ddd 100644
+--- a/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h
++++ b/board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h
+@@ -37165,6 +37165,8 @@
+ #define AFIFM2_AFIFM_RDCTRL_OFFSET                                                 0XFD380000
+ #undef AFIFM3_AFIFM_RDCTRL_OFFSET 
+ #define AFIFM3_AFIFM_RDCTRL_OFFSET                                                 0XFD390000
++#undef AFIFM0_AFIFM_WRCTRL_OFFSET 
++#define AFIFM0_AFIFM_WRCTRL_OFFSET                                                 0XFD360014
+ #undef AFIFM2_AFIFM_WRCTRL_OFFSET 
+ #define AFIFM2_AFIFM_WRCTRL_OFFSET                                                 0XFD380014
+ #undef AFIFM3_AFIFM_WRCTRL_OFFSET 
+@@ -37252,6 +37254,17 @@
+ #define FPD_SLCR_AFI_FS_DW_SS0_SEL_SHIFT                       8
+ #define FPD_SLCR_AFI_FS_DW_SS0_SEL_MASK                        0x00000300U
+ 
++/*
++* Configures the Read Channel Fabric interface width. 2'b11 : Reserved 2'b
++    * 10 : 32-bit Fabric 2'b01 : 64-bit enabled 2'b00 : 128-bit enabled
++*/
++#undef AFIFM0_AFIFM_RDCTRL_FABRIC_WIDTH_DEFVAL 
++#undef AFIFM0_AFIFM_RDCTRL_FABRIC_WIDTH_SHIFT 
++#undef AFIFM0_AFIFM_RDCTRL_FABRIC_WIDTH_MASK 
++#define AFIFM0_AFIFM_RDCTRL_FABRIC_WIDTH_DEFVAL                0x000003B0
++#define AFIFM0_AFIFM_RDCTRL_FABRIC_WIDTH_SHIFT                 0
++#define AFIFM0_AFIFM_RDCTRL_FABRIC_WIDTH_MASK                  0x00000003U
++
+ /*
+ * Configures the Read Channel Fabric interface width. 2'b11 : Reserved 2'b
+     * 10 : 32-bit Fabric 2'b01 : 64-bit enabled 2'b00 : 128-bit enabled
+@@ -37274,6 +37287,17 @@
+ #define AFIFM3_AFIFM_RDCTRL_FABRIC_WIDTH_SHIFT                 0
+ #define AFIFM3_AFIFM_RDCTRL_FABRIC_WIDTH_MASK                  0x00000003U
+ 
++/*
++* Configures the Write Channel Fabric interface width. 2'b11 : Reserved 2'
++    * b10 : 32-bit Fabric 2'b01 : 64-bit enabled 2'b00 : 128-bit enabled
++*/
++#undef AFIFM0_AFIFM_WRCTRL_FABRIC_WIDTH_DEFVAL 
++#undef AFIFM0_AFIFM_WRCTRL_FABRIC_WIDTH_SHIFT 
++#undef AFIFM0_AFIFM_WRCTRL_FABRIC_WIDTH_MASK 
++#define AFIFM0_AFIFM_WRCTRL_FABRIC_WIDTH_DEFVAL                0x000003B0
++#define AFIFM0_AFIFM_WRCTRL_FABRIC_WIDTH_SHIFT                 0
++#define AFIFM0_AFIFM_WRCTRL_FABRIC_WIDTH_MASK                  0x00000003U
++
+ /*
+ * Configures the Write Channel Fabric interface width. 2'b11 : Reserved 2'
+     * b10 : 32-bit Fabric 2'b01 : 64-bit enabled 2'b00 : 128-bit enabled
+-- 
+2.17.1
+

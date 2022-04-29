@@ -1,0 +1,65 @@
+From ccba6b697adf8baafa3bb6d8147a8bd1cb1deac2 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 12 Jun 2020 09:48:55 +0200
+Subject: [PATCH 18/35] zynqmp-topic boards: Add no-1-8-v quirk to SD1
+ controller
+
+The SD interface has a 3v3 level shifter so cannot be used in ultraspeed
+mode. The u-boot drivers currently use conservative settings, so this is
+mostly for future.
+---
+ arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts | 1 +
+ arch/arm/dts/zynqmp-topic-miamimp.dts            | 2 ++
+ arch/arm/dts/zynqmp-topic-miamiplusmp.dts        | 4 +++-
+ 3 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts b/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
+index b03c4808f2..a02d075071 100644
+--- a/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
++++ b/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
+@@ -106,6 +106,7 @@
+ 	xlnx,mio_bank = <1>;
+ 	disable-wp; /* We don't have a write-protect detection */
+ 	bus-width = <4>;
++	no-1-8-v;
+ };
+ 
+ &uart0 {
+diff --git a/arch/arm/dts/zynqmp-topic-miamimp.dts b/arch/arm/dts/zynqmp-topic-miamimp.dts
+index 2561386cb6..bc9e1a623e 100644
+--- a/arch/arm/dts/zynqmp-topic-miamimp.dts
++++ b/arch/arm/dts/zynqmp-topic-miamimp.dts
+@@ -132,6 +132,8 @@
+ 	status = "okay";
+ 	xlnx,mio_bank = <1>;
+ 	disable-wp; /* We don't have a write-protect detection */
++	bus-width = <4>;
++	no-1-8-v;
+ };
+ 
+ &uart0 {
+diff --git a/arch/arm/dts/zynqmp-topic-miamiplusmp.dts b/arch/arm/dts/zynqmp-topic-miamiplusmp.dts
+index 17fe220eb5..ba8bcebb07 100644
+--- a/arch/arm/dts/zynqmp-topic-miamiplusmp.dts
++++ b/arch/arm/dts/zynqmp-topic-miamiplusmp.dts
+@@ -84,7 +84,7 @@
+ 	is-dual = <1>;
+ 	num-cs = <1>;
+ 	flash@0 {
+-		compatible = "st,m25p80", "n25q256a", "spi-flash";
++		compatible = "st,m25p80", "n25q00a", "spi-flash";
+ 		reg = <0x0>;
+ 		spi-tx-bus-width = <1>;
+ 		spi-rx-bus-width = <4>;
+@@ -133,6 +133,8 @@
+ 	status = "okay";
+ 	xlnx,mio_bank = <1>;
+ 	disable-wp; /* We don't have a write-protect detection */
++	bus-width = <4>;
++	no-1-8-v;
+ };
+ 
+ &uart0 {
+-- 
+2.17.1
+

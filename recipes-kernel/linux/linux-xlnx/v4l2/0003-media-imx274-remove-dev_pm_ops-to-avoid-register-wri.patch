@@ -1,0 +1,26 @@
+From 1c18aff27f7253a0c8276b2e6e042e43bef9eabf Mon Sep 17 00:00:00 2001
+From: Bob Veringa <bob.veringa@topic.nl>
+Date: Fri, 23 Apr 2021 02:13:37 +0200
+Subject: [PATCH 3/7] media: imx274: remove dev_pm_ops to avoid register write
+ issues
+
+---
+ drivers/media/i2c/imx274.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/media/i2c/imx274.c b/drivers/media/i2c/imx274.c
+index 54642d5f2d5b..d9849d34f39f 100644
+--- a/drivers/media/i2c/imx274.c
++++ b/drivers/media/i2c/imx274.c
+@@ -2112,7 +2112,7 @@ static const struct dev_pm_ops imx274_pm_ops = {
+ static struct i2c_driver imx274_i2c_driver = {
+ 	.driver = {
+ 		.name	= DRIVER_NAME,
+-		.pm = &imx274_pm_ops,
++		// .pm = &imx274_pm_ops,
+ 		.of_match_table	= imx274_of_id_table,
+ 	},
+ 	.probe_new	= imx274_probe,
+-- 
+2.17.1
+

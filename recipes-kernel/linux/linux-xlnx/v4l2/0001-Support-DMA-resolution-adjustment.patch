@@ -1,0 +1,453 @@
+From 05d8e06c18db7e0b6c7ef53f221b556d11e796e3 Mon Sep 17 00:00:00 2001
+From: Bob Veringa <bob.veringa@topic.nl>
+Date: Tue, 6 Apr 2021 09:34:32 +0200
+Subject: [PATCH 1/7] Support DMA resolution adjustment
+
+Add in support for the VIDIOC_S_FMT ioctl to the DMA.
+In addition, this adds in a support for changing the frame interval,
+using the video device. Furthermore, the overall V4L2 compliance,
+of the drivers has been increased as well as several minor bugfixes.
+
+[ML] Adapted to 5.10, dropped the "subscribe" code
+---
+ .../media/platform/xilinx/xilinx-csi2rxss.c   |  16 +-
+ drivers/media/platform/xilinx/xilinx-dma.c    | 282 +++++++++++++++++-
+ 2 files changed, 286 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/media/platform/xilinx/xilinx-csi2rxss.c b/drivers/media/platform/xilinx/xilinx-csi2rxss.c
+index c11c0d20c5bb..23b227321395 100644
+--- a/drivers/media/platform/xilinx/xilinx-csi2rxss.c
++++ b/drivers/media/platform/xilinx/xilinx-csi2rxss.c
+@@ -762,11 +762,22 @@ static int xcsi2rxss_get_format(struct v4l2_subdev *sd,
+ 	struct xcsi2rxss_state *xcsi2rxss = to_xcsi2rxssstate(sd);
+ 	struct v4l2_mbus_framefmt *get_fmt;
+ 	int ret = 0;
++       __u32 pad = fmt->pad;
++
++	/*
++	* When getting the format of a try_fmt the format for pad 0 is
++	* incorrect. This is because in the set_fmt function it is not
++	* explicitly set. This causes issues when trying a format, always
++	* changing pad 0 to pad 1 solves this issue. This has no impact on the
++	* result of the format as the input and output frameformat
++	* are the same.
++	*/
++	if (pad == 0)
++		pad = 1;
+ 
+ 	mutex_lock(&xcsi2rxss->lock);
+ 
+-	get_fmt = __xcsi2rxss_get_pad_format(xcsi2rxss, cfg, fmt->pad,
+-					     fmt->which);
++	get_fmt = __xcsi2rxss_get_pad_format(xcsi2rxss, cfg, pad, fmt->which);
+ 	if (!get_fmt) {
+ 		ret = -EINVAL;
+ 		goto unlock_get_format;
+@@ -877,6 +888,7 @@ static int xcsi2rxss_enum_mbus_code(struct v4l2_subdev *sd,
+ 	return ret;
+ }
+ 
++
+ /* -----------------------------------------------------------------------------
+  * Media Operations
+  */
+diff --git a/drivers/media/platform/xilinx/xilinx-dma.c b/drivers/media/platform/xilinx/xilinx-dma.c
+index 267d26add545..c294c3951a57 100644
+--- a/drivers/media/platform/xilinx/xilinx-dma.c
++++ b/drivers/media/platform/xilinx/xilinx-dma.c
+@@ -19,6 +19,7 @@
+ #include <linux/xilinx-v4l2-controls.h>
+ 
+ #include <media/v4l2-dev.h>
++#include <media/v4l2-event.h>
+ #include <media/v4l2-fh.h>
+ #include <media/v4l2-ioctl.h>
+ #include <media/videobuf2-v4l2.h>
+@@ -31,6 +32,7 @@
+ #define XVIP_DMA_DEF_FORMAT		V4L2_PIX_FMT_YUYV
+ #define XVIP_DMA_DEF_WIDTH		1920
+ #define XVIP_DMA_DEF_HEIGHT		1080
++
+ #define XVIP_DMA_DEF_WIDTH_ALIGN	2
+ /* Minimum and maximum widths are expressed in bytes */
+ #define XVIP_DMA_MIN_WIDTH		1U
+@@ -800,7 +802,184 @@ xvip_dma_get_format(struct file *file, void *fh, struct v4l2_format *format)
+ 	return 0;
+ }
+ 
+-static void
++/**
++ * @brief Adjust the pipeline resolution
++ *
++ * @param dma DMA channel used
++ * @param format The V4L2 format to adjust the pipeline with
++ * @param try Trying a pipeline
++ * @return int 0 on succes
++ */
++static int
++__adjust_pipeline_resolution(struct xvip_dma *dma,
++		      struct v4l2_format *format,
++			  bool try)
++{
++	struct xvip_pipeline *pipe;
++	struct media_graph graph;
++	struct media_entity *entity = &dma->video.entity;
++	struct media_device *mdev = entity->graph_obj.mdev;
++	__u32 new_width, new_height;
++	int ret;
++	int i;
++
++	/* Set the new hgith depending on the V4L2 TYPE */
++	if (V4L2_TYPE_IS_MULTIPLANAR(dma->format.type)) {
++		new_width = format->fmt.pix_mp.width;
++		new_height = format->fmt.pix_mp.height;
++	} else {
++		new_width = format->fmt.pix.width;
++		new_height = format->fmt.pix.height;
++	}
++
++	pipe = dma->video.entity.pipe
++		 ? to_xvip_pipeline(&dma->video.entity) : &dma->pipe;
++
++	/* Lock to avoid changes to the graph while walking */
++	mutex_lock(&mdev->graph_mutex);
++
++	/* Walk the graph to locate the video nodes. */
++	ret = media_graph_walk_init(&graph, mdev);
++	if (ret) {
++		mutex_unlock(&mdev->graph_mutex);
++		return -1;
++	}
++
++	struct v4l2_subdev_pad_config *cfg;
++
++	media_graph_walk_start(&graph, entity);
++
++
++	while ((entity = media_graph_walk_next(&graph)) && ret == 0) {
++		struct v4l2_subdev *subdev;
++		struct v4l2_subdev_format sdfmt;
++
++		cfg = kcalloc(entity->num_pads,
++			sizeof(struct v4l2_subdev_pad_config), GFP_KERNEL);
++
++		/* If the entity is not a subdev it cannot be adjusted */
++		if (!is_media_entity_v4l2_subdev(entity)) {
++			dev_dbg(dma->xdev->dev,
++						"%s: Entity '%s' is not a subdev",
++						__func__, entity->name);
++			/* The entity was not a subdev but the pipeline
++			 * can still be valid continuing
++			 * with the adjustement.
++			 */
++			continue;
++		}
++
++		/* Get subdev from entity */
++		subdev = media_entity_to_v4l2_subdev(entity);
++
++		for (i = 0; i < entity->num_pads; i++) {
++			sdfmt.pad = i;
++
++			/*
++			 * Get already configured pad settings, as they need to
++			 * be kept the same. It might be possible to set the
++			 * format dynamically, but drivers do not really
++			 * support this.
++			 */
++			sdfmt.which = V4L2_SUBDEV_FORMAT_ACTIVE;
++			ret = v4l2_subdev_call(subdev,
++					pad, get_fmt, cfg, &sdfmt);
++			if (ret < 0) {
++				/*
++				 * Not able to get the format of the pad
++				 * cannot make modifications to it, abort
++				 * the attempt
++				 */
++				dev_dbg(dma->xdev->dev,
++					"%s: get_fmt! '%s' ret = %d",
++						__func__, subdev->name, ret);
++				ret = -EINVAL;
++				goto unlock;
++			}
++			sdfmt.pad = i;
++
++			/* Changing resolution of format */
++			sdfmt.format.width = new_width;
++			sdfmt.format.height = new_height;
++			sdfmt.which = try
++			   ? V4L2_SUBDEV_FORMAT_TRY : V4L2_SUBDEV_FORMAT_ACTIVE;
++
++			/* Call the subdev to make the adjustment */
++			ret = v4l2_subdev_call(subdev,
++					pad, set_fmt, cfg, &sdfmt);
++			if (ret < 0) {
++				/* Failed to make the adjustment, abort */
++				dev_dbg(dma->xdev->dev,
++					"%s: set_fmt! '%s' ret = %d",
++						__func__, subdev->name, ret);
++				ret = -EINVAL;
++				goto unlock;
++
++			}
++		}
++
++		/*
++		 * After all pads have een configured we can check
++		 * if they are all correct
++		 */
++		for (i = 0; i < entity->num_pads; i++) {
++			sdfmt.pad = i;
++
++			/*
++			 * Get already configured pad settings, as they
++			 * need to be kept the same. This is done later
++			 * because most of the time source pads cannot
++			 * be configured, they should always be on pad 0,
++			 * but well they are not always
++			 */
++			sdfmt.which = try
++			   ? V4L2_SUBDEV_FORMAT_TRY : V4L2_SUBDEV_FORMAT_ACTIVE;
++			ret = v4l2_subdev_call(subdev,
++						pad, get_fmt, cfg, &sdfmt);
++			if (ret < 0) {
++				/*
++				 * Not able to get the format of the pad
++				 * required for validation, aborting attempt
++				 */
++				dev_dbg(dma->xdev->dev,
++					"%s: get_fmt! '%s' returned = %d",
++						__func__, subdev->name, ret);
++				ret = -EINVAL;
++				goto unlock;
++			}
++			dev_dbg(dma->xdev->dev,
++				"%s: sd: '%s' p: %d, adjusted to %ux%u",
++					__func__, subdev->name, i,
++					sdfmt.format.width,
++					sdfmt.format.height);
++
++			/* Check if the configuration was applied correctly */
++			if (sdfmt.format.width != new_width ||
++				sdfmt.format.height != new_height) {
++				/* If it does not match, the set resolution
++				 *  was invalid and a change is required
++				 */
++				dev_dbg(dma->xdev->dev,
++					"%s: Pad resolution did not match!",
++						__func__);
++				ret = -EINVAL;
++				goto unlock;
++			}
++		}
++		kfree(cfg);
++	}
++unlock:
++	/* Unlock the graph */
++	mutex_unlock(&mdev->graph_mutex);
++
++	/* Free Mem */
++	kfree(cfg);
++
++	media_graph_walk_cleanup(&graph);
++	return ret;
++}
++
++static int
+ __xvip_dma_try_format(struct xvip_dma *dma,
+ 		      struct v4l2_format *format,
+ 		      const struct xvip_video_format **fmtinfo)
+@@ -819,15 +998,22 @@ __xvip_dma_try_format(struct xvip_dma *dma,
+ 	struct v4l2_subdev_format fmt;
+ 	struct v4l2_subdev *subdev;
+ 	int ret;
++	bool trying;
++
++	trying = fmtinfo == NULL;
++
++	ret = __adjust_pipeline_resolution(dma, format, trying);
++	if (ret < 0)
++		return ret;
+ 
+ 	subdev = xvip_dma_remote_subdev(&dma->pad, &fmt.pad);
+ 	if (!subdev)
+-		return;
++		return -EINVAL;
+ 
+ 	fmt.which = V4L2_SUBDEV_FORMAT_ACTIVE;
+ 	ret = v4l2_subdev_call(subdev, pad, get_fmt, NULL, &fmt);
+ 	if (ret < 0)
+-		return;
++		return ret;
+ 
+ 	if (fmt.format.field == V4L2_FIELD_ALTERNATE) {
+ 		if (V4L2_TYPE_IS_MULTIPLANAR(dma->format.type))
+@@ -854,6 +1040,13 @@ __xvip_dma_try_format(struct xvip_dma *dma,
+ 	if (IS_ERR(info))
+ 		info = xvip_get_format_by_fourcc(XVIP_DMA_DEF_FORMAT);
+ 
++	fmt.which = V4L2_SUBDEV_FORMAT_ACTIVE;
++	fmt.format.code = info->code;
++	ret = v4l2_subdev_call(subdev, pad, set_fmt, NULL, &fmt);
++	if (ret < 0) {
++		dev_err(dma->xdev->dev, "Invalid pixelformat for pipeline");
++		return -EINVAL;
++	}
+ 	xvip_width_padding_factor(info->fourcc, &padding_factor_nume,
+ 				  &padding_factor_deno);
+ 	xvip_bpl_scaling_factor(info->fourcc, &bpl_nume, &bpl_deno);
+@@ -878,6 +1071,8 @@ __xvip_dma_try_format(struct xvip_dma *dma,
+ 				info->bpl_factor;
+ 		pix_mp->height = clamp(pix_mp->height, XVIP_DMA_MIN_HEIGHT,
+ 				       XVIP_DMA_MAX_HEIGHT);
++		pix_mp->pixelformat = info->fourcc;
++		pix_mp->num_planes = info->buffers;
+ 
+ 		/*
+ 		 * Clamp the requested bytes per line value. If the maximum
+@@ -950,10 +1145,12 @@ __xvip_dma_try_format(struct xvip_dma *dma,
+ 		bpl = rounddown(pix->bytesperline, dma->align);
+ 		pix->bytesperline = clamp(bpl, min_bpl, max_bpl);
+ 		pix->sizeimage = pix->width * pix->height * info->bpp / 8;
++		pix->pixelformat = info->fourcc;
+ 	}
+ 
+ 	if (fmtinfo)
+ 		*fmtinfo = info;
++	return 0;
+ }
+ 
+ static int
+@@ -961,9 +1158,10 @@ xvip_dma_try_format(struct file *file, void *fh, struct v4l2_format *format)
+ {
+ 	struct v4l2_fh *vfh = file->private_data;
+ 	struct xvip_dma *dma = to_xvip_dma(vfh->vdev);
++	int ret;
+ 
+-	__xvip_dma_try_format(dma, format, NULL);
+-	return 0;
++	ret = __xvip_dma_try_format(dma, format, NULL);
++	return ret;
+ }
+ 
+ static int
+@@ -972,8 +1170,11 @@ xvip_dma_set_format(struct file *file, void *fh, struct v4l2_format *format)
+ 	struct v4l2_fh *vfh = file->private_data;
+ 	struct xvip_dma *dma = to_xvip_dma(vfh->vdev);
+ 	const struct xvip_video_format *info;
++	int ret;
+ 
+-	__xvip_dma_try_format(dma, format, &info);
++	ret = __xvip_dma_try_format(dma, format, &info);
++	if (ret < 0)
++		return ret;
+ 
+ 	if (vb2_is_busy(&dma->queue))
+ 		return -EBUSY;
+@@ -1098,6 +1299,63 @@ xvip_dma_s_selection(struct file *file, void *fh, struct v4l2_selection *sel)
+ 	return 0;
+ }
+ 
++static int
++__get_stream_parm(struct xvip_dma *dma,
++		struct v4l2_streamparm *a,
++		struct v4l2_subdev_frame_interval *fi)
++{
++	v4l2_device_call_all(&dma->xdev->v4l2_dev,
++			0, video, g_frame_interval, fi);
++	dev_dbg(dma->xdev->dev,
++		"%s: Subdev reported framerate: %d / %d\n",
++		__func__, fi->interval.numerator, fi->interval.denominator);
++
++	a->parm.capture.timeperframe.numerator = fi->interval.numerator;
++	a->parm.capture.timeperframe.denominator = fi->interval.denominator;
++	a->parm.capture.capability = V4L2_CAP_TIMEPERFRAME;
++
++	return 0;
++}
++
++static int
++xvip_dma_g_parm(struct file *file, void *fh, struct v4l2_streamparm *a)
++{
++	struct v4l2_fh *vfh = file->private_data;
++	struct xvip_dma *dma = to_xvip_dma(vfh->vdev);
++	struct v4l2_subdev_frame_interval fi;
++	int ret;
++
++	ret = __get_stream_parm(dma, a, &fi);
++
++	return ret;
++}
++
++static int
++xvip_dma_s_parm(struct file *file, void *fh, struct v4l2_streamparm *a)
++{
++	struct v4l2_fh *vfh = file->private_data;
++	struct xvip_dma *dma = to_xvip_dma(vfh->vdev);
++	struct v4l2_subdev_frame_interval fi;
++	int ret;
++
++	fi.interval = a->parm.capture.timeperframe;
++
++	dev_dbg(dma->xdev->dev, "%s: Attempting to set framerate to: %d / %d\n",
++		__func__, fi.interval.numerator, fi.interval.denominator);
++
++	v4l2_device_call_all(&dma->xdev->v4l2_dev,
++			0, video, s_frame_interval, &fi);
++
++	ret = __get_stream_parm(dma, a, &fi);
++
++	dev_dbg(dma->xdev->dev,
++		"%s: Framerate set to: %d / %d\n",
++			__func__,
++			a->parm.capture.timeperframe.numerator,
++			a->parm.capture.timeperframe.denominator);
++
++	return ret;
++}
+ static const struct v4l2_ioctl_ops xvip_dma_ioctl_ops = {
+ 	.vidioc_querycap		= xvip_dma_querycap,
+ 	.vidioc_enum_fmt_vid_cap	= xvip_dma_enum_format,
+@@ -1116,6 +1374,8 @@ static const struct v4l2_ioctl_ops xvip_dma_ioctl_ops = {
+ 	.vidioc_try_fmt_vid_out_mplane	= xvip_dma_try_format,
+ 	.vidioc_s_selection		= xvip_dma_s_selection,
+ 	.vidioc_g_selection		= xvip_dma_g_selection,
++	.vidioc_s_parm			= xvip_dma_s_parm,
++	.vidioc_g_parm			= xvip_dma_g_parm,
+ 	.vidioc_reqbufs			= vb2_ioctl_reqbufs,
+ 	.vidioc_querybuf		= vb2_ioctl_querybuf,
+ 	.vidioc_qbuf			= vb2_ioctl_qbuf,
+@@ -1124,9 +1384,11 @@ static const struct v4l2_ioctl_ops xvip_dma_ioctl_ops = {
+ 	.vidioc_expbuf			= vb2_ioctl_expbuf,
+ 	.vidioc_streamon		= vb2_ioctl_streamon,
+ 	.vidioc_streamoff		= vb2_ioctl_streamoff,
+-	.vidioc_enum_input	= &xvip_dma_enum_input,
+-	.vidioc_g_input		= &xvip_dma_get_input,
+-	.vidioc_s_input		= &xvip_dma_set_input,
++	.vidioc_enum_input		= &xvip_dma_enum_input,
++	.vidioc_g_input			= &xvip_dma_get_input,
++	.vidioc_s_input			= &xvip_dma_set_input,
++	.vidioc_subscribe_event		= v4l2_ctrl_subscribe_event,
++	.vidioc_unsubscribe_event	= v4l2_event_unsubscribe,
+ };
+ 
+ /* -----------------------------------------------------------------------------
+@@ -1261,6 +1523,7 @@ int xvip_dma_init(struct xvip_composite_device *xdev, struct xvip_dma *dma,
+ 		pix_mp->colorspace = V4L2_COLORSPACE_SRGB;
+ 		pix_mp->field = V4L2_FIELD_NONE;
+ 		pix_mp->width = XVIP_DMA_DEF_WIDTH;
++		pix_mp->num_planes = dma->fmtinfo->num_planes;
+ 
+ 		/* Handling contiguous data with mplanes */
+ 		if (dma->fmtinfo->buffers == 1) {
+@@ -1419,7 +1682,6 @@ int xvip_dma_init(struct xvip_composite_device *xdev, struct xvip_dma *dma,
+ 			"Using width align %d\n", XVIP_DMA_DEF_WIDTH_ALIGN);
+ 		dma->width_align = XVIP_DMA_DEF_WIDTH_ALIGN;
+ 	}
+-
+ 	dma->align = 1 << dma->dma->device->copy_align;
+ 
+ 	ret = video_register_device(&dma->video, VFL_TYPE_VIDEO, -1);
+-- 
+2.17.1
+

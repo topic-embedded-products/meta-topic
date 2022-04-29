@@ -1,0 +1,91 @@
+From 8837dd516a08c88c5d7e48fe95387d0e9ca89d98 Mon Sep 17 00:00:00 2001
+From: Manish Narani <manish.narani@xilinx.com>
+Date: Wed, 14 Jul 2021 04:47:05 -0600
+Subject: [PATCH 2/2] usb: dwc3: xilinx: Handle USB3 PHY initialization
+ properly
+
+Modify driver to skip doing redundant controller resets when there is no
+USB3 PHY used. This will resolve issue with PIPE CLK bit getting set
+to 0 leading to device detection failure when the controller is forced
+to USB2.0 mode.
+
+Signed-off-by: Manish Narani <manish.narani@xilinx.com>
+---
+ drivers/usb/dwc3/dwc3-xilinx.c | 40 ++++++++++++++++++----------------
+ 1 file changed, 21 insertions(+), 19 deletions(-)
+
+diff --git a/drivers/usb/dwc3/dwc3-xilinx.c b/drivers/usb/dwc3/dwc3-xilinx.c
+index b5dafc313420..2fc2bc152d08 100644
+--- a/drivers/usb/dwc3/dwc3-xilinx.c
++++ b/drivers/usb/dwc3/dwc3-xilinx.c
+@@ -374,14 +374,6 @@ static int dwc3_xlnx_init_zynqmp(struct dwc3_xlnx *priv_data)
+ 	u32			reg;
+ 	struct gpio_desc	*reset_gpio = NULL;
+ 
+-	usb3_phy = devm_phy_get(dev, "usb3-phy");
+-	if (PTR_ERR(usb3_phy) == -EPROBE_DEFER) {
+-		ret = -EPROBE_DEFER;
+-		goto err;
+-	} else if (IS_ERR(usb3_phy)) {
+-		usb3_phy = NULL;
+-	}
+-
+ 	crst = devm_reset_control_get_exclusive(dev, "usb_crst");
+ 	if (IS_ERR(crst)) {
+ 		ret = PTR_ERR(crst);
+@@ -407,6 +399,15 @@ static int dwc3_xlnx_init_zynqmp(struct dwc3_xlnx *priv_data)
+ 		goto err;
+ 	}
+ 
++	usb3_phy = devm_phy_get(dev, "usb3-phy");
++	if (PTR_ERR(usb3_phy) == -EPROBE_DEFER) {
++		ret = -EPROBE_DEFER;
++		goto err;
++	} else if (IS_ERR(usb3_phy)) {
++		ret = 0;
++		goto skip_usb3_phy;
++	}
++
+ 	ret = reset_control_assert(crst);
+ 	if (ret < 0) {
+ 		dev_err(dev, "Failed to assert core reset\n");
+@@ -461,17 +462,7 @@ static int dwc3_xlnx_init_zynqmp(struct dwc3_xlnx *priv_data)
+ 		goto err;
+ 	}
+ 
+-	/*
+-	 * This routes the USB DMA traffic to go through FPD path instead
+-	 * of reaching DDR directly. This traffic routing is needed to
+-	 * make SMMU and CCI work with USB DMA.
+-	 */
+-	if (of_dma_is_coherent(dev->of_node) || device_iommu_mapped(dev)) {
+-		reg = readl(priv_data->regs + XLNX_USB_TRAFFIC_ROUTE_CONFIG);
+-		reg |= XLNX_USB_TRAFFIC_ROUTE_FPD;
+-		writel(reg, priv_data->regs + XLNX_USB_TRAFFIC_ROUTE_CONFIG);
+-	}
+-
++skip_usb3_phy:
+ 	/* ulpi reset via gpio-modepin or gpio-framework driver */
+ 	reset_gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
+ 	if (IS_ERR(reset_gpio)) {
+@@ -487,6 +478,17 @@ static int dwc3_xlnx_init_zynqmp(struct dwc3_xlnx *priv_data)
+ 		usleep_range(5000, 10000); /* delay */
+ 	}
+ 
++	/*
++	 * This routes the USB DMA traffic to go through FPD path instead
++	 * of reaching DDR directly. This traffic routing is needed to
++	 * make SMMU and CCI work with USB DMA.
++	 */
++	if (of_dma_is_coherent(dev->of_node) || device_iommu_mapped(dev)) {
++		reg = readl(priv_data->regs + XLNX_USB_TRAFFIC_ROUTE_CONFIG);
++		reg |= XLNX_USB_TRAFFIC_ROUTE_FPD;
++		writel(reg, priv_data->regs + XLNX_USB_TRAFFIC_ROUTE_CONFIG);
++	}
++
+ err:
+ 	return ret;
+ }
+-- 
+2.17.1
+

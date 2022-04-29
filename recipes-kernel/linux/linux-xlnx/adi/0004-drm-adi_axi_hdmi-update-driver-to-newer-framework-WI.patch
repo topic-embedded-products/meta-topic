@@ -1,8 +1,7 @@
-From 172544928ae97d65c1a77b03bcf5d79cb0f8ed22 Mon Sep 17 00:00:00 2001
+From 32893e2962e0c83250dda2587e751235546e3e3a Mon Sep 17 00:00:00 2001
 From: Alexandru Ardelean <alexandru.ardelean@analog.com>
 Date: Wed, 15 Jul 2020 07:33:44 +0300
-Subject: [PATCH 04/12] drm: adi_axi_hdmi: update driver to newer framework
- [WIP]
+Subject: [PATCH 4/8] drm: adi_axi_hdmi: update driver to newer framework [WIP]
 
 Signed-off-by: Alexandru Ardelean <alexandru.ardelean@analog.com>
 ---

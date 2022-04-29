@@ -20,7 +20,7 @@
 
 	memory {
 		device_type = "memory";
-		reg = <0x000000000 0x20000000>;
+		reg = <0x000000000 0x40000000>;
 	};
 
 	chosen {
@@ -128,11 +128,11 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		/* NVMEM entries */
-		gem0_mac: mac@1e8 {
-			reg = <0x1e8 6>;
+		gem0_mac: mac@30 {
+			reg = <0x30 6>;
 		};
-		gem1_mac: mac@1ee {
-			reg = <0x1ee 6>;
+		gem1_mac: mac@38 {
+			reg = <0x38 6>;
 		};
 		miamiserial: serial@1f4 {
 			reg = <0x1f4 4>;
@@ -223,26 +223,18 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0x0>;
-		partition@qspi-u-boot-spl {
-			label = "qspi-u-boot-spl";
-			reg = <0x00000 0x20000>;
-		};
-		partition@qspi-u-boot-img {
-			label = "qspi-u-boot-img";
-			reg = <0x20000 0xC0000>;
-		};
-		partition@qspi-u-boot-env {
-			label = "qspi-u-boot-env";
-			reg = <0xE0000 0x20000>;
+		partition@qspi-boot-bin {
+			label = "qspi-boot-bin";
+			reg = <0x00000 0x100000>;
 		};
 		partition@qspi-rootfs {
 			label = "qspi-rootfs";
-			reg = <0x100000 0x1F00000>;
+			reg = <0x100000 0>;
 		};
 		/* Everything */
 		partition@qspi-all {
 			label = "qspi-all";
-			reg = <0x0 0x2000000>;
+			reg = <0x0 0>;
 		};
 	};
 };

@@ -1,8 +1,7 @@
-From 6f1fab47835c106a54e81c06b5f999379c7aa272 Mon Sep 17 00:00:00 2001
+From c20178eb8a7b356a901aeacaf2d1da7a294d8325 Mon Sep 17 00:00:00 2001
 From: Alexandru Ardelean <alexandru.ardelean@analog.com>
 Date: Wed, 15 Jul 2020 07:24:57 +0300
-Subject: [PATCH 03/12] drm: adi_axi_hdmi: remove drm_plane_helper_disable()
- call
+Subject: [PATCH 3/8] drm: adi_axi_hdmi: remove drm_plane_helper_disable() call
 
 This is no longer needed in newer kernels.
 

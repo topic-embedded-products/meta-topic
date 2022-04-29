@@ -30,7 +30,8 @@ COMPATIBLE_MACHINE_tdpzu9 = ".*"
 SRC_URI_append_tdpzu9 = "\
 	file://zynqmp-topic-miamiplusmp.dts \
 	file://${MACHINE}.dts \
-	file://${MACHINE}-wifi.dts \
+	file://${MACHINE}-v1r1.dts \
+	file://${MACHINE}-v1r1-wifi.dts \
 	"
 
 TDKZU_SOURCES = "\

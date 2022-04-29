@@ -68,20 +68,23 @@
 		};
 	};
 
-	/* USB PHY reset IO pin. Carrier board's USB PHY can use this. */
-	usb_phy0: phy0 {
-		compatible = "usb-nop-xceiv";
-		#phy-cells = <0>;
-		vcc-supply = <&reg_3v3_miami>;
-		reset-gpios = <&gpioex 0 GPIO_ACTIVE_LOW>;
-	};
-
 	/* Make temperature readouts show up in hwmon applications */
 	iio-hwmon-ams-temp {
 		compatible = "iio-hwmon";
 		io-channels = <&xilinx_ams 7>, <&xilinx_ams 8>, <&xilinx_ams 20>;
 		io-channel-names = "ps_temp", "remote_temp", "pl_temp";
 	};
+};
+
+/* USB PHY reset (Xilinx specific) */
+&usb0 {
+	/* Xilinx defines "reset-gpio" but this should be reset-gpios */
+	/delete-property/ reset-gpio;
+	reset-gpios = <&gpioex 0 0>;
+};
+
+&cci {
+	status = "okay";
 };
 
 &gpio {
@@ -93,7 +96,6 @@
 &gpu {
 	status = "okay";
 };
-
 
 &i2c0 {
 	status = "okay";
@@ -163,7 +165,7 @@
 	is-dual = <1>;
 	multi-die = <1>;
 	flash@0 {
-		compatible = "st,m25p80", "n25q256a";
+		compatible = "jedec,spi-nor";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0x0>;
@@ -174,30 +176,22 @@
 		multi-die = <1>;
 		partition@qspi-boot-bin {
 			label = "qspi-boot-bin";
-			reg = <0x00000 0x60000>;
-		};
-		partition@qspi-u-boot-itb {
-			label = "qspi-u-boot-itb";
-			reg = <0x60000 0x100000>;
-		};
-		partition@qspi-u-boot-env {
-			label = "qspi-u-boot-env";
-			reg = <0x160000 0x20000>;
+			reg = <0x00000 0x180000>;
 		};
 		partition@qspi-rootfs {
 			label = "qspi-rootfs";
-			reg = <0x180000 0x7e80000>;
+			reg = <0x180000 0>;
 		};
 		/* Everything */
 		partition@qspi-all {
 			label = "qspi-all";
-			reg = <0x0 0x8000000>;
+			reg = <0x0 0>;
 		};
 	};
 };
 
 &rtc {
-	status = "disabled"; /* Doesn't work unless you connect VBAT */
+	status = "okay"; 
 };
 
 /* eMMC device */
@@ -211,8 +205,10 @@
 	pinctrl-0 = <&pinctrl_sdhci0_default>;
 };
 
-&serdes {
+&psgtr {
 	status = "okay";
+	clock-names = "ref0", "ref1", "ref2", "ref3";
+	/* TODO: clocks = ... */
 };
 
 &uart0 {

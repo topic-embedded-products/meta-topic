@@ -1,7 +1,7 @@
 /*
  * dts file for tdpzu9 (Topic Developmentkit Plus) board without PL
  *
- * (C) Copyright 2020, Topic Embedded Products BV
+ * (C) Copyright 2020-2021, Topic Embedded Products BV
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -26,7 +26,6 @@
 			label = "power";
 			gpios = <&tdp_gpioex10 0 GPIO_ACTIVE_LOW>; /* Input 0, active low */
 			linux,code = <116>; /* KEY_POWER */
-			gpio-key,wakeup;
 		};
 	};
 
@@ -49,22 +48,18 @@
 		regulator-name = "SD-SEL";
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <3300000>;
-		gpios = <&gpio 42 0>;
+		gpios = <&gpio 39 0>;
 		states = <3300000 0>, <1800000 1>; /* LOW = 3v3 */
 		enable-active-high;
 	};
 
-	/* Enable for Bluetooth */
-	reg_ble: regulator_ble {
-		compatible = "regulator-fixed";
-		regulator-name = "pwr-ble";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		enable-active-high;
-		gpio = <&tdp_gpioex24 0 0>;
-		startup-delay-us = <100>;
-		/* No power control (yet), just turn it on please */
-		regulator-always-on;
+	leds-gpioex {
+		compatible = "gpio-leds";
+		leds-eth2 {
+			label = "ethled2:green";
+			gpios = <&tdp_gpioex24 0 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "ff0d0000.ethernet-ffffffff:01:link";
+		};
 	};
 };
 
@@ -180,7 +175,7 @@
 		compatible = "microchip,mcp23008";
 		reg = <0x27>;
 		vcc-supply = <&reg_3v3_miami>;
-		gpio-line-names = "BT_EN", "WIFI_EN", "BT_HOST_WK", "BT_DEV_WK", "PWR_KILL_N", "SW1_4", "SW1_5", "SW1_6";
+		gpio-line-names = "ETH_LED2", "", "", "", "PWR_KILL_N", "SW1_4", "SW1_5", "SW1_6";
 		gpio-controller;
 		#gpio-cells = <2>;
 		interrupt-controller;
@@ -195,13 +190,6 @@
 				"gpio4", "gpio5", "gpio6", "gpio7";
 			bias-pull-up;
 		};
-
-		wifi-en {
-			gpio-hog;
-			gpios = <1 0>;
-			output-low;
-			line-name = "wifi-en";
-		};
 	};
 
 	/* USB-C DRP port contoller */
@@ -213,7 +201,10 @@
 		connector {
 			compatible = "usb-c-connector";
 			label = "USB-C-0";
-			data-role = "sink";
+			data-role = "dual";
+			try-data-role = "sink";
+			power-role = "source";
+			try-power-role = "source";
 			ports {
 				#address-cells = <1>;
 				#size-cells = <0>;
@@ -236,7 +227,10 @@
 		connector {
 			compatible = "usb-c-connector";
 			label = "USB-C-1";
-			data-role = "source";
+			data-role = "dual";
+			try-data-role = "source";
+			power-role = "source";
+			try-power-role = "source";
 			ports {
 				#address-cells = <1>;
 				#size-cells = <0>;
@@ -249,7 +243,27 @@
 			};
 		};
 	};
+
+	/* I2C mux to select one of the two FMCs. */
+	i2cmux_fmc: i2cswitch@70 {
+		compatible = "nxp,pca9543";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x70>;
+	};
 };
+
+/* EEPROM on carrier is connected to bus 0 */
+&i2c1 {
+	carrier_eeprom: m24c32@50 {
+		compatible = "atmel,24c32";
+		reg = <0x50>;
+		pagesize = <32>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+	};
+};
+
 
 &uart1 {
 	status = "disabled";
@@ -261,12 +275,12 @@
 
 &dwc3_0 {
 	status = "okay";
-	dr_mode = "peripheral"; /* "host", "peripheral" or "otg" */
+	dr_mode = "otg"; /* "host", "peripheral" or "otg" */
 	/* refclk0 from clock synth */
 	assigned-clocks = <&si5345 0 3>;
 	assigned-clock-rates = <100000000>;
 	phy-names = "usb3-phy";
-	phys = <&lane1 PHY_TYPE_USB3 0 0 100000000>;
+	phys = <&psgtr 1 PHY_TYPE_USB3 0 0>;
 	maximum-speed = "super-speed";
 	snps,usb3_lpm_capable;
 	usb-phy = <&usb_phy0>;
@@ -283,12 +297,12 @@
 
 &dwc3_1 {
 	status = "okay";
-	dr_mode = "host";
+	dr_mode = "otg";
 	/* refclk0 from clock synth */
 	assigned-clocks = <&si5345 0 3>;
 	assigned-clock-rates = <100000000>;
 	phy-names = "usb3-phy";
-	phys = <&lane3 PHY_TYPE_USB3 1 0 100000000>;
+	phys = <&psgtr 3 PHY_TYPE_USB3 1 0>;
 	maximum-speed = "super-speed";
 	snps,usb3_lpm_capable;
 	usb-phy = <&usb_phy1>;
@@ -301,20 +315,13 @@
 
 &pcie {
 	status = "okay";
-	phys = <&lane0 PHY_TYPE_PCIE 0 0 100000000>;
+	phys = <&psgtr 0 PHY_TYPE_PCIE 0 0>;
 	/* refclk0 from clock synth */
 	assigned-clocks      = <&si5345 0 3>;
 	assigned-clock-rates =   <100000000>;
 };
 
 &gpio {
-	/* SD 1v8 select signal, keep low for now to force 3v3 mode */
-	usd-sw-sel {
-		gpio-hog;
-		gpios = <43 0>;
-		output-low;
-		line-name = "uSD_SW_SEL";
-	};
 	eth-led1 {
 		gpio-hog;
 		gpios = <86 0>; /* EMIO 8 */
@@ -341,22 +348,9 @@
 	};
 };
 
-&serdes {
-	status = "okay";
-};
-
 /* Carrier provides VBAT for RTC */
 &rtc {
 	status = "okay";
-};
-
-&gpio {
-	sd1-wp {
-		gpio-hog;
-		gpios = <44 0>;
-		input;
-		line-name = "SD1_WP";
-	};
 };
 
 &si5345 {
@@ -405,6 +399,18 @@
 			bias-pull-up;
 			slew-rate = <SLEW_RATE_SLOW>;
 			io-standard = <IO_STANDARD_LVCMOS18>;
+		};
+
+		/* Voltage select pin */
+		mux-sel {
+			groups = "gpio0_39_grp";
+			function = "gpio0";
+		};
+		conf-sel {
+			groups = "gpio0_39_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+			bias-pull-down;
 		};
 	};
 };

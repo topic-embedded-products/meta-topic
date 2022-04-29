@@ -1,0 +1,28 @@
+From 6754f9e7c8f174509918c998d2c33a11cb9d6e4d Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 18 Oct 2021 11:30:04 +0200
+Subject: [PATCH] adv7511_audio: Only register the SPDIF output
+
+The ADV7511 design only uses SPDIF, and I couldn't find a proper way to communicate
+this to the audio framework, so simply remove the I2S interface to make the SPDIF
+always the active one.
+---
+ drivers/gpu/drm/bridge/adv7511/adv7511_audio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/bridge/adv7511/adv7511_audio.c b/drivers/gpu/drm/bridge/adv7511/adv7511_audio.c
+index f101dd2819b5..6bf7821d43f5 100644
+--- a/drivers/gpu/drm/bridge/adv7511/adv7511_audio.c
++++ b/drivers/gpu/drm/bridge/adv7511/adv7511_audio.c
+@@ -227,7 +227,7 @@ static const struct hdmi_codec_ops adv7511_codec_ops = {
+ static const struct hdmi_codec_pdata codec_data = {
+ 	.ops = &adv7511_codec_ops,
+ 	.max_i2s_channels = 2,
+-	.i2s = 1,
++	.i2s = 0,
+ 	.spdif = 1,
+ };
+ 
+-- 
+2.17.1
+

@@ -1,0 +1,60 @@
+From 464ad96a017e189ebf8af68b6cc110be15fb9a75 Mon Sep 17 00:00:00 2001
+From: Leon Leijssen <leon.leijssen@topic.nl>
+Date: Wed, 5 Feb 2020 10:05:39 +0100
+Subject: [PATCH 12/35] topic-miamimp: Support UBIFS
+
+---
+ include/configs/topic_miamimp.h | 10 +++++++++-
+ include/configs/xilinx_zynqmp.h |  3 +++
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/include/configs/topic_miamimp.h b/include/configs/topic_miamimp.h
+index ff9b892ee7..94e55f326a 100644
+--- a/include/configs/topic_miamimp.h
++++ b/include/configs/topic_miamimp.h
+@@ -63,7 +63,15 @@
+ 	"usb_reset=gpio clear gpio@41_0 && gpio set gpio@41_0\0" \
+ 	"usb_reset_boot=run usb_reset; run usb_boot\0" \
+ 	"usb_reset_hostboot=run usb_reset; run usb_hostboot\0" \
+-	"usb_reset_dfu_ram=run usb_reset; run dfu_ram\0"
++	"usb_reset_dfu_ram=run usb_reset; run dfu_ram\0" \
++	"ubi_mount=sf probe && ubi part qspi-rootfs && ubifsmount ubi0:qspi-rootfs && setenv devtype ubi\0" \
++	"bootcmd_ubi=run ubi_mount && ubifsload ${scriptaddr} /boot/boot.scr && source ${scriptaddr}\0" \
++	"bootubipart=qspi-rootfs\0" \
++	"bootubivol=qspi-rootfs\0"
++
++#define BOOTENV_DEV_QSPI(devtypeu, devtypel, instance) \
++		"bootcmd_" #devtypel #instance "=sf probe " #instance " && " \
++				"run bootcmd_ubi\0"
+ 
+ #include "xilinx_zynqmp.h"
+ 
+diff --git a/include/configs/xilinx_zynqmp.h b/include/configs/xilinx_zynqmp.h
+index 36f3d962e4..7a77303a15 100644
+--- a/include/configs/xilinx_zynqmp.h
++++ b/include/configs/xilinx_zynqmp.h
+@@ -44,6 +44,7 @@
+ # define CONFIG_SYS_NAND_ONFI_DETECTION
+ #endif
+ 
++
+ #if defined(CONFIG_SPL_BUILD)
+ #define CONFIG_ZYNQMP_PSU_INIT_ENABLED
+ #endif
+@@ -136,11 +137,13 @@
+ # define BOOT_TARGET_DEVICES_NAND(func)
+ #endif
+ 
++#ifndef BOOTENV_DEV_QSPI
+ #define BOOTENV_DEV_QSPI(devtypeu, devtypel, instance) \
+ 	"bootcmd_" #devtypel #instance "=sf probe " #instance " 0 0 && " \
+ 		       "sf read $scriptaddr $script_offset_f $script_size_f && " \
+ 		       "echo QSPI: Trying to boot script at ${scriptaddr} && " \
+ 		       "source ${scriptaddr}; echo QSPI: SCRIPT FAILED: continuing...;\0"
++#endif
+ 
+ #define BOOTENV_DEV_NAME_QSPI(devtypeu, devtypel, instance) \
+ 	#devtypel #instance " "
+-- 
+2.17.1
+

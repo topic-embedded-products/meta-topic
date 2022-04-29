@@ -1,0 +1,29 @@
+From 453a443aaceeaeccb872fa436b71673a3aafe946 Mon Sep 17 00:00:00 2001
+From: Alexandru Ardelean <alexandru.ardelean@analog.com>
+Date: Wed, 11 Mar 2020 11:37:25 +0200
+Subject: [PATCH 7/8] drm: adv7511: check return code for regmap_bulk_read()
+
+The value of regmap_bulk_read() should be checked.
+
+Signed-off-by: Alexandru Ardelean <alexandru.ardelean@analog.com>
+(cherry picked from commit 44e7b75fd5d814918f1dc4249e22670e86a4ca4a)
+---
+ drivers/gpu/drm/bridge/adv7511/adv7511_drv.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/gpu/drm/bridge/adv7511/adv7511_drv.c b/drivers/gpu/drm/bridge/adv7511/adv7511_drv.c
+index 99eed4300b10..8bf927c5f37e 100644
+--- a/drivers/gpu/drm/bridge/adv7511/adv7511_drv.c
++++ b/drivers/gpu/drm/bridge/adv7511/adv7511_drv.c
+@@ -551,6 +551,8 @@ static int adv7511_get_edid_block(void *data, u8 *buf, unsigned int block,
+ 
+ 		ret = regmap_bulk_read(adv7511->regmap_edid, 0,
+ 				       adv7511->edid_buf, 256);
++		if (ret < 0)
++			return ret;
+ 
+ 		adv7511->current_edid_segment = block / 2;
+ 	}
+-- 
+2.17.1
+

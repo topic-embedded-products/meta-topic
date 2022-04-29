@@ -1,7 +1,7 @@
-From 0febe6d3df14148e663d6f333c9cb0ccbe6e7c09 Mon Sep 17 00:00:00 2001
+From f7364c05771821768c829fff0b5a22abc8713be9 Mon Sep 17 00:00:00 2001
 From: Alexandru Ardelean <alexandru.ardelean@analog.com>
 Date: Wed, 15 Jul 2020 07:17:29 +0300
-Subject: [PATCH 02/12] drm: adi_axi_hdmi: add includes required to build in
+Subject: [PATCH 2/8] drm: adi_axi_hdmi: add includes required to build in
  newer kernels
 
 In newer kernels, this is required to build.

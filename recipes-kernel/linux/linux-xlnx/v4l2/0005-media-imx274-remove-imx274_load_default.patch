@@ -1,0 +1,86 @@
+From 91c9a918847a67b4dfa74d4848992cd676e1985a Mon Sep 17 00:00:00 2001
+From: Bob Veringa <bob.veringa@topic.nl>
+Date: Fri, 23 Apr 2021 15:25:03 +0200
+Subject: [PATCH 5/7] media: imx274: remove imx274_load_default
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The function imx274_load_default no longer serves a purpose as it
+does not configure the values since
+commit ad97bc37426c1eec1464 ("media: i2c: imx274: Add IMX274
+power on and off sequence')
+
+All the values set in this function match the default value set when
+registering the controls, except for exposure. The default value
+of this is set to the minimal value for this field. The result of this 
+is that the output video is black when exposure is not explicitly 
+set by the user. By setting the default value when registering 
+the control to the same value originally used in the function, 
+this issue is avoided.
+
+Signed-off-by: Bob Veringa <bob.veringa@topic.nl>
+Acked-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/media/i2c/imx274.c | 24 ++----------------------
+ 1 file changed, 2 insertions(+), 22 deletions(-)
+
+diff --git a/drivers/media/i2c/imx274.c b/drivers/media/i2c/imx274.c
+index ce27c3ed6c0d..968a2f009fdf 100644
+--- a/drivers/media/i2c/imx274.c
++++ b/drivers/media/i2c/imx274.c
+@@ -1463,23 +1463,6 @@ static int imx274_s_frame_interval(struct v4l2_subdev *sd,
+ 	return ret;
+ }
+ 
+-/**
+- * imx274_load_default - load default control values
+- * @priv: Pointer to device structure
+- *
+- * Return: 0 on success, errors otherwise
+- */
+-static void imx274_load_default(struct stimx274 *priv)
+-{
+-	/* load default control values */
+-	priv->frame_interval.numerator = 1;
+-	priv->frame_interval.denominator = IMX274_DEF_FRAME_RATE;
+-	priv->ctrls.exposure->val = 1000000 / IMX274_DEF_FRAME_RATE;
+-	priv->ctrls.gain->val = IMX274_DEF_GAIN;
+-	priv->ctrls.vflip->val = 0;
+-	priv->ctrls.test_pattern->val = TEST_PATTERN_DISABLED;
+-}
+-
+ /**
+  * imx274_s_stream - It is used to start/stop the streaming.
+  * @sd: V4L2 Sub device
+@@ -2103,7 +2086,7 @@ static int imx274_probe(struct i2c_client *client)
+ 	imx274->ctrls.test_pattern = v4l2_ctrl_new_std_menu_items(
+ 		&imx274->ctrls.handler, &imx274_ctrl_ops,
+ 		V4L2_CID_TEST_PATTERN,
+-		ARRAY_SIZE(tp_qmenu) - 1, 0, 0, tp_qmenu);
++		ARRAY_SIZE(tp_qmenu) - 1, 0, TEST_PATTERN_DISABLED, tp_qmenu);
+ 
+ 	imx274->ctrls.gain = v4l2_ctrl_new_std(
+ 		&imx274->ctrls.handler,
+@@ -2117,7 +2100,7 @@ static int imx274_probe(struct i2c_client *client)
+ 		&imx274_ctrl_ops,
+ 		V4L2_CID_EXPOSURE, IMX274_MIN_EXPOSURE_TIME,
+ 		1000000 / IMX274_DEF_FRAME_RATE, 1,
+-		IMX274_MIN_EXPOSURE_TIME);
++		1000000 / IMX274_DEF_FRAME_RATE);
+ 
+ 	imx274->ctrls.vflip = v4l2_ctrl_new_std(
+ 		&imx274->ctrls.handler,
+@@ -2130,9 +2113,6 @@ static int imx274_probe(struct i2c_client *client)
+ 		goto err_ctrls;
+ 	}
+ 
+-	/* load default control values */
+-	imx274_load_default(imx274);
+-
+ 	/* register subdevice */
+ 	ret = v4l2_async_register_subdev(sd);
+ 	if (ret < 0) {
+-- 
+2.17.1
+

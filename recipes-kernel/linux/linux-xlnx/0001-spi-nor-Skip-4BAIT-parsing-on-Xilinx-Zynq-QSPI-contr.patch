@@ -1,0 +1,44 @@
+From f2cbf3740f80cf12d7dd18d09f6cb36d9ce9b8a7 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Wed, 19 May 2021 14:50:45 +0200
+Subject: [PATCH] spi-nor: Skip 4BAIT parsing on Xilinx Zynq QSPI controller
+
+Modern SPI flash chips have extra tables to tell the driver what instructions
+to use. This takes precedence over the "manual" settings.
+
+The Zynq QSPI controller is uncapable of 4-byte addres modes, resulting in
+corrupted reads on devices that provide a 4-Byte Address Instruction Table.
+
+Since there's no proper way to inform the spi-nor layer of this controller
+restriction, check the "compatible" value of the SPI controller and skip
+parsing the 4BAIT header alltogether on that controller.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/mtd/spi-nor/sfdp.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/mtd/spi-nor/sfdp.c b/drivers/mtd/spi-nor/sfdp.c
+index e2a43d39eb5f..b48ad614f328 100644
+--- a/drivers/mtd/spi-nor/sfdp.c
++++ b/drivers/mtd/spi-nor/sfdp.c
+@@ -1107,6 +1107,16 @@ int spi_nor_parse_sfdp(struct spi_nor *nor,
+ 	size_t psize;
+ 	int i, err;
+ 
++
++#ifdef CONFIG_OF
++	/* Xilinx Zynq QSPI controller does not support 4-byte addressing */
++	struct device_node *np = spi_nor_get_flash_node(nor);
++	struct device_node *np_spi = of_get_next_parent(np);
++	if (of_property_match_string(np_spi, "compatible",
++				     "xlnx,zynq-qspi-1.0") >= 0)
++		return 0;
++#endif
++
+ 	/* Get the SFDP header. */
+ 	err = spi_nor_read_sfdp_dma_unsafe(nor, 0, sizeof(header), &header);
+ 	if (err < 0)
+-- 
+2.17.1
+

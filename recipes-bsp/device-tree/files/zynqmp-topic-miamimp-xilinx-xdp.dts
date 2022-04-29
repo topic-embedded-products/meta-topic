@@ -53,7 +53,7 @@
 		regulator-name = "usb0-vbus";
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
-		gpio = <&gpio 77 GPIO_ACTIVE_LOW>; /* MIO77 -> USB_OTG_EN */
+		gpio = <&gpio 77 0>; /* MIO77 -> USB_OTG_EN */
 		enable-active-high;
 	};
 
@@ -64,12 +64,6 @@
 			gpios = <&gpio 26 GPIO_ACTIVE_LOW>;
 			linux,default-trigger = "heartbeat";
 		};
-	};
-
-	usb_phy0: phy0 {
-		compatible = "usb-nop-xceiv";
-		#phy-cells = <0>;
-		reset-gpios = <&gpio 65 GPIO_ACTIVE_LOW>; /* MIO65 -> USB_RESET */
 	};
 
 	/* XTAL for Si5341 */
@@ -149,7 +143,7 @@
 	is-dual = <1>;
 	multi-die = <1>;
 	flash@0 {
-		compatible = "st,m25p80", "n25q256a";
+		compatible = "jedec,spi-nor";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0x0>;
@@ -160,24 +154,16 @@
 		multi-die = <1>;
 		partition@qspi-boot-bin {
 			label = "qspi-boot-bin";
-			reg = <0x00000 0x60000>;
-		};
-		partition@qspi-u-boot-itb {
-			label = "qspi-u-boot-itb";
-			reg = <0x60000 0x100000>;
-		};
-		partition@qspi-u-boot-env {
-			label = "qspi-u-boot-env";
-			reg = <0x160000 0x20000>;
+			reg = <0x00000 0x180000>;
 		};
 		partition@qspi-rootfs {
 			label = "qspi-rootfs";
-			reg = <0x180000 0x3e80000>;
+			reg = <0x180000 0>;
 		};
 		/* Everything */
 		partition@qspi-all {
 			label = "qspi-all";
-			reg = <0x0 0x4000000>;
+			reg = <0x0 0>;
 		};
 	};
 };
@@ -186,8 +172,10 @@
 	status = "okay";
 };
 
-&serdes {
+&psgtr {
 	status = "okay";
+	clock-names = "ref0", "ref2";
+	clocks = <&si5341 0 0>, <&si5341 0 1>;
 };
 
 &uart1 {
@@ -325,7 +313,6 @@
 			silabs,common-mode = <3>;
 			silabs,amplitude = <3>;
 			silabs,synth-master;
-			always-on;
 		};
 
 		out@4 {
@@ -393,18 +380,21 @@
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usb0_default>;
+	/* Xilinx defines "reset-gpio" but this should be reset-gpios. Polarity is reversed. */
+	/delete-property/ reset-gpio;
+	reset-gpios = <&gpio 65 0>; /* MIO65 -> USB_RESET */
 };
 
 &dwc3_0 {
 	status = "okay";
-	dr_mode = "peripheral"; /* One of host, peripheral, otg */
+	dr_mode = "otg"; /* One of host, peripheral, otg */
 	vbus-supply = <&reg_usb0_vbus>;
-	usb-phy = <&usb_phy0>;
 
 	/* USB3 controller uses GTX lane "2" and refclk "2" at 26MHz */
 	phy-names = "usb3-phy";
-	phys = <&lane2 PHY_TYPE_USB3 0 2 26000000>;
+	phys = <&psgtr 2 PHY_TYPE_USB3 0 2>;
 	maximum-speed = "super-speed";
+	snps,usb3_lpm_capable;
 
 	/* refclk2 for USB3 from clock synth, use synth 2 to generate it */
 	assigned-clocks        = <&si5341 1 2>, <&si5341 0 1>;
@@ -426,8 +416,8 @@
 
 	phy-names = "sata-phy", "sata-phy";
 	/* Use refclock 0 at 150MHz for both instances */
-	phys = <&lane0 PHY_TYPE_SATA 0 0 150000000>,
-	       <&lane1 PHY_TYPE_SATA 1 0 150000000>;
+	phys = <&psgtr 0 PHY_TYPE_SATA 0 0>,
+	       <&psgtr 1 PHY_TYPE_SATA 1 0>;
 	/* refclk0 from clock output 0 synth 3 */
 	assigned-clocks        = <&si5341 1 3>, <&si5341 0 0>;
 	assigned-clock-parents = <0>,           <&si5341 1 3>;
@@ -440,8 +430,8 @@
 	assigned-clock-parents = <0>,           <&si5341 1 3>, <&si5341 1 3>;
 	assigned-clock-rates   = <400000000>,   <100000000>,   <100000000>;
 
-	phys = <&lane0 PHY_TYPE_PCIE 0 0 100000000>,
-	       <&lane1 PHY_TYPE_PCIE 1 0 100000000>;
+	phys = <&psgtr 0 PHY_TYPE_PCIE 0 0>,
+	       <&psgtr 1 PHY_TYPE_PCIE 1 0>;
 };
 
 /* DMA stuff copied from petalinux */

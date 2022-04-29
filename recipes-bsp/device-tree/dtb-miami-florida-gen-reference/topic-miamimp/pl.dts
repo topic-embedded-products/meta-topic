@@ -125,7 +125,8 @@
 				clocks = <&zynqmp_clk PL0_REF>, <&zynqmp_clk PL1_REF>, <&zynqmp_clk PL1_REF>;
 				interrupt-parent = <&gic>;
 				interrupts = <0 89 4>;
-				dma-ranges = <0x00000000 0x00000000 0x80000000>;
+				/* 32-bit child node, 64-bit parent node, thus 32-64-32 bits of dma-ranges */
+				dma-ranges = <0x0 0x0 0x0 0x80000000>;
 				xlnx,num-fstores = <3>;
 				xlnx,flush-fsync = <1>;
 				xlnx,addrwidth = <32>;
@@ -210,7 +211,7 @@
 		__overlay__ {
 			status = "okay";
 			phy-handle = <&phy3>;
-			phy-mode = "gmii";
+			phy-mode = "rgmii";
 			/* gem3 is the eth0 controller, hence we'll use the "0" mac for that */
 			nvmem-cells = <&gem0_mac>;
 			nvmem-cell-names = "mac-address";
@@ -239,7 +240,7 @@
 	};
 
 	fragment@6 {
-		target = <&serdes>;
+		target = <&psgtr>;
 		__overlay__ {
 			status = "okay";
 		};
@@ -261,13 +262,11 @@
 			/* For now, only try one instance */
 			phy-names = "sata-phy", "sata-phy";
 			/* Use refclock 0 at 150MHz for both instances */
-			phys = <&lane0 PHY_TYPE_SATA 0 0 150000000>,
-			       <&lane1 PHY_TYPE_SATA 1 0 150000000>;
+			phys = <&psgtr 0 PHY_TYPE_SATA 0 0>,
+			       <&psgtr 1 PHY_TYPE_SATA 1 0>;
 			/* Using SI514 on miami through logic as REFCLK0. Must be programmed to 150MHz. */
 			assigned-clocks = <&si514s>;
 			assigned-clock-rates = <150000000>;
-			/* Apparently doesn't work this way? */
-			clocks = <&si514s>;
 		};
 	};
 };

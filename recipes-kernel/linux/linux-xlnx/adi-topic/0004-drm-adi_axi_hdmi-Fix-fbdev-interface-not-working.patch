@@ -1,7 +1,7 @@
-From d2af25a6064c462bfe08167e46a922e29b0dc424 Mon Sep 17 00:00:00 2001
+From 56e9da6bdb616c9e357b302316c28c5bd2542782 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 30 Sep 2019 09:52:33 +0200
-Subject: [PATCH 4/4] drm: adi_axi_hdmi: Fix fbdev interface not working
+Subject: [PATCH 4/7] drm: adi_axi_hdmi: Fix fbdev interface not working
 
 In axi_hdmi_drv.c provide the "gem_prime_vmap" and similar methods and
 point them to the generic CMA implementation.

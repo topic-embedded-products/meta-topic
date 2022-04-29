@@ -23,7 +23,7 @@ index 1affa3e0dba9..2f566724032e 100644
 +	 */
 +	ret = mcp_write(mcp, MCP_IODIR, mcp->chip.ngpio == 16 ? 0xFFFF : 0xFF);
 +	if (ret < 0)
-+		goto fail;
++		return ret;
 +
  	/* verify MCP_IOCON.SEQOP = 0, so sequential reads work,
  	 * and MCP_IOCON.HAEN = 1, so we work with all chips.

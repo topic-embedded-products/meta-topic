@@ -1,0 +1,81 @@
+From 10251360ae6a9385700efc8452997bb19376b1c4 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Wed, 7 Jul 2021 11:58:32 +0200
+Subject: [PATCH 7/7] drm: axi_hdmi_encoder: Fix drm bridge methods
+
+Adapt to drm bridge interface changes (linked list)
+
+Since commit 1aed9509b29a6 ("drm/fb-helper: Remove return value from
+drm_fbdev_generic_setup()"), drm_fbdev_generic_setup() must be called
+after drm_dev_register()
+
+gem_free_object_unlocked replaces gem_free_object
+---
+ drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c     | 14 ++++++++------
+ drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c |  6 ++----
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c
+index cb128de779d5..1c7dbbb6e587 100644
+--- a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c
++++ b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c
+@@ -87,16 +87,18 @@ static int axi_hdmi_init(struct drm_driver *ddrv, struct device *dev)
+ 
+ 	drm_mode_config_reset(ddev);
+ 
+-	ret = drm_fbdev_generic_setup(ddev, 32);
++	/* init kms poll for handling hpd */
++	drm_kms_helper_poll_init(ddev);
++
++	ret = drm_dev_register(ddev, 0);
+ 	if (ret) {
+-		DRM_ERROR("failed to initialize drm fbdev: %d\n", ret);
++		DRM_ERROR("drm_dev_register failed: %d\n", ret);
+ 		goto err_crtc;
+ 	}
+ 
+-	/* init kms poll for handling hpd */
+-	drm_kms_helper_poll_init(ddev);
++	drm_fbdev_generic_setup(ddev, 32);
+ 
+-	return drm_dev_register(ddev, 0);
++	return 0;
+ 
+ err_crtc:
+ 	drm_mode_config_cleanup(ddev);
+@@ -134,7 +136,7 @@ static struct drm_driver axi_hdmi_driver = {
+ 	.gem_prime_vunmap	= drm_gem_cma_prime_vunmap,
+ 	.gem_prime_mmap		= drm_gem_cma_prime_mmap,
+ 	.dumb_create		= drm_gem_cma_dumb_create,
+-	.gem_free_object	= drm_gem_cma_free_object,
++	.gem_free_object_unlocked = drm_gem_cma_free_object,
+ 	.gem_vm_ops		= &drm_gem_cma_vm_ops,
+ 	.dumb_create		= drm_gem_cma_dumb_create,
+ 	.fops			= &axi_hdmi_driver_fops,
+diff --git a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
+index d12bc017c07b..1b0f7752ae49 100644
+--- a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
++++ b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
+@@ -110,7 +110,7 @@ static int axi_hdmi_connector_init(struct drm_device *dev,
+ static const struct drm_encoder_slave_funcs *get_slave_funcs(
+ 	struct drm_encoder *enc)
+ {
+-	if (enc->bridge)
++	if (drm_bridge_chain_get_first_bridge(enc))
+ 		return NULL;
+ 
+ 	return to_encoder_slave(enc)->slave_funcs;
+@@ -395,9 +395,7 @@ struct drm_encoder *axi_hdmi_encoder_create(struct drm_device *dev)
+ 
+ 	bridge = of_drm_find_bridge(priv->encoder_slave->dev.of_node);
+ 	if (bridge) {
+-		bridge->encoder = encoder;
+-		encoder->bridge = bridge;
+-		ret = drm_bridge_attach(encoder, bridge, NULL);
++		ret = drm_bridge_attach(encoder, bridge, NULL, 0);
+ 		if (ret) {
+ 		    drm_encoder_cleanup(encoder);
+ 		    return NULL;
+-- 
+2.17.1
+

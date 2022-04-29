@@ -1,0 +1,132 @@
+From 7609c8777cb2ba477c3bb47028bc3a2c7e43bcc9 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 9 Jul 2021 09:54:49 +0200
+Subject: [PATCH] phy-zynqmp: Postpone getting clock rate until it's actually
+ needed
+
+At probe time the driver would display the following error and abort:
+  xilinx-psgtr fd400000.phy: Invalid rate 0 for reference clock 0
+
+This issue was that at probe time, the system has not decided yet whether the
+GTR is to be used for SATA (150MHz) or PCIe (100 MHz). The driver doesn't need
+to know the clock frequency at that point yet, so wait until the lane is
+actually being initialized before requesting the clock rate setting.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/phy/xilinx/phy-zynqmp.c | 59 ++++++++++++++++-----------------
+ 1 file changed, 29 insertions(+), 30 deletions(-)
+
+diff --git a/drivers/phy/xilinx/phy-zynqmp.c b/drivers/phy/xilinx/phy-zynqmp.c
+index f478d8a17115..755c632b3cf5 100644
+--- a/drivers/phy/xilinx/phy-zynqmp.c
++++ b/drivers/phy/xilinx/phy-zynqmp.c
+@@ -207,7 +207,6 @@ struct xpsgtr_phy {
+  * @siou: siou base address
+  * @gtr_mutex: mutex for locking
+  * @phys: PHY lanes
+- * @refclk_sscs: spread spectrum settings for the reference clocks
+  * @clk: reference clocks
+  * @tx_term_fix: fix for GT issue
+  * @saved_icm_cfg0: stored value of ICM CFG0 register
+@@ -219,7 +218,6 @@ struct xpsgtr_dev {
+ 	void __iomem *siou;
+ 	struct mutex gtr_mutex; /* mutex for locking */
+ 	struct xpsgtr_phy phys[NUM_LANES];
+-	const struct xpsgtr_ssc *refclk_sscs[NUM_LANES];
+ 	struct clk *clk[NUM_LANES];
+ 	bool tx_term_fix;
+ 	unsigned int saved_icm_cfg0;
+@@ -335,13 +333,38 @@ static int xpsgtr_wait_pll_lock(struct phy *phy)
+ 	return ret;
+ }
+ 
++/* Get the spread spectrum (SSC) settings for the reference clock rate */
++static const struct xpsgtr_ssc * xpsgtr_find_sscs(struct xpsgtr_phy *gtr_phy)
++{
++	unsigned long rate;
++	struct clk *clk;
++	unsigned int i;
++
++	clk = gtr_phy->dev->clk[gtr_phy->refclk];
++	rate = clk_get_rate(clk);
++
++	for (i = 0 ; i < ARRAY_SIZE(ssc_lookup); i++) {
++		if (rate == ssc_lookup[i].refclk_rate) {
++			return &ssc_lookup[i];
++		}
++	}
++
++	dev_err(gtr_phy->dev->dev,
++		"Invalid rate %lu for reference clock %u\n",
++		rate, gtr_phy->refclk);
++
++	return NULL;
++}
++
+ /* Configure PLL and spread-sprectrum clock. */
+ static void xpsgtr_configure_pll(struct xpsgtr_phy *gtr_phy)
+ {
+-	const struct xpsgtr_ssc *ssc;
++	const struct xpsgtr_ssc *ssc = xpsgtr_find_sscs(gtr_phy);
+ 	u32 step_size;
+ 
+-	ssc = gtr_phy->dev->refclk_sscs[gtr_phy->refclk];
++	if (!ssc)
++		return;
++
+ 	step_size = ssc->step_size;
+ 
+ 	xpsgtr_clr_set(gtr_phy->dev, PLL_REF_SEL(gtr_phy->lane),
+@@ -796,8 +819,7 @@ static struct phy *xpsgtr_xlate(struct device *dev,
+ 	}
+ 
+ 	refclk = args->args[3];
+-	if (refclk >= ARRAY_SIZE(gtr_dev->refclk_sscs) ||
+-	    !gtr_dev->refclk_sscs[refclk]) {
++	if (refclk >= ARRAY_SIZE(gtr_dev->clk)) {
+ 		dev_err(dev, "Invalid reference clock number %u\n", refclk);
+ 		return ERR_PTR(-EINVAL);
+ 	}
+@@ -889,9 +911,7 @@ static int xpsgtr_get_ref_clocks(struct xpsgtr_dev *gtr_dev)
+ 	unsigned int refclk;
+ 	int ret;
+ 
+-	for (refclk = 0; refclk < ARRAY_SIZE(gtr_dev->refclk_sscs); ++refclk) {
+-		unsigned long rate;
+-		unsigned int i;
++	for (refclk = 0; refclk < ARRAY_SIZE(gtr_dev->clk); ++refclk) {
+ 		struct clk *clk;
+ 		char name[8];
+ 
+@@ -912,27 +932,6 @@ static int xpsgtr_get_ref_clocks(struct xpsgtr_dev *gtr_dev)
+ 			goto err_clk_put;
+ 
+ 		gtr_dev->clk[refclk] = clk;
+-
+-		/*
+-		 * Get the spread spectrum (SSC) settings for the reference
+-		 * clock rate.
+-		 */
+-		rate = clk_get_rate(clk);
+-
+-		for (i = 0 ; i < ARRAY_SIZE(ssc_lookup); i++) {
+-			if (rate == ssc_lookup[i].refclk_rate) {
+-				gtr_dev->refclk_sscs[refclk] = &ssc_lookup[i];
+-				break;
+-			}
+-		}
+-
+-		if (i == ARRAY_SIZE(ssc_lookup)) {
+-			dev_err(gtr_dev->dev,
+-				"Invalid rate %lu for reference clock %u\n",
+-				rate, refclk);
+-			ret = -EINVAL;
+-			goto err_clk_put;
+-		}
+ 	}
+ 
+ 	return 0;
+-- 
+2.17.1
+

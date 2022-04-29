@@ -94,7 +94,14 @@
 };
 
 /* Setup for SATA serdes clock */
-&si514s {
+&psgtr {
+	status = "disabled"; /* Must wait until PL has been programmed */
+	/* SI514 on miami can be routed through logic as REFCLK0. */
+	/* Routed Si514 on Florida to refclk1 */
+	clock-names = "ref0";
+	clocks = <&si514s>;
+	/* Set clock rates since the psgtr driver doesn't do that */
+	assigned-clocks = <&si514s>;
 	assigned-clock-rates = <150000000>;
 };
 
@@ -201,11 +208,6 @@
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usb0_default>;
-	/* see: https://forums.xilinx.com/t5/Embedded-Linux/Zynqmp-USB2-0/td-p/790522/page/2 */
-	/delete-property/ clocks;
-	/delete-property/ clock-names;
-	clocks = <&zynqmp_clk USB0_BUS_REF>;
-	clock-names = "bus_clk";
 };
 
 &dwc3_0 {
@@ -213,17 +215,19 @@
 	dr_mode = "otg"; /* "host", "peripheral" or "otg" */
 	vbus-supply = <&reg_usb0_vbus>;
 	maximum-speed = "high-speed"; /* super-speed not available on carrier */
+	snps,transceiver_delay_quirk; /* USB3340 PHY needs extra delay */
 	/* see: https://forums.xilinx.com/t5/Embedded-Linux/Zynqmp-USB2-0/td-p/790522/page/2 */
 	snps,dis_u2_susphy_quirk;
 	snps,dis_u3_susphy_quirk;
 	/delete-property/ phy-names;
 	/delete-property/ phys;
-	usb-phy = <&usb_phy0>;
+/*
 	ulpi {
 		phy {
 			compatible = "smsc,usb3340";
 		};
 	};
+*/
 };
 
 &pinctrl0 {

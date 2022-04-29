@@ -90,6 +90,18 @@
 		#clock-cells = <0x0>;
 		clock-frequency = <50000000>;
 	};
+	xtal38MHz: xtal_38_clock {
+		compatible = "fixed-clock";
+		#clock-cells = <0x0>;
+		clock-frequency = <38880000>;
+	};
+	xtalmux: xtal_mux {
+		compatible = "gpio-mux-clock";
+		clocks = <&xtal38MHz>, <&xtal50MHz>;
+		#clock-cells = <0>;
+		select-gpios = <&gpioex 7 GPIO_ACTIVE_HIGH>;
+		input;
+	};
 
 	/* Make temperature readouts show up in hwmon applications */
 	iio-hwmon-ams-temp {
@@ -99,11 +111,21 @@
 	};
 };
 
+&usb0 {
+        /* Xilinx defines "reset-gpio" which by default controls the MODE pins. Only some Xilinx boards have that */
+        /delete-property/ reset-gpio;
+};
+
+
 &gpio {
 	status = "okay";
 };
 
 &gpu {
+	status = "okay";
+};
+
+&cci {
 	status = "okay";
 };
 
@@ -116,13 +138,13 @@
 		compatible = "nxp,pcal9554b";
 		vcc-supply = <&reg_1v8_miami>;
 		reg = <0x20>;
-		gpio-line-names = "USERLED", "", "ETH_RESET_N", "USB0_RESET_N", "USB1_RESET_N", "CLK_SW_CNTRL", "", "";
+		gpio-line-names = "USERLED", "PULLUP", "ETH_RESET_N", "USB0_RESET_N", "USB1_RESET_N", "CLK_SW_CNTRL", "ETH_SWITCH_CTRL", "XTAL_CFG";
 		gpio-controller;
 		#gpio-cells = <2>;
 		eth-clk-sw-ctrl {
 			gpio-hog;
 			gpios = <5 0>;
-			output-low;
+			input; /* Hardware pull-up or pull-down sets default */
 			line-name = "eth_clk_sw_ctrl";
 		};
 	};
@@ -134,8 +156,11 @@
 		pagesize = <32>;
 		#address-cells = <1>;
 		#size-cells = <1>;
-		gem2_mac: mac@0 {
-			reg = <0x0 6>;
+		gem2_mac: mac@f30 {
+			reg = <0xf30 6>;
+		};
+		gem0_mac: mac@f38 {
+			reg = <0xf38 6>;
 		};
 	};
 
@@ -146,14 +171,17 @@
 		#clock-cells = <2>;
 		#address-cells = <1>;
 		#size-cells = <0>;
-		clocks = <&xtal50MHz>;
+		clocks = <&xtalmux>;
 		clock-names = "xtal";
 		/* Interrupt connected to MIO26 (not actually used) */
 		interrupt-parent = <&gpio>;
 		interrupts = <26 IRQ_TYPE_LEVEL_LOW>;
 
-		silabs,pll-m-num = <280>; /* PLL at 280x50M = 14.0 GHz */
-		silabs,pll-m-den = <1>;
+		/*
+		 * Not setting silabs,pll-m-num and silabs,pll-m-den, this will
+		 * make the driver default to 14GHz, regardless of the input
+		 * frequency (which may be 50MHz or 38.88MHz).
+		 */
 
 		/*
 		 * Clock tree for the ttpzu9 and tdpzu9, with one PLL running at
@@ -286,7 +314,7 @@
 	status = "okay";
 	is-dual = <1>;
 	flash@0 {
-		compatible = "st,m25p80", "n25q256a";
+		compatible = "jedec,spi-nor";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0x0>;
@@ -296,24 +324,16 @@
 		is-dual = <1>;
 		partition@qspi-boot-bin {
 			label = "qspi-boot-bin";
-			reg = <0x00000 0x60000>;
-		};
-		partition@qspi-u-boot-itb {
-			label = "qspi-u-boot-itb";
-			reg = <0x60000 0x100000>;
-		};
-		partition@qspi-u-boot-env {
-			label = "qspi-u-boot-env";
-			reg = <0x160000 0x20000>;
+			reg = <0x00000 0x180000>;
 		};
 		partition@qspi-rootfs {
 			label = "qspi-rootfs";
-			reg = <0x180000 0xFE80000>;
+			reg = <0x180000 0>;
 		};
 		/* Everything */
 		partition@qspi-all {
 			label = "qspi-all";
-			reg = <0x0 0x10000000>;
+			reg = <0x0 0>;
 		};
 	};
 };
@@ -335,8 +355,10 @@
 	disable-wp; /* We don't have a write-protect detection */
 };
 
-&serdes {
+&psgtr {
 	status = "okay";
+	clock-names = "ref0", "ref1", "ref3";
+	clocks = <&si5345 0 3>, <&si5345 0 2>, <&si5345 0 8>;
 };
 
 &uart0 {
@@ -371,7 +393,7 @@
 	phy-mode = "sgmii";
 	nvmem-cells = <&gem2_mac>;
 	nvmem-cell-names = "mac-address";
-	phys = <&lane2 PHY_TYPE_SGMII 2 1 125000000>; /* Lane 2 refclk 1 */
+	phys = <&psgtr 2 PHY_TYPE_SGMII 2 1>; /* Lane 2 refclk 1 */
 	/* Need 25MHz and 125MHz clocks (Xilinx drivers lack proper clk support) */
 	assigned-clocks      = <&si5345 0 5>, <&si5345 0 2>, <&si5345 0 7>;
 	assigned-clock-rates =    <25000000>,   <125000000>,   <250000000>;
@@ -384,12 +406,15 @@
 	mdio {
 		#address-cells = <1>;
 		#size-cells = <0>;
+		reset-gpios = <&gpioex 2 1>; /* Active low, on port 2 of GPIO expander */
+		/* Datasheet: 10 ms reset pulse, wait 50 ms for register access */
+		reset-delay-us = <10000>;
+		reset-post-delay-us = <50000>;
 
 		miamiphy: ethernet-phy@1 {
 			/* PHY on the board */
 			device_type = "ethernet-phy";
 			reg = <0x1>;
-			reset-gpios = <&gpioex 2 1>; /* Active low, on port 2 of GPIO expander */
 			interrupt-parent = <&gpio>;
 			interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
 			marvell,reg-init =

@@ -1,7 +1,7 @@
-From adcbb78292552606acc46205b771025c2d538b17 Mon Sep 17 00:00:00 2001
+From d1262b94b98b077107ef23a16d7d6d41369b813e Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 2 Dec 2014 08:33:03 +0100
-Subject: [PATCH 3/4] sound/soc/adi/axi-spdif.c: Support programmable master
+Subject: [PATCH 3/7] sound/soc/adi/axi-spdif.c: Support programmable master
  clock
 
 If the master clock supports programmable rates, program it to generate
