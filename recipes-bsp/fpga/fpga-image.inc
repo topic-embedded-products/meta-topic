@@ -28,7 +28,8 @@ BOARD_DESIGN_URI ?= ""
 BOARD_DESIGN_PATH ?= ""
 
 SRC_URI = "${BOARD_DESIGN_URI}"
-S = "${WORKDIR}/git/${BOARD_DESIGN_PATH}"
+S = "${WORKDIR}/git${@'${BOARD_DESIGN_PATH}' and '/${BOARD_DESIGN_PATH}' or ''}"
+
 
 PACKAGES = "${PN}"
 
