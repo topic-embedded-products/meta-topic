@@ -13,10 +13,10 @@ inherit devicetree
 # We do not provide virtual/dtb, there may be more overlays
 PROVIDES = ""
 
-RRECOMMENDS_${PN} = "fpga-firmware-load"
+RRECOMMENDS:${PN} = "fpga-firmware-load"
 
 BITSTREAM = "Unsupported-board-for-overlay"
-RDEPENDS_${PN} += "${BITSTREAM}"
+RDEPENDS:${PN} += "${BITSTREAM}"
 
 SRC_URI = "file://pl.dts"
 
@@ -27,7 +27,7 @@ addtask replacevars after do_patch before do_compile
 
 # devicetree.bbclass installs into /boot/devicetree while we want to install
 # into /lib/firmware
-FILES_${PN} = "/lib/firmware"
+FILES:${PN} = "/lib/firmware"
 do_install() {
     for DTB_FILE in `ls *.dtbo`; do
         install -Dm 0644 ${B}/${DTB_FILE} ${D}/lib/firmware/${DTB_FILE}

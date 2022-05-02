@@ -18,7 +18,7 @@ do_compile() {
 	grep -v '^#' ${WORKDIR}/fpga-bit-to-bin.py.tmp >> ${WORKDIR}/fpga-bit-to-bin.py
 }
 
-FILES_${PN} = "${bindir}"
+FILES:${PN} = "${bindir}"
 do_install() {
 	install -d ${D}${bindir}
 	install -m 755 ${WORKDIR}/fpga-bit-to-bin.py ${D}${bindir}/fpga-bit-to-bin.py

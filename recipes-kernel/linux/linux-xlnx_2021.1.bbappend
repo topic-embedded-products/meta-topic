@@ -5,17 +5,17 @@
 
 require topic-xilinx-kernel-patches.inc
 
-COMPATIBLE_MACHINE_topic-miami = "topic-miami"
+COMPATIBLE_MACHINE:topic-miami = "topic-miami"
 
 # Kernel configuration
 TOPICBSPCONFIG ?= ""
-TOPICBSPCONFIG_topic-miami = "file://topic-miami-standard.cfg file://usb-network-cdc.cfg"
-TOPICBSPCONFIG_topic-miamimp = "file://topic-miamimp-standard.cfg file://tdk-peta.cfg file://usb-network-cdc.cfg"
-TOPICBSPCONFIG_tdpzu9 = "file://topic-miamimp-standard.cfg file://topic-miamiplusmp-extra.cfg file://tdpzu9-extra.cfg file://usb-wired-network-adapters.cfg"
-TOPICBSPCONFIG_ttpzu9 = "file://topic-miamimp-standard.cfg file://topic-miamiplusmp-extra.cfg file://ttpzu9-extra.cfg file://usb-wired-network-adapters.cfg"
-TOPICBSPCONFIG_xdpzu7 = "file://topic-xdpzu7-standard.cfg file://usb-wired-network-adapters.cfg"
+TOPICBSPCONFIG:topic-miami = "file://topic-miami-standard.cfg file://usb-network-cdc.cfg"
+TOPICBSPCONFIG:topic-miamimp = "file://topic-miamimp-standard.cfg file://tdk-peta.cfg file://usb-network-cdc.cfg"
+TOPICBSPCONFIG:tdpzu9 = "file://topic-miamimp-standard.cfg file://topic-miamiplusmp-extra.cfg file://tdpzu9-extra.cfg file://usb-wired-network-adapters.cfg"
+TOPICBSPCONFIG:ttpzu9 = "file://topic-miamimp-standard.cfg file://topic-miamiplusmp-extra.cfg file://ttpzu9-extra.cfg file://usb-wired-network-adapters.cfg"
+TOPICBSPCONFIG:xdpzu7 = "file://topic-xdpzu7-standard.cfg file://usb-wired-network-adapters.cfg"
 
-SRC_URI_append = "\
+SRC_URI:append = "\
 	${TOPICBSPCONFIG} \
 	${@bb.utils.contains("MACHINE_FEATURES", "rtc", "file://zynqmp-rtc.cfg", "", d)} \
 	"

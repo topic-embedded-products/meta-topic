@@ -1,5 +1,5 @@
 XSERVER_ADDITIONAL ?= " xf86-video-modesetting"
-XSERVER_append_topic-miamimp = "${XSERVER_ADDITIONAL}"
-XSERVER_append_topic-miami = "${XSERVER_ADDITIONAL}"
-XSERVER_append_xdpzu7 = "${XSERVER_ADDITIONAL}"
+XSERVER:append:topic-miamimp = "${XSERVER_ADDITIONAL}"
+XSERVER:append:topic-miami = "${XSERVER_ADDITIONAL}"
+XSERVER:append:xdpzu7 = "${XSERVER_ADDITIONAL}"
 

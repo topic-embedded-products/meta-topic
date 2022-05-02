@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/linux-xlnx:"
 
 # Brings the Xilinx kernel up to date with our fork at:
 #   https://github.com/topic-embedded-products/linux
@@ -51,7 +51,7 @@ XILINX_V4L2_FIXES = "\
 	file://v4l2/0007-Fix-colors-resetting-after-format-adjust.patch \
 	"
 
-SRC_URI_append = "\
+SRC_URI:append = "\
 	${MDEVSUPPORT} \
 	${EXFATSUPPORT} \
 	${ADIHDMISUPPORT} \
@@ -79,4 +79,4 @@ SRC_URI_append = "\
 	"
 
 # Compile overlay-capable devicetrees
-EXTRA_OEMAKE_append = " DTC_FLAGS="-p 1024 -@""
+EXTRA_OEMAKE:append = " DTC_FLAGS="-p 1024 -@""

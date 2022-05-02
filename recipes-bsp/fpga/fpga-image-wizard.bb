@@ -31,7 +31,7 @@ do_compile() {
 }
 
 # Copy the dyplo_license_file if exists.
-do_install_append() {
+do_install:append() {
 	if [ -f ${S}/dyplo_license_file.lic ]; then
 		cp -f ${S}/dyplo_license_file.lic ${D}${datadir}/dyplo_license_file.lic
 	fi

@@ -1,6 +1,6 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
-SRC_URI_append = "\
+SRC_URI:append = "\
 	file://pmu-firmware-zynqmp-pmu.bin.xz \
 	file://0001-board-topic-Detect-RAM-size-at-boot.patch \
 	file://0002-board-topic_miamilite-Support-cost-reduced-version.patch \
@@ -41,19 +41,19 @@ SRC_URI_append = "\
 
 # Glitches on serial input interrupt the boot sequence on some boards, use
 # a particular key (space) to stop autoboot instead of any key.
-SRC_URI_append_topic-miamimp = " file://must-press-space-to-stop-autoboot.cfg"
+SRC_URI:append:topic-miamimp = " file://must-press-space-to-stop-autoboot.cfg"
 
 EXTRACOMPILEDEPENDS = ""
-EXTRACOMPILEDEPENDS_zynqmp = "arm-trusted-firmware:do_deploy"
+EXTRACOMPILEDEPENDS:zynqmp = "arm-trusted-firmware:do_deploy"
 
 # Add PMU and ATF
 do_compile[depends] += "${EXTRACOMPILEDEPENDS}"
-do_compile_prepend_zynqmp() {
+do_compile:prepend:zynqmp() {
 	cp ${WORKDIR}/pmu-firmware-zynqmp-pmu.bin ${S}/board/topic/zynqmp/pmufw.bin
 	cp ${DEPLOY_DIR_IMAGE}/arm-trusted-firmware.bin ${B}/arm-trusted-firmware.bin
 }
 
-do_compile_append_zynqmp() {
+do_compile:append:zynqmp() {
 	cp ${S}/board/topic/zynqmp/fit_spl_atf.its ${B}/fit_spl_atf.its
 	${B}/tools/mkimage -f ${B}/fit_spl_atf.its ${B}/u-boot.itb
 }

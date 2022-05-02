@@ -7,9 +7,9 @@ LICENSE = "CLOSED"
 COMPATIBLE_MACHINE = "^(tdkz|xdpzu)"
 
 PV = "38+8838cd5"
-PV_tdkzu15 = "36+02419a0"
-PV_tdkz15 = "39+d47bd96"
-PV_xdpzu7 = "78+3320771"
+PV:tdkzu15 = "36+02419a0"
+PV:tdkz15 = "39+d47bd96"
+PV:xdpzu7 = "78+3320771"
 
 BOARD_DESIGN_PATH = "${BPN}-${MACHINE}"
 TOPICDOWNLOADS_URI ?= "https://topic-downloads.fra1.digitaloceanspaces.com"
@@ -25,7 +25,7 @@ do_compile() {
 }
 
 # Create symlinks to be compatible with PR demo
-do_install_append() {
+do_install:append() {
     for f in contrast grayscale treshold
     do
         if [ -d ${D}${FPGA_BITSTREAM_PATH}/bitstreams/yuv_$f ]
@@ -41,12 +41,12 @@ do_install_append() {
 
 # Package partials separately
 PACKAGES =+ "${PN}-partials"
-RPROVIDES_${PN}-partials = "pr-demo-partials"
-FILES_${PN}-partials = "${FPGA_BITSTREAM_PATH}/bitstreams ${FPGA_BITSTREAM_PATH}/bitstreams.*"
+RPROVIDES:${PN}-partials = "pr-demo-partials"
+FILES:${PN}-partials = "${FPGA_BITSTREAM_PATH}/bitstreams ${FPGA_BITSTREAM_PATH}/bitstreams.*"
 
 # Any design checkpoint goes into the "dev" package
 PACKAGES =+ "${PN}-dev"
-FILES_${PN}-dev = "${FPGA_BITSTREAM_PATH}/bitstreams*/${BPN}-${MACHINE}.dcp"
+FILES:${PN}-dev = "${FPGA_BITSTREAM_PATH}/bitstreams*/${BPN}-${MACHINE}.dcp"
 
 SRC_URI[tdkzu6.md5sum] = "e06f16961b8e5cc21ea0dcc55d7251a5"
 SRC_URI[tdkzu9.md5sum] = "e17e5efc3745062d0cdc2bf3e6004820"

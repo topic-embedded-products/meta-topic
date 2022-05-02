@@ -11,15 +11,15 @@ inherit allarch update-rc.d systemd
 INITSCRIPT_NAME = "${BPN}.sh"
 INITSCRIPT_PARAMS = "start 08 S ."
 
-SYSTEMD_SERVICE_${PN} = "${BPN}.service"
+SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 
-RDEPENDS_${PN} += "yavta media-ctl"
+RDEPENDS:${PN} += "yavta media-ctl"
 
 do_compile() {
 	true
 }
 
-FILES_${PN} = "${bindir} ${sysconfdir} ${systemd_unitdir}"
+FILES:${PN} = "${bindir} ${sysconfdir} ${systemd_unitdir}"
 
 do_install() {
 	install -d ${D}${bindir}

@@ -14,7 +14,7 @@ SRCREV = "041f3745f3eff6ff89c834d3b883dc4f0df265d1"
 
 INITSCRIPT_NAME = "${BPN}.sh"
 INITSCRIPT_PARAMS = "start 9 S ."
-SYSTEMD_SERVICE_${PN} = "${BPN}.service"
+SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 
 do_install() {
 	install -d ${D}${bindir}

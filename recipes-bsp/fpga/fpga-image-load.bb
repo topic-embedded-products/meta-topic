@@ -17,13 +17,13 @@ inherit update-rc.d systemd
 INITSCRIPT_NAME = "${PN}.sh"
 INITSCRIPT_PARAMS = "start 03 S ."
 
-SYSTEMD_SERVICE_${PN} = "fpga-image-load.service"
+SYSTEMD_SERVICE:${PN} = "fpga-image-load.service"
 
 do_compile() {
 	true
 }
 
-FILES_${PN} = "${bindir} ${sysconfdir} ${systemd_unitdir}"
+FILES:${PN} = "${bindir} ${sysconfdir} ${systemd_unitdir}"
 
 do_install() {
 	install -d ${D}${bindir}

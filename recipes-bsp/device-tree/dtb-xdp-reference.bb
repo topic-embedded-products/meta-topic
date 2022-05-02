@@ -4,9 +4,9 @@ SUMMARY = "Devicetree overlay for XDP reference FPGA image"
 
 PV = "2"
 
-RRECOMMENDS_${PN} += "xdp-hwdetect"
+RRECOMMENDS:${PN} += "xdp-hwdetect"
 
-BITSTREAM_xdpzu7 = "fpga-image-pr-reference"
+BITSTREAM:xdpzu7 = "fpga-image-pr-reference"
 
 COMPATIBLE_MACHINE = "^xdp"
 

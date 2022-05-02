@@ -3,11 +3,11 @@ inherit gitpkgv
 PV = "${XLNX_HDMI_VERSION}+${SRCPV}"
 PKGV = "${XLNX_HDMI_VERSION}+${GITPKGV}"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
-RPROVIDES_${PN} = "dp159"
+RPROVIDES:${PN} = "dp159"
 
-SRC_URI_append = "\
+SRC_URI:append = "\
 	file://0001-Add-support-for-manual-control-of-tx-refclk-rdy-sign.patch \
 	file://0002-dp159-enable-output-termination.patch \
 	file://0003-xilinx_drm_hdmi-Do-not-floor-clock-rate.patch \

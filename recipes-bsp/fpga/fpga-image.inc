@@ -5,7 +5,7 @@ INHIBIT_DEFAULT_DEPS = "1"
 # Need the bitstream converter on the build machine
 DEPENDS = "fpga-bit-to-bin-native"
 # Recommend bitstream to be loaded at boot
-RRECOMMENDS_${PN} = "${@bb.utils.contains("MACHINE_FEATURES", "fpgamgr", "fpga-firmware-load", "fpga-image-load", d)}"
+RRECOMMENDS:${PN} = "${@bb.utils.contains("MACHINE_FEATURES", "fpgamgr", "fpga-firmware-load", "fpga-image-load", d)}"
 # Package is machine specific
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 # Workaround: XPS fails to build when there's a "+" in the path.
@@ -36,7 +36,7 @@ PACKAGES = "${PN}"
 # Multiple bitstream providers may exist for a single machine, so use
 # update-alternatives to keep them apart
 inherit update-alternatives
-ALTERNATIVE_${PN} = "fpga.bin bitstreams"
+ALTERNATIVE:${PN} = "fpga.bin bitstreams"
 ALTERNATIVE_LINK_NAME[fpga.bin] = "${FPGA_STATIC_BITSTREAM_PATH}/fpga.bin"
 ALTERNATIVE_TARGET[fpga.bin] = "${FPGA_STATIC_BITSTREAM_PATH}/fpga.bin"
 ALTERNATIVE_LINK_NAME[bitstreams] = "${FPGA_BITSTREAM_PATH}/bitstreams"
@@ -137,7 +137,7 @@ do_convert_bitstreams() {
 }
 do_convert_bitstreams[dirs] = "${B}"
 
-FILES_${PN} = "${FPGA_BITSTREAM_PATH} ${FPGA_STATIC_BITSTREAM_PATH}"
+FILES:${PN} = "${FPGA_BITSTREAM_PATH} ${FPGA_STATIC_BITSTREAM_PATH}"
 do_install() {
 	install -d ${D}${FPGA_BITSTREAM_PATH}
 	install -d ${D}${FPGA_STATIC_BITSTREAM_PATH}
@@ -152,6 +152,6 @@ do_install() {
 addtask convert_bitstreams after do_compile before do_install
 
 # Prevent bitstreams ending up in sysroot.
-sysroot_stage_dirs_append() {
+sysroot_stage_dirs:append() {
 	rm -rf $to${FPGA_STATIC_BITSTREAM_PATH}/fpga.bin $to${FPGA_BITSTREAM_PATH}/bitstreams
 }

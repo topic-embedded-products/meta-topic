@@ -56,7 +56,7 @@ do_convert_bitstreams() {
 }
 do_convert_bitstreams[dirs] = "${B}"
 
-FILES_${PN} = "${datadir}"
+FILES:${PN} = "${datadir}"
 do_install() {
 	install -d ${D}${datadir}/bitstreams.${FPGA_STATIC_PN}
 	if [ -d ${WORKDIR}/bitstreams ]
@@ -68,6 +68,6 @@ do_install() {
 addtask convert_bitstreams after do_compile before do_install
 
 # Prevent bitstreams ending up in sysroot.
-sysroot_stage_dirs_append() {
+sysroot_stage_dirs:append() {
 	rm -rf $to${datadir}/bitstreams.${FPGA_STATIC_PN}
 }

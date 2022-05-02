@@ -8,7 +8,7 @@ SRC_URI = "https://github.com/analogdevicesinc/linux/blob/c7c505283d373d0618e33e
 
 S = "${WORKDIR}"
 
-FILES_${PN} = "/lib/firmware"
+FILES:${PN} = "/lib/firmware"
 
 do_install() {
 	install -d ${D}/lib/firmware

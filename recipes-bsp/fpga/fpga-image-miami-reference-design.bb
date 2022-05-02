@@ -15,7 +15,7 @@ SRCREV = "4c97f5f3de034d09a606a15354a3ff219721a5ca"
 PV = "0.${SRCPV}"
 PKGV = "0.${GITPKGV}"
 
-do_compile_prepend() {
+do_compile:prepend() {
 	export MACHINE="${MACHINE}"
 	chmod a+x *.sh
 }

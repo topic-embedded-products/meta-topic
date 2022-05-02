@@ -3,7 +3,7 @@ require kernel-module-topic.inc
 
 SRCREV = "29c911fc839588830098dc61c57ed1357ae1671d"
 
-RRECOMMENDS_${PN} = "\
+RRECOMMENDS:${PN} = "\
 	kernel-module-backlight \
 	kernel-module-xilinx-dma \
 	"

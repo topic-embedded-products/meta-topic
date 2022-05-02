@@ -4,7 +4,7 @@ SRC_URI[sha256sum] = "2fe9f3da94f19ba6a74d7da32f4c719ffddd31e38ada3be167884eba51
 
 # Remove the KHR headers, conflicts with mesa-gl
 # Install gbm includes for x11 as well, not just for wayland
-do_install_append() {
+do_install:append() {
     rm -rf ${D}${includedir}/KHR
     if [ "${USE_X11}" = "yes" ]; then
         install -m 0644 ${S}/${PV}/glesHeaders/GBM/gbm.h ${D}${includedir}/

@@ -13,7 +13,7 @@ do_compile() {
 	:
 }
 
-FILES_${PN} = "${nonarch_base_libdir}/firmware /etc/firmware"
+FILES:${PN} = "${nonarch_base_libdir}/firmware /etc/firmware"
 # inhibit dbg/dev packages
 PACKAGES = "${PN}"
 

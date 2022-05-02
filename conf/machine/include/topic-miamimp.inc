@@ -50,11 +50,11 @@ UBOOT_MACHINE = "topic_miamimp_config"
 SPL_BINARY = "spl/boot.bin"
 SPL_SYMLINK = "BOOT.bin"
 UBOOT_SUFFIX = "itb"
-# Since Xilinx defines UBOOT_SUFFIX_zynqmp somewhere, fix that here
-UBOOT_SUFFIX_zynqmp = "itb"
+# Since Xilinx defines UBOOT_SUFFIX:zynqmp somewhere, fix that here
+UBOOT_SUFFIX:zynqmp = "itb"
 UBOOT_LOADADDRESS = "0x8000000"
 UBOOT_ENTRYPOINT = "0x8000000"
-HAS_PLATFORM_INIT_append = "\
+HAS_PLATFORM_INIT:append = "\
     topic_miamimp_config \
     topic_miamiplusmp_config \
     topic_miamimp_xilinx_xdp_config\

@@ -15,7 +15,7 @@ require conf/machine/include/soc-zynq.inc
 require conf/machine/include/machine-xilinx-default.inc
 
 # tune-zynq is adding an unused zImage
-KERNEL_IMAGETYPES_remove = "zImage"
+KERNEL_IMAGETYPES:remove = "zImage"
 
 MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 
@@ -27,7 +27,7 @@ UBOOT_MACHINE = "topic_miami_config"
 UBOOT_SUFFIX = "img"
 SPL_BINARY = "spl/boot.bin"
 SPL_SYMLINK = "BOOT.bin"
-HAS_PLATFORM_INIT_append = "\
+HAS_PLATFORM_INIT:append = "\
 	topic_miami_config \
 	topic_miamilite_config \
 	topic_miamiplus_config"
