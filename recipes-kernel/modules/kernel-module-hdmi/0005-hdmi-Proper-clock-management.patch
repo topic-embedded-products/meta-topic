@@ -1,0 +1,264 @@
+From ce5289d2a940db49f1948062ca32ed2f93917819 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 6 Aug 2021 11:53:09 +0200
+Subject: [PATCH 5/5] hdmi: Proper clock management
+
+Properly control the TX and retimer clocks. Only enable the clock when needed,
+and disable the clocks when the HDMI output is disabled.
+
+The HDMI IP core apparently needs to detect a clock change in order to properly initialize.
+Enforce this by always resetting the clock detector, and by starting the TX clock after
+having done the settings.
+
+Implement prepare/unprepare in the dp159 driver and turn the chip off when not in use.
+Experience has shown that the chip gets confused when there's no valid video signal while
+it is powered up.
+
+This fixes that the HDMI would not start properly.
+---
+ hdmi/xilinx_drm_hdmi.c | 67 +++++++++++++++++++++++++++---------------
+ misc/dp159.c           | 48 ++++++++++++++++++++++++++++--
+ 2 files changed, 88 insertions(+), 27 deletions(-)
+
+diff --git a/hdmi/xilinx_drm_hdmi.c b/hdmi/xilinx_drm_hdmi.c
+index c1fb6bb..2082264 100644
+--- a/hdmi/xilinx_drm_hdmi.c
++++ b/hdmi/xilinx_drm_hdmi.c
+@@ -162,6 +162,8 @@ struct xlnx_drm_hdmi {
+ 	int hdcp_auth_counter;
+ 
+ 	bool teardown;
++	bool tmds_clk_enabled;
++	bool retimer_clk_enabled;
+ 
+ 	struct phy *phy[HDMI_MAX_LANES];
+ 
+@@ -260,6 +262,24 @@ static inline struct xlnx_drm_hdmi *connector_to_hdmi(struct drm_connector *conn
+ 	return container_of(connector, struct xlnx_drm_hdmi, connector);
+ }
+ 
++static void XV_HdmiTxSs_tx_refclk_enable(struct xlnx_drm_hdmi *xhdmi)
++{
++	if (!xhdmi->tmds_clk_enabled) {
++		if (clk_prepare_enable(xhdmi->tmds_clk))
++			dev_err(xhdmi->dev, "failed to enable tx clk\n");
++		else
++			xhdmi->tmds_clk_enabled = true;
++	}
++}
++
++static void XV_HdmiTxSs_tx_refclk_disable(struct xlnx_drm_hdmi *xhdmi)
++{
++	if (xhdmi->tmds_clk_enabled) {
++		gpiod_set_value_cansleep(xhdmi->tx_refclk_rdy_gpio, 0);
++		clk_disable_unprepare(xhdmi->tmds_clk);
++		xhdmi->tmds_clk_enabled = false;
++	}
++}
+ 
+ void HdmiTx_PioIntrHandler(XV_HdmiTx *InstancePtr);
+ 
+@@ -561,6 +581,9 @@ static void TxConnectCallback(void *CallbackRef)
+ 		int xst_hdmi20;
+ 		xhdmi->cable_connected = 1;
+ 		xhdmi->connector.status = connector_status_connected;
++		/* Apparently the IP needs "some" TX clock. The set_rate will happen later */
++		XV_HdmiTxSs_tx_refclk_enable(xhdmi);
++		gpiod_set_value_cansleep(xhdmi->tx_refclk_rdy_gpio, 1);
+ 		/* Check HDMI sink version */
+ 		xst_hdmi20 = XV_HdmiTxSs_DetectHdmi20(HdmiTxSsPtr);
+ 		dev_dbg(xhdmi->dev,"TxConnectCallback(): TX connected to HDMI %s Sink Device\n",
+@@ -590,6 +613,8 @@ static void TxConnectCallback(void *CallbackRef)
+ 			XVphy_IBufDsEnable(VphyPtr, 0, XVPHY_DIR_TX, (FALSE));
+ 		else
+ 			XHdmiphy1_IBufDsEnable(XGtPhyPtr, 0, XHDMIPHY1_DIR_TX, (FALSE));
++		/* Stop the TX clock */
++		XV_HdmiTxSs_tx_refclk_disable(xhdmi);
+ 	}
+ 	xvphy_mutex_unlock(xhdmi->phy[0]);
+ 
+@@ -680,7 +705,14 @@ static void TxStreamUpCallback(void *CallbackRef)
+ 	if (xhdmi->retimer_clk) {
+ 		dev_dbg(xhdmi->dev,"retimer: clk_set_rate(xhdmi->retimer_clk, TxLineRate=%lld\n", TxLineRate);
+ 		(void)clk_set_rate(xhdmi->retimer_clk, (signed long long)TxLineRate);
++		if (!xhdmi->retimer_clk_enabled) {
++			if (clk_prepare_enable(xhdmi->retimer_clk))
++				dev_err(xhdmi->dev, "retimer: clk_prepare_enable failed\n");
++			else
++				xhdmi->retimer_clk_enabled = true;
++		}
+ 	}
++
+ 	/* Copy Sampling Rate */
+ 	if (xhdmi->isvphy)
+ 		XV_HdmiTxSs_SetSamplingRate(HdmiTxSsPtr, VphyPtr->HdmiTxSampleRate);
+@@ -738,6 +770,12 @@ static void TxStreamDownCallback(void *CallbackRef)
+ 	xhdmi->hdcp_authenticated = 0;
+ 	xhdmi->hdcp_encrypted = 0;
+ 	hdcp_protect_content(xhdmi);
++
++	/* Turn off the retimer output */
++	if (xhdmi->retimer_clk_enabled) {
++		clk_disable_unprepare(xhdmi->retimer_clk);
++		xhdmi->retimer_clk_enabled = false;
++	}
+ }
+ 
+ static void TxVsCallback(void *CallbackRef)
+@@ -1554,7 +1592,7 @@ static void xlnx_drm_hdmi_encoder_atomic_mode_set(struct drm_encoder *encoder,
+ 		rate = XGtPhyPtr->HdmiTxRefClkHz;
+ 	adjusted_mode->clock = rate / 1000;
+ 
+-	dev_dbg(xhdmi->dev,"adjusted_mode->clock = %u Hz\n", rate);
++	dev_dbg(xhdmi->dev,"adjusted_mode->clock = %lu Hz\n", rate);
+ 
+ 	gpiod_set_value_cansleep(xhdmi->tx_refclk_rdy_gpio, 0);
+ 
+@@ -1565,24 +1603,18 @@ static void xlnx_drm_hdmi_encoder_atomic_mode_set(struct drm_encoder *encoder,
+ 			"failed to set tmds clock rate to %lu: %d\n",
+ 			rate, ret);
+ 	}
++	XV_HdmiTxSs_tx_refclk_enable(xhdmi);
++
+ 	/* When switching between modes with same Phy RefClk phy tx_refxlk_rdy_en
+ 	 * signal must be toggled (asserted and de-asserted) to reset phy's
+ 	 * internal frequency detection state machine
+ 	 */
+ 	if (xhdmi->isvphy) {
+ 		dev_dbg(xhdmi->dev,"PrevPhyTxRefClock: %d, NewRefClock: %d\n", PrevPhyTxRefClock, VphyPtr->HdmiTxRefClkHz);
+-		if (PrevPhyTxRefClock == VphyPtr->HdmiTxRefClkHz) {
+-			/* Switching between resolutions with same frequency */
+-			dev_dbg(xhdmi->dev,"***** Reset Phy Tx Frequency *******\n");
+-			XVphy_ClkDetFreqReset(VphyPtr, 0, XVPHY_DIR_TX);
+-		}
++		XVphy_ClkDetFreqReset(VphyPtr, 0, XVPHY_DIR_TX);
+ 	} else {
+ 		dev_dbg(xhdmi->dev,"PrevPhyTxRefClock: %d, NewRefClock: %d\n", PrevPhyTxRefClock, XGtPhyPtr->HdmiTxRefClkHz);
+-		if (PrevPhyTxRefClock == XGtPhyPtr->HdmiTxRefClkHz) {
+-			/* Switching between resolutions with same frequency */
+-			dev_dbg(xhdmi->dev,"***** Reset Phy Tx Frequency *******\n");
+-			XHdmiphy1_ClkDetFreqReset(XGtPhyPtr, 0, XHDMIPHY1_DIR_TX);
+-		}
++		XHdmiphy1_ClkDetFreqReset(XGtPhyPtr, 0, XHDMIPHY1_DIR_TX);
+ 	}
+ 
+ 	gpiod_set_value_cansleep(xhdmi->tx_refclk_rdy_gpio, 1);
+@@ -2861,13 +2893,6 @@ static int xlnx_drm_hdmi_probe(struct platform_device *pdev)
+ 		return ret;
+ 	}
+ 	dev_dbg(xhdmi->dev, "got txref-clk (default rate = %lu)\n", clk_get_rate(xhdmi->tmds_clk));
+-	ret = clk_prepare_enable(xhdmi->tmds_clk);
+-	if (ret) {
+-		dev_err(&pdev->dev, "failed to enable tx clk\n");
+-		return ret;
+-	}
+-
+-	gpiod_set_value_cansleep(xhdmi->tx_refclk_rdy_gpio, 1);
+ 
+ 	xhdmi->tx_audio_data->tmds_clk = clk_get_rate(xhdmi->tmds_clk);
+ 	/* support to drive an external retimer IC on the TX path, depending on TX clock line rate */
+@@ -2882,12 +2907,6 @@ static int xlnx_drm_hdmi_probe(struct platform_device *pdev)
+ 		return ret;
+ 	} else if (xhdmi->retimer_clk) {
+ 		dev_dbg(xhdmi->dev,"got retimer-clk\n");
+-		ret = clk_prepare_enable(xhdmi->retimer_clk);
+-		if (ret) {
+-			dev_err(xhdmi->dev, "failed to enable retimer-clk\n");
+-			return ret;
+-		}
+-		dev_dbg(xhdmi->dev,"prepared and enabled retimer-clk\n");
+ 	} else {
+ 		dev_dbg(xhdmi->dev,"no retimer clk specified, assuming no redriver/retimer is used.\n");
+ 	}
+diff --git a/misc/dp159.c b/misc/dp159.c
+index 11572b6..0504bd1 100644
+--- a/misc/dp159.c
++++ b/misc/dp159.c
+@@ -44,6 +44,7 @@ struct clk_tx_linerate {
+ 	struct i2c_client *client;
+ 	struct clk *clk;
+ 	unsigned long rate;
++	bool output_enabled;
+ };
+ 
+ static inline int dp159_write(struct i2c_client *client, u8 reg, u8 value)
+@@ -61,8 +62,6 @@ static inline int dp159_read(struct i2c_client *client, u8 reg)
+ 
+ static int dp159_program(struct i2c_client *client, unsigned long rate)
+ {
+-	dp159_write(client, 0x09, 0x0F); // Power down, allow 400kHz I2C
+-
+ 	if ((rate / (1000000)) > 3400) {
+ //		printk(KERN_INFO "dp159_program(rate = %lu) for HDMI 2.0\n", rate);
+ 		/* SLEW_CTL    = Reg0Bh[7:6] = 10
+@@ -92,7 +91,7 @@ static int dp159_program(struct i2c_client *client, unsigned long rate)
+ 		dp159_write(client, 0x0A, 0x36); // Automatic retimer for HDMI 2.0
+ 	}
+ 
+-	return 	dp159_write(client, 0x09, 0x07); // Power up, allow 400kHz I2C
++	return 0;
+ }
+ 
+ #define to_clk_tx_linerate(_hw) container_of(_hw, struct clk_tx_linerate, hw)
+@@ -103,7 +102,17 @@ int clk_tx_set_rate(struct clk_hw *hw, unsigned long rate, unsigned long parent_
+ 	clk = to_clk_tx_linerate(hw);
+ 	//printk(KERN_INFO "dp159: clk_tx_set_rate(): rate = %lu, parent_rate = %lu\n", rate, parent_rate);
+ 	clk->rate = rate;
++
++	/* Power down while changing settings */
++	if (clk->output_enabled)
++		dp159_write(clk->client, 0x09, 0x0F);
++
+ 	dp159_program(clk->client, rate);
++
++	/* Power up again if needed */
++	if (clk->output_enabled)
++		dp159_write(clk->client, 0x09, 0x07);
++
+ 	return 0;
+ };
+ 
+@@ -123,7 +132,40 @@ long clk_tx_round_rate(struct clk_hw *hw,
+ 	return rate;
+ };
+ 
++
++static int clk_tx_prepare(struct clk_hw *hw)
++{
++	struct clk_tx_linerate *clk = to_clk_tx_linerate(hw);
++	int ret;
++
++	ret = dp159_write(clk->client, 0x09, 0x07);
++	if (ret < 0)
++		return ret;
++
++	clk->output_enabled = true;
++
++	return 0;
++}
++
++static void clk_tx_unprepare(struct clk_hw *hw)
++{
++	struct clk_tx_linerate *clk = to_clk_tx_linerate(hw);
++
++	dp159_write(clk->client, 0x09, 0x0F);
++	clk->output_enabled = false;
++}
++
++static int clk_tx_is_prepared(struct clk_hw *hw)
++{
++	struct clk_tx_linerate *clk = to_clk_tx_linerate(hw);
++
++	return clk->output_enabled;
++}
++
+ struct clk_ops clk_tx_rate_ops = {
++	.prepare = clk_tx_prepare,
++	.unprepare = clk_tx_unprepare,
++	.is_prepared = clk_tx_is_prepared,
+ 	.set_rate 		= &clk_tx_set_rate,
+ 	.recalc_rate	= &clk_tx_recalc_rate,
+ 	.round_rate		= &clk_tx_round_rate,
+-- 
+2.17.1
+

@@ -1,0 +1,29 @@
+From 4b7427f3e15ef0af97e172e265c0d820929f3706 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 3 Aug 2021 15:06:31 +0200
+Subject: [PATCH 2/5] dp159: enable output termination
+
+Set the output termination to 150 Ohm. This improves the output signal
+and solves issues with various displays failing at 1080p resolution.
+---
+ misc/dp159.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/misc/dp159.c b/misc/dp159.c
+index b5b2773..1aa3367 100644
+--- a/misc/dp159.c
++++ b/misc/dp159.c
+@@ -83,8 +83,8 @@ static int dp159_program(struct i2c_client *client, unsigned long rate)
+ 		/*datasheet has 0 by default. 0x1 disables DDC training and only
+ 		 * allows HDMI1.4b/DVI, which is OK*/
+ 
+-		r |= dp159_write(client, 0x0B, 0x80); // SLEW_CTL    = Reg0Bh[7:6] = 10
+-                                              // TX_TERM_CTL = Reg0Bh[4:3] = 00
++		r |= dp159_write(client, 0x0B, 0x90); // SLEW_CTL    = Reg0Bh[7:6] = 10
++                                              // TX_TERM_CTL = Reg0Bh[4:3] = 01 (150 Ohm)
+ 		// VSWING_DATA & VSWING_CLK to +14%
+ 		//           Reg0Ch[7:2] = 100100
+ 		// PRE_SEL = Reg0Ch[1:0] = 00 (labeled HDMI_TWPST)
+-- 
+2.17.1
+

@@ -1,0 +1,55 @@
+From 51a13810be366eb2c1f1259b563cab7b7a546d38 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 3 Aug 2021 15:16:33 +0200
+Subject: [PATCH 3/5] xilinx_drm_hdmi: Do not floor clock rate
+
+Don't divide the clock rate and multiply by 1000 for no good reason, as that "floors"
+the value. This also fixes the debug/error outputs to correctly print Hz values.
+---
+ hdmi/xilinx_drm_hdmi.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/hdmi/xilinx_drm_hdmi.c b/hdmi/xilinx_drm_hdmi.c
+index c7eec51..c1fb6bb 100644
+--- a/hdmi/xilinx_drm_hdmi.c
++++ b/hdmi/xilinx_drm_hdmi.c
+@@ -1347,6 +1347,7 @@ static void xlnx_drm_hdmi_encoder_atomic_mode_set(struct drm_encoder *encoder,
+ 	u32 PrevPhyTxRefClock = 0;
+ 	u32 Result;
+ 	u32 drm_fourcc;
++	unsigned long rate;
+ 	int ret;
+ 
+ 	dev_dbg(xhdmi->dev,"%s\n", __func__);
+@@ -1548,20 +1549,21 @@ static void xlnx_drm_hdmi_encoder_atomic_mode_set(struct drm_encoder *encoder,
+ 	}
+ 
+ 	if (xhdmi->isvphy)
+-		adjusted_mode->clock = VphyPtr->HdmiTxRefClkHz / 1000;
++		rate = VphyPtr->HdmiTxRefClkHz;
+ 	else
+-		adjusted_mode->clock = XGtPhyPtr->HdmiTxRefClkHz / 1000;
++		rate = XGtPhyPtr->HdmiTxRefClkHz;
++	adjusted_mode->clock = rate / 1000;
+ 
+-	dev_dbg(xhdmi->dev,"adjusted_mode->clock = %u Hz\n", adjusted_mode->clock);
++	dev_dbg(xhdmi->dev,"adjusted_mode->clock = %u Hz\n", rate);
+ 
+ 	gpiod_set_value_cansleep(xhdmi->tx_refclk_rdy_gpio, 0);
+ 
+ 	/* request required tmds clock rate */
+-	ret = clk_set_rate(xhdmi->tmds_clk,
+-			   adjusted_mode->clock * (unsigned long)1000);
++	ret = clk_set_rate(xhdmi->tmds_clk, rate);
+ 	if (ret) {
+-		dev_err(xhdmi->dev, "failed to set tmds clock rate to %d: %d\n",
+-					(adjusted_mode->clock * 1000), ret);
++		dev_err(xhdmi->dev,
++			"failed to set tmds clock rate to %lu: %d\n",
++			rate, ret);
+ 	}
+ 	/* When switching between modes with same Phy RefClk phy tx_refxlk_rdy_en
+ 	 * signal must be toggled (asserted and de-asserted) to reset phy's
+-- 
+2.17.1
+

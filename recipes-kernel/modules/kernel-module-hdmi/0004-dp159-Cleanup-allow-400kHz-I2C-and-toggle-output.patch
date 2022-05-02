@@ -1,0 +1,88 @@
+From 607b282c794df72a11c5e4ee0dd89b048f22b06d Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 3 Aug 2021 16:35:26 +0200
+Subject: [PATCH 4/5] dp159: Cleanup, allow 400kHz I2C and toggle output
+
+Disable output signal while off. Only enable it once programmed, and
+disable it before changing settings.
+
+Cleanup the "program" routine to return a somewhat valid error code.
+
+Disable the retimer, only use it for 4k modes.
+---
+ misc/dp159.c | 29 +++++++++++++++--------------
+ 1 file changed, 15 insertions(+), 14 deletions(-)
+
+diff --git a/misc/dp159.c b/misc/dp159.c
+index 1aa3367..11572b6 100644
+--- a/misc/dp159.c
++++ b/misc/dp159.c
+@@ -61,39 +61,38 @@ static inline int dp159_read(struct i2c_client *client, u8 reg)
+ 
+ static int dp159_program(struct i2c_client *client, unsigned long rate)
+ {
+-	int r;
+-	r = dp159_write(client, 0x09, 0x06);
++	dp159_write(client, 0x09, 0x0F); // Power down, allow 400kHz I2C
+ 
+ 	if ((rate / (1000000)) > 3400) {
+ //		printk(KERN_INFO "dp159_program(rate = %lu) for HDMI 2.0\n", rate);
+ 		/* SLEW_CTL    = Reg0Bh[7:6] = 10
+ 		 * TX_TERM_CTL = Reg0Bh[4:3] = 11
+ 		*/
+-		r |= dp159_write(client, 0x0B, 0x9A);
++		dp159_write(client, 0x0B, 0x9A);
+ 
+ 		/* VSWING_DATA & VSWING_CLK to +14%%
+ 		 *            Reg0Ch[7:2] = 100100
+ 		 *  PRE_SEL   Reg0Ch[1:0] = 01 (labeled HDMI_TWPST)
+ 		*/
+-		r |= dp159_write(client, 0x0C, 0x49);
+-		r |= dp159_write(client, 0x0D, 0x00);
+-		r |= dp159_write(client, 0x0A, 0x36); // Automatic retimer for HDMI 2.0
++		dp159_write(client, 0x0C, 0x49);
++		dp159_write(client, 0x0D, 0x00);
++		dp159_write(client, 0x0A, 0x36); // Automatic retimer for HDMI 2.0
+ 	} else {
+ //		printk(KERN_INFO "dp159_program(rate = %lu) for HDMI 1.4\n", rate);
+ 		/*datasheet has 0 by default. 0x1 disables DDC training and only
+ 		 * allows HDMI1.4b/DVI, which is OK*/
+ 
+-		r |= dp159_write(client, 0x0B, 0x90); // SLEW_CTL    = Reg0Bh[7:6] = 10
++		dp159_write(client, 0x0B, 0x90); // SLEW_CTL    = Reg0Bh[7:6] = 10
+                                               // TX_TERM_CTL = Reg0Bh[4:3] = 01 (150 Ohm)
+ 		// VSWING_DATA & VSWING_CLK to +14%
+ 		//           Reg0Ch[7:2] = 100100
+ 		// PRE_SEL = Reg0Ch[1:0] = 00 (labeled HDMI_TWPST)
+-		r |= dp159_write(client, 0x0C, 0x48);
+-		r |= dp159_write(client, 0x0D, 0x00);
+-        // Automatic redriver to retimer crossover at 1.0 Gbps
+-		r |= dp159_write(client, 0x0A, 0x35);
++		dp159_write(client, 0x0C, 0x48);
++		dp159_write(client, 0x0D, 0x00);
++		dp159_write(client, 0x0A, 0x36); // Automatic retimer for HDMI 2.0
+ 	}
+-	return r;
++
++	return 	dp159_write(client, 0x09, 0x07); // Power up, allow 400kHz I2C
+ }
+ 
+ #define to_clk_tx_linerate(_hw) container_of(_hw, struct clk_tx_linerate, hw)
+@@ -149,10 +148,12 @@ static int dp159_probe(struct i2c_client *client,
+ 
+ 	dev_info(&client->dev, "probed\n");
+ 	/* initialize to HDMI 1.4 */
+-	(void)dp159_write(client, 0x0B, 0x80);
++	(void)dp159_write(client, 0x09, 0x0F); // Power down, allow 400kHz I2C
++	(void)dp159_write(client, 0x0B, 0x90);
+ 	(void)dp159_write(client, 0x0C, 0x48);
+ 	(void)dp159_write(client, 0x0D, 0x00);
+-	(void)dp159_write(client, 0x0A, 0x35);
++	(void)dp159_write(client, 0x0A, 0x36);
++	(void)dp159_write(client, 0x09, 0x07); // Power up
+ 
+ 	/* allocate fixed-rate clock */
+ 	clk_tx = kzalloc(sizeof(*clk_tx), GFP_KERNEL);
+-- 
+2.17.1
+
