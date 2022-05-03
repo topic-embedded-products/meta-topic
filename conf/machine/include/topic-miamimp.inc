@@ -34,8 +34,15 @@ DEFAULTTUNE = "cortexa53"
 
 require conf/machine/zynqmp-generic.conf
 
-# Add board compatibility override
-MACHINEOVERRIDES .= ":${MACHINE}"
+# Remove the unneeded stuff
+EXTRA_IMAGEDEPENDS += " \
+		arm-trusted-firmware \
+		virtual/bootloader \
+		bootscript \
+		"
+
+# We want to use u-boot SPL
+PREFERRED_PROVIDER_virtual/boot-bin = "u-boot-xlnx"
 
 # The RTC only works if a battery is connected, which most boards do not have
 MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
