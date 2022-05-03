@@ -1,4 +1,4 @@
-From 003135c0d83de8fde1da35401eff1efdcd9eb8a4 Mon Sep 17 00:00:00 2001
+From 12ace6de68028011ee25e2425b41b205d8554fca Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 16 Dec 2019 16:25:02 +0100
 Subject: [PATCH 09/34] mach-zynqmp/spl.c: Implement more SPL boot fallbacks

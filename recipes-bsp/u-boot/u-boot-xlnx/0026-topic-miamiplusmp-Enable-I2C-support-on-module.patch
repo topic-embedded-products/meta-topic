@@ -1,4 +1,4 @@
-From 39d6daa04ad5320c1efc421d9ef3d82b4e88a029 Mon Sep 17 00:00:00 2001
+From fd74369c5bd2ebfcfe473ca5788b76afc7ecaf21 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 28 Sep 2020 11:22:23 +0200
 Subject: [PATCH 26/34] topic-miamiplusmp: Enable I2C support on module

@@ -1,4 +1,4 @@
-From 7a7040c448b0b7f67124ef687b759b3fce06b5e4 Mon Sep 17 00:00:00 2001
+From 54fc2ee3f77d8ffb4b2f2b2c3ab7f0ee3edf4b78 Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Fri, 7 Feb 2020 11:52:51 +0100
 Subject: [PATCH 11/34] Disable spi transfer breakable by CTRL C support

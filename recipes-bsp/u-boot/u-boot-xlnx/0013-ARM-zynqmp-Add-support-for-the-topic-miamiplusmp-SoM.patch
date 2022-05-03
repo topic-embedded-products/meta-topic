@@ -1,4 +1,4 @@
-From a4797a86f71ab912a89299fb8bd833c01f76ea78 Mon Sep 17 00:00:00 2001
+From 51c157ca5efe4b12a676d5fbd74a35c6ba722fbf Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 12 Feb 2020 11:45:06 +0100
 Subject: [PATCH 13/34] ARM: zynqmp: Add support for the topic-miamiplusmp SoM

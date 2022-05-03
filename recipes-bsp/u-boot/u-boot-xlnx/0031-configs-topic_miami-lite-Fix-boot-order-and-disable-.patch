@@ -1,4 +1,4 @@
-From 09ffc1e35273519a796bafe292e3c126574cd3f2 Mon Sep 17 00:00:00 2001
+From 6da9de7d25474b13a9fdd3f817d095468a0bca0a Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 18 Jan 2021 08:30:11 +0100
 Subject: [PATCH 31/34] configs, topic_miami[lite]: Fix boot order and disable

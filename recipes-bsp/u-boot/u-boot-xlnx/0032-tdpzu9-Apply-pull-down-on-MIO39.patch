@@ -1,4 +1,4 @@
-From c097b4c9f9074d7a97b6cdd03af510a3a18954ce Mon Sep 17 00:00:00 2001
+From fd7eb9497e281bc51b7e23fe593012cf4ac36d91 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 6 Apr 2021 16:53:40 +0200
 Subject: [PATCH 32/34] tdpzu9: Apply pull-down on MIO39

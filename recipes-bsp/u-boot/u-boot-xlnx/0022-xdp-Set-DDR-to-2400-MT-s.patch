@@ -1,4 +1,4 @@
-From 2974e32b51a240c5ec339cceaf91d4a09a38e8c3 Mon Sep 17 00:00:00 2001
+From b358705001f47e99e21925eeef5e0a3e859e889d Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 10 Jul 2020 15:15:19 +0200
 Subject: [PATCH 22/34] xdp: Set DDR to 2400 MT/s

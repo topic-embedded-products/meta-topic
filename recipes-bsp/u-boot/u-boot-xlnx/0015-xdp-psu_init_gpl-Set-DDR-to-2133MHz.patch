@@ -1,4 +1,4 @@
-From f711f9794d4c7d39c5bec5370e55048c29f2ee17 Mon Sep 17 00:00:00 2001
+From c2b82a76deee074f9d2a48a752bddf8205efa10f Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Mar 2020 15:15:54 +0100
 Subject: [PATCH 15/34] xdp/psu_init_gpl: Set DDR to 2133MHz

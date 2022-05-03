@@ -1,4 +1,4 @@
-From ea49d5d8d44b9f0b5ca2f33241013f1b446029a7 Mon Sep 17 00:00:00 2001
+From 33f67fb350a799a36e7446625ddb16564ca36c2e Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Jan 2017 15:35:41 +0100
 Subject: [PATCH 06/34] ARM: zynqmp: Add support for the topic-miamimp
@@ -10,25 +10,23 @@ The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
  arch/arm/dts/Makefile                         |     9 +-
  arch/arm/dts/zynqmp-topic-miamimp.dts         |   162 +
  board/topic/zynqmp/MAINTAINERS                |     6 +
- board/topic/zynqmp/Makefile                   |    27 +
+ board/topic/zynqmp/Makefile                   |    25 +
  board/topic/zynqmp/cmds.c                     |     1 +
  board/topic/zynqmp/fit_spl_atf.its            |    57 +
  board/topic/zynqmp/sleep.h                    |     0
- board/topic/zynqmp/tap_delays.c               |     1 +
  board/topic/zynqmp/xil_io.h                   |    41 +
  .../zynqmp-topic-miamimp/psu_init_gpl.c       | 21892 +++++++++
  .../zynqmp-topic-miamimp/psu_init_gpl.h       | 37386 ++++++++++++++++
  board/topic/zynqmp/zynqmp.c                   |     6 +
  configs/topic_miamimp_defconfig               |   113 +
  include/configs/topic_miamimp.h               |    86 +
- 14 files changed, 59779 insertions(+), 8 deletions(-)
+ 13 files changed, 59776 insertions(+), 8 deletions(-)
  create mode 100644 arch/arm/dts/zynqmp-topic-miamimp.dts
  create mode 100644 board/topic/zynqmp/MAINTAINERS
  create mode 100644 board/topic/zynqmp/Makefile
  create mode 120000 board/topic/zynqmp/cmds.c
  create mode 100644 board/topic/zynqmp/fit_spl_atf.its
  create mode 100644 board/topic/zynqmp/sleep.h
- create mode 120000 board/topic/zynqmp/tap_delays.c
  create mode 100644 board/topic/zynqmp/xil_io.h
  create mode 100644 board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.c
  create mode 100644 board/topic/zynqmp/zynqmp-topic-miamimp/psu_init_gpl.h
@@ -288,10 +286,10 @@ index 0000000000..d795b304e5
 +F:	configs/topic_*_defconfig
 diff --git a/board/topic/zynqmp/Makefile b/board/topic/zynqmp/Makefile
 new file mode 100644
-index 0000000000..534907baab
+index 0000000000..b6f0f847f5
 --- /dev/null
 +++ b/board/topic/zynqmp/Makefile
-@@ -0,0 +1,27 @@
+@@ -0,0 +1,25 @@
 +#
 +# (C) Copyright 2014 - 2016 Xilinx, Inc.
 +# Michal Simek <michal.simek@xilinx.com>
@@ -304,8 +302,6 @@ index 0000000000..534907baab
 +hw-platform-y := $(shell echo $(CONFIG_DEFAULT_DEVICE_TREE))
 +
 +obj-$(CONFIG_SPL_BUILD) += $(hw-platform-y)/psu_init_gpl.o
-+
-+obj-$(CONFIG_MMC_SDHCI_ZYNQ) += tap_delays.o
 +
 +ifndef CONFIG_SPL_BUILD
 +obj-$(CONFIG_CMD_ZYNQMP) += cmds.o
@@ -393,14 +389,6 @@ index 0000000000..2736b1712b
 diff --git a/board/topic/zynqmp/sleep.h b/board/topic/zynqmp/sleep.h
 new file mode 100644
 index 0000000000..e69de29bb2
-diff --git a/board/topic/zynqmp/tap_delays.c b/board/topic/zynqmp/tap_delays.c
-new file mode 120000
-index 0000000000..9d0ecd5b27
---- /dev/null
-+++ b/board/topic/zynqmp/tap_delays.c
-@@ -0,0 +1 @@
-+../../xilinx/zynqmp/tap_delays.c
-\ No newline at end of file
 diff --git a/board/topic/zynqmp/xil_io.h b/board/topic/zynqmp/xil_io.h
 new file mode 100644
 index 0000000000..5340280e5d

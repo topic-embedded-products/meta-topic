@@ -1,4 +1,4 @@
-From 0f2291e530585f19a7cd7800762c63165d18418b Mon Sep 17 00:00:00 2001
+From 54a65e7748ba0363402ab2ca43a8c051d7948c2a Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Wed, 5 Feb 2020 10:05:39 +0100
 Subject: [PATCH 12/34] topic-miamimp: Support UBIFS

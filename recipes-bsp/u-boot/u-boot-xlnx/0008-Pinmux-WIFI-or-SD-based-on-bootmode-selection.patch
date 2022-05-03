@@ -1,4 +1,4 @@
-From ff90002e4683051f3143c10698d9d518db4e9032 Mon Sep 17 00:00:00 2001
+From e2caf3c7b0b3b0eb1ec3c7de28838e37147141ae Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 23 Sep 2019 12:13:41 +0200
 Subject: [PATCH 08/34] Pinmux WIFI or SD based on bootmode selection

@@ -1,4 +1,4 @@
-From 7b902d99dca559a9fcaf36451604f94868bcdb7c Mon Sep 17 00:00:00 2001
+From 1230451f62daf6110292e0cf3608f2d7b15fe37f Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 12 Jun 2020 09:48:55 +0200
 Subject: [PATCH 17/34] zynqmp-topic boards: Add no-1-8-v quirk to SD1
