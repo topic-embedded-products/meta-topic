@@ -16,6 +16,10 @@ VIRTUAL-RUNTIME_dev_manager ??= 'busybox-mdev'
 MDEVSUPPORT = "${@bb.utils.contains('VIRTUAL-RUNTIME_dev_manager', 'busybox-mdev', 'file://enable-mdev-hotplug.cfg', '', d)}"
 EXFATSUPPORT = "file://enable-exfat-fs.cfg"
 
+TODO_PATCHES_THAT_DONT_APPLY = "\
+	file://v4l2/0007-Fix-colors-resetting-after-format-adjust.patch \
+"
+
 # These patches are cherry-picked from the ADI Linux kernel, branch "adi-5.4.0"
 # The "-topic" patches are topic specific
 ADIHDMISUPPORT = "\
@@ -48,7 +52,6 @@ XILINX_V4L2_FIXES = "\
 	file://v4l2/0004-media-imx274-improve-v4l2-compliance.patch \
 	file://v4l2/0005-media-imx274-remove-imx274_load_default.patch \
 	file://v4l2/0006-Improve-resolution-control.patch \
-	file://v4l2/0007-Fix-colors-resetting-after-format-adjust.patch \
 	"
 
 SRC_URI:append = "\
@@ -62,7 +65,6 @@ SRC_URI:append = "\
 	file://0001-usb-dwc3-Disable-hibernation-by-default.patch \
 	file://0001-usb-dwc3-xilinx-Fix-sequence-and-propagate-error-cod.patch \
 	file://0001-usb-dwc3-core-add-transceiver-delay-for-required-UTM.patch \
-	file://0002-usb-dwc3-xilinx-Handle-USB3-PHY-initialization-prope.patch \
 	file://0001-phy-zynqmp-Postpone-getting-clock-rate-until-it-s-ac.patch \
 	file://0001-phy-zynqmp-Longer-PLL-timeout.patch \
 	file://mcp23s08/0004-pinctrl-mcp23s08-Reset-all-pins-to-input-at-probe.patch \
