@@ -48,3 +48,6 @@ UBI_VOLNAME = "qspi-rootfs"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree"
 
 DEVICETREE ??= "devicetree/topic-miami.dtb"
+
+# We want to use u-boot SPL
+PREFERRED_PROVIDER_virtual/boot-bin = "u-boot-xlnx"
