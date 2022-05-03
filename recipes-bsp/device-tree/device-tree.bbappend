@@ -3,7 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 # We want overlay support, so sompile everything with "symbols".
 DTC_BFLAGS:append = " -@"
 
-COMPATIBLE_MACHINE_tdkz10 = ".*"
+COMPATIBLE_MACHINE:tdkz10 = ".*"
 SRC_URI:append:tdkz10 = "\
 	file://topic-miami-florida-mio.dtsi \
 	file://topic-miami-florida.dtsi \
