@@ -50,6 +50,10 @@ SRC_URI:append:topic-miamimp = " file://must-press-space-to-stop-autoboot.cfg"
 EXTRACOMPILEDEPENDS = ""
 EXTRACOMPILEDEPENDS:zynqmp = "arm-trusted-firmware:do_deploy"
 
+# Temporary workaround for having the binary here...
+PMU_FIRMWARE_DEPLOY_DIR = "${S}/board/topic/zynqmp"
+PMU_FIRMWARE_IMAGE_NAME = "pmufw"
+
 # Add PMU and ATF
 do_compile[depends] += "${EXTRACOMPILEDEPENDS}"
 do_compile:prepend:zynqmp() {
@@ -61,4 +65,3 @@ do_compile:append:zynqmp() {
 	cp ${S}/board/topic/zynqmp/fit_spl_atf.its ${B}/fit_spl_atf.its
 	${B}/tools/mkimage -f ${B}/fit_spl_atf.its ${B}/u-boot.itb
 }
-
