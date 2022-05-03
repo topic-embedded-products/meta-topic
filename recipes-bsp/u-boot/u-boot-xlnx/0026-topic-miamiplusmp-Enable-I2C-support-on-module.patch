@@ -1,7 +1,7 @@
-From 4d355f5e03246d501a88854bf7314486a0a3cca2 Mon Sep 17 00:00:00 2001
+From 39d6daa04ad5320c1efc421d9ef3d82b4e88a029 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 28 Sep 2020 11:22:23 +0200
-Subject: [PATCH 27/35] topic-miamiplusmp: Enable I2C support on module
+Subject: [PATCH 26/34] topic-miamiplusmp: Enable I2C support on module
 
 The I2C bus on the module itself can be used to detect board revision
 and read/write the eeprom on it.

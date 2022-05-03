@@ -1,7 +1,7 @@
-From 00255219ae7db4bd3d94a72b36eab9203b38fd87 Mon Sep 17 00:00:00 2001
+From ea49d5d8d44b9f0b5ca2f33241013f1b446029a7 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Jan 2017 15:35:41 +0100
-Subject: [PATCH 06/35] ARM: zynqmp: Add support for the topic-miamimp
+Subject: [PATCH 06/34] ARM: zynqmp: Add support for the topic-miamimp
  system-on-module
 
 The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
@@ -37,7 +37,7 @@ The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
  create mode 100644 include/configs/topic_miamimp.h
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index a872ce46fd..5db0b40995 100644
+index b5be5398b5..fdf73bc4cc 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
 @@ -151,7 +151,6 @@ dtb-$(CONFIG_ROCKCHIP_RV1108) += \
@@ -48,7 +48,7 @@ index a872ce46fd..5db0b40995 100644
  dtb-$(CONFIG_ARCH_MESON) += \
  	meson-gxbb-nanopi-k2.dtb \
  	meson-gxbb-odroidc2.dtb \
-@@ -322,6 +321,7 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
+@@ -324,6 +323,7 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
  	zynqmp-sck-kv-g-revA.dtbo		\
  	zynqmp-sck-kv-g-revB.dtbo		\
  	zynqmp-sck-kv-g-revA-pl.dtbo		\
@@ -56,7 +56,7 @@ index a872ce46fd..5db0b40995 100644
  	zynqmp-topic-miamimp-xilinx-xdp-v1r1.dtb	\
  	zynqmp-vpk120-revA.dtb			\
  	zynqmp-vp-x-a2785-00-revA.dtb		\
-@@ -498,7 +498,6 @@ dtb-$(CONFIG_TARGET_DRAGONBOARD410C) += dragonboard410c.dtb
+@@ -502,7 +502,6 @@ dtb-$(CONFIG_TARGET_DRAGONBOARD410C) += dragonboard410c.dtb
  dtb-$(CONFIG_TARGET_DRAGONBOARD820C) += dragonboard820c.dtb
  
  dtb-$(CONFIG_TARGET_STEMMY) += ste-ux500-samsung-stemmy.dtb
@@ -64,7 +64,7 @@ index a872ce46fd..5db0b40995 100644
  dtb-$(CONFIG_STM32F4) += stm32f429-disco.dtb \
  	stm32429i-eval.dtb \
  	stm32f469-disco.dtb
-@@ -698,7 +697,6 @@ dtb-$(CONFIG_VF610) += vf500-colibri.dtb \
+@@ -702,7 +701,6 @@ dtb-$(CONFIG_VF610) += vf500-colibri.dtb \
  
  dtb-$(CONFIG_MX28) += \
  	imx28-xea.dtb
@@ -72,7 +72,7 @@ index a872ce46fd..5db0b40995 100644
  dtb-$(CONFIG_MX53) += imx53-cx9020.dtb \
  	imx53-kp.dtb \
  	imx53-m53menlo.dtb
-@@ -869,7 +867,6 @@ dtb-$(CONFIG_RCAR_GEN3) += \
+@@ -873,7 +871,6 @@ dtb-$(CONFIG_RCAR_GEN3) += \
  ifdef CONFIG_RCAR_GEN3
  DTC_FLAGS += -R 4 -p 0x1000
  endif
@@ -80,7 +80,7 @@ index a872ce46fd..5db0b40995 100644
  dtb-$(CONFIG_RZA1) += \
  	r7s72100-gr-peach-u-boot.dtb
  
-@@ -947,7 +944,6 @@ dtb-$(CONFIG_TARGET_OMAP4_SDP4430) += \
+@@ -951,7 +948,6 @@ dtb-$(CONFIG_TARGET_OMAP4_SDP4430) += \
  
  dtb-$(CONFIG_TARGET_OMAP5_UEVM) += \
  	omap5-uevm.dtb
@@ -88,7 +88,7 @@ index a872ce46fd..5db0b40995 100644
  dtb-$(CONFIG_TARGET_SAMA5D2_PTC_EK) += \
  	at91-sama5d2_ptc_ek.dtb
  
-@@ -1003,7 +999,6 @@ dtb-$(CONFIG_ARCH_BCM63158) += \
+@@ -1007,7 +1003,6 @@ dtb-$(CONFIG_ARCH_BCM63158) += \
  
  dtb-$(CONFIG_ARCH_BCM68360) += \
  	bcm968360bg.dtb
@@ -96,7 +96,7 @@ index a872ce46fd..5db0b40995 100644
  dtb-$(CONFIG_ARCH_BCM6858) += \
  	bcm968580xref.dtb
  
-@@ -1055,9 +1050,7 @@ dtb-$(CONFIG_TARGET_VEXPRESS_CA9X4) += vexpress-v2p-ca9.dtb
+@@ -1059,9 +1054,7 @@ dtb-$(CONFIG_TARGET_VEXPRESS_CA9X4) += vexpress-v2p-ca9.dtb
  dtb-$(CONFIG_TARGET_VEXPRESS_CA15_TC2) += vexpress-v2p-ca15_a7.dtb
  
  dtb-$(CONFIG_TARGET_TOTAL_COMPUTE) += total_compute.dtb

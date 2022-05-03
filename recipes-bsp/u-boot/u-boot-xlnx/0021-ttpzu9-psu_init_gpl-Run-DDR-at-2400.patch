@@ -1,7 +1,7 @@
-From 40277d4437ca208ec7cacce7d2f4f98f1cfe3ab9 Mon Sep 17 00:00:00 2001
+From 22ab14d2e9d46caf7ea939756300e4432e9c4150 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 3 Jul 2020 09:02:55 +0200
-Subject: [PATCH 22/35] ttpzu9/psu_init_gpl: Run DDR at 2400
+Subject: [PATCH 21/34] ttpzu9/psu_init_gpl: Run DDR at 2400
 
 Using 17-17-17 (aka -083) timings as 063E is compatible with that.
 Uses DPLL to clock DDR controller and CPU at 1200

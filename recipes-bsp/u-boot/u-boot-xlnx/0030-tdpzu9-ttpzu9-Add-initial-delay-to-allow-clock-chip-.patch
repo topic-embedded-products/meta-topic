@@ -1,7 +1,7 @@
-From 11ba463d1b8bbec9c56ef4cd12c30992767fde9c Mon Sep 17 00:00:00 2001
+From 625d370661983b79640899b249f2a15d0a47250f Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 8 Jan 2021 15:14:21 +0100
-Subject: [PATCH 31/35] tdpzu9, ttpzu9: Add initial delay to allow clock chip
+Subject: [PATCH 30/34] tdpzu9, ttpzu9: Add initial delay to allow clock chip
  to initialize
 
 The Si5341 clock takes a while to initialize and when booting from QSPI the

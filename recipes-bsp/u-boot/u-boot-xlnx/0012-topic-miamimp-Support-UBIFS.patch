@@ -1,7 +1,7 @@
-From 464ad96a017e189ebf8af68b6cc110be15fb9a75 Mon Sep 17 00:00:00 2001
+From 0f2291e530585f19a7cd7800762c63165d18418b Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Wed, 5 Feb 2020 10:05:39 +0100
-Subject: [PATCH 12/35] topic-miamimp: Support UBIFS
+Subject: [PATCH 12/34] topic-miamimp: Support UBIFS
 
 ---
  include/configs/topic_miamimp.h | 10 +++++++++-
@@ -30,7 +30,7 @@ index ff9b892ee7..94e55f326a 100644
  #include "xilinx_zynqmp.h"
  
 diff --git a/include/configs/xilinx_zynqmp.h b/include/configs/xilinx_zynqmp.h
-index 36f3d962e4..7a77303a15 100644
+index 2f74726815..bbbc4c7aec 100644
 --- a/include/configs/xilinx_zynqmp.h
 +++ b/include/configs/xilinx_zynqmp.h
 @@ -44,6 +44,7 @@
@@ -41,7 +41,7 @@ index 36f3d962e4..7a77303a15 100644
  #if defined(CONFIG_SPL_BUILD)
  #define CONFIG_ZYNQMP_PSU_INIT_ENABLED
  #endif
-@@ -136,11 +137,13 @@
+@@ -138,11 +139,13 @@
  # define BOOT_TARGET_DEVICES_NAND(func)
  #endif
  

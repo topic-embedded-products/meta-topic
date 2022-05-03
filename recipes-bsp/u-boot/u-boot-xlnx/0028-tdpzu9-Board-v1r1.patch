@@ -1,7 +1,7 @@
-From ceb524087c0207c0fb61b10b3d9449bd97a86d63 Mon Sep 17 00:00:00 2001
+From 7c46a0e3dc17e783e7c1f0b87e51303fa92a7114 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 13 Oct 2020 15:58:28 +0200
-Subject: [PATCH 29/35] tdpzu9: Board v1r1
+Subject: [PATCH 28/34] tdpzu9: Board v1r1
 
 Enable USB3 on both controllers
 Use refclk0 at 100MHz for USB3 GT lanes

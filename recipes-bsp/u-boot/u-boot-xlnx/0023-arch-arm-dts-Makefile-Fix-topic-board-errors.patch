@@ -1,7 +1,7 @@
-From 4f1b78e1acac911d445d4b66510398881157553a Mon Sep 17 00:00:00 2001
+From 83f7023c8f5ebe6d63664e1aefca150d55c3286d Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 11 Aug 2020 09:37:17 +0200
-Subject: [PATCH 24/35] arch/arm/dts/Makefile: Fix topic board errors
+Subject: [PATCH 23/34] arch/arm/dts/Makefile: Fix topic board errors
 
 Add missing xdp dtb
 Fix typos "dts" instead of "dtb"
@@ -10,10 +10,10 @@ Fix typos "dts" instead of "dtb"
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index 111c20cf81..20d545fc1f 100644
+index 1b33b9cde6..d45e1c84b9 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -323,8 +323,9 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
+@@ -325,8 +325,9 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
  	zynqmp-sck-kv-g-revA-pl.dtbo		\
  	zynqmp-topic-miamimp.dtb		\
  	zynqmp-topic-miamimp-xilinx-xdp-v1r1.dtb	\

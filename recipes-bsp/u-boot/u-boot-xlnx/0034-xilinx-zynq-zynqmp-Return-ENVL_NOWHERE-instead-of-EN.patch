@@ -1,7 +1,7 @@
-From f570544a3e1238a9f8f1066cefc8e8dc589f5960 Mon Sep 17 00:00:00 2001
+From fc7d2d7dac7998a44228a316451eeaf3824fadf5 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 2 Jul 2021 10:10:53 +0200
-Subject: [PATCH 35/35] xilinx: zynq, zynqmp: Return ENVL_NOWHERE instead of
+Subject: [PATCH 34/34] xilinx: zynq, zynqmp: Return ENVL_NOWHERE instead of
  ENVL_UNKNOWN
 
 The system refuses to boot without any environment, so return ENVL_NOWHERE when
@@ -45,10 +45,10 @@ index 6cd4f7698f..bf3e589531 100644
  	default:
  		return ENVL_NOWHERE;
 diff --git a/board/xilinx/zynqmp/zynqmp.c b/board/xilinx/zynqmp/zynqmp.c
-index 94f9332530..63bf9fc677 100644
+index 4c09532a69..792ee71eeb 100644
 --- a/board/xilinx/zynqmp/zynqmp.c
 +++ b/board/xilinx/zynqmp/zynqmp.c
-@@ -729,18 +729,18 @@ enum env_location env_get_location(enum env_operation op, int prio)
+@@ -730,18 +730,18 @@ enum env_location env_get_location(enum env_operation op, int prio)
  			return ENVL_FAT;
  		if (IS_ENABLED(CONFIG_ENV_IS_IN_EXT4))
  			return ENVL_EXT4;

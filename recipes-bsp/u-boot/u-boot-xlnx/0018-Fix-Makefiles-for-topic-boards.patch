@@ -1,7 +1,7 @@
-From ba91800334d80d12db156c0092763f6fa6ce85d5 Mon Sep 17 00:00:00 2001
+From e9c69ac4c79f3afd5f33afc5a7c5813d1330865d Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 19 Jun 2020 11:38:10 +0200
-Subject: [PATCH 19/35] Fix Makefiles for topic boards
+Subject: [PATCH 18/34] Fix Makefiles for topic boards
 
 ---
  board/topic/zynq/Makefile   | 13 +++++++++++--

@@ -1,7 +1,7 @@
-From 62543b825361d6e4be9aca378c4b034d08703df0 Mon Sep 17 00:00:00 2001
+From 21b8e9abd699df868a2ffd181ce7e5cb927161b2 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 30 Oct 2020 18:21:01 +0100
-Subject: [PATCH 30/35] ttpzu9/psu_init: Use 100MHz refclk for USB3
+Subject: [PATCH 29/34] ttpzu9/psu_init: Use 100MHz refclk for USB3
 
 ---
  .../zynqmp/zynqmp-topic-ttpzu9/psu_init_gpl.c  | 18 +++++++++---------

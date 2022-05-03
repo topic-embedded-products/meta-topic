@@ -1,7 +1,7 @@
-From 6f69534b7e68a978998e979aeec8fb37a0f34132 Mon Sep 17 00:00:00 2001
+From 1a6e68560f0beb86a5f9ab28f775d209780592ef Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 11 Aug 2020 14:58:05 +0200
-Subject: [PATCH 25/35] topic_miamimp: Move CONFIG_SYS_SPI_U_BOOT_OFFS to
+Subject: [PATCH 24/34] topic_miamimp: Move CONFIG_SYS_SPI_U_BOOT_OFFS to
  defconfig
 
 ---

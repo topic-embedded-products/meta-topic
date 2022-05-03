@@ -1,7 +1,7 @@
-From 12cb83fa69c5d7c22d9320fc46f489a610558fa5 Mon Sep 17 00:00:00 2001
+From 451fd1fbbefcb883d0465c854c35fc98bfac1258 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 6 Jun 2019 09:47:41 +0200
-Subject: [PATCH 07/35] Add support for zynqmp-xilinx-xdp platform
+Subject: [PATCH 07/34] Add support for zynqmp-xilinx-xdp platform
 
 ---
  .../dts/zynqmp-topic-miamimp-xilinx-xdp.dts   |   117 +

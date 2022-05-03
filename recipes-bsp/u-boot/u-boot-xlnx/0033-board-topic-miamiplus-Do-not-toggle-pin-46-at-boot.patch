@@ -1,7 +1,7 @@
-From 3c1bcc05149754bdde53ae3dcd3ced72a557e53e Mon Sep 17 00:00:00 2001
+From 2c9400238e3ddecd936829dea9736d07580e1fde Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 18 Feb 2021 11:08:12 +0100
-Subject: [PATCH 34/35] board/topic-miamiplus: Do not toggle pin 46 at boot
+Subject: [PATCH 33/34] board/topic-miamiplus: Do not toggle pin 46 at boot
 
 The initialization code toggles MIO 46 for no apparent reason. This may
 cause some boards to fail to work properly, and causes issues when the

@@ -1,7 +1,7 @@
-From 9ecdfead47b641596e606cc6357b43d331f90bce Mon Sep 17 00:00:00 2001
+From 6a3b5f894c885c7efa9918225e3139252002c645 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 11 Aug 2020 16:56:34 +0200
-Subject: [PATCH 26/35] dts/zynqmp-topic*: Use jedec,spi-nor compatible instead
+Subject: [PATCH 25/34] dts/zynqmp-topic*: Use jedec,spi-nor compatible instead
  of spi-flash
 
 ---
@@ -11,27 +11,27 @@ Subject: [PATCH 26/35] dts/zynqmp-topic*: Use jedec,spi-nor compatible instead
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts b/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
-index a02d075071..7083804029 100644
+index 64bc3fa059..7083804029 100644
 --- a/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
 +++ b/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
 @@ -59,7 +59,7 @@
  	status = "okay";
  	is-dual = <1>;
  	flash@0 {
--		compatible = "st,m25p80", "n25q256a", "spi-flash";
+-		compatible = "st,m25p80", "n25q256a";
 +		compatible = "st,m25p80", "n25q256a", "jedec,spi-nor";
  		m25p,fast-read;
  		reg = <0x0>;
  		spi-tx-bus-width = <1>;
 diff --git a/arch/arm/dts/zynqmp-topic-miamimp.dts b/arch/arm/dts/zynqmp-topic-miamimp.dts
-index bc9e1a623e..d69e0e64ae 100644
+index 2e9caefb7b..d69e0e64ae 100644
 --- a/arch/arm/dts/zynqmp-topic-miamimp.dts
 +++ b/arch/arm/dts/zynqmp-topic-miamimp.dts
 @@ -83,7 +83,7 @@
  	is-dual = <1>;
  	num-cs = <1>;
  	flash@0 {
--		compatible = "st,m25p80", "n25q256a", "spi-flash";
+-		compatible = "st,m25p80", "n25q256a";
 +		compatible = "st,m25p80", "n25q256a", "jedec,spi-nor";
  		reg = <0x0>;
  		spi-tx-bus-width = <1>;

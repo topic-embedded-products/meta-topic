@@ -1,7 +1,7 @@
-From a2fe7b53d57cc1c2ec91128419f4bcc89683bbda Mon Sep 17 00:00:00 2001
+From c097b4c9f9074d7a97b6cdd03af510a3a18954ce Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 6 Apr 2021 16:53:40 +0200
-Subject: [PATCH 33/35] tdpzu9: Apply pull-down on MIO39
+Subject: [PATCH 32/34] tdpzu9: Apply pull-down on MIO39
 
 MIO39 is the SD SEL pin which must be low by default, selecting 3v3 IO.
 ---

@@ -1,7 +1,7 @@
-From 594b6d1362633023cd577070b5f45ae3bcc29ed2 Mon Sep 17 00:00:00 2001
+From 2974e32b51a240c5ec339cceaf91d4a09a38e8c3 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 10 Jul 2020 15:15:19 +0200
-Subject: [PATCH 23/35] xdp: Set DDR to 2400 MT/s
+Subject: [PATCH 22/34] xdp: Set DDR to 2400 MT/s
 
 Configure DDR at 2400 MT/s
 Avoid using VPLL

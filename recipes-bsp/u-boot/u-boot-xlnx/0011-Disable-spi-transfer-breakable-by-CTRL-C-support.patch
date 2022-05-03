@@ -1,28 +1,138 @@
-From e41e6ecbba3a4300607cce88d9d5e333c8ca492b Mon Sep 17 00:00:00 2001
+From 7a7040c448b0b7f67124ef687b759b3fce06b5e4 Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Fri, 7 Feb 2020 11:52:51 +0100
-Subject: [PATCH 11/35] Disable spi transfer breakable by CTRL C support
+Subject: [PATCH 11/34] Disable spi transfer breakable by CTRL C support
 
 The spi transfers during boot are consuming the serial port
 characters which prevent the bootloader to be entered when
 bootdelay is set to 0
 ---
- drivers/spi/zynqmp_gqspi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/spi/zynqmp_gqspi.c | 57 ++++++++++++++++++--------------------
+ 1 file changed, 27 insertions(+), 30 deletions(-)
 
 diff --git a/drivers/spi/zynqmp_gqspi.c b/drivers/spi/zynqmp_gqspi.c
-index 84fbd603c7..253791b1e7 100644
+index c04de703f4..5630f3da65 100644
 --- a/drivers/spi/zynqmp_gqspi.c
 +++ b/drivers/spi/zynqmp_gqspi.c
-@@ -775,7 +775,7 @@ static int zynqmp_qspi_start_dma(struct zynqmp_qspi_priv *priv,
- 	}
+@@ -299,7 +299,6 @@ static void zynqmp_qspi_fill_gen_fifo(struct zynqmp_qspi_priv *priv,
+ 	int ret = 0;
  
- 	ret = wait_for_bit_le32(&dma_regs->dmaisr, GQSPI_DMA_DST_I_STS_DONE,
--				1, GQSPI_TIMEOUT, 1);
-+                1, GQSPI_TIMEOUT, 0);
- 	if (ret) {
- 		printf("DMA Timeout:0x%x\n", readl(&dma_regs->dmaisr));
- 		return -ETIMEDOUT;
+ 	writel(gqspi_fifo_reg, &regs->genfifo);
+-
+ 	config_reg = readl(&regs->confr);
+ 	/* Manual start if needed */
+ 	config_reg |= GQSPI_STRT_GEN_FIFO;
+@@ -315,6 +314,7 @@ static void zynqmp_qspi_fill_gen_fifo(struct zynqmp_qspi_priv *priv,
+ 				GQSPI_TIMEOUT, 1);
+ 	if (ret)
+ 		printf("%s Timeout\n", __func__);
++
+ }
+ 
+ static void zynqmp_qspi_chipselect(struct zynqmp_qspi_priv *priv, int is_on)
+@@ -338,6 +338,7 @@ static void zynqmp_qspi_chipselect(struct zynqmp_qspi_priv *priv, int is_on)
+ 
+ 	debug("GFIFO_CMD_CS: 0x%x\n", gqspi_fifo_reg);
+ 
++
+ 	zynqmp_qspi_fill_gen_fifo(priv, gqspi_fifo_reg);
+ }
+ 
+@@ -523,10 +524,10 @@ static int zynqmp_qspi_fill_tx_fifo(struct zynqmp_qspi_priv *priv, u32 size)
+ 	debug("TxFIFO: 0x%x, size: 0x%x\n", readl(&regs->isr),
+ 	      size);
+ 
+-	/* Enable interrupts */
+-	ier = readl(&regs->ier);
++		/* Enable interrupts */
++		ier = readl(&regs->ier);
+ 	ier |= GQSPI_IXR_ALL_MASK | GQSPI_IXR_TXFIFOEMPTY_MASK;
+-	writel(ier, &regs->ier);
++		writel(ier, &regs->ier);
+ 
+ 	while (size) {
+ 		ret = wait_for_bit_le32(&regs->isr, GQSPI_IXR_TXNFULL_MASK, 1,
+@@ -569,7 +570,6 @@ static int zynqmp_qspi_fill_tx_fifo(struct zynqmp_qspi_priv *priv, u32 size)
+ 		printf("%s: Timeout\n", __func__);
+ 		return ret;
+ 	}
+-
+ 	priv->tx_buf += len;
+ 	return 0;
+ }
+@@ -763,42 +763,40 @@ static int zynqmp_qspi_start_dma(struct zynqmp_qspi_priv *priv,
+ 
+ 		totallen -= priv->len; /* Save remaining bytes length to read */
+ 		actuallen = priv->len; /* Actual number of bytes reading */
++	writel((unsigned long)buf, &dma_regs->dmadst);
++	writel(roundup(priv->len, GQSPI_DMA_ALIGN), &dma_regs->dmasize);
++	writel(GQSPI_DMA_DST_I_STS_MASK, &dma_regs->dmaier);
++	addr = (unsigned long)buf;
++	size = roundup(priv->len, GQSPI_DMA_ALIGN);
++	flush_dcache_range(addr, addr + size);
+ 
+-		writel((unsigned long)buf, &dma_regs->dmadst);
+-		writel(roundup(priv->len, GQSPI_DMA_ALIGN), &dma_regs->dmasize);
+-		writel(GQSPI_DMA_DST_I_STS_MASK, &dma_regs->dmaier);
+-		addr = (unsigned long)buf;
+-		size = roundup(priv->len, GQSPI_DMA_ALIGN);
+-		flush_dcache_range(addr, addr + size);
+-
+-		while (priv->len) {
+-			zynqmp_qspi_calc_exp(priv, &gen_fifo_cmd);
+-			zynqmp_qspi_fill_gen_fifo(priv, gen_fifo_cmd);
++	while (priv->len) {
++		zynqmp_qspi_calc_exp(priv, &gen_fifo_cmd);
++		zynqmp_qspi_fill_gen_fifo(priv, gen_fifo_cmd);
+ 
+-			debug("GFIFO_CMD_RX:0x%x\n", gen_fifo_cmd);
+-		}
++		debug("GFIFO_CMD_RX:0x%x\n", gen_fifo_cmd);
++	}
+ 
+ 		ret = wait_for_bit_le32(&dma_regs->dmaisr,
+ 					GQSPI_DMA_DST_I_STS_DONE, 1,
+-					GQSPI_TIMEOUT, 1);
+-		if (ret) {
+-			printf("DMA Timeout:0x%x\n", readl(&dma_regs->dmaisr));
+-			return -ETIMEDOUT;
+-		}
++					GQSPI_TIMEOUT, 0);
++	if (ret) {
++		printf("DMA Timeout:0x%x\n", readl(&dma_regs->dmaisr));
++		return -ETIMEDOUT;
++	}
+ 
+-		writel(GQSPI_DMA_DST_I_STS_DONE, &dma_regs->dmaisr);
++	writel(GQSPI_DMA_DST_I_STS_DONE, &dma_regs->dmaisr);
+ 
+-		debug("buf:0x%lx, rxbuf:0x%lx, *buf:0x%x len: 0x%x\n",
+-		      (unsigned long)buf, (unsigned long)priv->rx_buf, *buf,
+-		      actuallen);
++	debug("buf:0x%lx, rxbuf:0x%lx, *buf:0x%x len: 0x%x\n",
++	      (unsigned long)buf, (unsigned long)priv->rx_buf, *buf,
++	      actuallen);
+ 
+-		if (buf != priv->rx_buf)
+-			memcpy(priv->rx_buf, buf, actuallen);
++	if (buf != priv->rx_buf)
++		memcpy(priv->rx_buf, buf, actuallen);
+ 
+ 		buf = (u32 *)((u8 *)buf + actuallen);
+ 		priv->rx_buf = (u8 *)priv->rx_buf + actuallen;
+ 	}
+-
+ 	return 0;
+ }
+ 
+@@ -996,7 +994,6 @@ static bool zynqmp_qspi_update_stripe(const struct spi_mem_op *op)
+ 		return true;
+ 	}
+ }
+-
+ static int zynqmp_qspi_exec_op(struct spi_slave *slave,
+ 			       const struct spi_mem_op *op)
+ {
 -- 
 2.17.1
 

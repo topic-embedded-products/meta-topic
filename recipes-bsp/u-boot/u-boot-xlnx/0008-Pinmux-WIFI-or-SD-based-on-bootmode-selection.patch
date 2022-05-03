@@ -1,7 +1,7 @@
-From 9714bfa77535b85437cab2a40388524cb05413c2 Mon Sep 17 00:00:00 2001
+From ff90002e4683051f3143c10698d9d518db4e9032 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 23 Sep 2019 12:13:41 +0200
-Subject: [PATCH 08/35] Pinmux WIFI or SD based on bootmode selection
+Subject: [PATCH 08/34] Pinmux WIFI or SD based on bootmode selection
 
 Pinmux the SD1 controller dynamically based on the effective bootmode.
 If the bootmode is set to SD boot, pinumux the SD card, otherwise switch

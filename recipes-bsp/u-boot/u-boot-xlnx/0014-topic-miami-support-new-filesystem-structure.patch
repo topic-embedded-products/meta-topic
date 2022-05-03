@@ -1,7 +1,7 @@
-From b7a2324ccb744a887db2dba0cef7678e7f235f85 Mon Sep 17 00:00:00 2001
+From bb1984c9a243e86d1675948a2652034d2a44f8ae Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Tue, 25 Feb 2020 17:25:24 +0100
-Subject: [PATCH 14/35] topic-miami: support new filesystem structure
+Subject: [PATCH 14/34] topic-miami: support new filesystem structure
 
 Add MTD and UBI support and boot from QSPI using UBI filesystem
 ---
@@ -13,7 +13,7 @@ Add MTD and UBI support and boot from QSPI using UBI filesystem
  5 files changed, 98 insertions(+), 27 deletions(-)
 
 diff --git a/arch/arm/dts/zynq-topic-miami.dts b/arch/arm/dts/zynq-topic-miami.dts
-index e50ae58a23..463eab21f0 100644
+index 2a541bcd50..244a2826cf 100644
 --- a/arch/arm/dts/zynq-topic-miami.dts
 +++ b/arch/arm/dts/zynq-topic-miami.dts
 @@ -50,23 +50,15 @@

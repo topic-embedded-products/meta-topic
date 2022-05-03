@@ -1,5 +1,10 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
+TODO_PATCHES_THAT_DONT_APPLY = "\
+	file://0011-Disable-spi-transfer-breakable-by-CTRL-C-support.patch \
+	file://0016-dts-Add-spi-flash-to-compatible-list-for-miami-SOMs.patch \
+"
+
 SRC_URI:append = "\
 	file://pmu-firmware-zynqmp-pmu.bin.xz \
 	file://0001-board-topic-Detect-RAM-size-at-boot.patch \
@@ -17,26 +22,25 @@ SRC_URI:append = "\
 	file://0013-ARM-zynqmp-Add-support-for-the-topic-miamiplusmp-SoM.patch \
 	file://0014-topic-miami-support-new-filesystem-structure.patch \
 	file://0015-xdp-psu_init_gpl-Set-DDR-to-2133MHz.patch \
-	file://0016-dts-Add-spi-flash-to-compatible-list-for-miami-SOMs.patch \
-	file://0017-mach-zynqmp-spl.c-Remove-1-second-delay-at-boot.patch \
-	file://0018-zynqmp-topic-boards-Add-no-1-8-v-quirk-to-SD1-contro.patch \
-	file://0019-Fix-Makefiles-for-topic-boards.patch \
-	file://0020-Split-miamiplusmp-into-tdpzu9-and-ttpzu9.patch \
-	file://0021-zynqmp-topic-miamimp-psu_init_gpl-New-DDR-chips.patch \
-	file://0022-ttpzu9-psu_init_gpl-Run-DDR-at-2400.patch \
-	file://0023-xdp-Set-DDR-to-2400-MT-s.patch \
-	file://0024-arch-arm-dts-Makefile-Fix-topic-board-errors.patch \
-	file://0025-topic_miamimp-Move-CONFIG_SYS_SPI_U_BOOT_OFFS-to-def.patch \
-	file://0026-dts-zynqmp-topic-Use-jedec-spi-nor-compatible-instea.patch \
-	file://0027-topic-miamiplusmp-Enable-I2C-support-on-module.patch \
-	file://0028-topic-miamimp-xilinx-xdp-Enable-CAN-controllers.patch \
-	file://0029-tdpzu9-Board-v1r1.patch \
-	file://0030-ttpzu9-psu_init-Use-100MHz-refclk-for-USB3.patch \
-	file://0031-tdpzu9-ttpzu9-Add-initial-delay-to-allow-clock-chip-.patch \
-	file://0032-configs-topic_miami-lite-Fix-boot-order-and-disable-.patch \
-	file://0033-tdpzu9-Apply-pull-down-on-MIO39.patch \
-	file://0034-board-topic-miamiplus-Do-not-toggle-pin-46-at-boot.patch \
-	file://0035-xilinx-zynq-zynqmp-Return-ENVL_NOWHERE-instead-of-EN.patch \
+	file://0016-mach-zynqmp-spl.c-Remove-1-second-delay-at-boot.patch \
+	file://0017-zynqmp-topic-boards-Add-no-1-8-v-quirk-to-SD1-contro.patch \
+	file://0018-Fix-Makefiles-for-topic-boards.patch \
+	file://0019-Split-miamiplusmp-into-tdpzu9-and-ttpzu9.patch \
+	file://0020-zynqmp-topic-miamimp-psu_init_gpl-New-DDR-chips.patch \
+	file://0021-ttpzu9-psu_init_gpl-Run-DDR-at-2400.patch \
+	file://0022-xdp-Set-DDR-to-2400-MT-s.patch \
+	file://0023-arch-arm-dts-Makefile-Fix-topic-board-errors.patch \
+	file://0024-topic_miamimp-Move-CONFIG_SYS_SPI_U_BOOT_OFFS-to-def.patch \
+	file://0025-dts-zynqmp-topic-Use-jedec-spi-nor-compatible-instea.patch \
+	file://0026-topic-miamiplusmp-Enable-I2C-support-on-module.patch \
+	file://0027-topic-miamimp-xilinx-xdp-Enable-CAN-controllers.patch \
+	file://0028-tdpzu9-Board-v1r1.patch \
+	file://0029-ttpzu9-psu_init-Use-100MHz-refclk-for-USB3.patch \
+	file://0030-tdpzu9-ttpzu9-Add-initial-delay-to-allow-clock-chip-.patch \
+	file://0031-configs-topic_miami-lite-Fix-boot-order-and-disable-.patch \
+	file://0032-tdpzu9-Apply-pull-down-on-MIO39.patch \
+	file://0033-board-topic-miamiplus-Do-not-toggle-pin-46-at-boot.patch \
+	file://0034-xilinx-zynq-zynqmp-Return-ENVL_NOWHERE-instead-of-EN.patch \
 	"
 
 # Glitches on serial input interrupt the boot sequence on some boards, use

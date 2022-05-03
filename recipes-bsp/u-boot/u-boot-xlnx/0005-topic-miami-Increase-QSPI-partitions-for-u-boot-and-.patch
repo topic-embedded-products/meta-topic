@@ -1,7 +1,7 @@
-From 28817fb03b37d1e2d731800cff4eb0046fe22a7c Mon Sep 17 00:00:00 2001
+From b9da494acdfab54971bd0f559abea2c6dbb0889d Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 30 Sep 2019 10:35:03 +0200
-Subject: [PATCH 05/35] topic-miami: Increase QSPI partitions for u-boot and
+Subject: [PATCH 05/34] topic-miami: Increase QSPI partitions for u-boot and
  kernel
 
 Since 2019.1 u-boot needs more space in QSPI flash to fit, so increase the
@@ -14,7 +14,7 @@ Also increase the kernel size, so the rootfs aligns on 512k.
  2 files changed, 12 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm/dts/zynq-topic-miami.dts b/arch/arm/dts/zynq-topic-miami.dts
-index ab6bde95fe..e50ae58a23 100644
+index c4ec56138e..2a541bcd50 100644
 --- a/arch/arm/dts/zynq-topic-miami.dts
 +++ b/arch/arm/dts/zynq-topic-miami.dts
 @@ -46,23 +46,27 @@
