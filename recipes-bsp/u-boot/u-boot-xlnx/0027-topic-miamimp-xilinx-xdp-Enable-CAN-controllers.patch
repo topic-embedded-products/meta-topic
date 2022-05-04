@@ -1,4 +1,4 @@
-From 1276bb4edd861da01249a5d8121bf2b676c50226 Mon Sep 17 00:00:00 2001
+From 1e226dcfe666ece7b959475fb72f4e068d1c4428 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 2 Oct 2020 10:42:47 +0200
 Subject: [PATCH 27/34] topic-miamimp-xilinx-xdp: Enable CAN controllers

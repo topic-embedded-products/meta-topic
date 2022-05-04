@@ -1,4 +1,4 @@
-From 5f4842b0c3c83d47673d1d60a2c896db0e941276 Mon Sep 17 00:00:00 2001
+From b06bbb92ca26aa95bf28345730b284add0fdaad3 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 11 Aug 2020 16:56:34 +0200
 Subject: [PATCH 25/34] dts/zynqmp-topic*: Use jedec,spi-nor compatible instead

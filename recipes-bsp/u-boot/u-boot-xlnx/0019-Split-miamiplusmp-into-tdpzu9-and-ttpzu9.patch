@@ -1,4 +1,4 @@
-From c8028abb18815730603acf5dcef8f14b86660ce6 Mon Sep 17 00:00:00 2001
+From 990ca9dbee3222a50bae1b4730857e9cc1ffd85a Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 25 Jun 2020 10:55:01 +0200
 Subject: [PATCH 19/34] Split miamiplusmp into tdpzu9 and ttpzu9
@@ -27,10 +27,10 @@ and rename the board.
  create mode 100644 configs/topic_ttpzu9_defconfig
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index 06ae230dd4..1b33b9cde6 100644
+index bc3d277245..c3e87486b9 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -325,7 +325,8 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
+@@ -362,7 +362,8 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
  	zynqmp-sck-kv-g-revA-pl.dtbo		\
  	zynqmp-topic-miamimp.dtb		\
  	zynqmp-topic-miamimp-xilinx-xdp-v1r1.dtb	\

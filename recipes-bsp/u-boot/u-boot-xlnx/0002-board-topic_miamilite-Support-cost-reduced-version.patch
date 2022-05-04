@@ -1,4 +1,4 @@
-From a3b384ebd5a686e8eba043b6825816205e2505bc Mon Sep 17 00:00:00 2001
+From 2f956f32d49fcdbc01fb7f6ef06955ade5732357 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 23 Feb 2017 12:07:49 +0100
 Subject: [PATCH 02/34] board: topic_miamilite: Support cost-reduced version
@@ -12,9 +12,9 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  arch/arm/dts/zynq-topic-miamilite.dts              |  7 ++++---
  .../topic/zynq/zynq-topic-miamilite/ps7_init_gpl.c | 14 +++++++-------
  board/topic/zynq/zynq-topic-miamilite/ps7_regs.txt | 14 +++++++-------
- include/configs/topic_miami.h                      |  7 +++++--
+ include/configs/topic_miami.h                      |  8 ++++++--
  include/configs/topic_miamilite.h                  | 11 +++++++++++
- 5 files changed, 34 insertions(+), 19 deletions(-)
+ 5 files changed, 35 insertions(+), 19 deletions(-)
  create mode 100644 include/configs/topic_miamilite.h
 
 diff --git a/arch/arm/dts/zynq-topic-miamilite.dts b/arch/arm/dts/zynq-topic-miamilite.dts
@@ -115,13 +115,21 @@ index db6e642890..08d5344125 100644
 -0xE000D0A0 0xE2FF06EB // LQSPI_CFG - Quad read, dual flash
 +0xE000D0A0 0x82FF04EB // LQSPI_CFG - QIOREAD mode, Numonyx/Micron
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
-index c12cd7ccad..6225b529b7 100644
+index 88bb4a8fd5..cc2e91cd15 100644
 --- a/include/configs/topic_miami.h
 +++ b/include/configs/topic_miami.h
-@@ -35,9 +35,12 @@
+@@ -22,6 +22,7 @@
+ #define CONFIG_SPL_MAX_FOOTPRINT	CONFIG_SYS_SPI_U_BOOT_OFFS
+ #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME     "u-boot.img"
+ 
++
+ /* FPGA commands that we don't use */
+ 
+ /* Extras */
+@@ -32,9 +33,12 @@
  /* Setup proper boot sequences for Miami boards */
  
- #if defined(CONFIG_USB)
+ #if defined(CONFIG_USB_HOST)
 +# ifndef ENV_USB_RESET
 +#  define ENV_USB_RESET "i2c dev 1 && i2c mw 41 1 ff && i2c mw 41 3 fe && "\
 +		"i2c mw 41 1 fe && i2c mw 41 1 ff"

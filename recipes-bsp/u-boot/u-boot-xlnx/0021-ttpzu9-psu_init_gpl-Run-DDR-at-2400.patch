@@ -1,4 +1,4 @@
-From eb10585d7004e576d5aa142f361bb4a5dc790e3c Mon Sep 17 00:00:00 2001
+From ff661e13d6df85ea08ba93821cadc92d3f2b309e Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 3 Jul 2020 09:02:55 +0200
 Subject: [PATCH 21/34] ttpzu9/psu_init_gpl: Run DDR at 2400

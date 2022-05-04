@@ -1,4 +1,4 @@
-From 2584c837e29e5faef28e0c0299e01aeb6ece4af6 Mon Sep 17 00:00:00 2001
+From 57086e7934c3444a199f3007325831ec1c99ee41 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 20 Oct 2017 13:01:54 +0200
 Subject: [PATCH 03/34] configs/topic_miami.h: Use same partitioning for USB
@@ -12,10 +12,10 @@ partitioning and boot using that instead of requiring a ramdisk image.
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
-index 6225b529b7..94080acc21 100644
+index cc2e91cd15..78e88cb275 100644
 --- a/include/configs/topic_miami.h
 +++ b/include/configs/topic_miami.h
-@@ -41,15 +41,15 @@
+@@ -39,15 +39,15 @@
  # endif
  # define EXTRA_ENV_USB \
  	"usbreset=" ENV_USB_RESET "\0" \

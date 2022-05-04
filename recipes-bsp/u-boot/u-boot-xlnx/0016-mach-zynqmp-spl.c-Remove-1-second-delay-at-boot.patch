@@ -1,4 +1,4 @@
-From a52dcd7207f1752fac6fd98f217e7e4c672893e3 Mon Sep 17 00:00:00 2001
+From b74a5818d470bcf18a71fc18186f662f89655ac6 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 26 May 2020 08:40:17 +0200
 Subject: [PATCH 16/34] mach-zynqmp/spl.c: Remove 1-second delay at boot
@@ -16,11 +16,11 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  1 file changed, 2 insertions(+)
 
 diff --git a/arch/arm/mach-zynqmp/spl.c b/arch/arm/mach-zynqmp/spl.c
-index 4c5f799d00..205a171406 100644
+index d03edfa788..9acbef80c0 100644
 --- a/arch/arm/mach-zynqmp/spl.c
 +++ b/arch/arm/mach-zynqmp/spl.c
-@@ -99,6 +99,8 @@ u32 spl_boot_device(void)
- #ifdef CONFIG_SPL_MMC_SUPPORT
+@@ -103,6 +103,8 @@ u32 spl_boot_device(void)
+ #ifdef CONFIG_SPL_MMC
  	case SD_MODE1:
  	case SD1_LSHFT_MODE: /* not working on silicon v1 */
 +		/* Without this SD boot fails */

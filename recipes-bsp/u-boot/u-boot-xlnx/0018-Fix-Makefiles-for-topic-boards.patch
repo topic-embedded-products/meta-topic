@@ -1,4 +1,4 @@
-From b7b6e807220f6ed3d33a8fce63fa552aa64abda4 Mon Sep 17 00:00:00 2001
+From 43eabc7004a5a270e239370528fcfd4f0d14a78c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 19 Jun 2020 11:38:10 +0200
 Subject: [PATCH 18/34] Fix Makefiles for topic boards

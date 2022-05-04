@@ -1,4 +1,4 @@
-From 46d8817da0dfbadc264f01ad4b4c97edda9f5e48 Mon Sep 17 00:00:00 2001
+From 4e13afd28e37ec8dc974a619776b642e526ac316 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 8 Jan 2021 15:14:21 +0100
 Subject: [PATCH 30/34] tdpzu9, ttpzu9: Add initial delay to allow clock chip

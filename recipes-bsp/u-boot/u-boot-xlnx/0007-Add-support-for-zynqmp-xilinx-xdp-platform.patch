@@ -1,4 +1,4 @@
-From 36b351676d4c7e4d91968a60711caaedb4ecd73a Mon Sep 17 00:00:00 2001
+From 989e6d23a3a7ca5f9ada30f8430e17d1f31076eb Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 6 Jun 2019 09:47:41 +0200
 Subject: [PATCH 07/34] Add support for zynqmp-xilinx-xdp platform
@@ -139,10 +139,10 @@ index 0000000000..78dc56cc25
 +	status = "okay";
 +};
 diff --git a/arch/arm/mach-zynqmp/spl.c b/arch/arm/mach-zynqmp/spl.c
-index 88386b23e5..861b713084 100644
+index 6b836cbff2..0c013927ae 100644
 --- a/arch/arm/mach-zynqmp/spl.c
 +++ b/arch/arm/mach-zynqmp/spl.c
-@@ -69,6 +69,8 @@ u32 spl_boot_device(void)
+@@ -73,6 +73,8 @@ u32 spl_boot_device(void)
  	u32 reg = 0;
  	u8 bootmode;
  

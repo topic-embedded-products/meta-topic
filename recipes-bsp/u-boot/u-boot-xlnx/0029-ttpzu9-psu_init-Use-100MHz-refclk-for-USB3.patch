@@ -1,4 +1,4 @@
-From d69736386fa89d2348d8e2572cb3cdfc8e29bcf2 Mon Sep 17 00:00:00 2001
+From 2d867e39284b00c175aad92b4464dcf3797fe459 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 30 Oct 2020 18:21:01 +0100
 Subject: [PATCH 29/34] ttpzu9/psu_init: Use 100MHz refclk for USB3

@@ -1,4 +1,4 @@
-From 1d1033ceb5f3a10a715d2d46cb84a48dba06c6f0 Mon Sep 17 00:00:00 2001
+From 190e91f86428e3940a633cf9aa40f2d53809da7b Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 17 Nov 2016 15:20:32 +0100
 Subject: [PATCH 01/34] board: topic: Detect RAM size at boot

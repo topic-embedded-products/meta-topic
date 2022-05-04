@@ -1,4 +1,4 @@
-From c6b9e61eb151cd50e7dc94eda0a7844bd383319b Mon Sep 17 00:00:00 2001
+From bdf3c3e10fd6604f4db0edec79a972d38549ef84 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 18 Feb 2021 11:08:12 +0100
 Subject: [PATCH 33/34] board/topic-miamiplus: Do not toggle pin 46 at boot

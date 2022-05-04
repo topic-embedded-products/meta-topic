@@ -40,7 +40,7 @@ SRC_URI:append = "\
 	file://0031-configs-topic_miami-lite-Fix-boot-order-and-disable-.patch \
 	file://0032-tdpzu9-Apply-pull-down-on-MIO39.patch \
 	file://0033-board-topic-miamiplus-Do-not-toggle-pin-46-at-boot.patch \
-	file://0034-xilinx-zynq-zynqmp-Return-ENVL_NOWHERE-instead-of-EN.patch \
+	file://0034-configs-topic-Adjust-configuration-to-match-upstream.patch \
 	"
 
 # Glitches on serial input interrupt the boot sequence on some boards, use

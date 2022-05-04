@@ -1,4 +1,4 @@
-From aa80298ea4f9f2dfec865f931e81485ca5645511 Mon Sep 17 00:00:00 2001
+From ffb5104429b4b5d59e279df3f30a3793b100c830 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 11 Aug 2020 14:58:05 +0200
 Subject: [PATCH 24/34] topic_miamimp: Move CONFIG_SYS_SPI_U_BOOT_OFFS to

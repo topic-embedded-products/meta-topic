@@ -1,4 +1,4 @@
-From 6da9de7d25474b13a9fdd3f817d095468a0bca0a Mon Sep 17 00:00:00 2001
+From 766048928e584ed8e75665a6517bb232628c5ea9 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 18 Jan 2021 08:30:11 +0100
 Subject: [PATCH 31/34] configs, topic_miami[lite]: Fix boot order and disable
@@ -19,34 +19,34 @@ Fix boot order, "qspi0" should be "qpsi", don't try JTAG first, and remove
  3 files changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
-index c0ae3bec58..9bcbb8c952 100644
+index f9dd86cb6e..493a102e2c 100644
 --- a/configs/topic_miami_defconfig
 +++ b/configs/topic_miami_defconfig
-@@ -16,6 +16,7 @@ CONFIG_DEBUG_UART_CLOCK=100000000
+@@ -15,6 +15,7 @@ CONFIG_DEBUG_UART_BASE=0xe0000000
+ CONFIG_DEBUG_UART_CLOCK=100000000
  CONFIG_BOOT_INIT_FILE="board/topic/zynq/zynq-topic-miami/ps7_regs.txt"
- CONFIG_DEFAULT_DEVICE_TREE="zynq-topic-miami"
  CONFIG_DEBUG_UART=y
 +# CONFIG_BOARD_LATE_INIT is not set
  CONFIG_DISTRO_DEFAULTS=y
  CONFIG_SYS_CUSTOM_LDSCRIPT=y
  CONFIG_SYS_LDSCRIPT="arch/arm/mach-zynq/u-boot.lds"
 diff --git a/configs/topic_miamilite_defconfig b/configs/topic_miamilite_defconfig
-index 2eba22ed80..e5cfe253f5 100644
+index a7b23f7e38..0a542e9e5c 100644
 --- a/configs/topic_miamilite_defconfig
 +++ b/configs/topic_miamilite_defconfig
-@@ -16,6 +16,7 @@ CONFIG_DEBUG_UART_CLOCK=100000000
+@@ -15,6 +15,7 @@ CONFIG_DEBUG_UART_BASE=0xe0000000
+ CONFIG_DEBUG_UART_CLOCK=100000000
  CONFIG_BOOT_INIT_FILE="board/topic/zynq/zynq-topic-miamilite/ps7_regs.txt"
- CONFIG_DEFAULT_DEVICE_TREE="zynq-topic-miamilite"
  CONFIG_DEBUG_UART=y
 +# CONFIG_BOARD_LATE_INIT is not set
  CONFIG_DISTRO_DEFAULTS=y
  CONFIG_SYS_CUSTOM_LDSCRIPT=y
  CONFIG_SYS_LDSCRIPT="arch/arm/mach-zynq/u-boot.lds"
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
-index 00c1ca80af..07c020c584 100644
+index 5aec781a7e..f900e50124 100644
 --- a/include/configs/topic_miami.h
 +++ b/include/configs/topic_miami.h
-@@ -77,7 +77,7 @@
+@@ -73,7 +73,7 @@
  	"boot_a_script=load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; source ${scriptaddr}\0" \
  	"boot_prefixes=/ /boot/\0" \
  	"boot_scripts=boot.scr\0" \

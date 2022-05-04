@@ -1,4 +1,4 @@
-From 51c157ca5efe4b12a676d5fbd74a35c6ba722fbf Mon Sep 17 00:00:00 2001
+From 1a508c19ac5b0e58bf18ad6ce0dd8f49dd5f2d73 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 12 Feb 2020 11:45:06 +0100
 Subject: [PATCH 13/34] ARM: zynqmp: Add support for the topic-miamiplusmp SoM
@@ -18,10 +18,10 @@ an ethernet PHY.
  create mode 100644 configs/topic_miamiplusmp_defconfig
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index fdf73bc4cc..06ae230dd4 100644
+index 8de89f52ca..bc3d277245 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -325,6 +325,7 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
+@@ -362,6 +362,7 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
  	zynqmp-sck-kv-g-revA-pl.dtbo		\
  	zynqmp-topic-miamimp.dtb		\
  	zynqmp-topic-miamimp-xilinx-xdp-v1r1.dtb	\

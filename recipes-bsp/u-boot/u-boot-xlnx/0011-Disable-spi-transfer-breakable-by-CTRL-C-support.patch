@@ -1,4 +1,4 @@
-From 54fc2ee3f77d8ffb4b2f2b2c3ab7f0ee3edf4b78 Mon Sep 17 00:00:00 2001
+From 845648e0237d9dc42837c283c49a0ea2ac63828d Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Fri, 7 Feb 2020 11:52:51 +0100
 Subject: [PATCH 11/34] Disable spi transfer breakable by CTRL C support
@@ -11,10 +11,10 @@ bootdelay is set to 0
  1 file changed, 27 insertions(+), 30 deletions(-)
 
 diff --git a/drivers/spi/zynqmp_gqspi.c b/drivers/spi/zynqmp_gqspi.c
-index c04de703f4..5630f3da65 100644
+index a65e22d1b9..b68c40daaf 100644
 --- a/drivers/spi/zynqmp_gqspi.c
 +++ b/drivers/spi/zynqmp_gqspi.c
-@@ -299,7 +299,6 @@ static void zynqmp_qspi_fill_gen_fifo(struct zynqmp_qspi_priv *priv,
+@@ -301,7 +301,6 @@ static void zynqmp_qspi_fill_gen_fifo(struct zynqmp_qspi_priv *priv,
  	int ret = 0;
  
  	writel(gqspi_fifo_reg, &regs->genfifo);
@@ -22,7 +22,7 @@ index c04de703f4..5630f3da65 100644
  	config_reg = readl(&regs->confr);
  	/* Manual start if needed */
  	config_reg |= GQSPI_STRT_GEN_FIFO;
-@@ -315,6 +314,7 @@ static void zynqmp_qspi_fill_gen_fifo(struct zynqmp_qspi_priv *priv,
+@@ -317,6 +316,7 @@ static void zynqmp_qspi_fill_gen_fifo(struct zynqmp_qspi_priv *priv,
  				GQSPI_TIMEOUT, 1);
  	if (ret)
  		printf("%s Timeout\n", __func__);
@@ -30,7 +30,7 @@ index c04de703f4..5630f3da65 100644
  }
  
  static void zynqmp_qspi_chipselect(struct zynqmp_qspi_priv *priv, int is_on)
-@@ -338,6 +338,7 @@ static void zynqmp_qspi_chipselect(struct zynqmp_qspi_priv *priv, int is_on)
+@@ -340,6 +340,7 @@ static void zynqmp_qspi_chipselect(struct zynqmp_qspi_priv *priv, int is_on)
  
  	debug("GFIFO_CMD_CS: 0x%x\n", gqspi_fifo_reg);
  
@@ -38,7 +38,7 @@ index c04de703f4..5630f3da65 100644
  	zynqmp_qspi_fill_gen_fifo(priv, gqspi_fifo_reg);
  }
  
-@@ -523,10 +524,10 @@ static int zynqmp_qspi_fill_tx_fifo(struct zynqmp_qspi_priv *priv, u32 size)
+@@ -526,10 +527,10 @@ static int zynqmp_qspi_fill_tx_fifo(struct zynqmp_qspi_priv *priv, u32 size)
  	debug("TxFIFO: 0x%x, size: 0x%x\n", readl(&regs->isr),
  	      size);
  
@@ -52,7 +52,7 @@ index c04de703f4..5630f3da65 100644
  
  	while (size) {
  		ret = wait_for_bit_le32(&regs->isr, GQSPI_IXR_TXNFULL_MASK, 1,
-@@ -569,7 +570,6 @@ static int zynqmp_qspi_fill_tx_fifo(struct zynqmp_qspi_priv *priv, u32 size)
+@@ -572,7 +573,6 @@ static int zynqmp_qspi_fill_tx_fifo(struct zynqmp_qspi_priv *priv, u32 size)
  		printf("%s: Timeout\n", __func__);
  		return ret;
  	}
@@ -60,7 +60,7 @@ index c04de703f4..5630f3da65 100644
  	priv->tx_buf += len;
  	return 0;
  }
-@@ -763,42 +763,40 @@ static int zynqmp_qspi_start_dma(struct zynqmp_qspi_priv *priv,
+@@ -752,42 +752,40 @@ static int zynqmp_qspi_start_dma(struct zynqmp_qspi_priv *priv,
  
  		totallen -= priv->len; /* Save remaining bytes length to read */
  		actuallen = priv->len; /* Actual number of bytes reading */
@@ -125,7 +125,7 @@ index c04de703f4..5630f3da65 100644
  	return 0;
  }
  
-@@ -996,7 +994,6 @@ static bool zynqmp_qspi_update_stripe(const struct spi_mem_op *op)
+@@ -870,7 +868,6 @@ static bool zynqmp_qspi_update_stripe(const struct spi_mem_op *op)
  		return true;
  	}
  }

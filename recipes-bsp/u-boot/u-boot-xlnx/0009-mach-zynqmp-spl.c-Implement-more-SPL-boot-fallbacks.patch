@@ -1,4 +1,4 @@
-From 12ace6de68028011ee25e2425b41b205d8554fca Mon Sep 17 00:00:00 2001
+From fb4e199b927e1607abdbdaf27b37cfb03cce71de Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 16 Dec 2019 16:25:02 +0100
 Subject: [PATCH 09/34] mach-zynqmp/spl.c: Implement more SPL boot fallbacks
@@ -14,10 +14,10 @@ otherwise.
  1 file changed, 14 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm/mach-zynqmp/spl.c b/arch/arm/mach-zynqmp/spl.c
-index 861b713084..4c5f799d00 100644
+index 0c013927ae..d03edfa788 100644
 --- a/arch/arm/mach-zynqmp/spl.c
 +++ b/arch/arm/mach-zynqmp/spl.c
-@@ -56,12 +56,22 @@ void board_boot_order(u32 *spl_boot_list)
+@@ -60,12 +60,22 @@ void board_boot_order(u32 *spl_boot_list)
  {
  	spl_boot_list[0] = spl_boot_device();
  
