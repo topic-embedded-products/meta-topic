@@ -1,7 +1,7 @@
-From 585461e1f7933bd3a1c0ac758361be135ff6c324 Mon Sep 17 00:00:00 2001
+From 1df0c78088bf81d976cf87ac407b337a20da7792 Mon Sep 17 00:00:00 2001
 From: Piyush Mehta <piyush.mehta@xilinx.com>
 Date: Tue, 17 Aug 2021 07:26:45 +0000
-Subject: [PATCH 1/2] usb: dwc3: core: add transceiver delay for required
+Subject: [PATCH 03/14] usb: dwc3: core: add transceiver delay for required
  UTMI/ULPI phy
 
 GUSB2PHYCFG.XCVRDLY adds transceiver delay from the time when the
@@ -20,10 +20,10 @@ Signed-off-by: Piyush Mehta <piyush.mehta@xilinx.com>
  2 files changed, 16 insertions(+)
 
 diff --git a/drivers/usb/dwc3/core.c b/drivers/usb/dwc3/core.c
-index c0bc1762cd09..a6566aea7ef7 100644
+index f5731c456070..2ed5a7d669a1 100644
 --- a/drivers/usb/dwc3/core.c
 +++ b/drivers/usb/dwc3/core.c
-@@ -758,6 +758,16 @@ static int dwc3_phy_setup(struct dwc3 *dwc)
+@@ -755,6 +755,16 @@ static int dwc3_phy_setup(struct dwc3 *dwc)
  	if (dwc->dis_u2_freeclk_exists_quirk)
  		reg &= ~DWC3_GUSB2PHYCFG_U2_FREECLK_EXISTS;
  
@@ -40,7 +40,7 @@ index c0bc1762cd09..a6566aea7ef7 100644
  	dwc3_writel(dwc->regs, DWC3_GUSB2PHYCFG(0), reg);
  
  	return 0;
-@@ -1441,6 +1451,8 @@ static void dwc3_get_properties(struct dwc3 *dwc)
+@@ -1466,6 +1476,8 @@ static void dwc3_get_properties(struct dwc3 *dwc)
  				"snps,dis_u2_susphy_quirk");
  	dwc->dis_enblslpm_quirk = device_property_read_bool(dev,
  				"snps,dis_enblslpm_quirk");
@@ -50,10 +50,10 @@ index c0bc1762cd09..a6566aea7ef7 100644
  				"snps,dis-u1-entry-quirk");
  	dwc->dis_u2_entry_quirk = device_property_read_bool(dev,
 diff --git a/drivers/usb/dwc3/core.h b/drivers/usb/dwc3/core.h
-index 0b41e148ebc6..b73b74e97e06 100644
+index 88a05cb1e509..7cd31dcc830b 100644
 --- a/drivers/usb/dwc3/core.h
 +++ b/drivers/usb/dwc3/core.h
-@@ -283,6 +283,7 @@
+@@ -289,6 +289,7 @@
  #define DWC3_GUSB2PHYCFG_SUSPHY		BIT(6)
  #define DWC3_GUSB2PHYCFG_ULPI_UTMI	BIT(4)
  #define DWC3_GUSB2PHYCFG_ENBLSLPM	BIT(8)
@@ -61,7 +61,7 @@ index 0b41e148ebc6..b73b74e97e06 100644
  #define DWC3_GUSB2PHYCFG_PHYIF(n)	(n << 3)
  #define DWC3_GUSB2PHYCFG_PHYIF_MASK	DWC3_GUSB2PHYCFG_PHYIF(1)
  #define DWC3_GUSB2PHYCFG_USBTRDTIM(n)	(n << 10)
-@@ -1065,6 +1066,8 @@ struct dwc3_scratchpad_array {
+@@ -1089,6 +1090,8 @@ struct dwc3_scratchpad_array {
   * @dis_u2_susphy_quirk: set if we disable usb2 suspend phy
   * @dis_enblslpm_quirk: set if we clear enblslpm in GUSB2PHYCFG,
   *                      disabling the suspend signal to the PHY.
@@ -70,7 +70,7 @@ index 0b41e148ebc6..b73b74e97e06 100644
   * @dis_u1_entry_quirk: set if link entering into U1 state needs to be disabled.
   * @dis_u2_entry_quirk: set if link entering into U2 state needs to be disabled.
   * @dis_rxdet_inp3_quirk: set if we disable Rx.Detect in P3
-@@ -1284,6 +1287,7 @@ struct dwc3 {
+@@ -1320,6 +1323,7 @@ struct dwc3 {
  	unsigned		dis_u3_susphy_quirk:1;
  	unsigned		dis_u2_susphy_quirk:1;
  	unsigned		dis_enblslpm_quirk:1;

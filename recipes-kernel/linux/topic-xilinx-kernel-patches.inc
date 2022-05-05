@@ -16,9 +16,9 @@ VIRTUAL-RUNTIME_dev_manager ??= 'busybox-mdev'
 MDEVSUPPORT = "${@bb.utils.contains('VIRTUAL-RUNTIME_dev_manager', 'busybox-mdev', 'file://enable-mdev-hotplug.cfg', '', d)}"
 EXFATSUPPORT = "file://enable-exfat-fs.cfg"
 
-TODO_PATCHES_THAT_DONT_APPLY = "\
-	file://v4l2/0007-Fix-colors-resetting-after-format-adjust.patch \
-"
+
+# TODO: These patches need updating for the 5.15 kernel
+#
 
 # These patches are cherry-picked from the ADI Linux kernel, branch "adi-5.4.0"
 # The "-topic" patches are topic specific
@@ -52,32 +52,26 @@ XILINX_V4L2_FIXES = "\
 	file://v4l2/0004-media-imx274-improve-v4l2-compliance.patch \
 	file://v4l2/0005-media-imx274-remove-imx274_load_default.patch \
 	file://v4l2/0006-Improve-resolution-control.patch \
+	file://v4l2/0007-Fix-colors-resetting-after-format-adjust.patch \
 	"
 
 SRC_URI:append = "\
 	${MDEVSUPPORT} \
 	${EXFATSUPPORT} \
-	${ADIHDMISUPPORT} \
-	${ADIHDMIINSUPPORT} \
-	${XILINX_V4L2_FIXES} \
-	file://enable-kexec-support.cfg \
-	file://0001-usb-dwc3-Add-support-for-VBUS-power-control.patch \
 	file://0001-usb-dwc3-Disable-hibernation-by-default.patch \
-	file://0001-usb-dwc3-xilinx-Fix-sequence-and-propagate-error-cod.patch \
-	file://0001-usb-dwc3-core-add-transceiver-delay-for-required-UTM.patch \
-	file://0001-phy-zynqmp-Postpone-getting-clock-rate-until-it-s-ac.patch \
-	file://0001-phy-zynqmp-Longer-PLL-timeout.patch \
-	file://mcp23s08/0004-pinctrl-mcp23s08-Reset-all-pins-to-input-at-probe.patch \
-	file://0001-wireless-brcmfmac-Disable-power-save-mode.patch \
-	file://0002-iio-accel-Add-support-for-the-Bosch-Sensortec-BMI088.patch \
-	file://0003-clk-si5341-Support-NVM-programming-through-sysfs.patch \
-	file://0004-clk-si5341-Add-output_mask-attribute.patch \
-	file://0001-clk-clk-gpio-Implement-input-only-mode.patch \
-	file://0005-Add-ltc3562-voltage-regulator-driver.patch \
-	file://0006-drm-introduce-helper-for-accessing-EDID-blob-in-drm_.patch \
-	file://0007-overlay-Reduce-memory-leak-warning-to-debug-level.patch \
-	file://0008-gpio-poweroff-Implement-force-pm-power-off-flag.patch \
-	file://0001-spi-nor-Skip-4BAIT-parsing-on-Xilinx-Zynq-QSPI-contr.patch \
+	file://0002-usb-dwc3-xilinx-Fix-sequence-and-propagate-error-cod.patch \
+	file://0003-usb-dwc3-core-add-transceiver-delay-for-required-UTM.patch \
+	file://0004-phy-zynqmp-Postpone-getting-clock-rate-until-it-s-ac.patch \
+	file://0005-phy-zynqmp-Longer-PLL-timeout.patch \
+	file://0006-wireless-brcmfmac-Disable-power-save-mode.patch \
+	file://0007-clk-si5341-Support-NVM-programming-through-sysfs.patch \
+	file://0008-clk-si5341-Add-output_mask-attribute.patch \
+	file://0009-clk-clk-gpio-Implement-input-only-mode.patch \
+	file://0010-Add-ltc3562-voltage-regulator-driver.patch \
+	file://0011-overlay-Reduce-memory-leak-warning-to-debug-level.patch \
+	file://0012-gpio-poweroff-Implement-force-pm-power-off-flag.patch \
+	file://0013-spi-nor-Skip-4BAIT-parsing-on-Xilinx-Zynq-QSPI-contr.patch \
+	file://0014-pinctrl-mcp23s08-Reset-all-pins-to-input-at-probe.patch \
 	"
 
 # Compile overlay-capable devicetrees

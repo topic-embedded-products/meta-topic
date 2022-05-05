@@ -1,7 +1,7 @@
-From acaf9df0e6c948217ff2a50b35717dac2c17ad20 Mon Sep 17 00:00:00 2001
+From b0a1b9dd1c76092fb7fee5b58305e2ae7368fa24 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 20 Nov 2019 14:56:47 +0100
-Subject: [PATCH 8/8] gpio-poweroff: Implement force-pm-power-off flag
+Subject: [PATCH 12/14] gpio-poweroff: Implement force-pm-power-off flag
 
 Implement a devicetree property to forcibly set the pm_power_off variable.
 
@@ -16,7 +16,7 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  1 file changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/power/reset/gpio-poweroff.c b/drivers/power/reset/gpio-poweroff.c
-index c5067eb75370..d683c942554d 100644
+index 1c5af2fef142..d242376920e9 100644
 --- a/drivers/power/reset/gpio-poweroff.c
 +++ b/drivers/power/reset/gpio-poweroff.c
 @@ -53,10 +53,13 @@ static int gpio_poweroff_probe(struct platform_device *pdev)

@@ -1,0 +1,49 @@
+From 16d56309bcc90c1e92e34f00b885a60ddbf47b11 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 16 Oct 2020 12:08:08 +0200
+Subject: [PATCH 14/14] pinctrl-mcp23s08: Reset all pins to input at probe
+
+On soft reset, the chip will just be in the state it was, so set the
+chip to a known safe mode (all inputs) before toggling other bits.
+---
+ drivers/pinctrl/pinctrl-mcp23s08.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/pinctrl/pinctrl-mcp23s08.c b/drivers/pinctrl/pinctrl-mcp23s08.c
+index bccebe43dd6a..d9317b6fbadf 100644
+--- a/drivers/pinctrl/pinctrl-mcp23s08.c
++++ b/drivers/pinctrl/pinctrl-mcp23s08.c
+@@ -356,7 +356,6 @@ static irqreturn_t mcp23s08_irq(int irq, void *data)
+ 		/* There is no interrupt pending */
+ 		goto unlock;
+ 	}
+-
+ 	if (mcp_read(mcp, MCP_INTCAP, &intcap))
+ 		goto unlock;
+ 
+@@ -374,6 +373,7 @@ static irqreturn_t mcp23s08_irq(int irq, void *data)
+ 	mcp->cached_gpio = gpio;
+ 	mutex_unlock(&mcp->lock);
+ 
++
+ 	dev_dbg(mcp->chip.parent,
+ 		"intcap 0x%04X intf 0x%04X gpio_orig 0x%04X gpio 0x%04X\n",
+ 		intcap, intf, gpio_orig, gpio);
+@@ -561,6 +561,14 @@ int mcp23s08_probe_one(struct mcp23s08 *mcp, struct device *dev,
+ 
+ 	mcp->reset_gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
+ 
++	/*
++	 * Reset the chip - we don't really know what state it's in, so reset
++	 * all pins to input first to prevent surprises.
++	 */
++	ret = mcp_write(mcp, MCP_IODIR, mcp->chip.ngpio == 16 ? 0xFFFF : 0xFF);
++	if (ret < 0)
++		return ret;
++
+ 	/* verify MCP_IOCON.SEQOP = 0, so sequential reads work,
+ 	 * and MCP_IOCON.HAEN = 1, so we work with all chips.
+ 	 */
+-- 
+2.17.1
+

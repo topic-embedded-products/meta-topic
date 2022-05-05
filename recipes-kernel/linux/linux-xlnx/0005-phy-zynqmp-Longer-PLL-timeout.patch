@@ -1,7 +1,7 @@
-From fc009561f5bababedfbf1da7fddc61cbf36353f0 Mon Sep 17 00:00:00 2001
+From fae89de1268168173fef6a0466ec44af9422f5ac Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 9 Jul 2021 11:11:16 +0200
-Subject: [PATCH] phy-zynqmp: Longer PLL timeout
+Subject: [PATCH 05/14] phy-zynqmp: Longer PLL timeout
 
 The PS GTR PLL sometimes takes a bit more than 1 millisecond to lock, resulting in:
   xilinx-psgtr fd400000.phy: lane 2 (type 0, protocol 3): PLL lock timeout
@@ -13,10 +13,10 @@ Change the timeout to approximately 20ms.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/phy/xilinx/phy-zynqmp.c b/drivers/phy/xilinx/phy-zynqmp.c
-index 755c632b3cf5..5aeb11166439 100644
+index 27e1c04ab7fe..92eeb7efeb2a 100644
 --- a/drivers/phy/xilinx/phy-zynqmp.c
 +++ b/drivers/phy/xilinx/phy-zynqmp.c
-@@ -162,7 +162,7 @@
+@@ -163,7 +163,7 @@
  #define XPSGTR_TYPE_SGMII3		13 /* Ethernet SGMII controller 3 */
  
  /* Timeout values */

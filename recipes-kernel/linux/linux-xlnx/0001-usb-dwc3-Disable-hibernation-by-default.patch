@@ -1,7 +1,7 @@
-From 0365c332dc4c70e9db9f0533d8a43201d6a9c78b Mon Sep 17 00:00:00 2001
+From 441bb4f824a5e3ca86b3848b038928cf39e3864c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 9 Jul 2021 15:35:50 +0200
-Subject: [PATCH] usb: dwc3: Disable hibernation by default
+Subject: [PATCH 01/14] usb: dwc3: Disable hibernation by default
 
 Hibernation support appears to be badly broken, plugging in a cable causes kernel panics like:
   BUG: scheduling while atomic: irq/50-dwc3/403/0x00010100
@@ -14,10 +14,10 @@ Fixes: 511e872607db "usb: dwc3: gadget: Add hibernation support when operating i
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/usb/dwc3/core.c b/drivers/usb/dwc3/core.c
-index 447781a0ae45..c0bc1762cd09 100644
+index ec77eca04c74..f5731c456070 100644
 --- a/drivers/usb/dwc3/core.c
 +++ b/drivers/usb/dwc3/core.c
-@@ -832,7 +832,7 @@ static void dwc3_core_setup_global_control(struct dwc3 *dwc)
+@@ -829,7 +829,7 @@ static void dwc3_core_setup_global_control(struct dwc3 *dwc)
  	case DWC3_GHWPARAMS1_EN_PWROPT_HIB:
  		/* enable hibernation here */
  		dwc->nr_scratch = DWC3_GHWPARAMS4_HIBER_SCRATCHBUFS(hwparams4);

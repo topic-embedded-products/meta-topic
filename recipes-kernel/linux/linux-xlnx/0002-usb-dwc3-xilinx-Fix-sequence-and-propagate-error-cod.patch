@@ -1,8 +1,8 @@
-From 7810cdcf846f6ecfb8b12819af8d5ef02ac9e820 Mon Sep 17 00:00:00 2001
+From 0a2c5fbb566752420c9500df9573c96c025f1247 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 12 Aug 2021 11:29:33 +0200
-Subject: [PATCH] usb: dwc3: xilinx: Fix sequence and propagate error code in
- gpio-reset support
+Subject: [PATCH 02/14] usb: dwc3: xilinx: Fix sequence and propagate error
+ code in gpio-reset support
 
 When the reset-gpios fails to probe, for example due to a EDEFER when the GPIO controller
 is not available yet, the error code was ignored and the function still returns 0.
@@ -17,22 +17,20 @@ was already low at probe time.
 Fixes: 476adf95bf466 ("usb: dwc3: xilinx: Add gpio-reset support")
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 ---
- drivers/usb/dwc3/dwc3-xilinx.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ drivers/usb/dwc3/dwc3-xilinx.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/usb/dwc3/dwc3-xilinx.c b/drivers/usb/dwc3/dwc3-xilinx.c
-index 7231c5a3eece..b5dafc313420 100644
+index 269c8b2eb16c..e25fbea43161 100644
 --- a/drivers/usb/dwc3/dwc3-xilinx.c
 +++ b/drivers/usb/dwc3/dwc3-xilinx.c
-@@ -473,18 +473,17 @@ static int dwc3_xlnx_init_zynqmp(struct dwc3_xlnx *priv_data)
- 	}
- 
+@@ -476,17 +476,15 @@ static int dwc3_xlnx_init_zynqmp(struct dwc3_xlnx *priv_data)
  	/* ulpi reset via gpio-modepin or gpio-framework driver */
--	reset_gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
-+	reset_gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
+ 	reset_gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
  	if (IS_ERR(reset_gpio)) {
--		dev_err_probe(dev, PTR_ERR(reset_gpio),
--			      "Failed to bind reset gpio\n");
+-		ret = PTR_ERR(reset_gpio);
+-		dev_err_probe(dev, ret,
+-			      "Failed to bind reset gpio %d,errcode\n", ret);
 +		ret = dev_err_probe(dev, PTR_ERR(reset_gpio),
 +				    "Failed to bind reset gpio\n");
  		goto err;
@@ -40,9 +38,9 @@ index 7231c5a3eece..b5dafc313420 100644
  
  	if (reset_gpio) {
  		/* Toggle ulpi to reset the phy. */
--		gpiod_set_value(reset_gpio, 0);
+-		gpiod_set_value_cansleep(reset_gpio, 1);
  		usleep_range(5000, 10000); /* delay */
--		gpiod_set_value(reset_gpio, 1);
+-		gpiod_set_value_cansleep(reset_gpio, 0);
 +		gpiod_set_value_cansleep(reset_gpio, 1);
  		usleep_range(5000, 10000); /* delay */
  	}

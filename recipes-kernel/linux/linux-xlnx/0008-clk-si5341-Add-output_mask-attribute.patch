@@ -1,7 +1,7 @@
-From 9e4de6ed6782db97a3fed24da802d195aabd9142 Mon Sep 17 00:00:00 2001
+From 16f0a299c714fa0cb576b83c657376d51a213c11 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 4 Jan 2021 16:36:48 +0100
-Subject: [PATCH 4/8] clk-si5341: Add output_mask attribute
+Subject: [PATCH 08/14] clk-si5341: Add output_mask attribute
 
 Allows disabling clocks from userspace. Expected sequence:
 - Check program status by reading program_nvm_bank
@@ -16,10 +16,10 @@ Upstream-status: Inappropriate
  1 file changed, 65 insertions(+)
 
 diff --git a/drivers/clk/clk-si5341.c b/drivers/clk/clk-si5341.c
-index 7e95db194d91..a73f76afcc71 100644
+index 6fd311344afa..d2a4b3b7b538 100644
 --- a/drivers/clk/clk-si5341.c
 +++ b/drivers/clk/clk-si5341.c
-@@ -1251,10 +1251,75 @@ static ssize_t program_nvm_bank_store(struct device *dev,
+@@ -1310,10 +1310,75 @@ static ssize_t program_nvm_bank_store(struct device *dev,
  	return count;
  }
  

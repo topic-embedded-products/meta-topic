@@ -1,8 +1,8 @@
-From 7609c8777cb2ba477c3bb47028bc3a2c7e43bcc9 Mon Sep 17 00:00:00 2001
+From 9643d89c48fdbf72d13c2d218792cc9402b4a900 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 9 Jul 2021 09:54:49 +0200
-Subject: [PATCH] phy-zynqmp: Postpone getting clock rate until it's actually
- needed
+Subject: [PATCH 04/14] phy-zynqmp: Postpone getting clock rate until it's
+ actually needed
 
 At probe time the driver would display the following error and abort:
   xilinx-psgtr fd400000.phy: Invalid rate 0 for reference clock 0
@@ -18,10 +18,10 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  1 file changed, 29 insertions(+), 30 deletions(-)
 
 diff --git a/drivers/phy/xilinx/phy-zynqmp.c b/drivers/phy/xilinx/phy-zynqmp.c
-index f478d8a17115..755c632b3cf5 100644
+index 9be9535ad7ab..27e1c04ab7fe 100644
 --- a/drivers/phy/xilinx/phy-zynqmp.c
 +++ b/drivers/phy/xilinx/phy-zynqmp.c
-@@ -207,7 +207,6 @@ struct xpsgtr_phy {
+@@ -208,7 +208,6 @@ struct xpsgtr_phy {
   * @siou: siou base address
   * @gtr_mutex: mutex for locking
   * @phys: PHY lanes
@@ -29,7 +29,7 @@ index f478d8a17115..755c632b3cf5 100644
   * @clk: reference clocks
   * @tx_term_fix: fix for GT issue
   * @saved_icm_cfg0: stored value of ICM CFG0 register
-@@ -219,7 +218,6 @@ struct xpsgtr_dev {
+@@ -220,7 +219,6 @@ struct xpsgtr_dev {
  	void __iomem *siou;
  	struct mutex gtr_mutex; /* mutex for locking */
  	struct xpsgtr_phy phys[NUM_LANES];
@@ -37,7 +37,7 @@ index f478d8a17115..755c632b3cf5 100644
  	struct clk *clk[NUM_LANES];
  	bool tx_term_fix;
  	unsigned int saved_icm_cfg0;
-@@ -335,13 +333,38 @@ static int xpsgtr_wait_pll_lock(struct phy *phy)
+@@ -336,13 +334,38 @@ static int xpsgtr_wait_pll_lock(struct phy *phy)
  	return ret;
  }
  
@@ -78,7 +78,7 @@ index f478d8a17115..755c632b3cf5 100644
  	step_size = ssc->step_size;
  
  	xpsgtr_clr_set(gtr_phy->dev, PLL_REF_SEL(gtr_phy->lane),
-@@ -796,8 +819,7 @@ static struct phy *xpsgtr_xlate(struct device *dev,
+@@ -797,8 +820,7 @@ static struct phy *xpsgtr_xlate(struct device *dev,
  	}
  
  	refclk = args->args[3];
@@ -88,7 +88,7 @@ index f478d8a17115..755c632b3cf5 100644
  		dev_err(dev, "Invalid reference clock number %u\n", refclk);
  		return ERR_PTR(-EINVAL);
  	}
-@@ -889,9 +911,7 @@ static int xpsgtr_get_ref_clocks(struct xpsgtr_dev *gtr_dev)
+@@ -890,9 +912,7 @@ static int xpsgtr_get_ref_clocks(struct xpsgtr_dev *gtr_dev)
  	unsigned int refclk;
  	int ret;
  
@@ -99,7 +99,7 @@ index f478d8a17115..755c632b3cf5 100644
  		struct clk *clk;
  		char name[8];
  
-@@ -912,27 +932,6 @@ static int xpsgtr_get_ref_clocks(struct xpsgtr_dev *gtr_dev)
+@@ -913,27 +933,6 @@ static int xpsgtr_get_ref_clocks(struct xpsgtr_dev *gtr_dev)
  			goto err_clk_put;
  
  		gtr_dev->clk[refclk] = clk;

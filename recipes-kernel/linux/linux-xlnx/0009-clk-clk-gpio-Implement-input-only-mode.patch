@@ -1,7 +1,7 @@
-From 39016e57e604314397abad7c610331163f5c8b75 Mon Sep 17 00:00:00 2001
+From 3c6aa640b04d507679f8e71e44608a81db108b4c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 31 Aug 2021 08:52:45 +0200
-Subject: [PATCH] clk: clk-gpio: Implement input-only mode
+Subject: [PATCH 09/14] clk: clk-gpio: Implement input-only mode
 
 clk-gpio normally only controls the output. This patch enables the driver to
 read the current state of the GPIO pin and use that as a default. The GPIO value
