@@ -154,6 +154,7 @@
 		compatible = "atmel,24c32";
 		reg = <0x51>;
 		pagesize = <32>;
+		vcc-supply = <&reg_1v8_miami>;
 		#address-cells = <1>;
 		#size-cells = <1>;
 		gem2_mac: mac@f30 {
@@ -173,6 +174,7 @@
 		#size-cells = <0>;
 		clocks = <&xtalmux>;
 		clock-names = "xtal";
+		silabs,xaxb-ext-clk; /* Input is a clock chip, not Xtal */
 		/* Interrupt connected to MIO26 (not actually used) */
 		interrupt-parent = <&gpio>;
 		interrupts = <26 IRQ_TYPE_LEVEL_LOW>;
@@ -229,6 +231,18 @@
 					<250000000>,
 					<100000000>, /* out 8 (PS refclk3) */
 					<100000000>;
+
+		/* Supply voltages for the output drivers */
+		vddo0-supply = <&reg_3v3_miami>;
+		vddo1-supply = <&reg_3v3_miami>;
+		vddo2-supply = <&reg_3v3_miami>;
+		vddo3-supply = <&reg_3v3_miami>;
+		vddo4-supply = <&reg_3v3_miami>;
+		vddo5-supply = <&reg_3v3_miami>;
+		vddo6-supply = <&reg_3v3_miami>;
+		vddo7-supply = <&reg_1v8_miami>;
+		vddo8-supply = <&reg_3v3_miami>;
+		vddo9-supply = <&reg_1v8_miami>;
 
 		out@0 {
 			/* MGT_D_REFCLK_0 */
@@ -294,8 +308,8 @@
 		out@8 {
 			/* PS_MGT_D_REFCLK_3 */
 			reg = <8>;
-			silabs,format = <1>; /* LVDS 1v8 */
-			silabs,common-mode = <13>;
+			silabs,format = <1>; /* LVDS 3v3 */
+			silabs,common-mode = <3>;
 			silabs,amplitude = <3>;
 			always-on;
 		};

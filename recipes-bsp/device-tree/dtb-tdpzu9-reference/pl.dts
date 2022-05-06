@@ -73,6 +73,7 @@
 				tmp101pl: sensor@4a{
 					compatible = "ti,tmp101";
 					reg = <0x4a>;
+					vs-supply = <&reg_3v3_miami>;
 					/* Interrupt not actually used by driver */
 					interrupt-parent = <&gpio>;
 					interrupts = <82 IRQ_TYPE_LEVEL_LOW>; /* EMIO 4 */

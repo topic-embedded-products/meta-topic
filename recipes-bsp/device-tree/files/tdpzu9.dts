@@ -259,6 +259,7 @@
 		compatible = "atmel,24c32";
 		reg = <0x50>;
 		pagesize = <32>;
+		vcc-supply = <&reg_1v8_miami>;
 		#address-cells = <1>;
 		#size-cells = <1>;
 	};
