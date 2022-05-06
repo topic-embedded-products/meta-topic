@@ -56,3 +56,7 @@ COMPATIBLE_MACHINE:tdkz15 = ".*"
 COMPATIBLE_MACHINE:tdkz30 = ".*"
 SRC_URI:append:tdkz15 = "${TDKZ_SOURCES}"
 SRC_URI:append:tdkz30 = "${TDKZ_SOURCES}"
+
+# Remove the check that requires some obsure variables to point to some files
+def check_devicetree_variables(d):
+    pass
