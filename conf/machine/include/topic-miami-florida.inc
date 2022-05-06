@@ -19,7 +19,6 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-snd-soc-adi-axi-spdif \
 	kernel-module-snd-soc-adv7511-hdmi \
 	kernel-module-snd-soc-simple-card \
-	kernel-module-vdmafb \
 	kernel-module-videobuf2-core \
 	kernel-module-videobuf2-dma-contig \
 	kernel-module-videobuf2-memops \
