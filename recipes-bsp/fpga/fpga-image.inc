@@ -8,8 +8,6 @@ DEPENDS = "fpga-bit-to-bin-native"
 RRECOMMENDS:${PN} = "${@bb.utils.contains("MACHINE_FEATURES", "fpgamgr", "fpga-firmware-load", "fpga-image-load", d)}"
 # Package is machine specific
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-# Workaround: XPS fails to build when there's a "+" in the path.
-SRCPV = "${@bb.fetch2.get_srcrev(d).replace('+','-')}"
 
 # By default, installs into /usr/share, but when using the fpga manager you
 # would want this to be /lib/firmware
