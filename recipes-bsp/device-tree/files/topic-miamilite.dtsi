@@ -19,7 +19,7 @@
 	conf {
 		groups = "gpio0_9_grp";
 		slew-rate = <0>;
-		io-standard = <1>;
+		power-source = <1>;
 	};
 };
 
@@ -46,6 +46,6 @@
 		groups = "gpio0_48_grp", "gpio0_49_grp";
 		bias-pull-up;
 		slew-rate = <0>;
-		io-standard = <1>;
+		power-source = <1>;
 	};
 };

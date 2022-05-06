@@ -521,7 +521,7 @@
 			groups = "i2c0_18_grp";
 			bias-pull-up;
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 		};
 	};
 	pinctrl_i2c0_gpio: i2c0-gpio {
@@ -533,7 +533,7 @@
 		conf {
 			groups = "gpio0_74_grp", "gpio0_75_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 		};
 	};
 
@@ -547,20 +547,20 @@
 		conf {
 			groups = "uart1_6_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 		};
 
 		conf-rx {
 			pins = "MIO25";
 			bias-high-impedance;
 			bias-pull-up;
-			schmitt-cmos = <PIN_INPUT_TYPE_SCHMITT>;
+			input-schmitt-enable;
 		};
 
 		conf-tx {
 			pins = "MIO24";
 			bias-disable;
-			schmitt-cmos = <PIN_INPUT_TYPE_CMOS>;
+			input-schmitt-disable;
 		};
 	};
 
@@ -574,7 +574,7 @@
 		conf-sw {
 			groups = "gpio0_36_grp", "gpio0_37_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 			bias-pull-up;
 		};
 
@@ -606,14 +606,14 @@
 		conf {
 			groups = "sdio0_0_grp";
 			slew-rate = <SLEW_RATE_FAST>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 			bias-disable;
 		};
 
 		conf-pc {
 			groups = "sdio0_pc_0_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 			bias-pull-up;
 		};
 	};
@@ -627,7 +627,7 @@
 		conf {
 			groups = "sdio1_2_grp";
 			slew-rate = <SLEW_RATE_FAST>;
-			io-standard = <IO_STANDARD_LVCMOS33>;
+			power-source = <IO_STANDARD_LVCMOS33>;
 			bias-disable;
 		};
 
@@ -639,7 +639,7 @@
 		conf-cd {
 			groups = "sdio1_cd_0_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS33>;
+			power-source = <IO_STANDARD_LVCMOS33>;
 			bias-pull-up;
 		};
 	};
@@ -653,7 +653,7 @@
 		conf {
 			groups = "usb0_0_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 		};
 
 		conf-rx {

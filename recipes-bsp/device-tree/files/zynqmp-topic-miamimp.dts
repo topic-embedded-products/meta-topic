@@ -248,7 +248,7 @@
 			groups = "i2c0_6_grp";
 			bias-pull-up;
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 		};
 	};
 
@@ -261,7 +261,7 @@
 		conf {
 			groups = "gpio0_26_grp", "gpio0_27_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 		};
 	};
 
@@ -275,7 +275,7 @@
 			groups = "i2c1_8_grp";
 			bias-pull-up;
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 		};
 	};
 
@@ -288,7 +288,7 @@
 		conf {
 			groups = "gpio0_32_grp", "gpio0_33_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 		};
 	};
 
@@ -301,12 +301,13 @@
 		conf {
 			groups = "uart0_7_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 		};
 
 		conf-rx {
 			pins = "MIO30";
 			bias-high-impedance;
+			input-schmitt-enable;
 		};
 
 		conf-tx {
@@ -324,7 +325,7 @@
 		conf {
 			groups = "sdio0_0_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 			bias-disable;
 		};
 
@@ -338,7 +339,7 @@
 			bias-high-impedance;
 			bias-pull-up;
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 		};
 	};
 
@@ -351,7 +352,7 @@
 		conf-sw {
 			groups = "gpio0_35_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 		};
 
 		mux-msp {
@@ -362,7 +363,7 @@
 		conf-msp {
 			groups = "gpio0_35_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			io-standard = <IO_STANDARD_LVCMOS18>;
+			power-source = <IO_STANDARD_LVCMOS18>;
 		};
 
 		conf-pull-none {

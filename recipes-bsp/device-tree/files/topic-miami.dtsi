@@ -241,7 +241,7 @@
 		conf {
 			groups = "qspi0_0_grp", "qspi_fbclk_grp";
 			slew-rate = <0>;
-			io-standard = <1>;
+			power-source = <1>;
 			bias-disable;
 		};
 	};
@@ -255,7 +255,7 @@
 		conf {
 			groups = "gpio0_25_grp";
 			slew-rate = <0>;
-			io-standard = <1>;
+			power-source = <1>;
 		};
 	};
 
@@ -269,7 +269,7 @@
 			groups = "gpio0_50_grp", "gpio0_51_grp";
 			bias-pull-up;
 			slew-rate = <0>;
-			io-standard = <1>;
+			power-source = <1>;
 		};
 	};
 
@@ -283,7 +283,7 @@
 			groups = "gpio0_52_grp", "gpio0_53_grp";
 			bias-pull-up;
 			slew-rate = <0>;
-			io-standard = <1>;
+			power-source = <1>;
 		};
 	};
 };

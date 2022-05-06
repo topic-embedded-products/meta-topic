@@ -62,7 +62,7 @@
 	conf-wp {
 		groups = "gpio0_44_grp";
 		slew-rate = <SLEW_RATE_SLOW>;
-		io-standard = <IO_STANDARD_LVCMOS33>;
+		power-source = <IO_STANDARD_LVCMOS33>;
 		bias-pull-down;
 	};
 };
