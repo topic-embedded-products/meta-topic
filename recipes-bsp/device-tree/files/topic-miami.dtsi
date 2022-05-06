@@ -177,33 +177,6 @@
 	};
 };
 
-&nand0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_smc0_nand_default>;
-
-	/* Micron MT29F2G16ABBFAH4 timings */
-	arm,nand-cycle-t0 = <0x4>;
-	arm,nand-cycle-t1 = <0x4>;
-	arm,nand-cycle-t2 = <0x1>;
-	arm,nand-cycle-t3 = <0x2>;
-	arm,nand-cycle-t4 = <0x2>;
-	arm,nand-cycle-t5 = <0x2>;
-	arm,nand-cycle-t6 = <0x4>;
-
-	#address-cells = <0x1>;
-	#size-cells = <0x1>;
-	partition@nand-all {
-		label = "nand-all";
-		reg = <0x0 0x10000000>; /* 256 MB */
-	};
-	/* to mount as UBI:
-	   ubiattach /dev/ubi_ctrl -m 0
-	   ubimkvol /dev/ubi0 -N nand -m
-	   mkdir /media/nand
-	   mount -t ubifs /dev/ubi0_0 /media/nand
-	 */
-};
-
 &usb0 {
 	dr_mode = "otg";
 };
@@ -270,13 +243,6 @@
 			slew-rate = <0>;
 			io-standard = <1>;
 			bias-disable;
-		};
-	};
-
-	pinctrl_smc0_nand_default: smc0_nand_default {
-		mux {
-			groups = "smc0_nand_grp";
-			function = "smc0_nand";
 		};
 	};
 
