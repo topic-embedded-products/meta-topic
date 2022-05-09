@@ -1,20 +1,51 @@
-From 400b88445d7e3a30f20f23c7e0b117d1e97382db Mon Sep 17 00:00:00 2001
+From 1900437c38ca5c9a1ba2fe021d49b9707b3e8709 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 5 May 2022 08:31:38 +0200
 Subject: [PATCH 34/34] configs, topic: Adjust configuration to match upstream
 
-Copy config from xilinx_zynqmp_virt_defconfig and adjust it.
-
-topic_miamimp: replace CONFIG_EXTRA_ENV_BOARD_SETTINGS
-New name CONFIG_EXTRA_ENV_SETTINGS
+Copy config from xilinx_zynq[mp]_virt_defconfig and adjust it.
 ---
- configs/topic_miamimp_defconfig            | 53 ++++++++++++++------
- configs/topic_miamimp_xilinx_xdp_defconfig | 57 ++++++++++++++++------
- configs/topic_tdpzu9_defconfig             | 53 ++++++++++++++------
- configs/topic_ttpzu9_defconfig             | 53 ++++++++++++++------
- include/configs/topic_miamimp.h            |  2 +-
- 5 files changed, 160 insertions(+), 58 deletions(-)
+ configs/topic_miami_defconfig              | 11 ++--
+ configs/topic_miamimp_defconfig            | 53 ++++++++++++-----
+ configs/topic_miamimp_xilinx_xdp_defconfig | 57 +++++++++++++-----
+ configs/topic_tdpzu9_defconfig             | 53 ++++++++++++-----
+ configs/topic_ttpzu9_defconfig             | 53 ++++++++++++-----
+ include/configs/topic_miamimp.h            | 67 ++--------------------
+ 6 files changed, 169 insertions(+), 125 deletions(-)
 
+diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
+index 493a102e2c..eb3d250a49 100644
+--- a/configs/topic_miami_defconfig
++++ b/configs/topic_miami_defconfig
+@@ -27,22 +27,23 @@ CONFIG_SPL_STACK_R=y
+ # CONFIG_SPL_RAM_SUPPORT is not set
+ CONFIG_SPL_SPI_LOAD=y
+ CONFIG_SYS_SPI_U_BOOT_OFFS=0x20000
+-CONFIG_SYS_PROMPT="zynq-uboot> "
++# CONFIG_BOOTM_NETBSD is not set
+ CONFIG_CMD_THOR_DOWNLOAD=y
+ CONFIG_CMD_MEMTEST=y
+ CONFIG_CMD_DFU=y
+ CONFIG_CMD_I2C=y
+ CONFIG_CMD_MMC=y
+ CONFIG_CMD_MTD=y
+-CONFIG_CMD_MTDPARTS=y
+-# CONFIG_CMD_MTDPARTS_SPREAD is not set
+ CONFIG_CMD_SF=y
+-CONFIG_CMD_UBI=y
+-CONFIG_CMD_UBIFS=y
+ CONFIG_CMD_USB=y
+ # CONFIG_CMD_SETEXPR is not set
+ # CONFIG_CMD_NET is not set
+ CONFIG_CMD_CACHE=y
++CONFIG_CMD_MTDPARTS=y
++# CONFIG_CMD_MTDPARTS_SPREAD is not set
++CONFIG_CMD_UBI=y
++CONFIG_CMD_UBIFS=y
++CONFIG_ENV_IS_NOWHERE=y
+ # CONFIG_ISO_PARTITION is not set
+ # CONFIG_SPL_PARTITION_UUIDS is not set
+ CONFIG_OF_EMBED=y
 diff --git a/configs/topic_miamimp_defconfig b/configs/topic_miamimp_defconfig
 index 8c0ab974ad..4717434cea 100644
 --- a/configs/topic_miamimp_defconfig
@@ -562,18 +593,92 @@ index ecf0c1b4d5..e698cd1298 100644
  # CONFIG_SPL_DM_USB is not set
  CONFIG_USB_XHCI_HCD=y
 diff --git a/include/configs/topic_miamimp.h b/include/configs/topic_miamimp.h
-index 9f4776aea1..1f7c4e19a7 100644
+index 9f4776aea1..dccdc9ebf9 100644
 --- a/include/configs/topic_miamimp.h
 +++ b/include/configs/topic_miamimp.h
-@@ -14,7 +14,7 @@
-  * Amend Xilinx settings and load FPGA
-  * QSPI boots from SD or eMMC for the time being.
-  */
+@@ -10,69 +10,14 @@
+ #ifndef __CONFIG_TOPIC_MIAMIMP_H
+ #define __CONFIG_TOPIC_MIAMIMP_H
+ 
+-/*
+- * Amend Xilinx settings and load FPGA
+- * QSPI boots from SD or eMMC for the time being.
+- */
 -#define CONFIG_EXTRA_ENV_BOARD_SETTINGS \
-+#define CONFIG_EXTRA_ENV_SETTINGS \
- 	"kernel_addr=0x80000\0" \
- 	"initrd_addr=0xa00000\0" \
- 	"initrd_size=0x2000000\0" \
+-	"kernel_addr=0x80000\0" \
+-	"initrd_addr=0xa00000\0" \
+-	"initrd_size=0x2000000\0" \
+-	"fdt_addr=4000000\0" \
+-	"fdt_high=0x10000000\0" \
+-	"loadbootenv_addr=0x100000\0" \
+-	"sdbootdev=0\0"\
+-	"kernel_offset=0x180000\0" \
+-	"fdt_offset=0x100000\0" \
+-	"kernel_size=0x1e00000\0" \
+-	"fdt_size=0x80000\0" \
+-	"bootenv=uEnv.txt\0" \
+-	"bootargs=quiet clk_ignore_unused\0" \
+-	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0" \
+-	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0" \
+-	"loadbootenv=load mmc $sdbootdev:$partid ${loadbootenv_addr} ${bootenv}\0" \
+-	"importbootenv=echo Importing environment from SD ...; " \
+-		"env import -t ${loadbootenv_addr} $filesize\0" \
+-	"sd_uEnvtxt_existence_test=test -e mmc $sdbootdev:$partid /uEnv.txt\0" \
+-	"sata_root=if test $scsidevs -gt 0; then setenv bootargs $bootargs root=/dev/sda rw rootfstype=ext4; fi\0" \
+-	"sataboot=load scsi 0 80000 boot/Image && load scsi 0 $fdt_addr boot/system.dtb && booti 80000 - $fdt_addr\0" \
+-	"qspiboot=setenv sdbootdev 1; run sdboot || setenv sdbootdev 0 && run sdboot\0" \
+-	"uenvboot=" \
+-		"if run sd_uEnvtxt_existence_test; then " \
+-			"run loadbootenv; " \
+-			"echo Load environment from ${bootenv}; " \
+-			"run importbootenv; " \
+-		"fi; " \
+-		"if test -n $uenvcmd; then " \
+-			"echo Running uenvcmd ...; " \
+-			"run uenvcmd; " \
+-		"fi\0" \
+-	"sdboot=mmc dev $sdbootdev && mmcinfo && " \
+-		"if load mmc $sdbootdev:$partid 0x3F00000 autorun.scr; then source 0x3F00000; else; run uenvboot; fi; "\
+-		"run sdroot$sdbootdev; " \
+-		"load mmc $sdbootdev:$partid $fdt_addr system.dtb && " \
+-		"load mmc $sdbootdev:$partid $kernel_addr Image && " \
+-		"booti $kernel_addr - $fdt_addr\0" \
+-	"emmcboot=run sdboot\0" \
+-	"sdroot0=setenv bootargs $bootargs root=/dev/mmcblk0p2 rw rootwait\0" \
+-	"sdroot1=setenv bootargs $bootargs root=/dev/mmcblk1p2 rw rootwait\0" \
+-	"usb_dfu_spl=booti $kernel_addr - $fdt_addr\0" \
+-	"usb_hostboot=usb start && load usb 0 $fdt_addr system.dtb && " \
+-		"load usb 0 $kernel_addr Image && " \
+-		"booti $kernel_addr - $fdt_addr\0" \
+-	"usb_reset=gpio clear gpio@41_0 && gpio set gpio@41_0\0" \
+-	"usb_reset_boot=run usb_reset; run usb_boot\0" \
+-	"usb_reset_hostboot=run usb_reset; run usb_hostboot\0" \
+-	"usb_reset_dfu_ram=run usb_reset; run dfu_ram\0" \
+-	"ubi_mount=sf probe && ubi part qspi-rootfs && ubifsmount ubi0:qspi-rootfs && setenv devtype ubi\0" \
++/* Use UBIFS to boot from QSPI */
++#define BOOTENV_DEV_QSPI(devtypeu, devtypel, instance) \
++	"bootcmd_" #devtypel #instance "=sf probe " #instance " && run bootcmd_ubi\0" \
++	"ubi_mount=ubi part qspi-rootfs && ubifsmount ubi0:qspi-rootfs && setenv devtype ubi\0" \
+ 	"bootcmd_ubi=run ubi_mount && ubifsload ${scriptaddr} /boot/boot.scr && source ${scriptaddr}\0" \
+ 	"bootubipart=qspi-rootfs\0" \
+ 	"bootubivol=qspi-rootfs\0"
+ 
+-#define BOOTENV_DEV_QSPI(devtypeu, devtypel, instance) \
+-		"bootcmd_" #devtypel #instance "=sf probe " #instance " && " \
+-				"run bootcmd_ubi\0"
+-
+ #include "xilinx_zynqmp.h"
+ 
+ /*
+@@ -83,8 +28,4 @@
+ #undef CONFIG_SF_DEFAULT_SPEED
+ #define CONFIG_SF_DEFAULT_SPEED 	50000000
+ 
+-/* Fixup boot file name for SPL */
+-#undef CONFIG_SPL_FS_LOAD_PAYLOAD_NAME
+-#define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME	"u-boot.itb"
+-
+ #endif /* __CONFIG_TOPIC_MIAMIMP_H */
 -- 
 2.17.1
 
