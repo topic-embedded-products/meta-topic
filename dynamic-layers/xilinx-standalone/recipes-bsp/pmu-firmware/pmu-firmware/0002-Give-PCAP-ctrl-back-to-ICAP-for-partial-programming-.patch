@@ -1,17 +1,18 @@
-From 523ac8d0bded808fbd060e0e1ef91d34a6012931 Mon Sep 17 00:00:00 2001
+From d6ca2db6844709f070d21e92588610dc178b5f71 Mon Sep 17 00:00:00 2001
 From: Niek van Agt <niek.van.agt@topic.nl>
 Date: Fri, 10 Jan 2020 11:38:53 +0100
-Subject: [PATCH] Give PCAP ctrl back to ICAP for partial programming (Dyplo)
+Subject: [PATCH 2/2] Give PCAP ctrl back to ICAP for partial programming
+ (Dyplo)
 
 ---
  lib/sw_services/xilfpga/src/interface/zynqmp/xilfpga_pcap.c | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/lib/sw_services/xilfpga/src/interface/zynqmp/xilfpga_pcap.c b/lib/sw_services/xilfpga/src/interface/zynqmp/xilfpga_pcap.c
-index c381fee1c8..d1f043a840 100644
+index ae06b17236..674e929df7 100644
 --- a/lib/sw_services/xilfpga/src/interface/zynqmp/xilfpga_pcap.c
 +++ b/lib/sw_services/xilfpga/src/interface/zynqmp/xilfpga_pcap.c
-@@ -563,6 +563,10 @@ static u32 XFpga_PostConfigPcap(XFpga *InstancePtr)
+@@ -617,6 +617,10 @@ static u32 XFpga_PostConfigPcap(XFpga *InstancePtr)
  	/* Disable the PCAP clk */
  	RegVal = Xil_In32(PCAP_CLK_CTRL);
  	Xil_Out32(PCAP_CLK_CTRL, RegVal & ~(PCAP_CLK_EN_MASK));

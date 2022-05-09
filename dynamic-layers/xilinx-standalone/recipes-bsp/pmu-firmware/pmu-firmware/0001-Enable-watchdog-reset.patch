@@ -1,7 +1,7 @@
-From 56c0d148b279e30a9ee682f9411b05d78802dda2 Mon Sep 17 00:00:00 2001
+From d061e9cc3531796e859babfcfdd7ee3cf90be4a4 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 9 Jun 2020 10:31:55 +0200
-Subject: [PATCH] Enable watchdog reset
+Subject: [PATCH 1/2] Enable watchdog reset
 
 MPSoC watchdog requires PMU support to actually perform a reset. Set the ENABLE_EM
 option to enable watchdog.
@@ -13,18 +13,18 @@ https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18842055/Cadence+WDT+Drive
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/lib/sw_apps/zynqmp_pmufw/src/xpfw_config.h b/lib/sw_apps/zynqmp_pmufw/src/xpfw_config.h
-index 4816a2dfd0..e2b37827ff 100644
+index cfef7c3458..9d48c5adda 100644
 --- a/lib/sw_apps/zynqmp_pmufw/src/xpfw_config.h
 +++ b/lib/sw_apps/zynqmp_pmufw/src/xpfw_config.h
-@@ -99,7 +99,7 @@ extern "C" {
-  */
+@@ -118,7 +118,7 @@ extern "C" {
+ #endif
  
- #define	ENABLE_PM_VAL					(1U)
--#define	ENABLE_EM_VAL					(0U)
-+#define	ENABLE_EM_VAL					(1U)
- #define	ENABLE_SCHEDULER_VAL			(1U)
- #define ENABLE_MOD_ULTRA96_VAL			(0U)
- #define	ENABLE_RECOVERY_VAL				(0U)
+ #ifndef ENABLE_EM_VAL
+-#define	ENABLE_EM_VAL						(0U)
++#define	ENABLE_EM_VAL						(1U)
+ #endif
+ 
+ #ifndef ENABLE_SCHEDULER_VAL
 -- 
 2.17.1
 
