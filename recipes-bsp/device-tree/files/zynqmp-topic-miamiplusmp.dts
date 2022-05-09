@@ -109,13 +109,37 @@
 		io-channels = <&xilinx_ams 7>, <&xilinx_ams 8>, <&xilinx_ams 20>;
 		io-channel-names = "ps_temp", "remote_temp", "pl_temp";
 	};
+
+	/* USB PHY reset IO pins */
+	usb_phy0: usb2phy0 {
+		compatible = "usb-nop-xceiv";
+		vcc-supply = <&reg_1v8_miami>;
+		#phy-cells = <0>;
+		reset-gpios = <&gpioex 3 GPIO_ACTIVE_LOW>;
+	};
+	usb_phy1: usb2phy1 {
+		compatible = "usb-nop-xceiv";
+		vcc-supply = <&reg_1v8_miami>;
+		#phy-cells = <0>;
+		reset-gpios = <&gpioex 4 GPIO_ACTIVE_LOW>;
+	};
+
 };
 
 &usb0 {
-        /* Xilinx defines "reset-gpio" which by default controls the MODE pins. Only some Xilinx boards have that */
-        /delete-property/ reset-gpio;
+	/* Xilinx defines "reset-gpio" or "reset-gpios" which by default controls the MODE pins,
+	 * Only some Xilinx boards have that, so remove it for other boards */
+	/delete-property/ reset-gpio;
+	/delete-property/ reset-gpios;
 };
 
+&dwc3_0 {
+	usb-phy = <&usb_phy0>;
+};
+
+&dwc3_1 {
+	usb-phy = <&usb_phy1>;
+};
 
 &gpio {
 	status = "okay";

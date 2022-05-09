@@ -61,6 +61,7 @@
 				tmp101pl: sensor@4a{
 					compatible = "ti,tmp101";
 					reg = <0x4a>;
+					vs-supply = <&reg_3v3_miami>;
 				};
 			};
 		};
