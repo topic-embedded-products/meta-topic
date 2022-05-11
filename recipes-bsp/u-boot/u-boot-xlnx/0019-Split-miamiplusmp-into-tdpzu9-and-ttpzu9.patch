@@ -1,7 +1,7 @@
-From 990ca9dbee3222a50bae1b4730857e9cc1ffd85a Mon Sep 17 00:00:00 2001
+From 2575ce1a0862d375ce8fa6a4235314cd29575da4 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 25 Jun 2020 10:55:01 +0200
-Subject: [PATCH 19/34] Split miamiplusmp into tdpzu9 and ttpzu9
+Subject: [PATCH 19/35] Split miamiplusmp into tdpzu9 and ttpzu9
 
 We cannot use the same bootloader code for both carriers with the
 miamiplusmp SOM because the early-init code differs. So split

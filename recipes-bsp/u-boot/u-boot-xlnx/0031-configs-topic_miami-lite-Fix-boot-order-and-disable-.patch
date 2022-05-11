@@ -1,7 +1,7 @@
-From 766048928e584ed8e75665a6517bb232628c5ea9 Mon Sep 17 00:00:00 2001
+From 615e2202c152c898c6cd8f89c01c0858c5bf7f65 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 18 Jan 2021 08:30:11 +0100
-Subject: [PATCH 31/34] configs, topic_miami[lite]: Fix boot order and disable
+Subject: [PATCH 31/35] configs, topic_miami[lite]: Fix boot order and disable
  BOARD_LATE_INIT
 
 The BOARD_LATE_INIT option for the Xilinx zynq prepends the boot_targets with

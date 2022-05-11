@@ -1,7 +1,7 @@
-From 679f0ead86ec44d9441ca0e8f604e41388acd75b Mon Sep 17 00:00:00 2001
+From fac8de0655fbbabff879e5e7ee99dde49e1fc74a Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Tue, 25 Feb 2020 17:25:24 +0100
-Subject: [PATCH 14/34] topic-miami: support new filesystem structure
+Subject: [PATCH 14/35] topic-miami: support new filesystem structure
 
 Add MTD and UBI support and boot from QSPI using UBI filesystem
 ---

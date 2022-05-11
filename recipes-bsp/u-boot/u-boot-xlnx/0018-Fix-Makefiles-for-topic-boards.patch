@@ -1,12 +1,15 @@
-From 43eabc7004a5a270e239370528fcfd4f0d14a78c Mon Sep 17 00:00:00 2001
+From 4a598a4a72d74cdd5fa27273246fd6455aa51453 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 19 Jun 2020 11:38:10 +0200
-Subject: [PATCH 18/34] Fix Makefiles for topic boards
+Subject: [PATCH 18/35] Fix Makefiles for topic boards
 
+Copy Makefile contents from Xilinx, e.g. adding support for pm_cfg_obj
 ---
- board/topic/zynq/Makefile   | 13 +++++++++++--
- board/topic/zynqmp/Makefile |  7 ++++++-
- 2 files changed, 17 insertions(+), 3 deletions(-)
+ board/topic/zynq/Makefile       | 13 +++++++++++--
+ board/topic/zynqmp/Makefile     | 14 +++++++++++++-
+ board/topic/zynqmp/pm_cfg_obj.S |  1 +
+ 3 files changed, 25 insertions(+), 3 deletions(-)
+ create mode 120000 board/topic/zynqmp/pm_cfg_obj.S
 
 diff --git a/board/topic/zynq/Makefile b/board/topic/zynq/Makefile
 index cc100b0f42..77437138a7 100644
@@ -32,10 +35,10 @@ index cc100b0f42..77437138a7 100644
 +endif
 +
 diff --git a/board/topic/zynqmp/Makefile b/board/topic/zynqmp/Makefile
-index b6f0f847f5..62f9587cb2 100644
+index b6f0f847f5..0a1f76b7ce 100644
 --- a/board/topic/zynqmp/Makefile
 +++ b/board/topic/zynqmp/Makefile
-@@ -6,8 +6,13 @@
+@@ -6,11 +6,23 @@
  #
  
  obj-y := zynqmp.o
@@ -50,6 +53,24 @@ index b6f0f847f5..62f9587cb2 100644
  
  obj-$(CONFIG_SPL_BUILD) += $(hw-platform-y)/psu_init_gpl.o
  
++ifdef CONFIG_SPL_BUILD
++ifneq ($(CONFIG_ZYNQMP_SPL_PM_CFG_OBJ_FILE),"")
++obj-$(CONFIG_SPL_BUILD) += pm_cfg_obj.o
++$(obj)/pm_cfg_obj.o: $(shell cd $(srctree); readlink -f $(CONFIG_ZYNQMP_SPL_PM_CFG_OBJ_FILE)) FORCE
++endif
++endif
++
+ ifndef CONFIG_SPL_BUILD
+ obj-$(CONFIG_CMD_ZYNQMP) += cmds.o
+ endif
+diff --git a/board/topic/zynqmp/pm_cfg_obj.S b/board/topic/zynqmp/pm_cfg_obj.S
+new file mode 120000
+index 0000000000..a6a19912b9
+--- /dev/null
++++ b/board/topic/zynqmp/pm_cfg_obj.S
+@@ -0,0 +1 @@
++../../xilinx/zynqmp/pm_cfg_obj.S
+\ No newline at end of file
 -- 
 2.17.1
 

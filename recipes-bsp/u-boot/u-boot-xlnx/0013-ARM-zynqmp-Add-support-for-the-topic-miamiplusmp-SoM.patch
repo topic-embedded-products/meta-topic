@@ -1,7 +1,7 @@
-From 1a508c19ac5b0e58bf18ad6ce0dd8f49dd5f2d73 Mon Sep 17 00:00:00 2001
+From 279fbe264d1ab7a168ee9e1879035429d1eb43af Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 12 Feb 2020 11:45:06 +0100
-Subject: [PATCH 13/34] ARM: zynqmp: Add support for the topic-miamiplusmp SoM
+Subject: [PATCH 13/35] ARM: zynqmp: Add support for the topic-miamiplusmp SoM
 
 A larger version of the topic-miamimp SoM, with integrated USB PHYs and
 an ethernet PHY.

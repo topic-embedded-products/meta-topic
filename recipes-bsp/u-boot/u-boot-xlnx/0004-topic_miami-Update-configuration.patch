@@ -1,7 +1,7 @@
-From 17f1bfb099fa6cdfca26bd4e7d8b673c5543f752 Mon Sep 17 00:00:00 2001
+From 448251fbf5ed078642920aa9b0f5d1fba90d2ffd Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 9 Oct 2019 10:26:37 +0200
-Subject: [PATCH 04/34] topic_miami: Update configuration
+Subject: [PATCH 04/35] topic_miami: Update configuration
 
 Remove unused "NET" support and make a slightly smaller SPL
 ---
