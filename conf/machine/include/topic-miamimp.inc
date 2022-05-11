@@ -30,22 +30,25 @@ SOC_VARIANT ?= "cg"
 MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 
 # The zynqmp is a CortexA53, no need to be binary compatible with other CPUs
+# This is a strange place to do this. Note that you'll have to remove this when
+# attempting to build the PMU firmware.
 DEFAULTTUNE = "cortexa53"
 
 require conf/machine/zynqmp-generic.conf
 
-# Remove the unneeded stuff
-EXTRA_IMAGEDEPENDS += " \
-		arm-trusted-firmware \
-		virtual/bootloader \
-		bootscript \
-		"
+# Remove the unneeded boot config/script, not needed for topic boards, but they
+# get added unconditionally by zynqmp-generic.conf.
+EXTRA_IMAGEDEPENDS:remove = "u-boot-zynq-uenv"
+EXTRA_IMAGEDEPENDS:remove = "u-boot-zynq-scr"
+# We have our own bootscript
+EXTRA_IMAGEDEPENDS += "bootscript"
 
 # We want to use u-boot SPL
 PREFERRED_PROVIDER_virtual/boot-bin = "u-boot-xlnx"
 
 # The RTC only works if a battery is connected, which most boards do not have
 MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
+# Sanitize the MACHINE_FEATURES
 MACHINE_FEATURES = "ext2 ext3 vfat usbhost mali fpgamgr"
 
 UBOOT_MACHINE = "topic_miamimp_config"
