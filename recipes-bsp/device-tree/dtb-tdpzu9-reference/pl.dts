@@ -93,7 +93,7 @@
 
 			/* GPIO controllers */
 			axi_gpio_pmod: gpio@80030000 {
-				#gpio-cells = <3>;
+				#gpio-cells = <2>;
 				clock-names = "s_axi_aclk";
 				clocks = <&zynqmp_clk PL0_REF>;
 				compatible = "xlnx,axi-gpio-2.0", "xlnx,xps-gpio-1.00.a";
