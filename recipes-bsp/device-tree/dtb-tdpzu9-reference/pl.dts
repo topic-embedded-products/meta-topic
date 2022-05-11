@@ -96,8 +96,8 @@
 				#gpio-cells = <2>;
 				clock-names = "s_axi_aclk";
 				clocks = <&zynqmp_clk PL0_REF>;
-				compatible = "xlnx,axi-gpio-2.0", "xlnx,xps-gpio-1.00.a";
-				gpio-controller ;
+				compatible = "xlnx,xps-gpio-1.00.a";
+				gpio-controller;
 				reg = <0x0 0x80030000 0x0 0x10000>;
 				xlnx,all-inputs = <0x0>;
 				xlnx,all-inputs-2 = <0x0>;
