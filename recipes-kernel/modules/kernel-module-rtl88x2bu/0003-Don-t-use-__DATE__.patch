@@ -1,0 +1,46 @@
+From d5444ed2b58624a478f7d048bfe38080dfa0dc2d Mon Sep 17 00:00:00 2001
+From: Francois <francois.loubser@topic.nl>
+Date: Wed, 11 May 2022 11:33:20 +0200
+Subject: [PATCH 3/3] Don't use __DATE__ Solves this error:   error: macro
+ __DATE__ might prevent reproducible builds [-Werror=date-time]
+
+Remove the 'bc' kludge that checks the GCC version as well
+---
+ Makefile         | 5 -----
+ core/rtw_debug.c | 1 -
+ 2 files changed, 6 deletions(-)
+ mode change 100644 => 100755 core/rtw_debug.c
+
+diff --git a/Makefile b/Makefile
+index 2b1742c..01dd7d9 100755
+--- a/Makefile
++++ b/Makefile
+@@ -11,11 +11,6 @@ EXTRA_CFLAGS += -Wno-unused-function
+ EXTRA_CFLAGS += -Wno-unused-parameter
+ EXTRA_CFLAGS += -Wno-unused-variable
+ 
+-GCC_VER_49 := $(shell echo `$(CC) -dumpversion | cut -f1-2 -d.` \>= 4.9 | bc )
+-ifeq ($(GCC_VER_49),1)
+-EXTRA_CFLAGS += -Wno-date-time	# Fix compile error && warning on gcc 4.9 and later
+-endif
+-
+ EXTRA_CFLAGS += -I$(src)/include
+ 
+ EXTRA_LDFLAGS += --strip-debug
+diff --git a/core/rtw_debug.c b/core/rtw_debug.c
+old mode 100644
+new mode 100755
+index 8bbbfdc..9d139d1
+--- a/core/rtw_debug.c
++++ b/core/rtw_debug.c
+@@ -42,7 +42,6 @@ const char *rtw_log_level_str[] = {
+ void dump_drv_version(void *sel)
+ {
+ 	RTW_PRINT_SEL(sel, "%s %s\n", DRV_NAME, DRIVERVERSION);
+-	RTW_PRINT_SEL(sel, "build time: %s %s\n", __DATE__, __TIME__);
+ }
+ 
+ void dump_drv_cfg(void *sel)
+-- 
+2.17.1
+

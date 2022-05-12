@@ -1,0 +1,60 @@
+From 90b467e0c40343553de7cf31e075caa25ab2538b Mon Sep 17 00:00:00 2001
+From: Francois <francois.loubser@topic.nl>
+Date: Wed, 11 May 2022 10:38:55 +0200
+Subject: [PATCH 2/3] Add CONFIG_PLATFORM_OPENEMBEDDED to Makefile as default
+ Only works for LITTLE_ENDIAN systems, but this might cross-compile
+
+---
+ Makefile | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index e5bc585..2b1742c 100755
+--- a/Makefile
++++ b/Makefile
+@@ -118,6 +118,7 @@ CONFIG_RTW_SDIO_PM_KEEP_POWER = y
+ ###################### MP HW TX MODE FOR VHT #######################
+ CONFIG_MP_VHT_HW_TX_MODE = n
+ ###################### Platform Related #######################
++CONFIG_PLATFORM_OPENEMBEDDED = y
+ CONFIG_PLATFORM_I386_PC = n
+ CONFIG_PLATFORM_ANDROID_X86 = n
+ CONFIG_PLATFORM_ANDROID_INTEL_X86 = n
+@@ -1324,6 +1325,18 @@ endif
+ INSTALL_PREFIX :=
+ endif
+ 
++# Openembedded already provides what we need, in KERNEL_VERSION and KERNEL_SRC
++ifeq ($(CONFIG_PLATFORM_OPENEMBEDDED), y)
++KERNEL_VERSION ?= $(shell uname -r)
++KERNEL_SRC ?= "/lib/modules/$(KERNEL_VERSION)/build"
++KVER = $(KERNEL_VERSION)
++KSRC = $(KERNEL_SRC)
++# Won't compile without these defines, so better hope your platform is little-endian
++EXTRA_CFLAGS += -DCONFIG_LITTLE_ENDIAN
++EXTRA_CFLAGS += -DCONFIG_IOCTL_CFG80211 -DRTW_USE_CFG80211_STA_EVENT
++endif
++
++
+ ifeq ($(CONFIG_PLATFORM_NV_TK1), y)
+ EXTRA_CFLAGS += -DCONFIG_PLATFORM_NV_TK1
+ EXTRA_CFLAGS += -DCONFIG_LITTLE_ENDIAN
+@@ -2386,8 +2399,15 @@ export CONFIG_RTL8822BU = m
+ 
+ all: modules
+ 
++ifeq ($(CONFIG_PLATFORM_OPENEMBEDDED), y)
++modules:
++	$(MAKE) -C $(KSRC) M=$(PWD) modules
++modules_install:
++	$(MAKE) -C $(KSRC) M=$(PWD) modules_install
++else
+ modules:
+ 	$(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KSRC) M=$(shell pwd)  modules
++endif
+ 
+ strip:
+ 	$(CROSS_COMPILE)strip $(MODULE_NAME).ko --strip-unneeded
+-- 
+2.17.1
+
