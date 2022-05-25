@@ -77,5 +77,5 @@ UBI_VOLNAME = "qspi-rootfs"
 # WIC image support.
 DEVICETREE ??= "devicetree/zynqmp-topic-miamimp.dtb"
 WKS_FILE = "sdimage-swu.wks"
-# IMAGE_BOOT_FILES = "boot.bin u-boot.itb"
+IMAGE_BOOT_FILES = "boot.bin u-boot.itb"
 IMAGE_OVERHEAD_FACTOR="1.1"
