@@ -57,6 +57,7 @@
 			};
 
 			adv7511_hdmi_snd {
+				status = "disabled";
 				compatible = "simple-audio-card";
 				simple-audio-card,name = "HDMI monitor";
 				simple-audio-card,widgets =
@@ -84,6 +85,7 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			adv7511: adv7511@39 {
+				status = "disabled";
 				compatible = "adi,adv7511";
 				reg = <0x39>, <0x3f>;
 				reg-names = "primary", "edid";
@@ -127,6 +129,7 @@
 			#size-cells = <0>;
 			/* HDMI IN */
 			adv7611@4c {
+				status = "disabled";
 				compatible = "adi,adv7611";
 				reg = <0x4c>;
 				#address-cells = <0x1>;
@@ -159,6 +162,7 @@
 			#size-cells = <1>;
 			interrupt-parent = <&intc>;
 			axi_vdma_0: axivdma@43000000 {
+				status = "disabled";
 				compatible = "xlnx,axi-vdma-1.00.a";
 				#address-cells = <1>;
 				#size-cells = <1>;
@@ -181,6 +185,7 @@
 			};
 
 			axi_hdmi_0: axi_hdmi@70e00000 {
+				status = "disabled";
 				compatible = "adi,axi-hdmi-tx-1.00.a";
 				reg = <0x70e00000 0x10000>;
 				adi,is-rgb;
@@ -195,6 +200,7 @@
 			};
 
 			axi_spdif_tx_0: axi-spdif-tx@75c00000 {
+				status = "disabled";
 				compatible = "adi,axi-spdif-tx-1.00.a";
 				reg = <0x75c00000 0x1000>;
 				dmas = <&dmac_s 0>;
@@ -211,6 +217,7 @@
 			};
 
 			axi_dmac: dmac@43c00000 {
+				status = "disabled";
 				compatible = "adi,axi-dmac-1.00.a";
 				reg = <0x43c00000 0x10000>;
 				#dma-cells = <1>;
@@ -231,6 +238,7 @@
 			};
 
 			axi_hdmi_rx_core: axi-hdmi-rx@43c10000 {
+				status = "disabled";
 				compatible = "adi,axi-hdmi-rx-1.00.a";
 				reg = <0x43c10000 0x10000>;
 				dmas = <&axi_dmac 0>;
