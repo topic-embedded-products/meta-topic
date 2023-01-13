@@ -74,6 +74,13 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_i2c1_default>;
 	};
+
+	/* Make temperature readouts show up in hwmon applications */
+	iio-hwmon-xadc {
+		compatible = "iio-hwmon";
+		io-channels = <&adc 0>;
+		io-channel-names = "temp";
+	};
 };
 
 /* Disable the ARM timer. This clocksource does not compensate for frequency
@@ -98,6 +105,10 @@
 	status = "okay";
 };
 
+&adc {
+	/* Missing propery for IIO-HWMON interface */
+	#io-channel-cells = <1>;
+};
 
 &i2c1 {
 	/* AD converter for voltage monitoring */
