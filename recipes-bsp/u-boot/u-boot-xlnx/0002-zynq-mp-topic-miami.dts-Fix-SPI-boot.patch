@@ -1,0 +1,78 @@
+From c9bf438450ed1ea0ec3646f6dc0a1a7fd8dff2bb Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 13 Jan 2023 17:19:25 +0100
+Subject: [PATCH 2/2] zynq[mp]-topic-miami.dts: Fix SPI boot
+
+SPI boot did not work because the flash@0 node was not present in SPL. Add
+a "u-boot,dm-pre-reloc" property to make the node part of the SPL build.
+
+Also add a config item for the u-boot payload offset.
+---
+ arch/arm/dts/zynq-topic-miami.dts                | 5 +++++
+ arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts | 1 +
+ arch/arm/dts/zynqmp-topic-miamimp.dts            | 1 +
+ arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi       | 1 +
+ 4 files changed, 8 insertions(+)
+
+diff --git a/arch/arm/dts/zynq-topic-miami.dts b/arch/arm/dts/zynq-topic-miami.dts
+index 244a2826cf..58c6902bb2 100644
+--- a/arch/arm/dts/zynq-topic-miami.dts
++++ b/arch/arm/dts/zynq-topic-miami.dts
+@@ -11,6 +11,10 @@
+ 	model = "Topic Miami Zynq Board";
+ 	compatible = "topic,miami", "xlnx,zynq-7000";
+ 
++	config {
++		u-boot,spl-payload-offset = <0x20000>;
++	};
++
+ 	aliases {
+ 		serial0 = &uart0;
+ 		spi0 = &qspi;
+@@ -36,6 +40,7 @@
+ 	is-dual = <0>;
+ 	num-cs = <1>;
+ 	flash@0 {
++		u-boot,dm-pre-reloc;
+ 		compatible = "st,m25p80", "n25q256a", "jedec,spi-nor";
+ 		m25p,fast-read;
+ 		reg = <0x0>;
+diff --git a/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts b/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
+index 7083804029..837d024e9a 100644
+--- a/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
++++ b/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
+@@ -59,6 +59,7 @@
+ 	status = "okay";
+ 	is-dual = <1>;
+ 	flash@0 {
++		u-boot,dm-pre-reloc;
+ 		compatible = "st,m25p80", "n25q256a", "jedec,spi-nor";
+ 		m25p,fast-read;
+ 		reg = <0x0>;
+diff --git a/arch/arm/dts/zynqmp-topic-miamimp.dts b/arch/arm/dts/zynqmp-topic-miamimp.dts
+index d69e0e64ae..2cb4466ed5 100644
+--- a/arch/arm/dts/zynqmp-topic-miamimp.dts
++++ b/arch/arm/dts/zynqmp-topic-miamimp.dts
+@@ -83,6 +83,7 @@
+ 	is-dual = <1>;
+ 	num-cs = <1>;
+ 	flash@0 {
++		u-boot,dm-pre-reloc;
+ 		compatible = "st,m25p80", "n25q256a", "jedec,spi-nor";
+ 		reg = <0x0>;
+ 		spi-tx-bus-width = <1>;
+diff --git a/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi b/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi
+index a621f0c9f1..1d42475702 100644
+--- a/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi
++++ b/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi
+@@ -82,6 +82,7 @@
+ 	is-dual = <1>;
+ 	num-cs = <1>;
+ 	flash@0 {
++		u-boot,dm-pre-reloc;
+ 		compatible = "st,m25p80", "n25q00a", "jedec,spi-nor";
+ 		reg = <0x0>;
+ 		spi-tx-bus-width = <1>;
+-- 
+2.17.1
+
