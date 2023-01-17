@@ -45,6 +45,7 @@ SRC_URI:append = "\
 	file://0035-tools-zynqmp_pm_cfg_obj_convert.py-Add-PM_CONFIG_OBJ.patch \
 	file://0001-topic_miami.h-Fix-build-fail-without-DFU-USB-support.patch \
 	file://0002-zynq-mp-topic-miami.dts-Fix-SPI-boot.patch \
+	file://0001-Same-partitions-as-kernel-on-QSPI-flash-of-topic-boa.patch \
 	"
 
 # Glitches on serial input interrupt the boot sequence on some boards, use

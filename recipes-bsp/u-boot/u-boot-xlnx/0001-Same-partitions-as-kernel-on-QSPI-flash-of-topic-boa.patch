@@ -1,0 +1,281 @@
+From d49a8d72c4dc84a9f23b4963bd67647b404a4b25 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 17 Jan 2023 07:12:26 +0100
+Subject: [PATCH] Same partitions as kernel on QSPI flash of topic boards
+
+Use the same simple partitioning scheme as the kernel is using these
+days.
+
+Move CONFIG_SPI_FLASH_MTD to config.
+
+Adjust the partitions to match the devicetree and kernel.
+
+---
+ arch/arm/dts/zynq-topic-miami.dts                | 14 +++-----------
+ arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts | 10 +---------
+ arch/arm/dts/zynqmp-topic-miamimp.dts            | 10 +---------
+ arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi       | 12 ++----------
+ configs/topic_miami_defconfig                    |  4 +++-
+ configs/topic_miamilite_defconfig                |  4 +++-
+ configs/topic_miamimp_defconfig                  |  3 ++-
+ configs/topic_miamimp_xilinx_xdp_defconfig       |  3 ++-
+ configs/topic_miamiplus_defconfig                |  4 +++-
+ configs/topic_tdpzu9_defconfig                   |  3 ++-
+ configs/topic_ttpzu9_defconfig                   |  3 ++-
+ include/configs/topic_miami.h                    |  6 ------
+ 12 files changed, 24 insertions(+), 52 deletions(-)
+
+diff --git a/arch/arm/dts/zynq-topic-miami.dts b/arch/arm/dts/zynq-topic-miami.dts
+index 58c6902bb2..3e73c659e3 100644
+--- a/arch/arm/dts/zynq-topic-miami.dts
++++ b/arch/arm/dts/zynq-topic-miami.dts
+@@ -50,20 +50,12 @@
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+ 		partition@0 {
+-			label = "qspi-u-boot-spl";
+-			reg = <0x00000 0x20000>;
+-		};
+-		partition@10000 {
+-			label = "qspi-u-boot-img";
+-			reg = <0x20000 0xC0000>;
+-		};
+-		partition@A0000 {
+-			label = "qspi-u-boot-env";
+-			reg = <0xA0000 0x20000>;
++			label = "qspi-boot-bin";
++			reg = <0x00000 0x100000>;
+ 		};
+ 		partition@100000 {
+ 			label = "qspi-rootfs";
+-			reg = <0x100000 0x1F00000>;
++			reg = <0x100000 0>;
+ 		};
+ 	};
+ };
+diff --git a/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts b/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
+index 837d024e9a..02c77cbd7a 100644
+--- a/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
++++ b/arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts
+@@ -71,15 +71,7 @@
+ 		is-dual = <1>;
+ 		partition@0 {
+ 			label = "qspi-boot-bin";
+-			reg = <0x00000 0x60000>;
+-		};
+-		partition@60000 {
+-			label = "qspi-u-boot-itb";
+-			reg = <0x60000 0x100000>;
+-		};
+-		partition@160000 {
+-			label = "qspi-u-boot-env";
+-			reg = <0x160000 0x20000>;
++			reg = <0x00000 0x180000>;
+ 		};
+ 		partition@200000 {
+ 			label = "qspi-rootfs";
+diff --git a/arch/arm/dts/zynqmp-topic-miamimp.dts b/arch/arm/dts/zynqmp-topic-miamimp.dts
+index 2cb4466ed5..c9812058d4 100644
+--- a/arch/arm/dts/zynqmp-topic-miamimp.dts
++++ b/arch/arm/dts/zynqmp-topic-miamimp.dts
+@@ -97,15 +97,7 @@
+ 
+ 			partition@0 {
+ 				label = "qspi-boot-bin";
+-				reg = <0x00000 0x60000>;
+-			};
+-			partition@60000 {
+-				label = "qspi-u-boot-itb";
+-				reg = <0x60000 0x100000>;
+-			};
+-			partition@160000 {
+-				label = "qspi-u-boot-env";
+-				reg = <0x160000 0x20000>;
++				reg = <0x00000 0x180000>;
+ 			};
+ 			partition@180000 {
+ 				label = "qspi-rootfs";
+diff --git a/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi b/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi
+index 1d42475702..d1e11d0d4f 100644
+--- a/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi
++++ b/arch/arm/dts/zynqmp-topic-miamiplusmp.dtsi
+@@ -96,19 +96,11 @@
+ 
+ 			partition@0 {
+ 				label = "qspi-boot-bin";
+-				reg = <0x00000 0x60000>;
+-			};
+-			partition@60000 {
+-				label = "qspi-u-boot-itb";
+-				reg = <0x60000 0x100000>;
+-			};
+-			partition@160000 {
+-				label = "qspi-u-boot-env";
+-				reg = <0x160000 0x20000>;
++				reg = <0x00000 0x180000>;
+ 			};
+ 			partition@180000 {
+ 				label = "qspi-rootfs";
+-				reg = <0x180000 0x7e80000>;
++				reg = <0x180000 0>;
+ 			};
+ 		};
+ 	};
+diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
+index eb3d250a49..a51bca9f15 100644
+--- a/configs/topic_miami_defconfig
++++ b/configs/topic_miami_defconfig
+@@ -80,11 +80,13 @@ CONFIG_CI_UDC=y
+ CONFIG_USB_GADGET_DOWNLOAD=y
+ CONFIG_USB_FUNCTION_THOR=y
+ CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
+-CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x20000(qspi-u-boot-spl),0xC0000(qspi-u-boot-img),0x20000(qspi-u-boot-env),-(qspi-rootfs)"
++CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x100000(qspi-boot-bin),-(qspi-rootfs)"
+ # CONFIG_DFU_NAND is not set
+ # CONFIG_FDT_FIXUP_PARTITIONS is not set
+ CONFIG_LZO=y
+ CONFIG_MTD=y
++CONFIG_DM_MTD=y
+ # CONFIG_CFI_FLASH is not set
+ # CONFIG_ALTERA_QSPI is not set
+ # CONFIG_MTD_SPI_NAND is not set
++CONFIG_SPI_FLASH_MTD=y
+diff --git a/configs/topic_miamilite_defconfig b/configs/topic_miamilite_defconfig
+index 0a542e9e5c..06bd1d41d9 100644
+--- a/configs/topic_miamilite_defconfig
++++ b/configs/topic_miamilite_defconfig
+@@ -75,11 +75,13 @@ CONFIG_CI_UDC=y
+ CONFIG_USB_GADGET_DOWNLOAD=y
+ CONFIG_USB_FUNCTION_THOR=y
+ CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
+-CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x20000(qspi-u-boot-spl),0xC0000(qspi-u-boot-img),0x20000(qspi-u-boot-env),-(qspi-rootfs)"
++CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x100000(qspi-boot-bin),-(qspi-rootfs)"
+ # CONFIG_DFU_NAND is not set
+ # CONFIG_FDT_FIXUP_PARTITIONS is not set
+ CONFIG_LZO=y
+ CONFIG_MTD=y
++CONFIG_DM_MTD=y
+ # CONFIG_CFI_FLASH is not set
+ # CONFIG_ALTERA_QSPI is not set
+ # CONFIG_MTD_SPI_NAND is not set
++CONFIG_SPI_FLASH_MTD=y
+diff --git a/configs/topic_miamimp_defconfig b/configs/topic_miamimp_defconfig
+index ffac051572..21ad2b053b 100644
+--- a/configs/topic_miamimp_defconfig
++++ b/configs/topic_miamimp_defconfig
+@@ -68,7 +68,7 @@ CONFIG_CMD_TIME=y
+ CONFIG_CMD_TIMER=y
+ CONFIG_CMD_MTDPARTS=y
+ CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
+-CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x60000(qspi-boot-bin),0x100000(qspi-u-boot-itb),0x20000(qspi-u-boot-env),-(qspi-rootfs)"
++CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x180000(qspi-boot-bin),-(qspi-rootfs)"
+ CONFIG_CMD_UBI=y
+ CONFIG_SPL_OF_CONTROL=y
+ CONFIG_OF_SPL_REMOVE_PROPS="pinctrl-0 pinctrl-names interrupt-parent interrupts iommus power-domains"
+@@ -110,6 +110,7 @@ CONFIG_SPI_FLASH_MACRONIX=y
+ CONFIG_SPI_FLASH_SPANSION=y
+ CONFIG_SPI_FLASH_STMICRO=y
+ # CONFIG_SPI_FLASH_USE_4K_SECTORS is not set
++CONFIG_SPI_FLASH_MTD=y
+ CONFIG_MTD_UBI_BEB_LIMIT=0
+ CONFIG_DEBUG_UART_ZYNQ=y
+ CONFIG_DEBUG_UART_ANNOUNCE=y
+diff --git a/configs/topic_miamimp_xilinx_xdp_defconfig b/configs/topic_miamimp_xilinx_xdp_defconfig
+index c5ee29208d..196f17f516 100644
+--- a/configs/topic_miamimp_xilinx_xdp_defconfig
++++ b/configs/topic_miamimp_xilinx_xdp_defconfig
+@@ -68,7 +68,7 @@ CONFIG_CMD_TIME=y
+ CONFIG_CMD_TIMER=y
+ CONFIG_CMD_MTDPARTS=y
+ CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
+-CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x60000(qspi-boot-bin),0x100000(qspi-u-boot-itb),0x20000(qspi-u-boot-env),-(qspi-rootfs)"
++CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x180000(qspi-boot-bin),-(qspi-rootfs)"
+ CONFIG_CMD_UBI=y
+ CONFIG_SPL_OF_CONTROL=y
+ CONFIG_OF_SPL_REMOVE_PROPS="pinctrl-0 pinctrl-names interrupt-parent interrupts iommus power-domains"
+@@ -110,6 +110,7 @@ CONFIG_SPI_FLASH_MACRONIX=y
+ CONFIG_SPI_FLASH_SPANSION=y
+ CONFIG_SPI_FLASH_STMICRO=y
+ # CONFIG_SPI_FLASH_USE_4K_SECTORS is not set
++CONFIG_SPI_FLASH_MTD=y
+ CONFIG_MTD_UBI_BEB_LIMIT=0
+ CONFIG_DEBUG_UART_ZYNQ=y
+ CONFIG_DEBUG_UART_ANNOUNCE=y
+diff --git a/configs/topic_miamiplus_defconfig b/configs/topic_miamiplus_defconfig
+index 99f8f2c340..3c7a897c7f 100644
+--- a/configs/topic_miamiplus_defconfig
++++ b/configs/topic_miamiplus_defconfig
+@@ -74,11 +74,13 @@ CONFIG_CI_UDC=y
+ CONFIG_USB_GADGET_DOWNLOAD=y
+ CONFIG_USB_FUNCTION_THOR=y
+ CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
+-CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x20000(qspi-u-boot-spl),0xC0000(qspi-u-boot-img),0x20000(qspi-u-boot-env),-(qspi-rootfs)"
++CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x100000(qspi-boot-bin),-(qspi-rootfs)"
+ # CONFIG_DFU_NAND is not set
+ # CONFIG_FDT_FIXUP_PARTITIONS is not set
+ CONFIG_LZO=y
+ CONFIG_MTD=y
++CONFIG_DM_MTD=y
+ # CONFIG_CFI_FLASH is not set
+ # CONFIG_ALTERA_QSPI is not set
+ # CONFIG_MTD_SPI_NAND is not set
++CONFIG_SPI_FLASH_MTD=y
+diff --git a/configs/topic_tdpzu9_defconfig b/configs/topic_tdpzu9_defconfig
+index 38b96d83f4..cb69b368ba 100644
+--- a/configs/topic_tdpzu9_defconfig
++++ b/configs/topic_tdpzu9_defconfig
+@@ -68,7 +68,7 @@ CONFIG_CMD_TIME=y
+ CONFIG_CMD_TIMER=y
+ CONFIG_CMD_MTDPARTS=y
+ CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
+-CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x60000(qspi-boot-bin),0x100000(qspi-u-boot-itb),0x20000(qspi-u-boot-env),-(qspi-rootfs)"
++CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x180000(qspi-boot-bin),-(qspi-rootfs)"
+ CONFIG_CMD_UBI=y
+ CONFIG_SPL_OF_CONTROL=y
+ CONFIG_OF_SPL_REMOVE_PROPS="pinctrl-0 pinctrl-names interrupt-parent interrupts iommus power-domains"
+@@ -108,6 +108,7 @@ CONFIG_SPI_FLASH_MACRONIX=y
+ CONFIG_SPI_FLASH_SPANSION=y
+ CONFIG_SPI_FLASH_STMICRO=y
+ # CONFIG_SPI_FLASH_USE_4K_SECTORS is not set
++CONFIG_SPI_FLASH_MTD=y
+ CONFIG_MTD_UBI_BEB_LIMIT=0
+ CONFIG_DEBUG_UART_ZYNQ=y
+ CONFIG_DEBUG_UART_ANNOUNCE=y
+diff --git a/configs/topic_ttpzu9_defconfig b/configs/topic_ttpzu9_defconfig
+index 1a3a646ace..3ea0ce6424 100644
+--- a/configs/topic_ttpzu9_defconfig
++++ b/configs/topic_ttpzu9_defconfig
+@@ -68,7 +68,7 @@ CONFIG_CMD_TIME=y
+ CONFIG_CMD_TIMER=y
+ CONFIG_CMD_MTDPARTS=y
+ CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
+-CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x60000(qspi-boot-bin),0x100000(qspi-u-boot-itb),0x20000(qspi-u-boot-env),-(qspi-rootfs)"
++CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x180000(qspi-boot-bin),-(qspi-rootfs)"
+ CONFIG_CMD_UBI=y
+ CONFIG_SPL_OF_CONTROL=y
+ CONFIG_OF_SPL_REMOVE_PROPS="pinctrl-0 pinctrl-names interrupt-parent interrupts iommus power-domains"
+@@ -108,6 +108,7 @@ CONFIG_SPI_FLASH_MACRONIX=y
+ CONFIG_SPI_FLASH_SPANSION=y
+ CONFIG_SPI_FLASH_STMICRO=y
+ # CONFIG_SPI_FLASH_USE_4K_SECTORS is not set
++CONFIG_SPI_FLASH_MTD=y
+ CONFIG_MTD_UBI_BEB_LIMIT=0
+ CONFIG_DEBUG_UART_ZYNQ=y
+ CONFIG_DEBUG_UART_ANNOUNCE=y
+diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
+index 0ba64bee7e..cd7c4a8a26 100644
+--- a/include/configs/topic_miami.h
++++ b/include/configs/topic_miami.h
+@@ -30,12 +30,6 @@
+ /* Faster flash, ours may run at 108 MHz */
+ #undef CONFIG_SPI_FLASH_WINBOND
+ 
+-/* CONFIG_SPI_FLASH_MTD only works outside SPL */
+-#if !defined(CONFIG_SPL_BUILD)
+-# if defined(CONFIG_ZYNQ_QSPI)
+-#  define CONFIG_SPI_FLASH_MTD
+-# endif
+-#endif
+ /* Setup proper boot sequences for Miami boards */
+ 
+ #if defined(CONFIG_USB_HOST)

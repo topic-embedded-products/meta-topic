@@ -160,11 +160,6 @@
 			label = "qspi-rootfs";
 			reg = <0x180000 0>;
 		};
-		/* Everything */
-		partition@qspi-all {
-			label = "qspi-all";
-			reg = <0x0 0>;
-		};
 	};
 };
 
