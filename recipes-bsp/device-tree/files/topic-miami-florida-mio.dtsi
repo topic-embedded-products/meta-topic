@@ -101,6 +101,7 @@
 			eepromc: eepromc@50 {
 				compatible = "at24,24c04";
 				reg = <0x50>;
+				pagesize = <16>;
 			};
 			/* Programmable clock */
 			si514: si514@55 {

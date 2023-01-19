@@ -138,6 +138,7 @@
 		reg = <0x50>;
 		#address-cells = <1>;
 		#size-cells = <1>;
+		pagesize = <16>;
 		/* NVMEM entries */
 		gem0_mac: mac@30 {
 			reg = <0x30 6>;
