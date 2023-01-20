@@ -15,6 +15,7 @@ VIRTUAL-RUNTIME_dev_manager ??= 'busybox-mdev'
 #   can't create /proc/sys/kernel/hotplug: nonexistent directory
 MDEVSUPPORT = "${@bb.utils.contains('VIRTUAL-RUNTIME_dev_manager', 'busybox-mdev', 'file://enable-mdev-hotplug.cfg', '', d)}"
 EXFATSUPPORT = "file://enable-exfat-fs.cfg"
+KEXECSUPPORT = "file://enable-kexec-support.cfg"
 
 
 # TODO: These patches need updating for the 5.15 kernel
@@ -58,6 +59,7 @@ XILINX_V4L2_FIXES = "\
 SRC_URI:append = "\
 	${MDEVSUPPORT} \
 	${EXFATSUPPORT} \
+	${KEXECSUPPORT} \
 	file://0001-usb-dwc3-Disable-hibernation-by-default.patch \
 	file://0002-usb-dwc3-xilinx-Fix-sequence-and-propagate-error-cod.patch \
 	file://0003-usb-dwc3-core-add-transceiver-delay-for-required-UTM.patch \
