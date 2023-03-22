@@ -1,0 +1,33 @@
+From c1104199942df92c8dda79da6a643387be31e1ad Mon Sep 17 00:00:00 2001
+From: Marc Brakels <marc.brakels@topic.nl>
+Date: Tue, 23 Aug 2022 10:56:30 +0200
+Subject: [PATCH] Add support for xilinx ZDMA
+
+---
+ configs/topic_tdpzu9_defconfig | 2 ++
+ configs/topic_ttpzu9_defconfig | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/configs/topic_tdpzu9_defconfig b/configs/topic_tdpzu9_defconfig
+index 0eb0da7148..3ecd19feff 100644
+--- a/configs/topic_tdpzu9_defconfig
++++ b/configs/topic_tdpzu9_defconfig
+@@ -110,3 +110,5 @@ CONFIG_USB_FUNCTION_THOR=y
+ # CONFIG_FAT_WRITE is not set
+ CONFIG_REGEX=y
+ CONFIG_EFI_LOADER_BOUNCE_BUFFER=y
++CONFIG_SPL_DMA_SUPPORT=y
++CONFIG_XILINX_ZDMA=y
+diff --git a/configs/topic_ttpzu9_defconfig b/configs/topic_ttpzu9_defconfig
+index f29a07ad92..7576c4869f 100644
+--- a/configs/topic_ttpzu9_defconfig
++++ b/configs/topic_ttpzu9_defconfig
+@@ -110,3 +110,5 @@ CONFIG_USB_FUNCTION_THOR=y
+ # CONFIG_FAT_WRITE is not set
+ CONFIG_REGEX=y
+ CONFIG_EFI_LOADER_BOUNCE_BUFFER=y
++CONFIG_SPL_DMA_SUPPORT=y
++CONFIG_XILINX_ZDMA=y
+-- 
+2.17.1
+

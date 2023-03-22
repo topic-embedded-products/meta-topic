@@ -1,0 +1,203 @@
+From b259f0b99048ae927e5d8dbf7f858e5032568ad9 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 9 Oct 2020 09:08:27 +0200
+Subject: [PATCH] dma: Add xilinx-zdma driver for clearing ECC
+
+Limited driver for the ZDMA controller as a fast way to clear memory on boot
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/dma/Kconfig       |   9 +++
+ drivers/dma/Makefile      |   1 +
+ drivers/dma/xilinx-zdma.c | 131 ++++++++++++++++++++++++++++++++++++++
+ include/xilinx-zdma.h     |  11 ++++
+ 4 files changed, 152 insertions(+)
+ create mode 100644 drivers/dma/xilinx-zdma.c
+ create mode 100644 include/xilinx-zdma.h
+
+diff --git a/drivers/dma/Kconfig b/drivers/dma/Kconfig
+index 1820676d7a..dab0d337c3 100644
+--- a/drivers/dma/Kconfig
++++ b/drivers/dma/Kconfig
+@@ -48,6 +48,15 @@ config APBH_DMA
+ 	help
+ 	  Enable APBH DMA driver.
+ 
++config XILINX_ZDMA
++	bool "Xilinx ZDMA driver for clearing ECC DDR"
++	depends on ARCH_ZYNQMP
++	help
++	  Enable the Xilinx ZDMA driver for ZynqMP boards
++	  The ZDMA is a mem-to-mem transfer engine, but this driver only
++	  supports clearing memory at boot for ECC.
++
++
+ if APBH_DMA
+ config APBH_DMA_BURST
+ 	bool "Enable DMA BURST"
+diff --git a/drivers/dma/Makefile b/drivers/dma/Makefile
+index b5f9147e0a..45747f5759 100644
+--- a/drivers/dma/Makefile
++++ b/drivers/dma/Makefile
+@@ -13,3 +13,4 @@ obj-$(CONFIG_SANDBOX_DMA) += sandbox-dma-test.o
+ obj-$(CONFIG_TI_KSNAV) += keystone_nav.o keystone_nav_cfg.o
+ obj-$(CONFIG_TI_EDMA3) += ti-edma3.o
+ obj-$(CONFIG_DMA_LPC32XX) += lpc32xx_dma.o
++obj-$(CONFIG_XILINX_ZDMA) += xilinx-zdma.o
+diff --git a/drivers/dma/xilinx-zdma.c b/drivers/dma/xilinx-zdma.c
+new file mode 100644
+index 0000000000..a9d2650f9a
+--- /dev/null
++++ b/drivers/dma/xilinx-zdma.c
+@@ -0,0 +1,131 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Xilinx ZDMA controller
++ *
++ * This currently is a very limited driver, it only supports clearing memory
++ * for ECC at boot.
++ *
++ * (C) Copyright 2020
++ *     Topic Embedded Products, <www.topic.nl>
++ *
++ * Author: Mike Looijmans <mike.looijmans@topic.nl>
++ */
++#include <asm/io.h>
++#include <common.h>
++
++/* LPD at 0xFFA80000U FPD at 0xFD500000U */
++#define ADMA_CH0_BASEADDR      0xFD500000U
++
++#define ADMA_CH0_ZDMA_CH_STATUS    (ADMA_CH0_BASEADDR + 0x0000011CU)
++#define ADMA_CH0_ZDMA_CH_STATUS_STATE_MASK    0x00000003U
++#define ADMA_CH0_ZDMA_CH_STATUS_STATE_DONE    0x00000000U
++#define ADMA_CH0_ZDMA_CH_STATUS_STATE_ERR     0x00000003U
++
++#define ADMA_CH0_ZDMA_CH_CTRL0    (ADMA_CH0_BASEADDR + 0x00000110U)
++#define ADMA_CH0_ZDMA_CH_CTRL0_POINT_TYPE_MASK    (u32)0x00000040U
++#define ADMA_CH0_ZDMA_CH_CTRL0_POINT_TYPE_NORMAL  (u32)0x00000000U
++#define ADMA_CH0_ZDMA_CH_CTRL0_MODE_MASK    (u32)0x00000030U
++#define ADMA_CH0_ZDMA_CH_CTRL0_MODE_WR_ONLY (u32)0x00000010U
++#define ADMA_CH0_ZDMA_CH_WR_ONLY_WORD0    (ADMA_CH0_BASEADDR + 0x00000148U)
++#define ADMA_CH0_ZDMA_CH_WR_ONLY_WORD1    (ADMA_CH0_BASEADDR + 0x0000014CU)
++#define ADMA_CH0_ZDMA_CH_WR_ONLY_WORD2    (ADMA_CH0_BASEADDR + 0x00000150U)
++#define ADMA_CH0_ZDMA_CH_WR_ONLY_WORD3    (ADMA_CH0_BASEADDR + 0x00000154U)
++#define ADMA_CH0_ZDMA_CH_DST_DSCR_WORD0    (ADMA_CH0_BASEADDR + 0x00000138U)
++#define ADMA_CH0_ZDMA_CH_DST_DSCR_WORD1    (ADMA_CH0_BASEADDR + 0x0000013CU)
++#define ADMA_CH0_ZDMA_CH_SRC_DSCR_WORD2    (ADMA_CH0_BASEADDR + 0x00000130U)
++#define ADMA_CH0_ZDMA_CH_DST_DSCR_WORD2    (ADMA_CH0_BASEADDR + 0x00000140U)
++#define ADMA_CH0_ZDMA_CH_SRC_DSCR_WORD1    (ADMA_CH0_BASEADDR + 0x0000012CU)
++#define ADMA_CH0_ZDMA_CH_SRC_DSCR_WORD0    (ADMA_CH0_BASEADDR + 0x00000128U)
++#define ADMA_CH0_ZDMA_CH_SRC_DSCR_WORD3    (ADMA_CH0_BASEADDR + 0x00000134U)
++#define ADMA_CH0_ZDMA_CH_DST_DSCR_WORD3    (ADMA_CH0_BASEADDR + 0x00000144U)
++
++#define ADMA_CH0_ZDMA_CH_CTRL2    (ADMA_CH0_BASEADDR + 0x00000200U)
++#define ADMA_CH0_ZDMA_CH_CTRL2_EN_MASK    0x00000001U
++
++#define ADMA_CH0_ZDMA_CH_ISR    (ADMA_CH0_BASEADDR + 0x00000100U)
++#define ADMA_CH0_ZDMA_CH_ISR_DMA_DONE_MASK    0x00000400U
++
++static inline u32 zdma_read(u32 addr)
++{
++	return readl(addr);
++}
++
++static inline void zdma_write(u32 addr, u32 data)
++{
++	__raw_writel(data, addr);
++}
++
++static void zdma_wait_idle()
++{
++	u32 reg;
++
++	do {
++		reg = zdma_read(ADMA_CH0_ZDMA_CH_STATUS);
++		reg &= ADMA_CH0_ZDMA_CH_STATUS_STATE_MASK;
++	} while ((reg != ADMA_CH0_ZDMA_CH_STATUS_STATE_DONE) &&
++			(reg != ADMA_CH0_ZDMA_CH_STATUS_STATE_ERR));
++}
++
++/*
++ * Clear the memory for ECC. It does not matter which pattern, and there is
++ * also no need for any coherency - all that matters is that the memory has been
++ * written to before any device attempts to read it.
++ */
++void zdma_clear_ecc(u64 destaddr, u64 size)
++{
++	u32 bytes;
++	u32 reg;
++
++	while (size) {
++		/* Max transfer is 1GB-1, just use 512MB for easy alignment */
++		if (size > 0x20000000)
++			bytes = 0x20000000;
++		else
++			bytes = size;
++
++		zdma_wait_idle();
++
++		/* Enable Simple (Write Only) Mode */
++		reg = zdma_read(ADMA_CH0_ZDMA_CH_CTRL0);
++		reg &= (ADMA_CH0_ZDMA_CH_CTRL0_POINT_TYPE_MASK |
++			ADMA_CH0_ZDMA_CH_CTRL0_MODE_MASK);
++		reg |= (ADMA_CH0_ZDMA_CH_CTRL0_POINT_TYPE_NORMAL |
++			ADMA_CH0_ZDMA_CH_CTRL0_MODE_WR_ONLY);
++		zdma_write(ADMA_CH0_ZDMA_CH_CTRL0, reg);
++
++		/* Fill in the data to be written */
++		zdma_write(ADMA_CH0_ZDMA_CH_WR_ONLY_WORD0, 0xDEADBEEF);
++		zdma_write(ADMA_CH0_ZDMA_CH_WR_ONLY_WORD1, 0xDEADBEEF);
++		zdma_write(ADMA_CH0_ZDMA_CH_WR_ONLY_WORD2, 0xDEADBEEF);
++		zdma_write(ADMA_CH0_ZDMA_CH_WR_ONLY_WORD3, 0xDEADBEEF);
++
++		/* Write Destination Address */
++		zdma_write(ADMA_CH0_ZDMA_CH_DST_DSCR_WORD0, (u32)destaddr);
++		zdma_write(ADMA_CH0_ZDMA_CH_DST_DSCR_WORD1,
++			   (u32)(destaddr >> 32));
++
++		/* Datasheet recommends to set both src and dest sizes */
++		zdma_write(ADMA_CH0_ZDMA_CH_SRC_DSCR_WORD2, bytes);
++		zdma_write(ADMA_CH0_ZDMA_CH_DST_DSCR_WORD2, bytes);
++
++		/* DMA Enable */
++		reg = zdma_read(ADMA_CH0_ZDMA_CH_CTRL2);
++		reg |= ADMA_CH0_ZDMA_CH_CTRL2_EN_MASK;
++		zdma_write(ADMA_CH0_ZDMA_CH_CTRL2, reg);
++
++		/* Check the status of the transfer by polling on DMA Done */
++		do {
++			reg = zdma_read(ADMA_CH0_ZDMA_CH_ISR);
++			reg &= ADMA_CH0_ZDMA_CH_ISR_DMA_DONE_MASK;
++		} while (reg != ADMA_CH0_ZDMA_CH_ISR_DMA_DONE_MASK);
++
++		/* Clear DMA status */
++		reg = zdma_read(ADMA_CH0_ZDMA_CH_ISR);
++		reg |= ADMA_CH0_ZDMA_CH_ISR_DMA_DONE_MASK;
++		zdma_write(ADMA_CH0_ZDMA_CH_ISR,
++			   ADMA_CH0_ZDMA_CH_ISR_DMA_DONE_MASK);
++
++		size -= bytes;
++		destaddr += bytes;
++	}
++}
+diff --git a/include/xilinx-zdma.h b/include/xilinx-zdma.h
+new file mode 100644
+index 0000000000..7c4e59fc51
+--- /dev/null
++++ b/include/xilinx-zdma.h
+@@ -0,0 +1,11 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Copyright (C) 2020 Topic Embedded Products
++ */
++
++#ifndef _XILINX_ZDMA_H_
++#define _XILINX_ZDMA_H_
++
++void zdma_clear_ecc(u64 destaddr, u64 size);
++
++#endif /* _XILINX_ZDMA_H_ */
+-- 
+2.17.1
+

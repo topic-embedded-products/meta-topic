@@ -37,6 +37,8 @@ SRC_URI_append = "\
 	file://0001-configs-topic_miami-lite-Fix-boot-order-and-disable-.patch \
 	file://0001-board-topic-miamiplus-Do-not-toggle-pin-46-at-boot.patch \
 	file://0001-tdpzu9-Apply-pull-down-on-MIO39.patch \
+	file://0001-dma-Add-xilinx-zdma-driver-for-clearing-ECC.patch \
+	file://0001-Add-support-for-xilinx-ZDMA.patch \
 	"
 
 # Glitches on serial input interrupt the boot sequence on some boards, use
