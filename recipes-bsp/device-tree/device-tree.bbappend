@@ -14,9 +14,6 @@ SRC_URI_append_xdpzu7 = " \
 		file://zynqmp-topic-miamimp-xilinx-xdp-sd-usbhost.dts \
 		"
 
-COMPATIBLE_MACHINE_ttpzu9 = ".*"
-SRC_URI_append_ttpzu9 = " file://${MACHINE}.dts"
-
 COMPATIBLE_MACHINE_tdpzu9 = ".*"
 SRC_URI_append_tdpzu9 = "\
 	file://${MACHINE}.dts \
