@@ -5,7 +5,8 @@ LIC_FILES_CHKSUM = "file://../COPYING;md5=9eef91148a9b14ec7f9df333daebc746"
 inherit gitpkgv update-rc.d systemd
 
 GITHUB_TOPIC_URI ?= "git://github.com/topic-embedded-products"
-SRC_URI = "${GITHUB_TOPIC_URI}/kernel-module-topic-pl-fanctrl"
+GITHUB_TOPIC_URI_SUFFIX ?= ";protocol=https"
+SRC_URI = "${GITHUB_TOPIC_URI}/kernel-module-topic-pl-fanctrl${GITHUB_TOPIC_URI_SUFFIX}"
 
 PV = "0+${SRCPV}"
 PKGV = "0+${GITPKGV}"
