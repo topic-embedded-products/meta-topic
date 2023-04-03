@@ -14,6 +14,9 @@ include conf/machine/include/zynq-base.inc
 require conf/machine/include/soc-zynq.inc
 require conf/machine/include/machine-xilinx-default.inc
 
+# Make Xilinx happy, we don't use it...
+HDF_MACHINE = "${MACHINE}"
+
 # tune-zynq is adding an unused zImage
 KERNEL_IMAGETYPES:remove = "zImage"
 
@@ -51,3 +54,7 @@ DEVICETREE ??= "devicetree/topic-miami.dtb"
 
 # We want to use u-boot SPL
 PREFERRED_PROVIDER_virtual/boot-bin = "u-boot-xlnx"
+
+# Xilinx sets WKS_FILE_DEPENDS:append which we'll undo here. We only want boot.bin there anyway...
+WKS_FILE_DEPENDS:remove = "xilinx-bootbin virtual/dtb u-boot-zynq-scr u-boot-zynq-uenv arm-trusted-firmware"
+

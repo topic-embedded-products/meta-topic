@@ -79,3 +79,7 @@ DEVICETREE ??= "devicetree/zynqmp-topic-miamimp.dtb"
 WKS_FILE = "sdimage-swu.wks"
 IMAGE_BOOT_FILES = "boot.bin u-boot.itb"
 IMAGE_OVERHEAD_FACTOR="1.1"
+
+# Xilinx sets WKS_FILE_DEPENDS:append which we'll undo here. We only want boot.bin there anyway...
+WKS_FILE_DEPENDS:remove = "xilinx-bootbin virtual/dtb u-boot-zynq-scr u-boot-zynq-uenv arm-trusted-firmware"
+
