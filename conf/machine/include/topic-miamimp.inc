@@ -43,6 +43,16 @@ EXTRA_IMAGEDEPENDS:remove = "u-boot-zynq-scr"
 # We have our own bootscript
 EXTRA_IMAGEDEPENDS += "bootscript"
 
+# Get rid of QEMU dependency, work around build failures
+IMAGE_CLASSES:remove = "image-types-xilinx-qemu"
+IMAGE_FSTYPES:remove = "wic.qemu-sd"
+EXTRA_IMAGEDEPENDS:remove = "qemu-system-native qemu-helper-native:do_addto_recipe_sysroot"
+PREFERRED_PROVIDER_qemu-helper-native ?= "qemu-helper-native"
+PREFERRED_PROVIDER_qemu = "qemu"
+PREFERRED_PROVIDER_qemu-native = "qemu-native"
+PREFERRED_PROVIDER_qemu-system-native = "qemu-system-native"
+PREFERRED_PROVIDER_nativesdk-qemu = "nativesdk-qemu"
+
 # We want to use u-boot SPL
 PREFERRED_PROVIDER_virtual/boot-bin = "u-boot-xlnx"
 
