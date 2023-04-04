@@ -19,6 +19,11 @@ BOARD_PL_REFERENCE ??= ""
 # just set BOARD_PL_REFERENCE="" in your my-image derived image recipe.
 IMAGE_INSTALL_MACHINE_EXTRAS = "packagegroup-machine-base ${BOARD_PL_REFERENCE}"
 
+# There's no entropy source in the SoM, so use 'haveged' to at least make the
+# ssh server start up in reasonable time.
+MACHINE_ENTROPY = "haveged"
+MACHINE_EXTRA_RDEPENDS += "${MACHINE_ENTROPY}"
+
 KERNEL_MODULE_AUTOLOAD ?= ""
 
 # Default a platform without GPU/VCU because the MALI GPU support is broken in

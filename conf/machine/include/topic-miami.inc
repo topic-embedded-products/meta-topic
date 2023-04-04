@@ -32,6 +32,11 @@ MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 # Workaround for broken check on IMAGE_FEATURES in kernel recipe
 FPGA_MNGR_RECONFIG_ENABLE = "1"
 
+# There's no entropy source in the SoM, so use 'haveged' to at least make the
+# ssh server start up in reasonable time.
+MACHINE_ENTROPY = "haveged"
+MACHINE_EXTRA_RDEPENDS += "${MACHINE_ENTROPY}"
+
 # u-boot configuration
 UBOOT_MACHINE = "topic_miami_config"
 UBOOT_SUFFIX = "img"
