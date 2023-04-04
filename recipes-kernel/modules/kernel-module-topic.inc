@@ -12,4 +12,5 @@ SRCREV = "${AUTOREV}"
 
 GITHUB_TOPIC_URI ?= "git://github.com/topic-embedded-products"
 GITHUB_TOPIC_URI_SUFFIX ?= ";protocol=https"
-SRC_URI = "${GITHUB_TOPIC_URI}/${BPN}${GITHUB_TOPIC_URI_SUFFIX}"
+BRANCH = "master"
+SRC_URI = "${GITHUB_TOPIC_URI}/${BPN}${GITHUB_TOPIC_URI_SUFFIX};branch=${BRANCH}"

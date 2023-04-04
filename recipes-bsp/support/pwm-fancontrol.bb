@@ -6,7 +6,8 @@ inherit gitpkgv update-rc.d systemd
 
 GITHUB_TOPIC_URI ?= "git://github.com/topic-embedded-products"
 GITHUB_TOPIC_URI_SUFFIX ?= ";protocol=https"
-SRC_URI = "${GITHUB_TOPIC_URI}/kernel-module-topic-pl-fanctrl${GITHUB_TOPIC_URI_SUFFIX}"
+BRANCH = "master"
+SRC_URI = "${GITHUB_TOPIC_URI}/kernel-module-topic-pl-fanctrl${GITHUB_TOPIC_URI_SUFFIX};branch=${BRANCH}"
 
 PV = "0+${SRCPV}"
 PKGV = "0+${GITPKGV}"

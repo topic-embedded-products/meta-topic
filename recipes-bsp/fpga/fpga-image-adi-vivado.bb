@@ -7,7 +7,7 @@ require fpga-image.inc
 # ip cores have changed versions.
 XILINX_VIVADO_VERSION = "2013.4"
 
-BOARD_DESIGN_URI = "git://github.com/analogdevicesinc/hdl.git"
+BOARD_DESIGN_URI = "git://github.com/analogdevicesinc/hdl.git;protocol=https;branch=master"
 SRCREV = "f3f8414d812470f309713fdd99c91af1a6458375"
 BOARD_DESIGN_PATH = ""
 BOARD_DESIGN_PATH_zedboard = "projects/adv7511/zed"

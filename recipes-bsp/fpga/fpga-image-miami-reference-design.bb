@@ -7,7 +7,8 @@ LIC_FILES_CHKSUM = "file://${METATOPIC_BASE}/LICENSE;md5=cf85de037de7ae12cc2d005
 COMPATIBLE_MACHINE = "topic-miami"
 
 GITHUB_TEP_URI ?= "git://github.com/topic-embedded-products"
-BOARD_DESIGN_URI = "${GITHUB_TEP_URI}/${BPN}"
+GITHUB_TEP_URI_SUFFIX ?= ";protocol=https"
+BOARD_DESIGN_URI = "${GITHUB_TEP_URI}/${BPN}${GITHUB_TEP_URI_SUFFIX};branch=master"
 BOARD_DESIGN_PATH = ""
 
 inherit gitpkgv
