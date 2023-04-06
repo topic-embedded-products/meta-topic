@@ -6,8 +6,6 @@ TODO_PATCHES_THAT_DONT_APPLY = "\
 "
 
 SRC_URI:append = "\
-	file://pmu-firmware-zynqmp-pmu.bin.xz \
-	file://pm_cfg_obj.c \
 	file://0001-board-topic-Detect-RAM-size-at-boot.patch \
 	file://0002-board-topic_miamilite-Support-cost-reduced-version.patch \
 	file://0003-configs-topic_miami.h-Use-same-partitioning-for-USB-.patch \
@@ -51,26 +49,3 @@ SRC_URI:append = "\
 # Glitches on serial input interrupt the boot sequence on some boards, use
 # a particular key (space) to stop autoboot instead of any key.
 SRC_URI:append:topic-miamimp = " file://must-press-space-to-stop-autoboot.cfg"
-
-EXTRACOMPILEDEPENDS = ""
-EXTRACOMPILEDEPENDS:zynqmp = "arm-trusted-firmware:do_deploy"
-
-# Temporary workaround for having the binary here...
-PMU_FIRMWARE_DEPLOY_DIR = "${S}/board/topic/zynqmp"
-PMU_FIRMWARE_IMAGE_NAME = "pmufw"
-
-# Inject the configuration
-EXTRA_OEMAKE:append:zynqmp = ' CONFIG_ZYNQMP_SPL_PM_CFG_OBJ_FILE="${B}/pm_cfg_obj.bin"'
-
-# Add PMU and ATF
-do_compile[depends] += "${EXTRACOMPILEDEPENDS}"
-do_compile:prepend:zynqmp() {
-	${S}/tools/zynqmp_pm_cfg_obj_convert.py ${WORKDIR}/pm_cfg_obj.c ${B}/pm_cfg_obj.bin
-	cp ${WORKDIR}/pmu-firmware-zynqmp-pmu.bin ${S}/board/topic/zynqmp/pmufw.bin
-	cp ${DEPLOY_DIR_IMAGE}/arm-trusted-firmware.bin ${B}/arm-trusted-firmware.bin
-}
-
-do_compile:append:zynqmp() {
-	cp ${S}/board/topic/zynqmp/fit_spl_atf.its ${B}/fit_spl_atf.its
-	${B}/tools/mkimage -f ${B}/fit_spl_atf.its ${B}/u-boot.itb
-}

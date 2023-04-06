@@ -1,0 +1,264 @@
+--- a/psu_init.c	2022-01-18 08:08:40.543442574 +0100
++++ b/psu_init.c	2022-01-18 08:40:32.143665313 +0100
+@@ -1775,7 +1775,7 @@
+ 
+ 	return 1;
+ }
+-unsigned long psu_ddr_init_data(void)
++unsigned long psu_ddr_init_data(int is_dual_rank)
+ {
+     /*
+     * DDR INITIALIZATION
+@@ -1887,7 +1887,7 @@
+     * Master Register
+     * (OFFSET, MASK, VALUE)      (0XFD070000, 0xE30FBE3DU ,0xC1081020U)
+     */
+-	PSU_Mask_Write(DDRC_MSTR_OFFSET, 0xE30FBE3DU, 0xC1081020U);
++	PSU_Mask_Write(DDRC_MSTR_OFFSET, 0xE30FBE3DU, is_dual_rank ? 0xC3081020U : 0xC1081020U);
+ /*##################################################################### */
+ 
+     /*
+@@ -2242,7 +2242,7 @@
+     * Refresh Timing Register
+     * (OFFSET, MASK, VALUE)      (0XFD070064, 0x0FFF83FFU ,0x00418096U)
+     */
+-	PSU_Mask_Write(DDRC_RFSHTMG_OFFSET, 0x0FFF83FFU, 0x00418096U);
++	PSU_Mask_Write(DDRC_RFSHTMG_OFFSET, 0x0FFF83FFU, is_dual_rank ? 0x00418061U : 0x00418096U);
+ /*##################################################################### */
+ 
+     /*
+@@ -2848,7 +2848,7 @@
+     * SDRAM Timing Register 2
+     * (OFFSET, MASK, VALUE)      (0XFD070108, 0x3F3F3F3FU ,0x060C1A10U)
+     */
+-	PSU_Mask_Write(DDRC_DRAMTMG2_OFFSET, 0x3F3F3F3FU, 0x060C1A10U);
++	PSU_Mask_Write(DDRC_DRAMTMG2_OFFSET, 0x3F3F3F3FU, is_dual_rank ? 0x060C1A13U : 0x060C1A10U);
+ /*##################################################################### */
+ 
+     /*
+@@ -3054,7 +3054,7 @@
+     * SDRAM Timing Register 8
+     * (OFFSET, MASK, VALUE)      (0XFD070120, 0x7F7F7F7FU ,0x04040606U)
+     */
+-	PSU_Mask_Write(DDRC_DRAMTMG8_OFFSET, 0x7F7F7F7FU, 0x04040606U);
++	PSU_Mask_Write(DDRC_DRAMTMG8_OFFSET, 0x7F7F7F7FU, is_dual_rank ? 0x04040505U : 0x04040606U);
+ /*##################################################################### */
+ 
+     /*
+@@ -3551,7 +3551,7 @@
+     * Address Map Register 0
+     * (OFFSET, MASK, VALUE)      (0XFD070200, 0x0000001FU ,0x0000001FU)
+     */
+-	PSU_Mask_Write(DDRC_ADDRMAP0_OFFSET, 0x0000001FU, 0x0000001FU);
++	PSU_Mask_Write(DDRC_ADDRMAP0_OFFSET, 0x0000001FU, is_dual_rank ? 0x00000015U : 0x0000001FU);
+ /*##################################################################### */
+ 
+     /*
+@@ -3788,7 +3788,7 @@
+     * Address Map Register 6
+     * (OFFSET, MASK, VALUE)      (0XFD070218, 0x8F0F0F0FU ,0x06060606U)
+     */
+-	PSU_Mask_Write(DDRC_ADDRMAP6_OFFSET, 0x8F0F0F0FU, 0x06060606U);
++	PSU_Mask_Write(DDRC_ADDRMAP6_OFFSET, 0x8F0F0F0FU, is_dual_rank ? 0x0F060606U : 0x06060606U);
+ /*##################################################################### */
+ 
+     /*
+@@ -6028,7 +6028,7 @@
+     * DRAM Timing Parameters Register 2
+     * (OFFSET, MASK, VALUE)      (0XFD080118, 0xFFFFFFFFU ,0x000F0133U)
+     */
+-	PSU_Mask_Write(DDR_PHY_DTPR2_OFFSET, 0xFFFFFFFFU, 0x000F0133U);
++	PSU_Mask_Write(DDR_PHY_DTPR2_OFFSET, 0xFFFFFFFFU, is_dual_rank ? 0x000F00C9U : 0x000F0133U);
+ /*##################################################################### */
+ 
+     /*
+@@ -6091,7 +6091,7 @@
+     * DRAM Timing Parameters Register 4
+     * (OFFSET, MASK, VALUE)      (0XFD080120, 0xFFFFFFFFU ,0x012B2B0CU)
+     */
+-	PSU_Mask_Write(DDR_PHY_DTPR4_OFFSET, 0xFFFFFFFFU, 0x012B2B0CU);
++	PSU_Mask_Write(DDR_PHY_DTPR4_OFFSET, 0xFFFFFFFFU, is_dual_rank ? 0x00C12B0CU : 0x012B2B0CU);
+ /*##################################################################### */
+ 
+     /*
+@@ -6744,7 +6744,7 @@
+     * Data Training Configuration Register 0
+     * (OFFSET, MASK, VALUE)      (0XFD080200, 0xFFFFFFFFU ,0x800091C7U)
+     */
+-	PSU_Mask_Write(DDR_PHY_DTCR0_OFFSET, 0xFFFFFFFFU, 0x800091C7U);
++	PSU_Mask_Write(DDR_PHY_DTCR0_OFFSET, 0xFFFFFFFFU, is_dual_rank ? 0x810091C7U : 0x800091C7U);
+ /*##################################################################### */
+ 
+     /*
+@@ -6789,7 +6789,7 @@
+     * Data Training Configuration Register 1
+     * (OFFSET, MASK, VALUE)      (0XFD080204, 0xFFFFFFFFU ,0x00010236U)
+     */
+-	PSU_Mask_Write(DDR_PHY_DTCR1_OFFSET, 0xFFFFFFFFU, 0x00010236U);
++	PSU_Mask_Write(DDR_PHY_DTCR1_OFFSET, 0xFFFFFFFFU, is_dual_rank ? 0x00030236U : 0x00010236U);
+ /*##################################################################### */
+ 
+     /*
+@@ -8320,7 +8320,7 @@
+     * DATX8 n General Configuration Register 4
+     * (OFFSET, MASK, VALUE)      (0XFD080910, 0xFFFFFFFFU ,0x0E00F504U)
+     */
+-	PSU_Mask_Write(DDR_PHY_DX2GCR4_OFFSET, 0xFFFFFFFFU, 0x0E00F504U);
++	PSU_Mask_Write(DDR_PHY_DX2GCR4_OFFSET, 0xFFFFFFFFU, is_dual_rank ? 0x0E00F50CU : 0x0E00F504U);
+ /*##################################################################### */
+ 
+     /*
+@@ -8597,7 +8597,7 @@
+     * DATX8 n General Configuration Register 4
+     * (OFFSET, MASK, VALUE)      (0XFD080A10, 0xFFFFFFFFU ,0x0E00F504U)
+     */
+-	PSU_Mask_Write(DDR_PHY_DX3GCR4_OFFSET, 0xFFFFFFFFU, 0x0E00F504U);
++	PSU_Mask_Write(DDR_PHY_DX3GCR4_OFFSET, 0xFFFFFFFFU, is_dual_rank ? 0x0E00F50CU : 0x0E00F504U);
+ /*##################################################################### */
+ 
+     /*
+@@ -21004,7 +21004,7 @@
+ 	return 1;
+ }
+ 
+-unsigned long psu_ddr_phybringup_data(void)
++unsigned long psu_ddr_phybringup_data(int is_dual_rank)
+ {
+ 
+ 
+@@ -21121,7 +21121,7 @@
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	Xil_Out32(0xFD070014U, 0x00000331U);
+-	Xil_Out32(0xFD070010U, 0x80000018U);
++	Xil_Out32(0xFD070010U, is_dual_rank ? 0x80000038U : 0x80000018U);
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	while ((regval & 0x1) != 0x0) {
+ 	/***MRSTAT***/
+@@ -21139,7 +21139,7 @@
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	Xil_Out32(0xFD070014U, 0x00000B36U);
+-	Xil_Out32(0xFD070010U, 0x80000018U);
++	Xil_Out32(0xFD070010U, is_dual_rank ? 0x80000038U : 0x80000018U);
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	while ((regval & 0x1) != 0x0) {
+ 	/***MRSTAT***/
+@@ -21157,7 +21157,7 @@
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	Xil_Out32(0xFD070014U, 0x00000C56U);
+-	Xil_Out32(0xFD070010U, 0x80000018U);
++	Xil_Out32(0xFD070010U, is_dual_rank ? 0x80000038U : 0x80000018U);
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	while ((regval & 0x1) != 0x0) {
+ 	/***MRSTAT***/
+@@ -21175,7 +21175,7 @@
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	Xil_Out32(0xFD070014U, 0x00000E19U);
+-	Xil_Out32(0xFD070010U, 0x80000018U);
++	Xil_Out32(0xFD070010U, is_dual_rank ? 0x80000038U : 0x80000018U);
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	while ((regval & 0x1) != 0x0) {
+ 	/***MRSTAT***/
+@@ -21193,8 +21193,8 @@
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	regval = Xil_In32(0xFD070018); /*MRSTAT*/
+ 	Xil_Out32(0xFD070014U, 0x00001616U);
+-	Xil_Out32(0xFD070010U, 0x80000018U);
+-	Xil_Out32(0xFD070010U, 0x80000010U);
++	Xil_Out32(0xFD070010U, is_dual_rank ? 0x80000038U : 0x80000018U);
++	Xil_Out32(0xFD070010U, is_dual_rank ? 0x80000030U : 0x80000010U);
+ 	Xil_Out32(0xFD0701B0U, 0x00000005U);
+ 	Xil_Out32(0xFD070320U, 0x00000001U);
+ 	while ((Xil_In32(0xFD070004U) & 0x0000000FU) != 0x00000001U) {
+@@ -21276,7 +21276,7 @@
+ 	}
+ 
+ /*Disabling REF before dqs2dq training - DTCR0.RFSHDT=0*/
+-	Xil_Out32(0xFD080200U, 0x000091C7U);
++	Xil_Out32(0xFD080200U, is_dual_rank ? 0x010091C7U: 0x000091C7U);
+ 	regval = Xil_In32(0xFD080030); /*PUB_PGSR0*/
+ 	while (regval != 0x80008FFF) {
+ 	/*PUB_PGSR0*/
+@@ -21284,14 +21284,14 @@
+ 	}
+ 
+ /*Enabling REF after dqs2dq training - DTCR0.RFSHDT=8*/
+-	Xil_Out32(0xFD080200U, 0x800091C7U);
++	Xil_Out32(0xFD080200U, is_dual_rank ? 0x810091C7U : 0x800091C7U);
+ 	regval = ((Xil_In32(0xFD080030) & 0x1FFF0000) >>18);
+ 	if(regval != 0) {
+ 		return(0);
+ 	}
+ 
+ /* Run Vref training in static read mode*/
+-	Xil_Out32(0xFD080200U, 0x800091C7U);
++	Xil_Out32(0xFD080200U, is_dual_rank ? 0x810091C7U : 0x800091C7U);
+ 	int cur_R006_tREFPRD;
+ 
+ 	cur_R006_tREFPRD = (Xil_In32(0xFD080018U) & 0x0003FFFFU) >> 0x00000000U;
+@@ -21326,7 +21326,7 @@
+ 	prog_reg(0xFD0814ECU, 0x00000030U, 0x00000004U, 0x00000000U);
+ 	prog_reg(0xFD08152CU, 0x00000030U, 0x00000004U, 0x00000000U);
+ /*Vref training is complete, disabling static read mode*/
+-	Xil_Out32(0xFD080200U, 0x800091C7U);
++	Xil_Out32(0xFD080200U, is_dual_rank ? 0x810091C7U : 0x800091C7U);
+ 	prog_reg(0xFD080018, 0x3FFFF, 0x0, cur_R006_tREFPRD);
+ 
+ 
+@@ -22878,17 +22878,35 @@
+ 	return 0;
+ }
+ 
++/* Defined in xfsbl_initialization.c */
++void XFsbl_MarkDdrAsReserved(u8 Cond);
++
++static int check_ram_wraparound()
++{
++	XFsbl_MarkDdrAsReserved(FALSE); /* Make memory accessible */
++	Xil_Out32(0x01000000, 0x12345678);
++	Xil_Out32(0x41000000, 0x87654321);
++	return Xil_In32(0x01000000) != 0x12345678;
++}
++
+ int
+ psu_init(void)
+ {
+ 	int status = 1;
++	int dual_rank_ddr;
+ 
+ 	status &= psu_mio_init_data();
+ 	status &=  psu_peripherals_pre_init_data();
+ 	status &=   psu_pll_init_data();
+ 	status &=   psu_clock_init_data();
+-	status &=  psu_ddr_init_data();
+-	status &=  psu_ddr_phybringup_data();
++
++	psu_ddr_init_data(0);
++	psu_ddr_phybringup_data(0);
++	if (check_ram_wraparound()) {
++		psu_ddr_init_data(1);
++		psu_ddr_phybringup_data(1);
++	}
++
+ 	status &=  psu_peripherals_init_data();
+ 	status &=  init_serdes();
+ 	init_peripheral();
+@@ -22905,12 +22923,14 @@
+ int psu_init_ddr_self_refresh(void) {
+ 
+     int status = 1;
++	int dual_rank_ddr;
+ 
+ 	status &= psu_mio_init_data();
+ 	status &=  psu_peripherals_pre_init_data();
+ 	status &=   psu_pll_init_data();
+ 	status &=   psu_clock_init_data();
+-	status &=  psu_ddr_init_data();
++	dual_rank_ddr = detect_dual_rank_ddr();
++	psu_ddr_init_data(dual_rank_ddr);
+ 	status &=  psu_peripherals_init_data();
+ 	status &=  init_serdes();
+ 	init_peripheral();

@@ -62,27 +62,10 @@ PREFERRED_PROVIDER_nativesdk-qemu = "nativesdk-qemu"
 PREFERRED_PROVIDER_virtual/dtb = "device-tree-static"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree-static"
 
-# We want to use u-boot SPL
-PREFERRED_PROVIDER_virtual/boot-bin = "u-boot-xlnx"
-
 # The RTC only works if a battery is connected, which most boards do not have
 MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
-# Sanitize the MACHINE_FEATURES
-MACHINE_FEATURES = "ext2 ext3 vfat usbhost mali fpgamgr"
-
-UBOOT_MACHINE = "topic_miamimp_config"
-SPL_BINARY = "spl/boot.bin"
-SPL_SYMLINK = "BOOT.bin"
-UBOOT_SUFFIX = "itb"
-# Since Xilinx defines UBOOT_SUFFIX:zynqmp somewhere, fix that here
-UBOOT_SUFFIX:zynqmp = "itb"
-UBOOT_LOADADDRESS = "0x8000000"
-UBOOT_ENTRYPOINT = "0x8000000"
-HAS_PLATFORM_INIT:append = "\
-    topic_miamimp_config \
-    topic_miamiplusmp_config \
-    topic_miamimp_xilinx_xdp_config\
-    "
+# Sanitize the MACHINE_FEATURES (otherwise we get wifi, bluetooth and more)
+MACHINE_FEATURES = "ext2 ext3 vfat usbhost fpgamgr"
 
 SERIAL_CONSOLE = "115200 ttyPS0"
 # We only want to run getty on the console.
@@ -96,9 +79,27 @@ UBI_VOLNAME = "qspi-rootfs"
 # WIC image support.
 DEVICETREE ??= "devicetree/zynqmp-topic-miamimp.dtb"
 WKS_FILE = "sdimage-swu.wks"
-IMAGE_BOOT_FILES = "boot.bin u-boot.itb"
+IMAGE_BOOT_FILES = "boot.bin"
 IMAGE_OVERHEAD_FACTOR="1.1"
 
 # Xilinx sets WKS_FILE_DEPENDS:append which we'll undo here. We only want boot.bin there anyway...
-WKS_FILE_DEPENDS:remove = "xilinx-bootbin virtual/dtb u-boot-zynq-scr u-boot-zynq-uenv arm-trusted-firmware"
+WKS_FILE_DEPENDS:remove = "virtual/dtb u-boot-zynq-scr u-boot-zynq-uenv arm-trusted-firmware"
 
+# HACK (xilins prepends file:// and appends .elf
+# FSBL_FILE = "${HOME}/projects/topic-platform-langdale/fsbl-${MACHINE}"
+
+# Devicetree needs a dependency...
+# BIF_PARTITION_IMAGE[device-tree] = "${RECIPE_SYSROOT}/boot/${DEVICETREE}"
+# BIF_DEVICETREE_ATTR = ""
+BIF_BITSTREAM_ATTR = ""
+
+# TLD uses this revision
+TOPIC_XSA_DESIGN_VERSION ?= "179+bcff7f6"
+TOPIC_XSA_DESIGN_NAME ?= "fpga-hardware-${HDF_MACHINE}-reference-${TOPIC_XSA_DESIGN_VERSION}.xsa"
+
+# Setup things for external-hdf.bb
+# Note: Update the checksums in "external-hdf.bbappend" when the reference designs change
+HDF_MACHINE = "${MACHINE}"
+HDF_BASE = "http://"
+HDF_PATH = "fpga-server.local/downloads/fpga/fpga-board-utils/${TOPIC_XSA_DESIGN_NAME}.xz;name=${HDF_MACHINE}"
+HDF_NAME = "${S}/${TOPIC_XSA_DESIGN_NAME}"

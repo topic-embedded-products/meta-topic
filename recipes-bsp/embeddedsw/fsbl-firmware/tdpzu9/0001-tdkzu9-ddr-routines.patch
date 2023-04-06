@@ -1,0 +1,55 @@
+From ee10588735614496d5ddaade4527a2b66274d578 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 17 Jan 2022 09:48:04 +0100
+Subject: [PATCH] tdkzu9 ddr routines
+
+Patch psu_init.c to pick the configuration based on EEPROM data
+---
+ psu_init.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/psu_init.c b/psu_init.c
+index 36bfbf8..6cf6644 100644
+--- a/psu_init.c
++++ b/psu_init.c
+@@ -23879,6 +23879,8 @@ int psu_protection(void)
+ 	return 0;
+ }
+ 
++#include "psu_init_ddr_custom.inc"
++
+ int
+ psu_init(void)
+ {
+@@ -23888,12 +23890,12 @@ psu_init(void)
+ 	status &=  psu_peripherals_pre_init_data();
+ 	status &=   psu_pll_init_data();
+ 	status &=   psu_clock_init_data();
+-	status &=  psu_ddr_init_data();
+-	status &=  psu_ddr_phybringup_data();
+ 	status &=  psu_peripherals_init_data();
+ 	status &=  init_serdes();
+ 	init_peripheral();
+ 
++	psu_init_ddr_eeprom(1);
++
+ 	status &=  psu_peripherals_powerdwn_data();
+ 	status &=    psu_afi_config();
+ 	psu_ddr_qos_init_data();
+@@ -23911,11 +23913,12 @@ int psu_init_ddr_self_refresh(void) {
+ 	status &=  psu_peripherals_pre_init_data();
+ 	status &=   psu_pll_init_data();
+ 	status &=   psu_clock_init_data();
+-	status &=  psu_ddr_init_data();
+ 	status &=  psu_peripherals_init_data();
+ 	status &=  init_serdes();
+ 	init_peripheral();
+ 
++	psu_init_ddr_eeprom(0);
++
+ 	status &=  psu_peripherals_powerdwn_data();
+ 	status &=    psu_afi_config();
+ 	psu_ddr_qos_init_data();
+-- 
+2.17.1
+

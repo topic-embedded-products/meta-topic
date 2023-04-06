@@ -1,0 +1,42 @@
+From a5d428517f6eabfa48c74598a612a849d6c319aa Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 17 Jan 2022 13:41:28 +0100
+Subject: [PATCH] xfsbl_initialization: Run ECC initialization when needed
+
+Always initialize ECC when register settings indicate it's enabled, regardless
+of any defined macro. This allows boards to do this dynamically based on jumper
+or EEPROM settings.
+---
+ lib/sw_apps/zynqmp_fsbl/src/xfsbl_initialization.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lib/sw_apps/zynqmp_fsbl/src/xfsbl_initialization.c b/lib/sw_apps/zynqmp_fsbl/src/xfsbl_initialization.c
+index 865a6e1722..51823bbe1c 100644
+--- a/lib/sw_apps/zynqmp_fsbl/src/xfsbl_initialization.c
++++ b/lib/sw_apps/zynqmp_fsbl/src/xfsbl_initialization.c
+@@ -1742,7 +1742,7 @@ END:
+ static u32 XFsbl_DdrEccInit(void)
+ {
+ 	u32 Status;
+-#if XPAR_PSU_DDRC_0_HAS_ECC
++if (XFsbl_In32(0XFD070070) & 0x04) { /* DDRC_ECCCFG0_OFFSET, ECC_MODE bit */
+ 	u64 LengthBytes =
+ 			(XFSBL_PS_DDR_END_ADDRESS - XFSBL_PS_DDR_INIT_START_ADDRESS) + 1;
+ 	u64 DestAddr = XFSBL_PS_DDR_INIT_START_ADDRESS;
+@@ -1769,10 +1769,10 @@ static u32 XFsbl_DdrEccInit(void)
+ 		goto END;
+ 	}
+ #endif
+-END:
+-#else
++} else {
+ 	Status = XFSBL_SUCCESS;
+-#endif
++}
++END:
+ 	return Status;
+ }
+ 
+-- 
+2.17.1
+
