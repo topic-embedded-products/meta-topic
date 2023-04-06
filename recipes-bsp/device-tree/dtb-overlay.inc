@@ -5,7 +5,7 @@ SUMMARY = "Devicetree overlay"
 SECTION = "bsp"
 
 # the device trees from within the layer are licensed as MIT, kernel includes are GPL
-LICENSE = "GPLv2+"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0-or-later;md5=fed54355545ffd980b814dab4a3b312c"
 
 inherit devicetree
