@@ -58,6 +58,10 @@ PREFERRED_PROVIDER_qemu-native = "qemu-native"
 PREFERRED_PROVIDER_qemu-system-native = "qemu-system-native"
 PREFERRED_PROVIDER_nativesdk-qemu = "nativesdk-qemu"
 
+# Out of kernel devicetree
+PREFERRED_PROVIDER_virtual/dtb = "device-tree-static"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree-static"
+
 # We want to use u-boot SPL
 PREFERRED_PROVIDER_virtual/boot-bin = "u-boot-xlnx"
 

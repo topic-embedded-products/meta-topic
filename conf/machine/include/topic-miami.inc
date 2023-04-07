@@ -60,7 +60,8 @@ UBINIZE_ARGS = "-m 1 -p 64KiB"
 UBI_VOLNAME = "qspi-rootfs"
 
 # Out of kernel devicetree
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree"
+PREFERRED_PROVIDER_virtual/dtb = "device-tree-static"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree-static"
 
 DEVICETREE ??= "devicetree/topic-miami.dtb"
 

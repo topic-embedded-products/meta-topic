@@ -34,7 +34,4 @@ module_autoload_axi-hdmi-rx = "adv7604 dma-axi-dmac axi-hdmi-rx"
 
 MACHINE_FEATURES += "usbhost usbgadget screen"
 
-# Out of kernel devicetree
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree"
-
 DEVICETREE ?= "devicetree/zynqmp-topic-miamimp-florida-gen.dtb"
