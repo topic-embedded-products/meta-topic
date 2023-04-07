@@ -27,7 +27,7 @@
 		/* Boot using squashfs system, nice for QSPI NOR flash */
 		bootargs = "console=ttyPS0,115200 root=/dev/mtdblock5 ro rootfstype=squashfs rootwait quiet";
 		/* bootargs = "console=ttyPS0,115200 ubi.mtd=qspi-rootfs root=ubi0:qspi-rootfs rw rootfstype=ubifs rootwait"; */
-		linux,stdout-path = "/amba@0/uart@e0000000";
+		stdout-path = "serial0:115200n8";
 	};
 
 	/* Represents the 3v3 supply on the Miami SOM. */
