@@ -180,11 +180,19 @@
 		vcc-supply = <&reg_1v8_miami>;
 		#address-cells = <1>;
 		#size-cells = <1>;
+		/* MAC address assigned in production test */
 		gem2_mac: mac@f30 {
 			reg = <0xf30 6>;
 		};
-		gem0_mac: mac@f38 {
+		gem3_mac: mac@f38 {
 			reg = <0xf38 6>;
+		};
+		/* Semi-random addresses */
+		gem0_mac: mac@0 {
+			reg = <0x0 6>;
+		};
+		gem1_mac: mac@6 {
+			reg = <0x6 6>;
 		};
 	};
 
@@ -419,6 +427,16 @@
 	status = "okay";
 };
 
+&gem0 {
+	nvmem-cells = <&gem0_mac>;
+	nvmem-cell-names = "mac-address";
+};
+
+&gem1 {
+	nvmem-cells = <&gem1_mac>;
+	nvmem-cell-names = "mac-address";
+};
+
 &gem2 {
 	status = "okay";
 	phy-handle = <&miamiphy>;
@@ -458,4 +476,9 @@
 				<3 0x11 0 0x4400>;
 		};
 	};
+};
+
+&gem3 {
+	nvmem-cells = <&gem3_mac>;
+	nvmem-cell-names = "mac-address";
 };
