@@ -48,4 +48,13 @@ SRC_URI:append = "\
 
 # Glitches on serial input interrupt the boot sequence on some boards, use
 # a particular key (space) to stop autoboot instead of any key.
-SRC_URI:append:topic-miamimp = " file://must-press-space-to-stop-autoboot.cfg"
+# Speed up boot by setting boot delays to zero and remove environment loading
+# Remove support for net, sata, video to reduce the bootloader size
+SRC_URI:append:topic-miamimp = "\
+	file://must-press-space-to-stop-autoboot.cfg \
+	file://no-bootdelay.cfg \
+	file://no-env.cfg \
+	file://no-network.cfg \
+	file://no-sata.cfg \
+	file://no-video.cfg \
+	"
