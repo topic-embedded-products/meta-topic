@@ -26,6 +26,8 @@ HDF_MACHINE = "${MACHINE}"
 
 # tune-zynq is adding an unused zImage
 KERNEL_IMAGETYPES:remove = "zImage"
+# Specify LOADADDR on the commandline to build an uImage
+KERNEL_EXTRA_ARGS += "UIMAGE_LOADADDR=0x8000"
 
 MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 
@@ -59,6 +61,9 @@ MKUBIFS_ARGS = "-m 1 -e 65408 -c 496 -x zlib"
 UBINIZE_ARGS = "-m 1 -p 64KiB"
 UBI_VOLNAME = "qspi-rootfs"
 
+# Xilinx borks this, "fix" that by making it empty again
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS = ""
+
 # Out of kernel devicetree
 PREFERRED_PROVIDER_virtual/dtb = "device-tree-static"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree-static"
@@ -69,5 +74,5 @@ DEVICETREE ??= "devicetree/topic-miami.dtb"
 PREFERRED_PROVIDER_virtual/boot-bin = "u-boot-xlnx"
 
 # Xilinx sets WKS_FILE_DEPENDS:append which we'll undo here. We only want boot.bin there anyway...
-WKS_FILE_DEPENDS:remove = "xilinx-bootbin virtual/dtb u-boot-zynq-scr u-boot-zynq-uenv arm-trusted-firmware"
+WKS_FILE_DEPENDS:remove = "xilinx-bootbin virtual/dtb u-boot-xlnx-scr u-boot-xlnx-uenv arm-trusted-firmware"
 

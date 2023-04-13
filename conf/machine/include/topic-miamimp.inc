@@ -26,10 +26,8 @@ MACHINE_EXTRA_RDEPENDS += "${MACHINE_ENTROPY}"
 
 KERNEL_MODULE_AUTOLOAD ?= ""
 
-# Default a platform without GPU/VCU because the MALI GPU support is broken in
-# Xilinx' warrior branch.
-# SOC_VARIANT = "eg" causes X11 programs to depend on libmali
-SOC_VARIANT ?= "cg"
+# Most topic modules carry the "eg" variant (quad-core CPU with MALI GPU)
+SOC_VARIANT ?= "eg"
 
 # The SOM_FAMILY is more specific than the SOC_FAMILY (=zynqmp) in the MACHINEOVERRIDES
 MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
@@ -43,8 +41,7 @@ require conf/machine/zynqmp-generic.conf
 
 # Remove the unneeded boot config/script, not needed for topic boards, but they
 # get added unconditionally by zynqmp-generic.conf.
-EXTRA_IMAGEDEPENDS:remove = "u-boot-zynq-uenv"
-EXTRA_IMAGEDEPENDS:remove = "u-boot-zynq-scr"
+EXTRA_IMAGEDEPENDS:remove = "u-boot-xlnx-uenv u-boot-xlnx-scr"
 # We have our own bootscript
 EXTRA_IMAGEDEPENDS += "bootscript"
 
@@ -85,7 +82,7 @@ IMAGE_BOOT_FILES = "boot.bin"
 IMAGE_OVERHEAD_FACTOR="1.1"
 
 # Xilinx sets WKS_FILE_DEPENDS:append which we'll undo here. We only want boot.bin there anyway...
-WKS_FILE_DEPENDS:remove = "virtual/dtb u-boot-zynq-scr u-boot-zynq-uenv arm-trusted-firmware"
+WKS_FILE_DEPENDS:remove = "virtual/dtb u-boot-xlnx-uenv u-boot-xlnx-scr arm-trusted-firmware"
 
 # HACK (xilins prepends file:// and appends .elf
 # FSBL_FILE = "${HOME}/projects/topic-platform-langdale/fsbl-${MACHINE}"
