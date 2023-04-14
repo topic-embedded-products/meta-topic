@@ -34,7 +34,7 @@ FPGA_MNGR_RECONFIG_ENABLE = "1"
 
 # There's no entropy source in the SoM, so use 'haveged' to at least make the
 # ssh server start up in reasonable time.
-MACHINE_ENTROPY = "haveged"
+MACHINE_ENTROPY = "haveged-once"
 MACHINE_EXTRA_RDEPENDS += "${MACHINE_ENTROPY}"
 
 # u-boot configuration

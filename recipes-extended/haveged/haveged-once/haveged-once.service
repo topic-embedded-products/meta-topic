@@ -1,0 +1,13 @@
+[Unit]
+Description=Entropy from haveged
+DefaultDependencies=no
+Wants=sys-kernel-config.mount
+After=sys-kernel-config.mount
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/haveged --once
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
