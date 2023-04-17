@@ -1,4 +1,4 @@
-setenv bootargs $bootargs coherent_pool=512k reset_reason=${reset_reason}
+setenv bootargs $bootargs coherent_pool=512k reset_reason=${reset_reason} quiet
 i2c dev 1
 if test "${devtype}" = "mmc"; then
 	echo "Loading kernel from mmc ${devnum}:${devplist}..."

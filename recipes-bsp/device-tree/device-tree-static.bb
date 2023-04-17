@@ -44,13 +44,18 @@ SRC_URI:ttpzu9 = "\
 	file://${MACHINE}.dts \
 	"
 
-COMPATIBLE_MACHINE:tdpzu9 = ".*"
-SRC_URI:tdpzu9 = "\
+COMPATIBLE_MACHINE:tspzu = ".*"
+# Generic configuration for SOM
+SRC_URI:tspzu = "\
 	file://zynqmp-topic-miamiplusmp.dts \
-	file://${MACHINE}.dts \
-	file://${MACHINE}-v1r1.dts \
-	file://${MACHINE}-v1r1-wifi.dts \
 	"
+SYSTEM_TOP_DTB:tspzu = "zynqmp-topic-miamiplusmp.dtb"
+# Specific configuration for tdpzu som + carrier
+SRC_URI:tdpzu = "\
+	file://zynqmp-topic-miamiplusmp.dts \
+	file://tdpzu.dts \
+	"
+SYSTEM_TOP_DTB:tdpzu = "tdpzu.dtb"
 
 TDKZU_SOURCES = "\
 	file://zynqmp-topic-miamimp-florida-gen.dts \

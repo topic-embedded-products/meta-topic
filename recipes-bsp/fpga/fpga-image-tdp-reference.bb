@@ -1,5 +1,5 @@
-SUMMARY = "FPGA bitstream for tdpzu9"
-COMPATIBLE_MACHINE = "^tdpzu9"
+SUMMARY = "FPGA bitstream for tdpzu"
+COMPATIBLE_MACHINE = "^tdpzu"
 
 # Downloads a precompiled bitstream from the TOPIC website
 
@@ -25,4 +25,5 @@ do_compile() {
    cp ${BOARD_DESIGN_PATH}-${PV} fpga.bit
 }
 
+# TODO: Upload tdpzu6 and tdpzu15
 SRC_URI[tdpzu9.sha256sum] = "474625df1f83e4bbda44a403be786bf5b74331b35cabb007d89fc9b27a08ea09"

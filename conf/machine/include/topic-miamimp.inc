@@ -38,6 +38,8 @@ MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 DEFAULTTUNE = "cortexa53"
 
 require conf/machine/zynqmp-generic.conf
+# Undo what Xilinx did, there's nothing that we want, so make it empty
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS = ""
 
 # Remove the unneeded boot config/script, not needed for topic boards, but they
 # get added unconditionally by zynqmp-generic.conf.
@@ -87,9 +89,8 @@ WKS_FILE_DEPENDS:remove = "virtual/dtb u-boot-xlnx-uenv u-boot-xlnx-scr arm-trus
 # HACK (xilins prepends file:// and appends .elf
 # FSBL_FILE = "${HOME}/projects/topic-platform-langdale/fsbl-${MACHINE}"
 
-# Devicetree needs a dependency...
-# BIF_PARTITION_IMAGE[device-tree] = "${RECIPE_SYSROOT}/boot/${DEVICETREE}"
-# BIF_DEVICETREE_ATTR = ""
+# Do not add device-tree or bitstream to boot.bin, they're not needed
+BIF_DEVICETREE_ATTR = ""
 BIF_BITSTREAM_ATTR = ""
 
 # TLD uses this revision

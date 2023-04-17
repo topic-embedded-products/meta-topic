@@ -1,7 +1,7 @@
 From ee10588735614496d5ddaade4527a2b66274d578 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 17 Jan 2022 09:48:04 +0100
-Subject: [PATCH] tdkzu9 ddr routines
+Subject: [PATCH] tspzu ddr routines
 
 Patch psu_init.c to pick the configuration based on EEPROM data
 ---

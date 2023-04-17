@@ -6,7 +6,7 @@ EXTRA_PSUINIT_PATCH:xdpzu7 = "xdpzu7_psu_init_sdio.patch"
 EXTRA_PSUINIT_PATCH:tdkzu6 = "tdkzu_psu_init_dual_rank_support.patch"
 EXTRA_PSUINIT_PATCH:tdkzu9 = "tdkzu_psu_init_dual_rank_support.patch"
 EXTRA_PSUINIT_PATCH:tdkzu15 = "tdkzu_psu_init_dual_rank_support.patch"
-EXTRA_PSUINIT_PATCH:tdpzu9 = "0001-tdkzu9-ddr-routines.patch"
+EXTRA_PSUINIT_PATCH:tspzu = "0001-tspzu-ddr-routines.patch"
 
 SRC_URI:append = "\
 	file://0001-xfsbl_initialization-Run-ECC-initialization-when-nee.patch \

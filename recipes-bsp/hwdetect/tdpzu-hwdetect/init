@@ -1,6 +1,0 @@
-#!/bin/sh
-case "$1" in
-  start)
-    /usr/bin/tdpzu-hwdetect.sh
-    ;;
-esac
