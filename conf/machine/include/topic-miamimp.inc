@@ -79,6 +79,8 @@ UBI_VOLNAME = "qspi-rootfs"
 # WIC image support.
 DEVICETREE ??= "devicetree/zynqmp-topic-miamimp.dtb"
 WKS_FILE = "sdimage-swu.wks"
+# Xilinx sets WKS_FILES instead of WKS_FILE, so we're forced to do that here too
+WKS_FILES = "${WKS_FILE}"
 IMAGE_BOOT_FILES = "boot.bin"
 IMAGE_OVERHEAD_FACTOR="1.1"
 

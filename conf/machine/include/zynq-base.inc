@@ -51,6 +51,8 @@ XILINX_LM_LICENSE_FILE ?= "${XILINX_VIVADO_PATH}/data/ip/core_licenses/Xilinx.li
 # WIC image support.
 DEVICETREE ??= "zynq-7000.dtb"
 WKS_FILE = "sdimage-swu.wks"
+# Xilinx sets WKS_FILES instead of WKS_FILE, so we're forced to do that here too
+WKS_FILES = "${WKS_FILE}"
 IMAGE_BOOT_FILES = "boot.bin u-boot.img"
 IMAGE_OVERHEAD_FACTOR="1.1"
 do_image_wic[depends] += "mtools-native:do_populate_sysroot dosfstools-native:do_populate_sysroot"
