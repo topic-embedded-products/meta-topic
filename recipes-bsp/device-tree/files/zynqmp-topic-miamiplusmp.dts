@@ -46,7 +46,9 @@
 
 	memory {
 		device_type = "memory";
-		reg = <0x0 0x0 0x0 0x80000000>, <0x8 0x00000000 0x0 0x80000000>; /* 4 GB */
+		#address-cells = <2>;
+		#size-cells = <2>;
+		reg = <0x0 0x0 0x0 0x80000000>, <0x8 0x00000000 0x1 0x80000000>; /* 2GB + 6GB maximum size */
 	};
 
 	/* Represents the 3v3 supply on the SOM. */

@@ -58,3 +58,8 @@ SRC_URI:append:topic-miamimp = "\
 	file://no-sata.cfg \
 	file://no-video.cfg \
 	"
+
+SRC_URI:append:tspzu = "\
+	file://0001-zynqmp-Detect-and-fixup-memory-config-on-topic-mpsoc.patch \
+	file://enable-of-board-setup.cfg \
+	"

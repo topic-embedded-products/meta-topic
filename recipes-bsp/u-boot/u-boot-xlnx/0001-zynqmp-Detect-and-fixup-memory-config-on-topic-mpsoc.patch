@@ -1,0 +1,90 @@
+From dba976d9e2d4955b813b5606475534fbfbf8710d Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Wed, 19 Apr 2023 14:45:51 +0200
+Subject: [PATCH] zynqmp: Detect and fixup memory config on topic mpsoc plus
+ modules
+
+Read DDR settings from controller and update board configuration
+Update memory settings in devicetree for OS boot
+Requires CONFIG_OF_BOARD_SETUP=y and CONFIG_ARCH_FIXUP_FDT_MEMORY=y
+
+Upstream-status: Inappropriate
+---
+ board/xilinx/zynqmp/zynqmp.c | 46 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+
+diff --git a/board/xilinx/zynqmp/zynqmp.c b/board/xilinx/zynqmp/zynqmp.c
+index 0fcc6ff993..c908576b60 100644
+--- a/board/xilinx/zynqmp/zynqmp.c
++++ b/board/xilinx/zynqmp/zynqmp.c
+@@ -11,6 +11,7 @@
+ #include <dfu.h>
+ #include <env.h>
+ #include <env_internal.h>
++#include <fdt_support.h>
+ #include <init.h>
+ #include <log.h>
+ #include <net.h>
+@@ -459,14 +460,59 @@ unsigned long do_go_exec(ulong (*entry)(int, char * const []), int argc,
+ }
+ 
+ #if !defined(CONFIG_SYS_SDRAM_BASE) && !defined(CONFIG_SYS_SDRAM_SIZE)
++
++int ft_board_setup(void *blob, struct bd_info *bd)
++{
++	u64 base[CONFIG_NR_DRAM_BANKS];
++	u64 size[CONFIG_NR_DRAM_BANKS];
++	u8 reg;
++
++	/* fixup DT for the two DDR banks */
++	base[0] = gd->bd->bi_dram[0].start;
++	size[0] = gd->bd->bi_dram[0].size;
++	base[1] = gd->bd->bi_dram[1].start;
++	size[1] = gd->bd->bi_dram[1].size;
++
++	fdt_fixup_memory_banks(blob, base, size, 2);
++
++	return 0;
++}
++
+ int dram_init_banksize(void)
+ {
++	unsigned long long detected_size;
+ 	int ret;
++	u32 mstr_12;
++	u32 addrmap7;
+ 
+ 	ret = fdtdec_setup_memory_banksize();
+ 	if (ret)
+ 		return ret;
+ 
++	gd->bd->bi_dram[0].size = get_ram_size((long *)gd->bd->bi_dram[0].start, gd->bd->bi_dram[0].size);
++	detected_size = gd->bd->bi_dram[1].size;
++	if (detected_size) {
++		/* Reading these registers only works on TOPIC boards */
++		/* bit 12:13 bus width, 00=Full 01=Half 10=Quarter */
++		mstr_12 = (readl(0xFD070000) >> 12) & 0x3;
++		/* bit 0:3 address bit 16 mapping */
++		addrmap7 = readl(0xFD07021C);
++		switch (addrmap7 & 0x0f) {
++		case 0xf:
++			/* density 8, max size 4GB */
++			detected_size = 0x100000000ull >> mstr_12;
++			detected_size -= 0x80000000; /* 2GB in lower range */
++			break;
++		case 0x7:
++			/* density 16, max size 8GB */
++			detected_size = 0x200000000ull >> mstr_12;
++			detected_size -= 0x80000000; /* 2GB in lower range */
++			break;
++		}
++
++		gd->bd->bi_dram[1].size = detected_size;
++	}
++
+ 	mem_map_fill();
+ 
+ 	return 0;
+-- 
+2.17.1
+
