@@ -1,0 +1,62 @@
+From b09739e100a6bdbbe3c2cfd264f31eb7b1a76b85 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 6 Oct 2022 08:31:21 +0200
+Subject: [PATCH] net: phy: xilinx_phy: Reset PHY to resume from shutdown
+
+The Xilinx PCS/PMA PHY has a quirck that it cannot resume from shutdown
+like a generic PHY, but instead it needs a (soft) reset to resume.
+Implement a xilinxphy specific resume function. This fixes that the PHY
+stopped working after a down-up sequence.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/net/phy/xilinx_phy.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/phy/xilinx_phy.c b/drivers/net/phy/xilinx_phy.c
+index aec23976ceaf..cc7178658ce2 100644
+--- a/drivers/net/phy/xilinx_phy.c
++++ b/drivers/net/phy/xilinx_phy.c
+@@ -123,14 +123,28 @@ static int xilinxphy_of_init(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
+-static int xilinxphy_config_init(struct phy_device *phydev)
++static void xilinxphy_enable(struct phy_device *phydev)
+ {
+ 	int temp;
+ 
+-	xilinxphy_of_init(phydev);
+ 	temp = phy_read(phydev, MII_BMCR);
+ 	temp &= XPCSPMA_PHY_CTRL_ISOLATE_DISABLE;
+ 	phy_write(phydev, MII_BMCR, temp);
++}
++
++static int xilinxphy_config_init(struct phy_device *phydev)
++{
++	xilinxphy_of_init(phydev);
++	xilinxphy_enable(phydev);
++
++	return 0;
++}
++
++/* The PCS/PMA PHY has a quirk that it needs a reset to resume from shutdown */
++static int xilinxphy_resume(struct phy_device *phydev)
++{
++	phy_set_bits(phydev, MII_BMCR, BMCR_RESET);
++	xilinxphy_enable(phydev);
+ 
+ 	return 0;
+ }
+@@ -145,7 +159,7 @@ static struct phy_driver xilinx_drivers[] = {
+ 		.config_init = &xilinxphy_config_init,
+ 		.config_aneg = &genphy_config_aneg,
+ 		.read_status = &xilinxphy_read_status,
+-		.resume = &genphy_resume,
++		.resume = &xilinxphy_resume,
+ 		.suspend = &genphy_suspend,
+ 	},
+ };
+-- 
+2.17.1
+
