@@ -71,13 +71,15 @@ SRC_URI:append = "\
 	file://0006-wireless-brcmfmac-Disable-power-save-mode.patch \
 	file://0007-clk-si5341-Support-NVM-programming-through-sysfs.patch \
 	file://0008-clk-si5341-Add-output_mask-attribute.patch \
-	file://0009-clk-clk-gpio-Implement-input-only-mode.patch \
 	file://0010-Add-ltc3562-voltage-regulator-driver.patch \
 	file://0011-overlay-Reduce-memory-leak-warning-to-debug-level.patch \
 	file://0012-gpio-poweroff-Implement-force-pm-power-off-flag.patch \
 	file://0013-spi-nor-Skip-4BAIT-parsing-on-Xilinx-Zynq-QSPI-contr.patch \
 	file://0014-pinctrl-mcp23s08-Reset-all-pins-to-input-at-probe.patch \
+	file://0001-dt-bindings-clock-fixed-clock-Add-nvmem-support.patch \
+	file://0002-clk-Add-fixed-clock-nvmem-provider.patch \
 	"
+
 
 # Compile overlay-capable devicetrees
 EXTRA_OEMAKE:append = " DTC_FLAGS="-p 1024 -@""

@@ -1,0 +1,185 @@
+From f5744685adaecabc18d7e9d1aff99e9a6790f61e Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 25 May 2023 14:09:24 +0200
+Subject: [PATCH 2/2] clk: Add fixed-clock-nvmem provider
+
+Adds a fixed-rate clock that retrieves its rate from an NVMEM provider.
+This allows to store clock settings in EEPROM or EFUSE or similar device.
+
+Component shortages lead to boards being shipped with different clock
+crystals, based on what was available at the time. The clock frequency
+was written to EEPROM at production time. Systems can adapt to a wide
+range of input frequencies using the clock framework, but this required
+us to patch the devicetree at runtime or use some custom driver. This
+provides a more generic solution.
+
+Because this clock depends on other hardware (typical NVMEM provider is
+an I2C EEPROM) it cannot be integrated into clk-fixed which uses
+CLK_OF_DECLARE to initialize.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+
+Series-to: linux-clk@vger.kernel.org
+Series-version: 4
+
+Series-changes: 3
+Change compatible to fixed-clock-nvmem
+---
+ drivers/clk/Kconfig     |   7 +++
+ drivers/clk/Makefile    |   1 +
+ drivers/clk/clk-nvmem.c | 113 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 121 insertions(+)
+ create mode 100644 drivers/clk/clk-nvmem.c
+
+diff --git a/drivers/clk/Kconfig b/drivers/clk/Kconfig
+index 016814e15536..63f165473481 100644
+--- a/drivers/clk/Kconfig
++++ b/drivers/clk/Kconfig
+@@ -447,6 +447,13 @@ config COMMON_CLK_FIXED_MMIO
+ 	help
+ 	  Support for Memory Mapped IO Fixed clocks
+ 
++config COMMON_CLK_NVMEM
++	bool "Clock driver for NVMEM provided frequency"
++	depends on COMMON_CLK && OF
++	help
++	  This driver allows a clock frequency to be provided by NVMEM data, for
++	  example in an EEPROM, by fuses or other non-volatile storage.
++
+ config COMMON_CLK_K210
+ 	bool "Clock driver for the Canaan Kendryte K210 SoC"
+ 	depends on OF && RISCV && SOC_CANAAN
+diff --git a/drivers/clk/Makefile b/drivers/clk/Makefile
+index 0aebef17edc6..aef1361e5085 100644
+--- a/drivers/clk/Makefile
++++ b/drivers/clk/Makefile
+@@ -52,6 +52,7 @@ obj-$(CONFIG_ARCH_MOXART)		+= clk-moxart.o
+ obj-$(CONFIG_ARCH_NOMADIK)		+= clk-nomadik.o
+ obj-$(CONFIG_ARCH_NPCM7XX)	    	+= clk-npcm7xx.o
+ obj-$(CONFIG_ARCH_NSPIRE)		+= clk-nspire.o
++obj-$(CONFIG_COMMON_CLK_NVMEM)		+= clk-nvmem.o
+ obj-$(CONFIG_COMMON_CLK_OXNAS)		+= clk-oxnas.o
+ obj-$(CONFIG_COMMON_CLK_PALMAS)		+= clk-palmas.o
+ obj-$(CONFIG_CLK_LS1028A_PLLDIG)	+= clk-plldig.o
+diff --git a/drivers/clk/clk-nvmem.c b/drivers/clk/clk-nvmem.c
+new file mode 100644
+index 000000000000..19aad5cd222f
+--- /dev/null
++++ b/drivers/clk/clk-nvmem.c
+@@ -0,0 +1,113 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Fixed rate clock that reads its frequency from NVMEM
++ *
++ * Copyright (C) 2023 Topic Embedded Products
++ * Mike Looijmans <mike.looijmans@topic.nl>
++ */
++
++#include <linux/clk-provider.h>
++#include <linux/module.h>
++#include <linux/nvmem-consumer.h>
++#include <linux/platform_device.h>
++#include <linux/slab.h>
++
++static int nvmemclk_retrieve(struct device *dev, const char *name, u32 *value)
++{
++	struct nvmem_cell *cell;
++	const void *data;
++	size_t len;
++	int ret = 0;
++
++	cell = of_nvmem_cell_get(dev->of_node, name);
++	if (IS_ERR(cell))
++		return PTR_ERR(cell);
++
++	data = nvmem_cell_read(cell, &len);
++	nvmem_cell_put(cell);
++
++	if (IS_ERR(data))
++		return PTR_ERR(data);
++
++	/* Abort when all zeroes or all ones */
++	if (!memchr_inv(data, 0, len) || !memchr_inv(data, 0xff, len)) {
++		dev_warn(dev, "%s invalid, using default: %u\n", name, *value);
++		goto exit_free_data;
++	}
++
++	switch (len) {
++	case 1:
++		*value = *(u8 *)data;
++		break;
++	case 2:
++		*value = *(u16 *)data;
++		break;
++	case 4:
++		*value = *(u32 *)data;
++		break;
++	case 8:
++		*value = *(u64 *)data;
++		break;
++	default:
++		ret = -EIO;
++		break;
++	}
++
++exit_free_data:
++	kfree(data);
++
++	return ret;
++}
++
++static int nvmemclk_probe(struct platform_device *pdev)
++{
++	struct device *dev = &pdev->dev;
++	const char *clk_name = dev->of_node->name;
++	struct clk_hw *hw;
++	u32 rate;
++	u32 accuracy = 0;
++	int ret;
++
++	of_property_read_u32(dev->of_node, "clock-frequency", &rate);
++	ret = nvmemclk_retrieve(dev, "clock-frequency", &rate);
++	if (ret < 0)
++		return dev_err_probe(dev, ret,
++				     "failed to access clock-frequency\n");
++
++	/* clock-accuracy can be provided by either NVMEM or property */
++	of_property_read_u32(dev->of_node, "clock-accuracy", &accuracy);
++	ret = nvmemclk_retrieve(dev, "clock-accuracy", &accuracy);
++	/* Only abort in case of deferral */
++	if (ret == -EPROBE_DEFER)
++		return ret;
++
++	of_property_read_string(dev->of_node, "clock-output-names", &clk_name);
++
++	hw = clk_hw_register_fixed_rate_with_accuracy(NULL, clk_name, NULL,
++						      0, rate, accuracy);
++	if (IS_ERR(hw))
++		return dev_err_probe(dev, PTR_ERR(hw),
++				     "Failed to register clock %s\n", clk_name);
++
++	return devm_of_clk_add_hw_provider(dev, of_clk_hw_simple_get, hw);
++}
++
++static const struct of_device_id of_nvmemclk_ids[] = {
++	{ .compatible = "fixed-clock-nvmem" },
++	{ }
++};
++MODULE_DEVICE_TABLE(of, of_nvmemclk_ids);
++
++static struct platform_driver nvmemclk_driver = {
++	.driver = {
++		.name = "fixed-clock-nvmem",
++		.of_match_table = of_nvmemclk_ids,
++	},
++	.probe = nvmemclk_probe,
++};
++
++module_platform_driver(nvmemclk_driver);
++
++MODULE_DESCRIPTION("NVMEM clock driver");
++MODULE_AUTHOR("Mike Looijmans <mike.looijmans@topic.nl>");
++MODULE_LICENSE("GPL");
+-- 
+2.17.1
+

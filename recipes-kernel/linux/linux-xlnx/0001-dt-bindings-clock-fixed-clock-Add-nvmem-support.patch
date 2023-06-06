@@ -1,0 +1,107 @@
+From 0134f942031d2387200b253aef2ab263de8d6612 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 25 May 2023 14:03:53 +0200
+Subject: [PATCH 1/2] dt-bindings: clock: fixed-clock: Add nvmem support
+
+Add bindings for a fixed-rate clock that retrieves its rate from an
+NVMEM provider. This allows to store clock settings in EEPROM or EFUSE
+or similar device.
+
+Component shortages lead to boards being shipped with different clock
+crystals, based on what was available at the time. The clock frequency
+was written to EEPROM at production time. Systems can adapt to a wide
+range of input frequencies using the clock framework, but this required
+us to patch the devicetree at runtime or use some custom driver. This
+provides a more generic solution.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+Series-to: devicetree@vger.kernel.org
+
+Series-changes: 4
+Use proper "if" block and add example dts
+
+Series-changes: 3
+Modify fixed-clock instead of introducing nvmem-clock
+
+Series-changes: 2
+Changed "fixed-clock" into "nvmem-clock" in dts example
+Add minItems:1 to nvmem-cell-names
+---
+ .../bindings/clock/fixed-clock.yaml           | 42 ++++++++++++++++++-
+ 1 file changed, 41 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/clock/fixed-clock.yaml b/Documentation/devicetree/bindings/clock/fixed-clock.yaml
+index b0a4fb8256e2..71a5791da438 100644
+--- a/Documentation/devicetree/bindings/clock/fixed-clock.yaml
++++ b/Documentation/devicetree/bindings/clock/fixed-clock.yaml
+@@ -12,7 +12,9 @@ maintainers:
+ 
+ properties:
+   compatible:
+-    const: fixed-clock
++    enum:
++      - fixed-clock
++      - fixed-clock-nvmem
+ 
+   "#clock-cells":
+     const: 0
+@@ -26,11 +28,41 @@ properties:
+   clock-output-names:
+     maxItems: 1
+ 
++  nvmem-cells:
++    minItems: 1
++    maxItems: 2
++    description:
++      Reads clock-frequency and/or clock-accuracy from an NVMEM provider in
++      binary native integer format. The size of the NVMEM cell can be 1, 2, 4
++      or 8 bytes. If the contents of the nvmem are all zeroes or all 0xff, the
++      value reverts to the one given in the property.
++
++  nvmem-cell-names:
++    minItems: 1
++    items:
++      - const: clock-frequency
++      - const: clock-accuracy
++
+ required:
+   - compatible
+   - "#clock-cells"
+   - clock-frequency
+ 
++allOf:
++  - if:
++      properties:
++        compatible:
++          contains:
++            const: fixed-clock-nvmem
++    then:
++      required:
++        - nvmem-cells
++        - nvmem-cell-names
++    else:
++      properties:
++        nvmem-cells: false
++        nvmem-cell-names: false
++
+ additionalProperties: false
+ 
+ examples:
+@@ -41,4 +73,12 @@ examples:
+       clock-frequency = <1000000000>;
+       clock-accuracy = <100>;
+     };
++  - |
++    clock {
++      compatible = "fixed-clock-nvmem";
++      #clock-cells = <0>;
++      clock-frequency = <48000000>;
++      nvmem-cells = <&efuse_xtal_freq>;
++      nvmem-cell-names = "clock-frequency";
++    };
+ ...
+-- 
+2.17.1
+
