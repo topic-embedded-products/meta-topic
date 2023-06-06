@@ -88,23 +88,13 @@
 		};
 	};
 
-	/* XTAL for Si5345 */
-	xtal50MHz: xtal_50_clock {
-		compatible = "fixed-clock";
-		#clock-cells = <0x0>;
-		clock-frequency = <50000000>;
-	};
-	xtal38MHz: xtal_38_clock {
-		compatible = "fixed-clock";
-		#clock-cells = <0x0>;
-		clock-frequency = <38880000>;
-	};
+	/* XTAL for Si5345, get frequency from EEPROM */
 	xtalmux: xtal_mux {
-		compatible = "gpio-mux-clock";
-		clocks = <&xtal38MHz>, <&xtal50MHz>;
+		compatible = "fixed-clock-nvmem";
 		#clock-cells = <0>;
-		select-gpios = <&gpioex 7 GPIO_ACTIVE_HIGH>;
-		input;
+		clock-frequency = <50000000>; /* Default value */
+		nvmem-cells = <&xtal_freq>;
+		nvmem-cell-names = "clock-frequency";
 	};
 
 	/* Make temperature readouts show up in hwmon applications */
@@ -197,6 +187,9 @@
 		};
 		gem1_mac: mac@6 {
 			reg = <0x6 6>;
+		};
+		xtal_freq: xtalfreq@f8c {
+			reg = <0xf8c 4>; /* 32-bit integer clock frequency */
 		};
 	};
 
