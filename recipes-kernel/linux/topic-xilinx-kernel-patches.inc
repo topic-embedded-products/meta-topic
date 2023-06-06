@@ -62,6 +62,7 @@ SRC_URI:append = "\
 	${KEXECSUPPORT} \
 	file://0001-net-phy-xilinx_phy-Reset-PHY-to-resume-from-shutdown.patch \
 	file://0001-pcie-xilinx-Support-reset-GPIO-and-wait-for-link-up-.patch \
+	file://0001-usb-hub-Ignore-OTG-negotiation-problems-during-enume.patch \
 	file://0001-usb-dwc3-Disable-hibernation-by-default.patch \
 	file://0002-usb-dwc3-xilinx-Fix-sequence-and-propagate-error-cod.patch \
 	file://0003-usb-dwc3-core-add-transceiver-delay-for-required-UTM.patch \

@@ -1,0 +1,37 @@
+From e86790c82b94754c1c51baed019c5f874f0f601b Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 6 Jun 2023 11:35:52 +0200
+Subject: [PATCH] usb: hub: Ignore OTG negotiation problems during enumeration
+
+Plugging an OTG bord directly into another board yields:
+  usb 1-1: Dual-Role OTG device on non-HNP port
+  usb 1-1: set a_alt_hnp_support failed: -32
+  usb usb1-port1: unable to enumerate USB device
+Adding a USB hub in between solves this.
+
+Modify the hub code to not give up immediately when the OTG negotiations
+run into trouble, but just continue as a standard hub, which lets the
+cable decide which end will be what.
+---
+ drivers/usb/core/hub.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/usb/core/hub.c b/drivers/usb/core/hub.c
+index ac6c5ccfe1cb..e8516b7ada3a 100644
+--- a/drivers/usb/core/hub.c
++++ b/drivers/usb/core/hub.c
+@@ -2410,9 +2410,8 @@ static int usb_enumerate_device(struct usb_device *udev)
+ 					      udev->descriptor.iManufacturer);
+ 	udev->serial = usb_cache_string(udev, udev->descriptor.iSerialNumber);
+ 
+-	err = usb_enumerate_device_otg(udev);
+-	if (err < 0)
+-		return err;
++	/* If OTG negotiations fail, just continue with normal enumeration */
++	usb_enumerate_device_otg(udev);
+ 
+ 	if (IS_ENABLED(CONFIG_USB_OTG_PRODUCTLIST) && hcd->tpl_support &&
+ 		!is_targeted(udev)) {
+-- 
+2.17.1
+
