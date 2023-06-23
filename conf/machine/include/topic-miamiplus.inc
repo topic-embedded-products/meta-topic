@@ -9,6 +9,7 @@ MACHINEOVERRIDES =. "topic-miami:"
 
 # Different flash layout, hence different u-boot
 UBOOT_MACHINE = "topic_miamiplus_config"
+UBOOT_USER_SPECIFIED_DTS = "zynq-topic-miamiplus"
 
 # Use QSPI flash with 128k sector size (dual parallel qspi flash)
 MKUBIFS_ARGS = "-m 1 -e 130944 -c 472 -x zlib"

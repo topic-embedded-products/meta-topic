@@ -48,6 +48,9 @@ HAS_PLATFORM_INIT:append = "\
 	topic_miami_config \
 	topic_miamilite_config \
 	topic_miamiplus_config"
+# u-boot-xlnx replaces any devicetree settings with its own, so we have
+# to provide the devicetree config explicitly here.
+UBOOT_USER_SPECIFIED_DTS = "zynq-topic-miami"
 
 KERNEL_MODULE_AUTOLOAD ?= ""
 KERNEL_MODULE_AUTOLOAD += "g_ether spi-cadence"
