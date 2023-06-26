@@ -83,15 +83,6 @@
 	};
 };
 
-/* Disable the ARM timer. This clocksource does not compensate for frequency
-   scaling. The TTC timer does this, but has a lower rating so it would not
-   get selected as system clocksource.
-   Alternatives to disabling this clock are setting the source in sysfs or
-   adding clocksource=ttc_clocksource to the kernel bootargs */
-&global_timer {
-	status = "disabled";
-};
-
 &uart0 {
 	u-boot,dm-pre-reloc;
 	status = "okay";
