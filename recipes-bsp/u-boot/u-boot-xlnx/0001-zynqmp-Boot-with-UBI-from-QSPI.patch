@@ -1,0 +1,32 @@
+From 7893dce34718971dfc88cb254e6f93a2f22a79a2 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 27 Jul 2023 12:16:42 +0200
+Subject: [PATCH] zynqmp: Boot with UBI from QSPI
+
+---
+ include/configs/xilinx_zynqmp.h | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/include/configs/xilinx_zynqmp.h b/include/configs/xilinx_zynqmp.h
+index e46600f260..d5818b3224 100644
+--- a/include/configs/xilinx_zynqmp.h
++++ b/include/configs/xilinx_zynqmp.h
+@@ -134,10 +134,11 @@
+ 
+ #ifndef BOOTENV_DEV_QSPI
+ #define BOOTENV_DEV_QSPI(devtypeu, devtypel, instance) \
+-	"bootcmd_" #devtypel #instance "=sf probe " #instance " 0 0 && " \
+-		       "sf read $scriptaddr $script_offset_f $script_size_f && " \
+-		       "echo QSPI: Trying to boot script at ${scriptaddr} && " \
+-		       "source ${scriptaddr}; echo QSPI: SCRIPT FAILED: continuing...;\0"
++	"bootcmd_" #devtypel #instance "=sf probe " #instance " && run bootcmd_ubi\0" \
++	"ubi_mount=ubi part qspi-rootfs && ubifsmount ubi0:qspi-rootfs && setenv devtype ubi\0" \
++	"bootcmd_ubi=run ubi_mount && ubifsload ${scriptaddr} /boot/boot.scr && source ${scriptaddr}\0" \
++	"bootubipart=qspi-rootfs\0" \
++	"bootubivol=qspi-rootfs\0"
+ #endif
+ 
+ #define BOOTENV_DEV_NAME_QSPI(devtypeu, devtypel, instance) \
+-- 
+2.17.1
+
