@@ -1,4 +1,4 @@
-From 7173a333456895a83fe095e240b95713612d2954 Mon Sep 17 00:00:00 2001
+From 72c4ebb3407bdf7ced4c8d8a279946488c4de18a Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 9 Sep 2022 10:01:01 +0200
 Subject: [PATCH] pcie-xilinx: Support reset GPIO and wait for link-up status
@@ -17,12 +17,14 @@ the system hundreds of milliseconds to boot.
 
 As the PCIe spec mentions about 120 ms time to establish a link, we'll
 allow up to 200ms before giving up.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 ---
  drivers/pci/controller/pcie-xilinx.c | 24 +++++++++++++++++++++++-
  1 file changed, 23 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/pci/controller/pcie-xilinx.c b/drivers/pci/controller/pcie-xilinx.c
-index 7b1389d8e2a5..7f8bbe7d692b 100644
+index cb6e9f7b0152..06b85d59cf85 100644
 --- a/drivers/pci/controller/pcie-xilinx.c
 +++ b/drivers/pci/controller/pcie-xilinx.c
 @@ -15,8 +15,10 @@
@@ -36,24 +38,24 @@ index 7b1389d8e2a5..7f8bbe7d692b 100644
  #include <linux/of_pci.h>
  #include <linux/of_platform.h>
  #include <linux/of_irq.h>
-@@ -133,6 +135,13 @@ static inline bool xilinx_pcie_link_up(struct xilinx_pcie_port *port)
+@@ -126,6 +128,13 @@ static inline bool xilinx_pcie_link_up(struct xilinx_pcie *pcie)
  		XILINX_PCIE_REG_PSCR_LNKUP) ? 1 : 0;
  }
  
-+static int xilinx_pci_wait_link_up(struct xilinx_pcie_port *port)
++static int xilinx_pci_wait_link_up(struct xilinx_pcie *pcie)
 +{
 +	u32 val;
-+	return readl_poll_timeout(port->reg_base + XILINX_PCIE_REG_PSCR, val,
++	return readl_poll_timeout(pcie->reg_base + XILINX_PCIE_REG_PSCR, val,
 +			(val & XILINX_PCIE_REG_PSCR_LNKUP), 2000, 200000);
 +}
 +
  /**
   * xilinx_pcie_clear_err_interrupts - Clear Error Interrupts
-  * @port: PCIe port information
-@@ -539,8 +548,21 @@ static int xilinx_pcie_init_irq_domain(struct xilinx_pcie_port *port)
- static void xilinx_pcie_init_port(struct xilinx_pcie_port *port)
+  * @pcie: PCIe port information
+@@ -497,8 +506,21 @@ static int xilinx_pcie_init_irq_domain(struct xilinx_pcie *pcie)
+ static void xilinx_pcie_init_port(struct xilinx_pcie *pcie)
  {
- 	struct device *dev = port->dev;
+ 	struct device *dev = pcie->dev;
 +	struct gpio_desc *perst_gpio;
 +
 +	perst_gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
@@ -68,8 +70,8 @@ index 7b1389d8e2a5..7f8bbe7d692b 100644
 +		usleep_range(1000, 2000);
 +	}
  
--	if (xilinx_pcie_link_up(port))
-+	if (!xilinx_pci_wait_link_up(port))
+-	if (xilinx_pcie_link_up(pcie))
++	if (!xilinx_pci_wait_link_up(pcie))
  		dev_info(dev, "PCIe Link is UP\n");
  	else
  		dev_info(dev, "PCIe Link is DOWN\n");

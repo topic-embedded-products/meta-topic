@@ -1,8 +1,8 @@
-From 9643d89c48fdbf72d13c2d218792cc9402b4a900 Mon Sep 17 00:00:00 2001
+From 2bd7f9ee49b9f9d5057b6246362faeddbfda5903 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 9 Jul 2021 09:54:49 +0200
-Subject: [PATCH 04/14] phy-zynqmp: Postpone getting clock rate until it's
- actually needed
+Subject: [PATCH] phy-zynqmp: Postpone getting clock rate until it's actually
+ needed
 
 At probe time the driver would display the following error and abort:
   xilinx-psgtr fd400000.phy: Invalid rate 0 for reference clock 0
@@ -14,11 +14,11 @@ actually being initialized before requesting the clock rate setting.
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 ---
- drivers/phy/xilinx/phy-zynqmp.c | 59 ++++++++++++++++-----------------
- 1 file changed, 29 insertions(+), 30 deletions(-)
+ drivers/phy/xilinx/phy-zynqmp.c | 56 ++++++++++++++++-----------------
+ 1 file changed, 28 insertions(+), 28 deletions(-)
 
 diff --git a/drivers/phy/xilinx/phy-zynqmp.c b/drivers/phy/xilinx/phy-zynqmp.c
-index 9be9535ad7ab..27e1c04ab7fe 100644
+index b846a1455f55..ab16a338f7c9 100644
 --- a/drivers/phy/xilinx/phy-zynqmp.c
 +++ b/drivers/phy/xilinx/phy-zynqmp.c
 @@ -208,7 +208,6 @@ struct xpsgtr_phy {
@@ -57,8 +57,7 @@ index 9be9535ad7ab..27e1c04ab7fe 100644
 +		}
 +	}
 +
-+	dev_err(gtr_phy->dev->dev,
-+		"Invalid rate %lu for reference clock %u\n",
++	dev_err(gtr_phy->dev->dev, "Invalid rate %lu for reference clock %u\n",
 +		rate, gtr_phy->refclk);
 +
 +	return NULL;
@@ -67,18 +66,18 @@ index 9be9535ad7ab..27e1c04ab7fe 100644
  /* Configure PLL and spread-sprectrum clock. */
  static void xpsgtr_configure_pll(struct xpsgtr_phy *gtr_phy)
  {
--	const struct xpsgtr_ssc *ssc;
-+	const struct xpsgtr_ssc *ssc = xpsgtr_find_sscs(gtr_phy);
+ 	const struct xpsgtr_ssc *ssc;
  	u32 step_size;
  
 -	ssc = gtr_phy->dev->refclk_sscs[gtr_phy->refclk];
++	ssc = xpsgtr_find_sscs(gtr_phy);
 +	if (!ssc)
 +		return;
 +
  	step_size = ssc->step_size;
  
  	xpsgtr_clr_set(gtr_phy->dev, PLL_REF_SEL(gtr_phy->lane),
-@@ -797,8 +820,7 @@ static struct phy *xpsgtr_xlate(struct device *dev,
+@@ -805,8 +828,7 @@ static struct phy *xpsgtr_xlate(struct device *dev,
  	}
  
  	refclk = args->args[3];
@@ -88,9 +87,9 @@ index 9be9535ad7ab..27e1c04ab7fe 100644
  		dev_err(dev, "Invalid reference clock number %u\n", refclk);
  		return ERR_PTR(-EINVAL);
  	}
-@@ -890,9 +912,7 @@ static int xpsgtr_get_ref_clocks(struct xpsgtr_dev *gtr_dev)
+@@ -880,9 +902,7 @@ static int xpsgtr_get_ref_clocks(struct xpsgtr_dev *gtr_dev)
+ {
  	unsigned int refclk;
- 	int ret;
  
 -	for (refclk = 0; refclk < ARRAY_SIZE(gtr_dev->refclk_sscs); ++refclk) {
 -		unsigned long rate;
@@ -99,8 +98,8 @@ index 9be9535ad7ab..27e1c04ab7fe 100644
  		struct clk *clk;
  		char name[8];
  
-@@ -913,27 +933,6 @@ static int xpsgtr_get_ref_clocks(struct xpsgtr_dev *gtr_dev)
- 			goto err_clk_put;
+@@ -898,26 +918,6 @@ static int xpsgtr_get_ref_clocks(struct xpsgtr_dev *gtr_dev)
+ 			continue;
  
  		gtr_dev->clk[refclk] = clk;
 -
@@ -121,8 +120,7 @@ index 9be9535ad7ab..27e1c04ab7fe 100644
 -			dev_err(gtr_dev->dev,
 -				"Invalid rate %lu for reference clock %u\n",
 -				rate, refclk);
--			ret = -EINVAL;
--			goto err_clk_put;
+-			return -EINVAL;
 -		}
  	}
  
