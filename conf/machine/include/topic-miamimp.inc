@@ -103,3 +103,6 @@ HDF_MACHINE = "${MACHINE}"
 HDF_BASE = "http://"
 HDF_PATH = "fpga-server.local/downloads/fpga/fpga-board-utils/${TOPIC_XSA_DESIGN_NAME}.xz;name=${HDF_MACHINE}"
 HDF_NAME = "${S}/${TOPIC_XSA_DESIGN_NAME}"
+
+# Use 2022.2 version until we've updated the patches
+PREFERRED_VERSION_u-boot-xlnx = "v2021.01-xilinx-v2022.2+gitAUTOINC+b31476685d"

@@ -40,6 +40,10 @@ MACHINE_ENTROPY = "haveged-once"
 MACHINE_EXTRA_RDEPENDS += "${MACHINE_ENTROPY}"
 
 # u-boot configuration
+
+# Use 2022.2 version until we've updated the patches
+PREFERRED_VERSION_u-boot-xlnx = "v2021.01-xilinx-v2022.2+gitAUTOINC+b31476685d"
+
 UBOOT_MACHINE = "topic_miami_config"
 UBOOT_SUFFIX = "img"
 SPL_BINARY = "spl/boot.bin"
