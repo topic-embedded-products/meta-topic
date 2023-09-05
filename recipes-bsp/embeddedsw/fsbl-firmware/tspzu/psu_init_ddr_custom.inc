@@ -30,7 +30,7 @@ static void psu_init_ddr_eeprom(int phy_bringup)
 		case 0x01:
 			ecc_mode = 1;
 			break;
-		default:
+		case 0x00:
 			ecc_mode = 0;
 			break;
 		}
@@ -49,7 +49,7 @@ static void psu_init_ddr_eeprom(int phy_bringup)
 		case 0x04:
 			ddr_size = 16;
 			break;
-		default:
+		case 0x03:
 			ddr_size = 8;
 			break;
 		}
