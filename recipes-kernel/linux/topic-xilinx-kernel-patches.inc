@@ -66,6 +66,7 @@ SRC_URI:append = "\
 	file://0001-usb-dwc3-Disable-hibernation-by-default.patch \
 	file://0002-usb-dwc3-xilinx-Fix-sequence-and-propagate-error-cod.patch \
 	file://0003-usb-dwc3-core-add-transceiver-delay-for-required-UTM.patch \
+	file://0001-usb-dwc3-Add-support-for-VBUS-power-control.patch \
 	file://0004-phy-zynqmp-Postpone-getting-clock-rate-until-it-s-ac.patch \
 	file://0005-phy-zynqmp-Longer-PLL-timeout.patch \
 	file://0006-wireless-brcmfmac-Disable-power-save-mode.patch \
