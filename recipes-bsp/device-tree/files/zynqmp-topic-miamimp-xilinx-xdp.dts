@@ -375,9 +375,9 @@
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usb0_default>;
-	/* Xilinx defines "reset-gpio" but this should be reset-gpios. Polarity is reversed. */
+	/* Xilinx defines "reset-gpio" but this should be reset-gpios. */
 	/delete-property/ reset-gpio;
-	reset-gpios = <&gpio 65 0>; /* MIO65 -> USB_RESET */
+	reset-gpios = <&gpio 65 GPIO_ACTIVE_LOW>; /* MIO65 -> USB_RESET */
 };
 
 &dwc3_0 {
