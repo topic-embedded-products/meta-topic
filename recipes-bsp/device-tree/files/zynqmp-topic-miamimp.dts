@@ -87,7 +87,7 @@
 &usb0 {
 	/* Xilinx defines "reset-gpio" but this should be reset-gpios */
 	/delete-property/ reset-gpio;
-	reset-gpios = <&gpioex 0 0>;
+	reset-gpios = <&gpioex 0 GPIO_ACTIVE_LOW>;
 };
 
 &cci {
