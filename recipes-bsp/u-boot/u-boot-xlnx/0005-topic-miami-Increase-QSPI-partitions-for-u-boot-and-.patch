@@ -1,7 +1,7 @@
-From cbc261a269d7d0fde768c5a7e3ee1669c17fb90e Mon Sep 17 00:00:00 2001
+From 386e320da36b2efd5f60605b8c1464a207cdf339 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 30 Sep 2019 10:35:03 +0200
-Subject: [PATCH 05/35] topic-miami: Increase QSPI partitions for u-boot and
+Subject: [PATCH 05/37] topic-miami: Increase QSPI partitions for u-boot and
  kernel
 
 Since 2019.1 u-boot needs more space in QSPI flash to fit, so increase the
@@ -51,10 +51,10 @@ index c4ec56138e..2a541bcd50 100644
  	};
  };
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
-index 78e88cb275..a476b2635b 100644
+index 78b82e4e40..e38e158284 100644
 --- a/include/configs/topic_miami.h
 +++ b/include/configs/topic_miami.h
-@@ -73,7 +73,7 @@
+@@ -60,7 +60,7 @@
  	"bootscript=autorun.scr\0" \
  	"loadbit_addr=0x100000\0"	\
  	"loadbootenv_addr=0x2000000\0" \
@@ -63,7 +63,7 @@ index 78e88cb275..a476b2635b 100644
  	"devicetree_size=0x10000\0"	\
  	"boot_size=0xF00000\0"	\
  	"fdt_high=0x20000000\0"	\
-@@ -84,8 +84,8 @@
+@@ -71,8 +71,8 @@
  		"fpga load 0 ${loadbit_addr} ${filesize}\0" \
  	"qspiboot=echo Booting from QSPI flash... && " \
  		"sf probe && " \

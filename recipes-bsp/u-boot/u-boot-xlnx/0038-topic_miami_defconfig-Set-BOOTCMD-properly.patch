@@ -1,0 +1,56 @@
+From 5a1a50f906a72d8209131ffdd688cc9a78fa5d8c Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 7 Dec 2023 15:38:02 +0100
+Subject: [PATCH 38/39] topic_miami_defconfig: Set BOOTCMD properly
+
+"run distro_bootcmd" is what should run at boot these days.
+Was moved from header to defconfig files, hence did not get
+updated.
+---
+ configs/topic_miami_defconfig     | 2 +-
+ configs/topic_miamilite_defconfig | 2 +-
+ configs/topic_miamiplus_defconfig | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
+index d51f076595..c5049dc439 100644
+--- a/configs/topic_miami_defconfig
++++ b/configs/topic_miami_defconfig
+@@ -23,7 +23,7 @@ CONFIG_REMAKE_ELF=y
+ CONFIG_SYS_CUSTOM_LDSCRIPT=y
+ CONFIG_SYS_LDSCRIPT="arch/arm/mach-zynq/u-boot.lds"
+ CONFIG_BOOTDELAY=0
+-CONFIG_BOOTCOMMAND="if mmcinfo; then if fatload mmc 0 0x1900000 ${bootscript}; then source 0x1900000; fi; fi; run $modeboot"
++CONFIG_BOOTCOMMAND="run distro_bootcmd"
+ CONFIG_USE_PREBOOT=y
+ CONFIG_CLOCKS=y
+ CONFIG_SPL_MAX_SIZE=0x30000
+diff --git a/configs/topic_miamilite_defconfig b/configs/topic_miamilite_defconfig
+index 64c185c41a..4e848b32aa 100644
+--- a/configs/topic_miamilite_defconfig
++++ b/configs/topic_miamilite_defconfig
+@@ -23,7 +23,7 @@ CONFIG_REMAKE_ELF=y
+ CONFIG_SYS_CUSTOM_LDSCRIPT=y
+ CONFIG_SYS_LDSCRIPT="arch/arm/mach-zynq/u-boot.lds"
+ CONFIG_BOOTDELAY=0
+-CONFIG_BOOTCOMMAND="if mmcinfo; then if fatload mmc 0 0x1900000 ${bootscript}; then source 0x1900000; fi; fi; run $modeboot"
++CONFIG_BOOTCOMMAND="run distro_bootcmd"
+ CONFIG_USE_PREBOOT=y
+ CONFIG_CLOCKS=y
+ CONFIG_SPL_MAX_SIZE=0x30000
+diff --git a/configs/topic_miamiplus_defconfig b/configs/topic_miamiplus_defconfig
+index 46dbfd3cbe..dceda9a8c7 100644
+--- a/configs/topic_miamiplus_defconfig
++++ b/configs/topic_miamiplus_defconfig
+@@ -22,7 +22,7 @@ CONFIG_REMAKE_ELF=y
+ CONFIG_SYS_CUSTOM_LDSCRIPT=y
+ CONFIG_SYS_LDSCRIPT="arch/arm/mach-zynq/u-boot.lds"
+ CONFIG_BOOTDELAY=0
+-CONFIG_BOOTCOMMAND="if mmcinfo; then if fatload mmc 0 0x1900000 ${bootscript}; then source 0x1900000; fi; fi; run $modeboot"
++CONFIG_BOOTCOMMAND="run distro_bootcmd"
+ CONFIG_USE_PREBOOT=y
+ CONFIG_CLOCKS=y
+ CONFIG_SPL_MAX_SIZE=0x30000
+-- 
+2.34.1
+

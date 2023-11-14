@@ -1,12 +1,12 @@
-From 69d10c25ce9ef92b2415cd48767bf855315b9804 Mon Sep 17 00:00:00 2001
+From 052ecd67797681ef3d8aee076de7ef37d23a952c Mon Sep 17 00:00:00 2001
 From: Leon Leijssen <leon.leijssen@topic.nl>
 Date: Wed, 5 Feb 2020 10:05:39 +0100
-Subject: [PATCH 12/35] topic-miamimp: Support UBIFS
+Subject: [PATCH 11/37] topic-miamimp: Support UBIFS
 
 ---
  include/configs/topic_miamimp.h | 10 +++++++++-
- include/configs/xilinx_zynqmp.h |  3 +++
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ include/configs/xilinx_zynqmp.h |  2 ++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/include/configs/topic_miamimp.h b/include/configs/topic_miamimp.h
 index ff9b892ee7..94e55f326a 100644
@@ -30,18 +30,10 @@ index ff9b892ee7..94e55f326a 100644
  #include "xilinx_zynqmp.h"
  
 diff --git a/include/configs/xilinx_zynqmp.h b/include/configs/xilinx_zynqmp.h
-index e214805787..3bd0f782d5 100644
+index 2f5ac0f6ec..25f06cc65b 100644
 --- a/include/configs/xilinx_zynqmp.h
 +++ b/include/configs/xilinx_zynqmp.h
-@@ -39,6 +39,7 @@
- # define CONFIG_SYS_MAX_NAND_DEVICE	1
- #endif
- 
-+
- #if defined(CONFIG_SPL_BUILD)
- #define CONFIG_ZYNQMP_PSU_INIT_ENABLED
- #endif
-@@ -131,11 +132,13 @@
+@@ -107,11 +107,13 @@
  # define BOOT_TARGET_DEVICES_NAND(func)
  #endif
  

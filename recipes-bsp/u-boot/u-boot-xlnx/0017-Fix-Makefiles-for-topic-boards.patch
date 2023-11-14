@@ -1,7 +1,7 @@
-From 4a598a4a72d74cdd5fa27273246fd6455aa51453 Mon Sep 17 00:00:00 2001
+From d2ed001750ca17c2c5663755e7d5e1061d4db12c Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 19 Jun 2020 11:38:10 +0200
-Subject: [PATCH 18/35] Fix Makefiles for topic boards
+Subject: [PATCH 17/37] Fix Makefiles for topic boards
 
 Copy Makefile contents from Xilinx, e.g. adding support for pm_cfg_obj
 ---

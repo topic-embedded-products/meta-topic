@@ -1,7 +1,7 @@
-From c9bf438450ed1ea0ec3646f6dc0a1a7fd8dff2bb Mon Sep 17 00:00:00 2001
+From 4436b9b9309daefda38341473417a0525f8b088b Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 13 Jan 2023 17:19:25 +0100
-Subject: [PATCH 2/2] zynq[mp]-topic-miami.dts: Fix SPI boot
+Subject: [PATCH 36/37] zynq[mp]-topic-miami.dts: Fix SPI boot
 
 SPI boot did not work because the flash@0 node was not present in SPL. Add
 a "u-boot,dm-pre-reloc" property to make the node part of the SPL build.

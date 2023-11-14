@@ -1,28 +1,27 @@
-From 6ba28f411213bb249ab5388af44625397837da84 Mon Sep 17 00:00:00 2001
+From 5443160c6052f29424387be8543122c184bf86b6 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 5 May 2022 08:31:38 +0200
-Subject: [PATCH 34/35] configs, topic: Adjust configuration to match upstream
+Subject: [PATCH 33/37] configs, topic: Adjust configuration to match upstream
 
 Copy config from xilinx_zynq[mp]_virt_defconfig and adjust it.
 Add CONFIG_ZYNQMP_SPL_PM_CFG_OBJ_FILE option to load PMU config
 ---
- configs/topic_miami_defconfig              | 11 ++--
+ configs/topic_miami_defconfig              | 10 ++--
  configs/topic_miamimp_defconfig            | 54 ++++++++++++-----
  configs/topic_miamimp_xilinx_xdp_defconfig | 58 ++++++++++++++-----
  configs/topic_tdpzu9_defconfig             | 54 ++++++++++++-----
  configs/topic_ttpzu9_defconfig             | 54 ++++++++++++-----
  include/configs/topic_miamimp.h            | 67 ++--------------------
- 6 files changed, 173 insertions(+), 125 deletions(-)
+ 6 files changed, 173 insertions(+), 124 deletions(-)
 
 diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
-index 493a102e2c..eb3d250a49 100644
+index 694f4e395d..7dabe0320a 100644
 --- a/configs/topic_miami_defconfig
 +++ b/configs/topic_miami_defconfig
-@@ -27,22 +27,23 @@ CONFIG_SPL_STACK_R=y
- # CONFIG_SPL_RAM_SUPPORT is not set
- CONFIG_SPL_SPI_LOAD=y
- CONFIG_SYS_SPI_U_BOOT_OFFS=0x20000
--CONFIG_SYS_PROMPT="zynq-uboot> "
+@@ -42,21 +42,23 @@ CONFIG_SYS_SPI_U_BOOT_OFFS=0x20000
+ CONFIG_SYS_MAXARGS=32
+ CONFIG_SYS_PBSIZE=2077
+ CONFIG_SYS_BOOTM_LEN=0x3c00000
 +# CONFIG_BOOTM_NETBSD is not set
  CONFIG_CMD_THOR_DOWNLOAD=y
  CONFIG_CMD_MEMTEST=y

@@ -1,7 +1,7 @@
-From 06324b96c6d13cbe8ecd578a1e45d1be25d0f383 Mon Sep 17 00:00:00 2001
+From 7a2b07daee8c80c011b970c2779d52dca545d271 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 11 Aug 2020 16:56:34 +0200
-Subject: [PATCH 25/35] dts/zynqmp-topic*: Use jedec,spi-nor compatible instead
+Subject: [PATCH 24/37] dts/zynqmp-topic*: Use jedec,spi-nor compatible instead
  of spi-flash
 
 ---

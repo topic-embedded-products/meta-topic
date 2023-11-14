@@ -1,4 +1,4 @@
-From 7893dce34718971dfc88cb254e6f93a2f22a79a2 Mon Sep 17 00:00:00 2001
+From 1b5fccfd237512cf38de18bba5b2b0e19ad50c0f Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 27 Jul 2023 12:16:42 +0200
 Subject: [PATCH] zynqmp: Boot with UBI from QSPI
@@ -8,10 +8,10 @@ Subject: [PATCH] zynqmp: Boot with UBI from QSPI
  1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/include/configs/xilinx_zynqmp.h b/include/configs/xilinx_zynqmp.h
-index e46600f260..d5818b3224 100644
+index 25f06cc65b..e820709c8b 100644
 --- a/include/configs/xilinx_zynqmp.h
 +++ b/include/configs/xilinx_zynqmp.h
-@@ -134,10 +134,11 @@
+@@ -109,10 +109,11 @@
  
  #ifndef BOOTENV_DEV_QSPI
  #define BOOTENV_DEV_QSPI(devtypeu, devtypel, instance) \

@@ -1,7 +1,7 @@
-From 448251fbf5ed078642920aa9b0f5d1fba90d2ffd Mon Sep 17 00:00:00 2001
+From 8130a477ef7278a97e6252fed559b62cd68b37f2 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 9 Oct 2019 10:26:37 +0200
-Subject: [PATCH 04/35] topic_miami: Update configuration
+Subject: [PATCH 04/37] topic_miami: Update configuration
 
 Remove unused "NET" support and make a slightly smaller SPL
 ---
@@ -9,19 +9,19 @@ Remove unused "NET" support and make a slightly smaller SPL
  1 file changed, 5 insertions(+)
 
 diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
-index f8ba64db14..b9b9756e7b 100644
+index e3ed0b2732..ded1491a4d 100644
 --- a/configs/topic_miami_defconfig
 +++ b/configs/topic_miami_defconfig
-@@ -22,6 +22,8 @@ CONFIG_SYS_LOAD_ADDR=0x0
- CONFIG_BOOTDELAY=0
- CONFIG_USE_PREBOOT=y
+@@ -34,6 +34,8 @@ CONFIG_SPL_STACK=0xfffffe00
  CONFIG_SPL_STACK_R=y
+ CONFIG_SYS_SPL_MALLOC=y
+ CONFIG_SYS_SPL_MALLOC_SIZE=0x2000000
 +# CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR is not set
 +# CONFIG_SPL_RAM_SUPPORT is not set
  CONFIG_SPL_SPI_LOAD=y
  CONFIG_SYS_SPI_U_BOOT_OFFS=0x20000
- CONFIG_SYS_PROMPT="zynq-uboot> "
-@@ -34,8 +36,11 @@ CONFIG_CMD_USB=y
+ CONFIG_SYS_MAXARGS=32
+@@ -48,8 +50,11 @@ CONFIG_CMD_USB=y
  # CONFIG_CMD_SETEXPR is not set
  # CONFIG_CMD_NET is not set
  CONFIG_CMD_CACHE=y

@@ -1,7 +1,7 @@
-From 6a22d3261bdb4b547dc84da24d33768b644a89e2 Mon Sep 17 00:00:00 2001
+From bf5ab7e4e23279e02e9d4f634e2fd68c9909a559 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 9 May 2022 16:14:43 +0200
-Subject: [PATCH 35/35] tools/zynqmp_pm_cfg_obj_convert.py: Add
+Subject: [PATCH 34/37] tools/zynqmp_pm_cfg_obj_convert.py: Add
  PM_CONFIG_OBJECT_TYPE_BASE
 
 Add extra define that appears to be used in newer versions of the tools
@@ -12,10 +12,10 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  1 file changed, 2 insertions(+)
 
 diff --git a/tools/zynqmp_pm_cfg_obj_convert.py b/tools/zynqmp_pm_cfg_obj_convert.py
-index 0a44710e1e..6e8eb05886 100755
+index 239991a526..c381a25bff 100755
 --- a/tools/zynqmp_pm_cfg_obj_convert.py
 +++ b/tools/zynqmp_pm_cfg_obj_convert.py
-@@ -247,6 +247,8 @@ pm_define = {
+@@ -249,6 +249,8 @@ pm_define = {
      'PM_CONFIG_IPI_PSU_CORTEXA53_0_MASK' : 0x00000001,
      'PM_CONFIG_IPI_PSU_CORTEXR5_0_MASK'  : 0x00000100,
      'PM_CONFIG_IPI_PSU_CORTEXR5_1_MASK'  : 0x00000200,

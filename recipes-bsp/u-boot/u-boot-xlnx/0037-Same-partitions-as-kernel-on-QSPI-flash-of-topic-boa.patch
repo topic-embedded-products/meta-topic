@@ -1,7 +1,7 @@
-From d49a8d72c4dc84a9f23b4963bd67647b404a4b25 Mon Sep 17 00:00:00 2001
+From aa449470d47c8eaf2ca4217c18e31582b5be838a Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 17 Jan 2023 07:12:26 +0100
-Subject: [PATCH] Same partitions as kernel on QSPI flash of topic boards
+Subject: [PATCH 37/37] Same partitions as kernel on QSPI flash of topic boards
 
 Use the same simple partitioning scheme as the kernel is using these
 days.
@@ -9,7 +9,6 @@ days.
 Move CONFIG_SPI_FLASH_MTD to config.
 
 Adjust the partitions to match the devicetree and kernel.
-
 ---
  arch/arm/dts/zynq-topic-miami.dts                | 14 +++-----------
  arch/arm/dts/zynqmp-topic-miamimp-xilinx-xdp.dts | 10 +---------
@@ -22,8 +21,8 @@ Adjust the partitions to match the devicetree and kernel.
  configs/topic_miamiplus_defconfig                |  4 +++-
  configs/topic_tdpzu9_defconfig                   |  3 ++-
  configs/topic_ttpzu9_defconfig                   |  3 ++-
- include/configs/topic_miami.h                    |  6 ------
- 12 files changed, 24 insertions(+), 52 deletions(-)
+ include/configs/topic_miami.h                    |  1 +
+ 12 files changed, 25 insertions(+), 46 deletions(-)
 
 diff --git a/arch/arm/dts/zynq-topic-miami.dts b/arch/arm/dts/zynq-topic-miami.dts
 index 58c6902bb2..3e73c659e3 100644
@@ -122,10 +121,10 @@ index 1d42475702..d1e11d0d4f 100644
  		};
  	};
 diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
-index eb3d250a49..a51bca9f15 100644
+index 7dabe0320a..d51f076595 100644
 --- a/configs/topic_miami_defconfig
 +++ b/configs/topic_miami_defconfig
-@@ -80,11 +80,13 @@ CONFIG_CI_UDC=y
+@@ -95,11 +95,13 @@ CONFIG_CI_UDC=y
  CONFIG_USB_GADGET_DOWNLOAD=y
  CONFIG_USB_FUNCTION_THOR=y
  CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
@@ -141,10 +140,10 @@ index eb3d250a49..a51bca9f15 100644
  # CONFIG_MTD_SPI_NAND is not set
 +CONFIG_SPI_FLASH_MTD=y
 diff --git a/configs/topic_miamilite_defconfig b/configs/topic_miamilite_defconfig
-index 0a542e9e5c..06bd1d41d9 100644
+index ad3c7c351f..64c185c41a 100644
 --- a/configs/topic_miamilite_defconfig
 +++ b/configs/topic_miamilite_defconfig
-@@ -75,11 +75,13 @@ CONFIG_CI_UDC=y
+@@ -89,11 +89,13 @@ CONFIG_CI_UDC=y
  CONFIG_USB_GADGET_DOWNLOAD=y
  CONFIG_USB_FUNCTION_THOR=y
  CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
@@ -202,10 +201,10 @@ index c5ee29208d..196f17f516 100644
  CONFIG_DEBUG_UART_ZYNQ=y
  CONFIG_DEBUG_UART_ANNOUNCE=y
 diff --git a/configs/topic_miamiplus_defconfig b/configs/topic_miamiplus_defconfig
-index 99f8f2c340..3c7a897c7f 100644
+index c1799ab707..46dbfd3cbe 100644
 --- a/configs/topic_miamiplus_defconfig
 +++ b/configs/topic_miamiplus_defconfig
-@@ -74,11 +74,13 @@ CONFIG_CI_UDC=y
+@@ -88,11 +88,13 @@ CONFIG_CI_UDC=y
  CONFIG_USB_GADGET_DOWNLOAD=y
  CONFIG_USB_FUNCTION_THOR=y
  CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
@@ -263,19 +262,17 @@ index 1a3a646ace..3ea0ce6424 100644
  CONFIG_DEBUG_UART_ZYNQ=y
  CONFIG_DEBUG_UART_ANNOUNCE=y
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
-index 0ba64bee7e..cd7c4a8a26 100644
+index 2ba04cdd9e..5d7820779c 100644
 --- a/include/configs/topic_miami.h
 +++ b/include/configs/topic_miami.h
-@@ -30,12 +30,6 @@
- /* Faster flash, ours may run at 108 MHz */
- #undef CONFIG_SPI_FLASH_WINBOND
+@@ -17,6 +17,7 @@
+ /* Fixup settings */
  
--/* CONFIG_SPI_FLASH_MTD only works outside SPL */
--#if !defined(CONFIG_SPL_BUILD)
--# if defined(CONFIG_ZYNQ_QSPI)
--#  define CONFIG_SPI_FLASH_MTD
--# endif
--#endif
+ 
++
  /* Setup proper boot sequences for Miami boards */
  
  #if defined(CONFIG_USB_HOST)
+-- 
+2.17.1
+

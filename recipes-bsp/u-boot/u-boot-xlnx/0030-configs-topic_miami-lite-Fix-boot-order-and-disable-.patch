@@ -1,7 +1,7 @@
-From 615e2202c152c898c6cd8f89c01c0858c5bf7f65 Mon Sep 17 00:00:00 2001
+From ec3bd999f519ec7acca2f9585c52a916983904ab Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 18 Jan 2021 08:30:11 +0100
-Subject: [PATCH 31/35] configs, topic_miami[lite]: Fix boot order and disable
+Subject: [PATCH 30/37] configs, topic_miami[lite]: Fix boot order and disable
  BOARD_LATE_INIT
 
 The BOARD_LATE_INIT option for the Xilinx zynq prepends the boot_targets with
@@ -19,34 +19,34 @@ Fix boot order, "qspi0" should be "qpsi", don't try JTAG first, and remove
  3 files changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
-index f9dd86cb6e..493a102e2c 100644
+index 6165acc822..694f4e395d 100644
 --- a/configs/topic_miami_defconfig
 +++ b/configs/topic_miami_defconfig
-@@ -15,6 +15,7 @@ CONFIG_DEBUG_UART_BASE=0xe0000000
- CONFIG_DEBUG_UART_CLOCK=100000000
+@@ -15,6 +15,7 @@ CONFIG_DEBUG_UART_CLOCK=100000000
  CONFIG_BOOT_INIT_FILE="board/topic/zynq/zynq-topic-miami/ps7_regs.txt"
+ CONFIG_SYS_LOAD_ADDR=0x0
  CONFIG_DEBUG_UART=y
 +# CONFIG_BOARD_LATE_INIT is not set
+ CONFIG_SYS_MEMTEST_START=0x00000000
+ CONFIG_SYS_MEMTEST_END=0x18000000
  CONFIG_DISTRO_DEFAULTS=y
- CONFIG_SYS_CUSTOM_LDSCRIPT=y
- CONFIG_SYS_LDSCRIPT="arch/arm/mach-zynq/u-boot.lds"
 diff --git a/configs/topic_miamilite_defconfig b/configs/topic_miamilite_defconfig
-index a7b23f7e38..0a542e9e5c 100644
+index 88529df088..ad3c7c351f 100644
 --- a/configs/topic_miamilite_defconfig
 +++ b/configs/topic_miamilite_defconfig
-@@ -15,6 +15,7 @@ CONFIG_DEBUG_UART_BASE=0xe0000000
- CONFIG_DEBUG_UART_CLOCK=100000000
+@@ -15,6 +15,7 @@ CONFIG_DEBUG_UART_CLOCK=100000000
  CONFIG_BOOT_INIT_FILE="board/topic/zynq/zynq-topic-miamilite/ps7_regs.txt"
+ CONFIG_SYS_LOAD_ADDR=0x0
  CONFIG_DEBUG_UART=y
 +# CONFIG_BOARD_LATE_INIT is not set
+ CONFIG_SYS_MEMTEST_START=0x00000000
+ CONFIG_SYS_MEMTEST_END=0x18000000
  CONFIG_DISTRO_DEFAULTS=y
- CONFIG_SYS_CUSTOM_LDSCRIPT=y
- CONFIG_SYS_LDSCRIPT="arch/arm/mach-zynq/u-boot.lds"
 diff --git a/include/configs/topic_miami.h b/include/configs/topic_miami.h
-index 5aec781a7e..f900e50124 100644
+index a7edc4a29a..70ae7675dd 100644
 --- a/include/configs/topic_miami.h
 +++ b/include/configs/topic_miami.h
-@@ -73,7 +73,7 @@
+@@ -54,7 +54,7 @@
  	"boot_a_script=load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; source ${scriptaddr}\0" \
  	"boot_prefixes=/ /boot/\0" \
  	"boot_scripts=boot.scr\0" \

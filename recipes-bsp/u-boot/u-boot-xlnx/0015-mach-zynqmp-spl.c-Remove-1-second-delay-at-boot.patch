@@ -1,7 +1,7 @@
-From 722a148324ae9468638890129b8107471126ec70 Mon Sep 17 00:00:00 2001
+From d974d8ebadf94976590d2ce2a4bd39a1a04a06e5 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 26 May 2020 08:40:17 +0200
-Subject: [PATCH 16/35] mach-zynqmp/spl.c: Remove 1-second delay at boot
+Subject: [PATCH 15/37] mach-zynqmp/spl.c: Remove 1-second delay at boot
 
 SPL boot is slow on the zynqMP because of this delay. The initialization done
 in psu_init no longer requires an external delay, so this can be removed to
@@ -16,10 +16,10 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  1 file changed, 2 insertions(+)
 
 diff --git a/arch/arm/mach-zynqmp/spl.c b/arch/arm/mach-zynqmp/spl.c
-index d03edfa788..9acbef80c0 100644
+index 0f92903f14..7f36a29f63 100644
 --- a/arch/arm/mach-zynqmp/spl.c
 +++ b/arch/arm/mach-zynqmp/spl.c
-@@ -103,6 +103,8 @@ u32 spl_boot_device(void)
+@@ -113,6 +113,8 @@ u32 spl_boot_device(void)
  #ifdef CONFIG_SPL_MMC
  	case SD_MODE1:
  	case SD1_LSHFT_MODE: /* not working on silicon v1 */

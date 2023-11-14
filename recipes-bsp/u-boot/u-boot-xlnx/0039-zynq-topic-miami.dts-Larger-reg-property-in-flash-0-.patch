@@ -1,0 +1,29 @@
+From 8d4de510b347cb37e8082a3abaa8a4be9ab322b5 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 7 Dec 2023 15:39:58 +0100
+Subject: [PATCH 39/39] zynq-topic-miami.dts: Larger "reg" property in flash@0
+ node
+
+Unknown why, but if the "reg" property is only a single u32 as it should
+be, the SPL fails to boot and returns FDT_ERR_BADSTRUCTURE (-12) internally.
+Just make it two zeroes as a workaround.
+---
+ arch/arm/dts/zynq-topic-miami.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/dts/zynq-topic-miami.dts b/arch/arm/dts/zynq-topic-miami.dts
+index 3e73c659e3..0f270aa239 100644
+--- a/arch/arm/dts/zynq-topic-miami.dts
++++ b/arch/arm/dts/zynq-topic-miami.dts
+@@ -43,7 +43,7 @@
+ 		u-boot,dm-pre-reloc;
+ 		compatible = "st,m25p80", "n25q256a", "jedec,spi-nor";
+ 		m25p,fast-read;
+-		reg = <0x0>;
++		reg = <0x0 0>; /* bug? Boot fails when this is just one zero. */
+ 		spi-tx-bus-width = <1>;
+ 		spi-rx-bus-width = <4>;
+ 		spi-max-frequency = <100000000>;
+-- 
+2.34.1
+

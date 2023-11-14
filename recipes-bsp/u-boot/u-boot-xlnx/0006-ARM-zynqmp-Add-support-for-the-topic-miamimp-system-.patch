@@ -1,13 +1,13 @@
-From 24c079db0328d91266ca8e22f3cb71ad5f8430fc Mon Sep 17 00:00:00 2001
+From 3e8ac2f127b00e951df575506f2a932f95b8b8a9 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 2 Jan 2017 15:35:41 +0100
-Subject: [PATCH 06/35] ARM: zynqmp: Add support for the topic-miamimp
+Subject: [PATCH 06/37] ARM: zynqmp: Add support for the topic-miamimp
  system-on-module
 
 The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
 32GB eMMC and 128MB Dual-parallel QSPI flash.
 ---
- arch/arm/dts/Makefile                         |    10 +-
+ arch/arm/dts/Makefile                         |    13 +-
  arch/arm/dts/zynqmp-topic-miamimp.dts         |   162 +
  board/topic/zynqmp/MAINTAINERS                |     6 +
  board/topic/zynqmp/Makefile                   |    25 +
@@ -20,7 +20,7 @@ The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
  board/topic/zynqmp/zynqmp.c                   |     6 +
  configs/topic_miamimp_defconfig               |   113 +
  include/configs/topic_miamimp.h               |    86 +
- 13 files changed, 59777 insertions(+), 8 deletions(-)
+ 13 files changed, 59779 insertions(+), 9 deletions(-)
  create mode 100644 arch/arm/dts/zynqmp-topic-miamimp.dts
  create mode 100644 board/topic/zynqmp/MAINTAINERS
  create mode 100644 board/topic/zynqmp/Makefile
@@ -35,18 +35,18 @@ The topic-miamimp module contains a Zynq Ultrascale MPSoC device, 2GB LPDDR4,
  create mode 100644 include/configs/topic_miamimp.h
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index 6213baaa4c..8de89f52ca 100644
+index 0fa428c7b3..c7d0fba81f 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -157,7 +157,6 @@ dtb-$(CONFIG_ROCKCHIP_RK3399) += \
+@@ -91,7 +91,6 @@ dtb-$(CONFIG_ROCKCHIP_RK3036) += \
  
- dtb-$(CONFIG_ROCKCHIP_RK3568) += \
- 	rk3568-evb.dtb
+ dtb-$(CONFIG_ROCKCHIP_RK3066) += \
+ 	rk3066a-mk808.dtb
 -
- dtb-$(CONFIG_ROCKCHIP_RV1108) += \
- 	rv1108-elgin-r1.dtb \
- 	rv1108-evb.dtb
-@@ -361,6 +360,7 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
+ dtb-$(CONFIG_ROCKCHIP_RK3128) += \
+ 	rk3128-evb.dtb
+ 
+@@ -389,6 +388,7 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += \
  	zynqmp-sck-kv-g-revA.dtbo		\
  	zynqmp-sck-kv-g-revB.dtbo		\
  	zynqmp-sck-kv-g-revA-pl.dtbo		\
@@ -54,69 +54,90 @@ index 6213baaa4c..8de89f52ca 100644
  	zynqmp-topic-miamimp-xilinx-xdp-v1r1.dtb	\
  	zynqmp-vpk120-revA.dtb			\
  	zynqmp-vp-x-a2785-00-revA.dtb		\
-@@ -506,7 +506,6 @@ dtb-$(CONFIG_ARCH_LS1021A) += ls1021a-qds-duart.dtb \
- 	ls1021a-iot-duart.dtb ls1021a-tsn.dtb
- dtb-$(CONFIG_TARGET_PG_WCOM_SELI8) += ls1021a-pg-wcom-seli8.dtb
- dtb-$(CONFIG_TARGET_PG_WCOM_EXPU1) += ls1021a-pg-wcom-expu1.dtb
--
- dtb-$(CONFIG_FSL_LSCH3) += fsl-ls2080a-qds.dtb \
- 	fsl-ls2080a-qds-42-x.dtb \
- 	fsl-ls2080a-rdb.dtb \
-@@ -767,14 +766,12 @@ dtb-$(CONFIG_MX23) += \
+@@ -613,7 +613,6 @@ dtb-$(CONFIG_TARGET_SL28) += fsl-ls1028a-kontron-sl28.dtb \
+ 	fsl-ls1028a-kontron-sl28-var4.dtb \
  
- dtb-$(CONFIG_TARGET_MX23_OLINUXINO) += \
- 	imx23-olinuxino.dtb
+ dtb-$(CONFIG_TARGET_TEN64) += fsl-ls1088a-ten64.dtb
 -
- dtb-$(CONFIG_MX28) += \
- 	imx28-evk.dtb \
- 	imx28-xea.dtb
- 
- dtb-$(CONFIG_MX51) += \
- 	imx51-babbage.dtb
--
- dtb-$(CONFIG_MX53) += imx53-cx9020.dtb \
- 	imx53-qsb.dtb \
- 	imx53-kp.dtb \
-@@ -927,7 +924,6 @@ dtb-$(CONFIG_O4_IMX_NANO) += \
- 
- dtb-$(CONFIG_EV_IMX280_NANO_X_MB) += \
- 	ev-imx280-nano-x-mb.dtb
--
- dtb-$(CONFIG_MX7) += imx7d-sdb.dtb \
- 	imx7d-sdb-qspi.dtb \
- 	imx7-cm.dtb \
-@@ -939,6 +935,7 @@ dtb-$(CONFIG_MX7) += imx7d-sdb.dtb \
- 	imx7d-pico-hobbit.dtb \
- 	imx7d-smegw01.dtb
- 
-+
- dtb-$(CONFIG_ARCH_MX7ULP) += imx7ulp-com.dtb \
+ dtb-$(CONFIG_TARGET_DRAGONBOARD410C) += dragonboard410c.dtb
+ dtb-$(CONFIG_TARGET_DRAGONBOARD820C) += dragonboard820c.dtb
+ dtb-$(CONFIG_TARGET_STARQLTECHN) += starqltechn.dtb
+@@ -1032,7 +1031,6 @@ dtb-$(CONFIG_ARCH_MX7ULP) += imx7ulp-com.dtb \
  	imx7ulp-evk.dtb
  
-@@ -956,7 +953,6 @@ dtb-$(CONFIG_ARCH_IMX8) += \
- 
- dtb-$(CONFIG_ARCH_IMX8ULP) += \
- 	imx8ulp-evk.dtb
+ dtb-$(CONFIG_ARCH_HIGHBANK) += highbank.dtb
 -
- dtb-$(CONFIG_ARCH_IMX8M) += \
- 	imx8mm-evk.dtb \
- 	imx8mm-icore-mx8mm-ctouch2.dtb \
-@@ -1099,7 +1095,6 @@ dtb-$(CONFIG_TARGET_OMAP5_UEVM) += \
+ dtb-$(CONFIG_ARCH_IMX8) += \
+ 	fsl-imx8qm-apalis.dtb \
+ 	fsl-imx8qm-mek.dtb \
+@@ -1172,7 +1170,6 @@ dtb-$(CONFIG_TARGET_AT91SAM9X5EK) += \
+ dtb-$(CONFIG_TARGET_SAM9X60EK) += sam9x60ek.dtb
  
- dtb-$(CONFIG_TARGET_SAMA7G5EK) += \
- 	sama7g5ek.dtb
+ dtb-$(CONFIG_TARGET_SAM9X60_CURIOSITY) += at91-sam9x60_curiosity.dtb
 -
- dtb-$(CONFIG_TARGET_SAMA5D2_PTC_EK) += \
- 	at91-sama5d2_ptc_ek.dtb
+ dtb-$(CONFIG_TARGET_AT91SAM9N12EK) += at91sam9n12ek.dtb
  
-@@ -1227,7 +1222,6 @@ dtb-$(CONFIG_TARGET_TOTAL_COMPUTE) += total_compute.dtb
- dtb-$(CONFIG_TARGET_DURIAN) += phytium-durian.dtb
+ dtb-$(CONFIG_TARGET_GARDENA_SMART_GATEWAY_AT91SAM) += \
+@@ -1198,7 +1195,6 @@ dtb-$(CONFIG_TARGET_OMAP3_BEAGLE) += \
+ 	omap3-beagle.dtb
  
- dtb-$(CONFIG_TARGET_PRESIDIO_ASIC) += ca-presidio-engboard.dtb
+ dtb-$(CONFIG_TARGET_DEVKIT8000) += omap3-devkit8000.dtb
 -
- dtb-$(CONFIG_TARGET_IMX8MM_CL_IOT_GATE) += imx8mm-cl-iot-gate.dtb
+ dtb-$(CONFIG_TARGET_OMAP3_IGEP00X0) += \
+ 	omap3-igep0020.dtb
  
- dtb-$(CONFIG_TARGET_IMX8MM_CL_IOT_GATE_OPTEE) += imx8mm-cl-iot-gate-optee.dtb
+@@ -1286,6 +1282,7 @@ dtb-$(CONFIG_BCM63148) += \
+ 	bcm963148.dtb
+ dtb-$(CONFIG_BCM63158) += \
+ 	bcm963158.dtb
++
+ dtb-$(CONFIG_BCM63178) += \
+ 	bcm963178.dtb
+ dtb-$(CONFIG_BCM6756) += \
+@@ -1300,9 +1297,11 @@ dtb-$(CONFIG_BCM6855) += \
+ dtb-$(CONFIG_BCM6856) += \
+ 	bcm96856.dtb \
+ 	bcm968360bg.dtb
++
+ dtb-$(CONFIG_BCM6858) += \
+ 	bcm96858.dtb \
+ 	bcm968580xref.dtb
++
+ dtb-$(CONFIG_BCM6878) += \
+ 	bcm96878.dtb
+ 
+@@ -1313,7 +1312,6 @@ dtb-$(CONFIG_ARCH_STI) += stih410-b2260.dtb
+ 
+ dtb-$(CONFIG_STM32MP13x) += \
+ 	stm32mp135f-dk.dtb
+-
+ dtb-$(CONFIG_STM32MP15x) += \
+ 	stm32mp157a-dk1.dtb \
+ 	stm32mp157a-dk1-scmi.dtb \
+@@ -1358,7 +1356,6 @@ dtb-$(CONFIG_SOC_K3_AM642) += k3-am642-evm.dtb \
+ 
+ dtb-$(CONFIG_SOC_K3_AM625) += k3-am625-sk.dtb \
+ 			      k3-am625-r5-sk.dtb
+-
+ dtb-$(CONFIG_ARCH_MEDIATEK) += \
+ 	mt7622-rfb.dtb \
+ 	mt7623a-unielec-u7623-02-emmc.dtb \
+@@ -1385,7 +1382,6 @@ dtb-$(CONFIG_XEN) += xenguest-arm64.dtb
+ 
+ dtb-$(CONFIG_ARCH_OCTEONTX) += octeontx.dtb
+ dtb-$(CONFIG_ARCH_OCTEONTX2) += octeontx.dtb
+-
+ dtb-$(CONFIG_TARGET_GE_BX50V3) += \
+ 	imx6q-bx50v3.dtb \
+ 	imx6q-b850v3.dtb \
+@@ -1434,7 +1430,6 @@ dtb-y += imx8mp-rsb3720-a1.dtb
+ endif
+ 
+ dtb-$(CONFIG_TARGET_EA_LPC3250DEVKITV2) += lpc3250-ea3250.dtb
+-
+ dtb-$(CONFIG_ARCH_QEMU) += qemu-arm.dtb qemu-arm64.dtb
+ 
+ dtb-$(CONFIG_TARGET_CORSTONE1000) += corstone1000-mps3.dtb \
 diff --git a/arch/arm/dts/zynqmp-topic-miamimp.dts b/arch/arm/dts/zynqmp-topic-miamimp.dts
 new file mode 100644
 index 0000000000..eb593c9048
