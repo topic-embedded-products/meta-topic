@@ -24,6 +24,11 @@
 /* Dual QSPI configuration */
 &qspi {
 	is-dual = <1>;
+	num-cs = <2>;
+};
+&primary_flash {
+	reg = <0>, <1>;
+	parallel-memories = /bits/ 64 <0x4000000 0x4000000>; /* 2x 64MB */
 };
 
 /* The plus SOMs have a programmable clock for the high-speed tranceivers */
