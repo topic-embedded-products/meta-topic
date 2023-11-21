@@ -48,14 +48,16 @@ COMPATIBLE_MACHINE:tspzu = ".*"
 # Generic configuration for SOM
 SRC_URI:tspzu = "\
 	file://zynqmp-topic-miamiplusmp.dts \
+	file://tspzu-uboot.dts \
 	"
-SYSTEM_TOP_DTB:tspzu = "zynqmp-topic-miamiplusmp.dtb"
+SYSTEM_TOP_DTB:tspzu = "tspzu-uboot.dtb"
 # Specific configuration for tdpzu som + carrier
 SRC_URI:tdpzu = "\
 	file://zynqmp-topic-miamiplusmp.dts \
 	file://tdpzu.dts \
+	file://tdpzu-uboot.dts \
 	"
-SYSTEM_TOP_DTB:tdpzu = "tdpzu.dtb"
+SYSTEM_TOP_DTB:tdpzu = "tdpzu-uboot.dtb"
 
 TDKZU_SOURCES = "\
 	file://zynqmp-topic-miamimp-florida-gen.dts \
