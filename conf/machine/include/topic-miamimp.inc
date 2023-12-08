@@ -101,5 +101,5 @@ TOPIC_XSA_DESIGN_NAME ?= "fpga-hardware-${HDF_MACHINE}-reference-${TOPIC_XSA_DES
 # Note: Update the checksums in "external-hdf.bbappend" when the reference designs change
 HDF_MACHINE = "${MACHINE}"
 HDF_BASE = "http://"
-HDF_PATH = "fpga-server.local/downloads/fpga/fpga-board-utils/${TOPIC_XSA_DESIGN_NAME}.xz;name=${HDF_MACHINE}"
+HDF_PATH = "topic.nl/downloads/xsa/${TOPIC_XSA_DESIGN_NAME}.xz;name=${HDF_MACHINE}"
 HDF_NAME = "${S}/${TOPIC_XSA_DESIGN_NAME}"
