@@ -33,6 +33,6 @@ module_autoload_adi_axi_hdmi = "xilinx_dma adi_axi_hdmi snd_soc_adi_axi_spdif sn
 KERNEL_MODULE_AUTOLOAD += "axi-hdmi-rx"
 module_autoload_axi-hdmi-rx = "adv7604 dma-axi-dmac axi-hdmi-rx"
 
-MACHINE_FEATURES += "usbhost usbgadget screen touchscreen wifi alsa ethernet"
+MACHINE_FEATURES += "usbhost usbgadget screen touchscreen wifi alsa ethernet powerkey"
 
 DEVICETREE = "devicetree/topic-miami-florida-mio.dtb"

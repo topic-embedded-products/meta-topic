@@ -19,7 +19,7 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	pwm-fancontrol \
 	"
 
-MACHINE_FEATURES += "rtc usbhost usbgadget ethernet"
+MACHINE_FEATURES += "rtc usbhost usbgadget ethernet powerkey"
 
 DEVICETREE = "devicetree/${MACHINE_BOARD}.dtb"
 
