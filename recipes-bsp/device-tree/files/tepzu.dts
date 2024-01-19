@@ -1,0 +1,370 @@
+/*
+ * dts file for tepzu (Topic Developmentkit Plus) V2 boards without PL
+ *
+ * (C) Copyright 2020-2023, Topic Embedded Products BV
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ */
+
+#include "zynqmp-topic-miamiplusmp.dts"
+
+/ {
+	gpio-poweroff {
+		compatible = "gpio-poweroff";
+		gpios = <&gpio 43 GPIO_ACTIVE_LOW>;
+		force-pm-power-off; /* Replace the PSCI power-off callback */
+	};
+
+	gpio-keys-mio {
+		compatible = "gpio-keys";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		power {
+			label = "power";
+			gpios = <&gpio 44 GPIO_ACTIVE_LOW>;
+			linux,code = <116>; /* KEY_POWER */
+		};
+		s1 {
+			label = "s1";
+			gpios = <&gpio 40 GPIO_ACTIVE_LOW>;
+			linux,code = <28>; /* KEY_ENTER */
+		};
+	};
+
+	leds-mio {
+		compatible = "gpio-leds";
+		leds-mio36 {
+			label = "mioled36:red";
+			/* LED connected from 3v3 to 1v8 IO, must use open drain output */
+			gpios = <&gpio 36 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+			linux,default-trigger = "mmc0"; /* eMMC activity */
+		};
+	};
+
+	leds-gpioex {
+		compatible = "gpio-leds";
+		leds-eth2 {
+			label = "ethled2:green";
+			gpios = <&tep_gpioex10 0 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "ff0d0000.ethernet-ffffffff:01:link";
+		};
+	};
+
+	/* Regulator for the 5V USB VBUS power line. */
+	reg_usb0_vbus: regulator_usb {
+		compatible = "regulator-fixed";
+		regulator-name = "usb0-vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&tep_gpioex10 6 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+};
+
+/* SD1 */
+&sdhci1 {
+	status = "okay";
+	bus-width = <4>;
+	xlnx,mio_bank = <1>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sdhci1_default>;
+	/* Use GPIO based card detect */
+	cd-gpios = <&gpio 45 GPIO_ACTIVE_LOW>;
+	no-1-8-v;
+	disable-wp;
+};
+
+&i2c0 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	/* I2C mux */
+	i2cmux: i2cswitch@70 {
+		compatible = "nxp,pca9544";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x70>;
+
+		i2cmux_0: i2c@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+
+			/* GPIO expander U8 */
+			tep_gpioex8: mcp23009@20 {
+				compatible = "microchip,mcp23008";
+				reg = <0x20>;
+				vcc-supply = <&reg_3v3_miami>;
+				gpio-line-names = "", "PEWAKE0", "PEWAKE1", "USB_OTG_OC_N", "nPRSNT_M2C", "PG_M2C", "", "";
+				gpio-controller;
+				#gpio-cells = <2>;
+				interrupt-controller;
+				#interrupt-cells = <2>;
+				interrupt-parent = <&gpio>;
+				interrupts = <32 IRQ_TYPE_LEVEL_LOW>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&gpio8pullups>;
+
+				gpio8pullups: pinmux {
+					pins =	"gpio0", "gpio1", "gpio2", "gpio3",
+						"gpio4", "gpio5", "gpio6", "gpio7";
+					bias-pull-up;
+				};
+			};
+
+			/* GPIO expander U10 */
+			tep_gpioex10: mcp23009@23 {
+				compatible = "microchip,mcp23008";
+				reg = <0x23>;
+				vcc-supply = <&reg_3v3_miami>;
+				gpio-line-names = "ETH_LED2", "GPIO_SW0", "GPIO_SW1", "HRESET", "", "USB_nRST", "USB2_5V_EN", "";
+				gpio-controller;
+				#gpio-cells = <2>;
+				interrupt-controller;
+				#interrupt-cells = <2>;
+				interrupt-parent = <&gpio>;
+				interrupts = <33 IRQ_TYPE_LEVEL_LOW>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&gpio10pullups>;
+
+				gpio10pullups: pinmux {
+					pins =	"gpio0", "gpio1", "gpio2", "gpio3",
+						"gpio4", "gpio5", "gpio6", "gpio7";
+					bias-pull-up;
+				};
+
+				hog-hreset {
+					gpio-hog;
+					gpios = <3 0>;
+					output-low;
+					line-name = "HRESET";
+				};
+			};
+
+			/* Also connected to PCIe switch */
+		};
+
+		/* FMC */
+		i2cmux_1: i2c@1 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <1>;
+		};
+
+		/* SYZYGY */
+		i2cmux_2: i2c@2 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <2>;
+		};
+
+		/* FTDI, USB, DP */
+		i2cmux_3: i2c@3 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <3>;
+		};
+	};
+};
+
+/* EEPROM on carrier is connected to bus 0 */
+&i2c1 {
+	carrier_eeprom: m24c32@50 {
+		compatible = "atmel,24c32";
+		reg = <0x50>;
+		pagesize = <32>;
+		vcc-supply = <&reg_1v8_miami>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+	};
+};
+
+&uart1 {
+	status = "disabled";
+};
+
+&usb0 {
+	status = "okay";
+	/* see: https://forums.xilinx.com/t5/Embedded-Linux/Zynqmp-USB2-0/td-p/790522/page/2 */
+	/delete-property/ clocks;
+	/delete-property/ clock-names;
+	clocks = <&zynqmp_clk USB0_BUS_REF>;
+	clock-names = "bus_clk";
+};
+
+&dwc3_0 {
+	status = "okay";
+	dr_mode = "otg"; /* "host", "peripheral" or "otg" */
+	maximum-speed = "high-speed"; /* super-speed not available on carrier */
+	/* see: https://forums.xilinx.com/t5/Embedded-Linux/Zynqmp-USB2-0/td-p/790522/page/2 */
+	snps,dis_u2_susphy_quirk;
+	snps,dis_u3_susphy_quirk;
+	/delete-property/ phy-names;
+	/delete-property/ phys;
+	/delete-property/ snps,usb3_lpm_capable;
+	vbus-supply = <&reg_usb0_vbus>;
+	connector {
+		compatible = "usb-b-connector";
+		label = "micro-USB-otg";
+		type = "micro";
+	};
+};
+
+&usb1 {
+	status = "okay";
+	/*
+	 * Using Xilinx' borked implementation to add a reset for the HUB,
+	 * otherwise SuperSpeed doesn't work.
+	 */
+	reset-gpios = <&tep_gpioex10 5 GPIO_ACTIVE_LOW>;
+};
+
+&dwc3_1 {
+	status = "okay";
+	dr_mode = "host";
+	/* refclk0 from clock synth */
+	assigned-clocks = <&si5345 0 3>;
+	assigned-clock-rates = <100000000>;
+	phy-names = "usb3-phy";
+	phys = <&psgtr 3 PHY_TYPE_USB3 1 0>;
+	maximum-speed = "super-speed";
+	snps,usb3_lpm_capable;
+};
+
+&pcie {
+	status = "okay";
+	phys = <&psgtr 0 PHY_TYPE_PCIE 0 0>;
+	/* refclk0 from clock synth */
+	assigned-clocks      = <&si5345 0 3>;
+	assigned-clock-rates =   <100000000>;
+};
+
+/* Displayport - HP and AUX signals through EMIO, enabled when PL probes */
+&zynqmp_dpsub {
+	phy-names = "dp-phy0";
+	phys = <&psgtr 1 PHY_TYPE_DP 0 3>;
+	xlnx,max-lanes = <1>;
+	assigned-clocks = <&si5345 0 8>;
+	assigned-clock-rates = <27000000>;
+	assigned-clock-parents = <&si5345 1 1>;
+};
+&zynqmp_dpdma {
+	status = "okay";
+};
+
+&si5345 {
+	assigned-clock-parents = <0>, <0>, <0>, <0>, <0>,
+				<&si5345 1 0>, /* out 0 */
+				<&si5345 1 0>,
+				<&si5345 1 0>,
+				<&si5345 1 0>,
+				<&si5345 1 0>,
+				<&si5345 1 0>, /* out 5 */
+				<&si5345 1 0>,
+				<&si5345 1 0>,
+				<&si5345 1 1>,
+				<&si5345 1 0>;
+	assigned-clock-rates =	<1000000000>, /* synth 0 */
+				< 216000000>, /* Set synth 1 to 8 * 27 MHz */
+				<0>,
+				<0>,
+				<0>,
+				<125000000>, /* out 0 */
+				<125000000>,
+				<125000000>,
+				<100000000>,
+				<125000000>,
+				< 25000000>, /* out 5 (ethernet) */
+				<100000000>,
+				<250000000>,
+				< 27000000>, /* out 8 (PS refclk3 Displayport) */
+				<100000000>;
+
+	out@0 {
+		always-on;
+	};
+	out@1 {
+		always-on;
+	};
+	out@4 {
+		/* 125MHz Clock for MGT bank 130 (firefly) */
+		always-on;
+	};
+	out@8 {
+		/* Displayport clock needs to generate 27MHz */
+		silabs,pll-master;
+	};
+};
+
+/* Carrier provides VBAT for RTC */
+&rtc {
+	status = "okay";
+};
+
+&gpio {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio_default>;
+};
+
+&pinctrl0 {
+	status = "okay";
+
+	pinctrl_sdhci1_default: sdhci1-sd-default {
+		/* SD using pins 46 .. 51 in 4-bit mode */
+		mux {
+			groups = "sdio1_2_grp";
+			function = "sdio1";
+		};
+		conf {
+			groups = "sdio1_2_grp";
+			slew-rate = <SLEW_RATE_FAST>;
+			power-source = <IO_STANDARD_LVCMOS18>;
+			bias-disable;
+		};
+
+		/* Card detect on pin 45 */
+		mux-cd {
+			groups = "gpio0_45_grp";
+			function = "gpio0";
+		};
+		conf-cd {
+			groups = "gpio0_45_grp";
+			bias-high-impedance;
+			slew-rate = <SLEW_RATE_SLOW>;
+			power-source = <IO_STANDARD_LVCMOS18>;
+			bias-pull-up;
+		};
+	};
+
+	pinctrl_gpio_default: gpio-default {
+		mux {
+			groups = "gpio0_32_grp", "gpio0_33_grp", "gpio0_40_grp", "gpio0_43_grp", "gpio0_44_grp";
+			function = "gpio0";
+		};
+		conf-pull-up {
+			groups = "gpio0_43_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+			bias-pull-up;
+		};
+		conf-button  {
+			groups = "gpio0_40_grp", "gpio0_44_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+			input-schmitt-enable;
+			bias-high-impedance;
+			bias-pull-up;
+		};
+		conf-input {
+			/* Interrupt pins */
+			groups = "gpio0_32_grp", "gpio0_33_grp";
+			slew-rate = <SLEW_RATE_SLOW>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
+			bias-high-impedance;
+			bias-disable; /* External pull-up and level shifter */
+		};
+	};
+};

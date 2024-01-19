@@ -1,0 +1,127 @@
+/* Overlay devicetree for the programmable logic part */
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/clock/xlnx-zynqmp-clk.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+
+/ {
+	/* This fragment causes the FPGA image to load */
+	fragment@0 {
+		target = <&fpga_full>;
+		__overlay__ {
+			firmware-name = "fpga.bin.@BITSTREAM@";
+		};
+	};
+
+	/* User LEDs */
+	fragment@1 {
+		target-path = "/";
+		__overlay__ {
+			leds-pl {
+				compatible = "gpio-leds";
+				user_led_1 {
+					label = "pl-user:green";
+					gpios = <&gpio 83 GPIO_ACTIVE_LOW>; /* EMIO 5 */
+					/* Located on SoM, the QSPI NOR flash is also on the SoM */
+					linux,default-trigger = "mtd";
+				};
+				gp-led-0 {
+					label = "gp0:green";
+					gpios = <&gpio 87 GPIO_ACTIVE_LOW>; /* EMIO 9 */
+					linux,default-trigger = "disk-activity"; /* Blink when NVME disk is working */
+				};
+				gp-led-1 {
+					label = "gp1:green";
+					gpios = <&gpio 88 GPIO_ACTIVE_LOW>; /* EMIO 10 */
+					linux,default-trigger = "mmc1"; /* SD card activity */
+				};
+				gp-led-2 {
+					label = "gp2:green";
+					gpios = <&gpio 89 GPIO_ACTIVE_LOW>; /* EMIO 11 */
+				};
+				gp-led-3 {
+					label = "gp3:green";
+					gpios = <&gpio 90 GPIO_ACTIVE_LOW>; /* EMIO 12 */
+					linux,default-trigger = "bluetooth-power";
+				};
+			};
+		};
+	};
+
+	fragment@2 {
+		target = <&amba>;
+		__overlay__ {
+			#address-cells = <2>;
+			#size-cells = <2>;
+			interrupt-parent = <&gic>;
+
+			 /* temperature sensor on i2c Uses lm75 hwmon driver */
+			axi_iic_0: i2c@80009000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clock-names = "s_axi_aclk";
+				clocks = <&zynqmp_clk PL0_REF>;
+				compatible = "xlnx,axi-iic-2.0", "xlnx,xps-iic-2.00.a";
+				interrupt-names = "iic2intc_irpt";
+				interrupt-parent = <&gic>;
+				interrupts = <0 89 4>;
+				reg = <0x0 0x80009000 0x0 0x1000>;
+
+				tmp101pl: sensor@4a{
+					compatible = "ti,tmp101";
+					reg = <0x4a>;
+					vs-supply = <&reg_3v3_miami>;
+					/* Interrupt not actually used by driver */
+					interrupt-parent = <&gpio>;
+					interrupts = <82 IRQ_TYPE_LEVEL_LOW>; /* EMIO 4 */
+				};
+			};
+
+			pl_fan_controller: fan-controller@8000a000 {
+				compatible = "topic,axi-pwm-fan-controller";
+				reg = <0x0 0x8000a000 0x0 0x1000>;
+				nr-fans = <1>;
+				clocks = <&zynqmp_clk PL0_REF>;
+				topic,initial-pwm = <100>; /* Run at 40% */
+				/* Interrupt connected but not actually used in driver */
+				interrupt-parent = <&gpio>;
+				interrupts = <90 IRQ_TYPE_EDGE_BOTH>; /* EMIO 12 */
+			};
+		};
+	};
+
+	/* DisplayPort - partially routed over EMIO, so needs to wait for PL */
+	fragment@3 {
+		target = <&zynqmp_dpsub>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+	fragment@4 {
+		target = <&zynqmp_dp_snd_pcm0>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+	fragment@5 {
+		target = <&zynqmp_dp_snd_pcm1>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+	fragment@6 {
+		target = <&zynqmp_dp_snd_codec0>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+	fragment@7 {
+		target = <&zynqmp_dp_snd_card0>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+};

@@ -12,6 +12,7 @@ TOPICBSPCONFIG ?= ""
 TOPICBSPCONFIG:topic-miami = "file://topic-miami-standard.cfg file://usb-network-cdc.cfg"
 TOPICBSPCONFIG:topic-miamimp = "file://topic-miamimp-standard.cfg file://tdk-peta.cfg file://usb-network-cdc.cfg"
 TOPICBSPCONFIG:tspzu = "file://topic-miamimp-standard.cfg file://topic-miamiplusmp-extra.cfg file://tdpzu-extra.cfg file://usb-wired-network-adapters.cfg"
+TOPICBSPCONFIG:tepzu = "file://topic-miamimp-standard.cfg file://topic-miamiplusmp-extra.cfg file://usb-wired-network-adapters.cfg file://tepzu.cfg file://wifi-iwl.cfg"
 TOPICBSPCONFIG:ttpzu9 = "file://topic-miamimp-standard.cfg file://topic-miamiplusmp-extra.cfg file://ttpzu9-extra.cfg file://usb-wired-network-adapters.cfg"
 TOPICBSPCONFIG:xdpzu7 = "file://topic-xdpzu7-standard.cfg file://usb-wired-network-adapters.cfg"
 
