@@ -1,8 +1,8 @@
 setenv devtype mmc
-setenv devplist 2
+setenv distro_bootpart 2
 setenv devnum 0  
 setenv fdt_addr ${devicetree_addr}
-load ${devtype} ${devnum}:${devplist} ${fdt_addr} /boot/system.dtb
-load ${devtype} ${devnum}:${devplist} $kernel_addr /boot/uImage
-setenv bootargs console=ttyPS0,115200 root=/dev/mmcblk${devnum}p${devplist} rw rootwait quiet
+load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr} /boot/system.dtb
+load ${devtype} ${devnum}:${distro_bootpart} $kernel_addr /boot/uImage
+setenv bootargs console=ttyPS0,115200 root=/dev/mmcblk${devnum}p${distro_bootpart} rw rootwait quiet
 bootm $kernel_addr - $fdt_addr
