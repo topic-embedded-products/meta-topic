@@ -26,6 +26,10 @@ MACHINE_EXTRA_RDEPENDS += "${MACHINE_ENTROPY}"
 
 KERNEL_MODULE_AUTOLOAD ?= ""
 
+# Build fitImage (compressed kernel and devicetree in single binary)
+KERNEL_IMAGETYPE = "fitImage"
+KERNEL_CLASSES += "kernel-fitimage"
+
 # Most topic modules carry the "eg" variant (quad-core CPU with MALI GPU)
 SOC_VARIANT ?= "eg"
 
