@@ -1,7 +1,7 @@
-From 63e81fa05173fd03101e2ec9153d367ae9803897 Mon Sep 17 00:00:00 2001
+From 168c3d26c1949f519650d2b5ae97ee0b45834b1b Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 3 Nov 2020 14:29:11 +0100
-Subject: [PATCH 07/14] clk-si5341: Support NVM programming through sysfs
+Subject: [PATCH] clk-si5341: Support NVM programming through sysfs
 
 Export an attribute program_nvm_bank that when read reports the current
 bank value. To program the chip's current state into NVM, write the
@@ -13,43 +13,11 @@ kernel boots (e.g. for bootloader usage).
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 ---
- .../ABI/testing/sysfs-devices-clk-si5341      | 24 ++++++
- drivers/clk/clk-si5341.c                      | 74 +++++++++++++++++--
- 2 files changed, 91 insertions(+), 7 deletions(-)
- create mode 100644 Documentation/ABI/testing/sysfs-devices-clk-si5341
+ drivers/clk/clk-si5341.c | 57 +++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 54 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/ABI/testing/sysfs-devices-clk-si5341 b/Documentation/ABI/testing/sysfs-devices-clk-si5341
-new file mode 100644
-index 000000000000..7243b82a3729
---- /dev/null
-+++ b/Documentation/ABI/testing/sysfs-devices-clk-si5341
-@@ -0,0 +1,24 @@
-+What:		/sys/bus/i2c/devices/.../clk-si534*/program_nvm_bank
-+Date:		Jan 2021
-+KernelVersion:	5.12
-+Contact:	Mike Looijmans <mike.looijmans@topic.nl>
-+Description:	Allows programming the NVM memory of the clock chip, so it boots
-+		up in the current configuration. This saves boot time (300ms
-+		clock initialization) and allows the clock to be available
-+		before the kernel boots (e.g. u-boot ethernet clock).
-+
-+		Write the magic value 0xc7 to this attribute to program the
-+		chip's current settings into its NVM storage. This magic value
-+		is taken from the datasheet, it's the same value that must be
-+		written to the hardware to program it. Programming can only be
-+		done twice in the lifetime of the chip.
-+
-+		Read the value to check the state of the chip. This returns the
-+		raw value as read from the hardware. Possible values:
-+		0x03: Not programmed
-+		0x0f: Programmed once
-+		0x3f: Programmed twice, can no longer be programmed
-+
-+Users:		User space applications for embedded boards equipped with one
-+		or more Si534x programmable clock devices. Would typically be
-+		used at the end of production stages.
 diff --git a/drivers/clk/clk-si5341.c b/drivers/clk/clk-si5341.c
-index f7b41366666e..6fd311344afa 100644
+index 2920fe2e5e8b..80ccf34741dc 100644
 --- a/drivers/clk/clk-si5341.c
 +++ b/drivers/clk/clk-si5341.c
 @@ -102,6 +102,8 @@ struct clk_si5341_output_config {
@@ -87,17 +55,9 @@ index f7b41366666e..6fd311344afa 100644
  /* Static configuration (to be moved to firmware) */
  struct si5341_reg_default {
  	u16 address;
-@@ -1165,7 +1168,6 @@ static int si5341_finalize_defaults(struct clk_si5341 *data)
- 			   data->iovdd_33 ? 1 : 0);
- 	if (res < 0)
- 		return res;
--
- 	res = regmap_read(data->regmap, SI5341_DEVICE_REV, &revision);
- 	if (res < 0)
- 		return res;
-@@ -1262,8 +1264,66 @@ static const struct regmap_config si5341_regmap_config = {
- 	.volatile_table = &si5341_regmap_volatile,
- };
+@@ -1539,12 +1542,61 @@ static ssize_t clear_sticky_store(struct device *dev,
+ }
+ static DEVICE_ATTR_WO(clear_sticky);
  
 +static ssize_t program_nvm_bank_show(struct device *dev,
 +				struct device_attribute *attr, char *buf)
@@ -147,31 +107,17 @@ index f7b41366666e..6fd311344afa 100644
 +
 +static DEVICE_ATTR_RW(program_nvm_bank);
 +
-+static struct attribute *si5341_sysfs_entries[] = {
+ static const struct attribute *si5341_attributes[] = {
+ 	&dev_attr_input_present.attr,
+ 	&dev_attr_input_present_sticky.attr,
+ 	&dev_attr_pll_locked.attr,
+ 	&dev_attr_pll_locked_sticky.attr,
+ 	&dev_attr_clear_sticky.attr,
 +	&dev_attr_program_nvm_bank.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group si5341_attr_group = {
-+	.name	= NULL,	/* put in device directory */
-+	.attrs	= si5341_sysfs_entries,
-+};
-+
- static int si5341_dt_parse_dt(struct clk_si5341 *data,
--			      struct clk_si5341_output_config *config)
-+	struct clk_si5341_output_config *config)
- {
- 	struct device_node *child;
- 	struct device_node *np = data->i2c_client->dev.of_node;
-@@ -1341,7 +1401,6 @@ static int si5341_dt_parse_dt(struct clk_si5341 *data,
+ 	NULL
+ };
  
- 		config[num].always_on =
- 			of_property_read_bool(child, "always-on");
--
- 		config[num].vdd_sel_bits = 0x08;
- 		if (data->clk[num].vddo_reg) {
- 			int vdd = regulator_get_voltage(data->clk[num].vddo_reg);
-@@ -1569,7 +1628,6 @@ static int si5341_probe(struct i2c_client *client,
+@@ -1571,7 +1623,6 @@ static int si5341_probe(struct i2c_client *client)
  	err = si5341_wait_device_ready(client);
  	if (err)
  		return err;
@@ -179,19 +125,6 @@ index f7b41366666e..6fd311344afa 100644
  	for (i = 0; i < SI5341_NUM_INPUTS; ++i) {
  		input = devm_clk_get(&client->dev, si5341_input_clock_names[i]);
  		if (IS_ERR(input)) {
-@@ -1784,9 +1842,11 @@ static int si5341_probe(struct i2c_client *client,
- 	/* Free the names, clk framework makes copies */
- 	for (i = 0; i < data->num_synth; ++i)
- 		 devm_kfree(&client->dev, (void *)synth_clock_names[i]);
-+	err = sysfs_create_group(&client->dev.kobj, &si5341_attr_group);
-+	if (err)
-+		dev_err(&client->dev, "failed to create sysfs entries\n");
- 
- 	return 0;
--
- cleanup:
- 	for (i = 0; i < SI5341_MAX_NUM_OUTPUTS; ++i) {
- 		if (data->clk[i].vddo_reg)
 -- 
-2.17.1
+2.34.1
 

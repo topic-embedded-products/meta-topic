@@ -1,7 +1,7 @@
-From 16f0a299c714fa0cb576b83c657376d51a213c11 Mon Sep 17 00:00:00 2001
+From 23dcb761d9b420aa0530f3faad831e1397d7d645 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Mon, 4 Jan 2021 16:36:48 +0100
-Subject: [PATCH 08/14] clk-si5341: Add output_mask attribute
+Subject: [PATCH] clk-si5341: Add output_mask attribute
 
 Allows disabling clocks from userspace. Expected sequence:
 - Check program status by reading program_nvm_bank
@@ -12,16 +12,16 @@ Allows disabling clocks from userspace. Expected sequence:
 
 Upstream-status: Inappropriate
 ---
- drivers/clk/clk-si5341.c | 65 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+ drivers/clk/clk-si5341.c | 66 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
 
 diff --git a/drivers/clk/clk-si5341.c b/drivers/clk/clk-si5341.c
-index 6fd311344afa..d2a4b3b7b538 100644
+index 80ccf34741dc..92a9472b279a 100644
 --- a/drivers/clk/clk-si5341.c
 +++ b/drivers/clk/clk-si5341.c
-@@ -1310,10 +1310,75 @@ static ssize_t program_nvm_bank_store(struct device *dev,
- 	return count;
- }
+@@ -1590,6 +1590,71 @@ static ssize_t program_nvm_bank_store(struct device *dev,
+ 
+ static DEVICE_ATTR_RW(program_nvm_bank);
  
 +static ssize_t output_mask_show(struct device *dev,
 +				struct device_attribute *attr, char *buf)
@@ -86,15 +86,19 @@ index 6fd311344afa..d2a4b3b7b538 100644
 +	return count;
 +}
 +
- static DEVICE_ATTR_RW(program_nvm_bank);
 +static DEVICE_ATTR_RW(output_mask);
- 
- static struct attribute *si5341_sysfs_entries[] = {
++
+ static const struct attribute *si5341_attributes[] = {
+ 	&dev_attr_input_present.attr,
+ 	&dev_attr_input_present_sticky.attr,
+@@ -1597,6 +1662,7 @@ static const struct attribute *si5341_attributes[] = {
+ 	&dev_attr_pll_locked_sticky.attr,
+ 	&dev_attr_clear_sticky.attr,
  	&dev_attr_program_nvm_bank.attr,
 +	&dev_attr_output_mask.attr,
- 	NULL,
+ 	NULL
  };
  
 -- 
-2.17.1
+2.34.1
 

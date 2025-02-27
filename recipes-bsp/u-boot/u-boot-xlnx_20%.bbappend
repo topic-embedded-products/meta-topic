@@ -2,6 +2,9 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI:append = "\
 	file://0001-board-topic-Detect-RAM-size-at-boot.patch \
+	"
+
+TODO_SKIP = "\
 	file://0002-board-topic_miamilite-Support-cost-reduced-version.patch \
 	file://0003-configs-topic_miami.h-Use-same-partitioning-for-USB-.patch \
 	file://0004-topic_miami-Update-configuration.patch \
@@ -56,10 +59,14 @@ SRC_URI:append:topic-miamimp = "\
 	file://no-video.cfg \
 	file://support-ubi-boot.cfg \
 	file://support-squashfs.cfg \
+	"
+TODO_topic-miamimp = "\
 	file://0001-zynqmp-Boot-with-UBI-from-QSPI.patch \
 	"
 
 SRC_URI:append:tspzu = "\
-	file://0001-zynqmp-Detect-and-fixup-memory-config-on-topic-mpsoc.patch \
 	file://enable-of-board-setup.cfg \
+	"
+TODO_tspzu = "\
+	file://0001-zynqmp-Detect-and-fixup-memory-config-on-topic-mpsoc.patch \
 	"

@@ -3,6 +3,8 @@
 FPGA_FAMILY_SHORT ?= "xczu"
 DEVICETREE ?= "devicetree/zynqmp-topic-miamiplusmp.dtb"
 
+XILINX_WITH_ESW = "xsct"
+
 require conf/machine/include/topic-miamimp.inc
 
 # Add SOM to overrides, takes precedence over topic-miamimp

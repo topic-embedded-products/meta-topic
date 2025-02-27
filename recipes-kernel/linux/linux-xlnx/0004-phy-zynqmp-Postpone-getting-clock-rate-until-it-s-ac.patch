@@ -1,4 +1,4 @@
-From 2bd7f9ee49b9f9d5057b6246362faeddbfda5903 Mon Sep 17 00:00:00 2001
+From f66091cf35f3d4e72d61fa46027d3f3a39738b0b Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Fri, 9 Jul 2021 09:54:49 +0200
 Subject: [PATCH] phy-zynqmp: Postpone getting clock rate until it's actually
@@ -14,14 +14,14 @@ actually being initialized before requesting the clock rate setting.
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 ---
- drivers/phy/xilinx/phy-zynqmp.c | 56 ++++++++++++++++-----------------
- 1 file changed, 28 insertions(+), 28 deletions(-)
+ drivers/phy/xilinx/phy-zynqmp.c | 62 ++++++++++++++++-----------------
+ 1 file changed, 31 insertions(+), 31 deletions(-)
 
 diff --git a/drivers/phy/xilinx/phy-zynqmp.c b/drivers/phy/xilinx/phy-zynqmp.c
-index b846a1455f55..ab16a338f7c9 100644
+index eccb17ddeada..e421b29b9fa0 100644
 --- a/drivers/phy/xilinx/phy-zynqmp.c
 +++ b/drivers/phy/xilinx/phy-zynqmp.c
-@@ -208,7 +208,6 @@ struct xpsgtr_phy {
+@@ -226,7 +226,6 @@ struct xpsgtr_phy {
   * @siou: siou base address
   * @gtr_mutex: mutex for locking
   * @phys: PHY lanes
@@ -29,7 +29,7 @@ index b846a1455f55..ab16a338f7c9 100644
   * @clk: reference clocks
   * @tx_term_fix: fix for GT issue
   * @saved_icm_cfg0: stored value of ICM CFG0 register
-@@ -220,7 +219,6 @@ struct xpsgtr_dev {
+@@ -239,7 +238,6 @@ struct xpsgtr_dev {
  	void __iomem *siou;
  	struct mutex gtr_mutex; /* mutex for locking */
  	struct xpsgtr_phy phys[NUM_LANES];
@@ -37,7 +37,7 @@ index b846a1455f55..ab16a338f7c9 100644
  	struct clk *clk[NUM_LANES];
  	bool tx_term_fix;
  	unsigned int saved_icm_cfg0;
-@@ -336,13 +334,38 @@ static int xpsgtr_wait_pll_lock(struct phy *phy)
+@@ -382,13 +380,41 @@ static int xpsgtr_wait_pll_lock(struct phy *phy)
  	return ret;
  }
  
@@ -52,7 +52,10 @@ index b846a1455f55..ab16a338f7c9 100644
 +	rate = clk_get_rate(clk);
 +
 +	for (i = 0 ; i < ARRAY_SIZE(ssc_lookup); i++) {
-+		if (rate == ssc_lookup[i].refclk_rate) {
++		/* Allow an error of 100 ppm */
++		unsigned long error = ssc_lookup[i].refclk_rate / 10000;
++
++		if (abs(rate - ssc_lookup[i].refclk_rate) < error) {
 +			return &ssc_lookup[i];
 +		}
 +	}
@@ -77,7 +80,7 @@ index b846a1455f55..ab16a338f7c9 100644
  	step_size = ssc->step_size;
  
  	xpsgtr_clr_set(gtr_phy->dev, PLL_REF_SEL(gtr_phy->lane),
-@@ -805,8 +828,7 @@ static struct phy *xpsgtr_xlate(struct device *dev,
+@@ -851,8 +877,7 @@ static struct phy *xpsgtr_xlate(struct device *dev,
  	}
  
  	refclk = args->args[3];
@@ -87,7 +90,7 @@ index b846a1455f55..ab16a338f7c9 100644
  		dev_err(dev, "Invalid reference clock number %u\n", refclk);
  		return ERR_PTR(-EINVAL);
  	}
-@@ -880,9 +902,7 @@ static int xpsgtr_get_ref_clocks(struct xpsgtr_dev *gtr_dev)
+@@ -928,9 +953,7 @@ static int xpsgtr_get_ref_clocks(struct xpsgtr_dev *gtr_dev)
  {
  	unsigned int refclk;
  
@@ -98,7 +101,7 @@ index b846a1455f55..ab16a338f7c9 100644
  		struct clk *clk;
  		char name[8];
  
-@@ -898,26 +918,6 @@ static int xpsgtr_get_ref_clocks(struct xpsgtr_dev *gtr_dev)
+@@ -946,29 +969,6 @@ static int xpsgtr_get_ref_clocks(struct xpsgtr_dev *gtr_dev)
  			continue;
  
  		gtr_dev->clk[refclk] = clk;
@@ -110,7 +113,10 @@ index b846a1455f55..ab16a338f7c9 100644
 -		rate = clk_get_rate(clk);
 -
 -		for (i = 0 ; i < ARRAY_SIZE(ssc_lookup); i++) {
--			if (rate == ssc_lookup[i].refclk_rate) {
+-			/* Allow an error of 100 ppm */
+-			unsigned long error = ssc_lookup[i].refclk_rate / 10000;
+-
+-			if (abs(rate - ssc_lookup[i].refclk_rate) < error) {
 -				gtr_dev->refclk_sscs[refclk] = &ssc_lookup[i];
 -				break;
 -			}
@@ -126,5 +132,5 @@ index b846a1455f55..ab16a338f7c9 100644
  
  	return 0;
 -- 
-2.17.1
+2.34.1
 

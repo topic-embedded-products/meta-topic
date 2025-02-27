@@ -1,4 +1,4 @@
-From f5744685adaecabc18d7e9d1aff99e9a6790f61e Mon Sep 17 00:00:00 2001
+From e7f3c6e78f46a967b624a9a25d2bb37afafd00d5 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 25 May 2023 14:09:24 +0200
 Subject: [PATCH] clk: Add fixed-clock-nvmem provider
@@ -32,10 +32,10 @@ Change compatible to fixed-clock-nvmem
  create mode 100644 drivers/clk/clk-nvmem.c
 
 diff --git a/drivers/clk/Kconfig b/drivers/clk/Kconfig
-index 016814e15536..63f165473481 100644
+index df9e4946414b..ee7a0d7935ab 100644
 --- a/drivers/clk/Kconfig
 +++ b/drivers/clk/Kconfig
-@@ -447,6 +447,13 @@ config COMMON_CLK_FIXED_MMIO
+@@ -482,6 +482,13 @@ config COMMON_CLK_FIXED_MMIO
  	help
  	  Support for Memory Mapped IO Fixed clocks
  
@@ -50,17 +50,17 @@ index 016814e15536..63f165473481 100644
  	bool "Clock driver for the Canaan Kendryte K210 SoC"
  	depends on OF && RISCV && SOC_CANAAN
 diff --git a/drivers/clk/Makefile b/drivers/clk/Makefile
-index 0aebef17edc6..aef1361e5085 100644
+index b62a5772b766..a5d48116c6f2 100644
 --- a/drivers/clk/Makefile
 +++ b/drivers/clk/Makefile
-@@ -52,6 +52,7 @@ obj-$(CONFIG_ARCH_MOXART)		+= clk-moxart.o
- obj-$(CONFIG_ARCH_NOMADIK)		+= clk-nomadik.o
- obj-$(CONFIG_ARCH_NPCM7XX)	    	+= clk-npcm7xx.o
- obj-$(CONFIG_ARCH_NSPIRE)		+= clk-nspire.o
-+obj-$(CONFIG_COMMON_CLK_NVMEM)		+= clk-nvmem.o
- obj-$(CONFIG_COMMON_CLK_OXNAS)		+= clk-oxnas.o
- obj-$(CONFIG_COMMON_CLK_PALMAS)		+= clk-palmas.o
- obj-$(CONFIG_CLK_LS1028A_PLLDIG)	+= clk-plldig.o
+@@ -10,6 +10,7 @@ obj-$(CONFIG_COMMON_CLK)	+= clk-gate.o
+ obj-$(CONFIG_CLK_GATE_KUNIT_TEST) += clk-gate_test.o
+ obj-$(CONFIG_COMMON_CLK)	+= clk-multiplier.o
+ obj-$(CONFIG_COMMON_CLK)	+= clk-mux.o
++obj-$(CONFIG_COMMON_CLK_NVMEM)	+= clk-nvmem.o
+ obj-$(CONFIG_COMMON_CLK)	+= clk-composite.o
+ obj-$(CONFIG_COMMON_CLK)	+= clk-fractional-divider.o
+ obj-$(CONFIG_COMMON_CLK)	+= clk-gpio.o
 diff --git a/drivers/clk/clk-nvmem.c b/drivers/clk/clk-nvmem.c
 new file mode 100644
 index 000000000000..19aad5cd222f
@@ -181,5 +181,5 @@ index 000000000000..19aad5cd222f
 +MODULE_AUTHOR("Mike Looijmans <mike.looijmans@topic.nl>");
 +MODULE_LICENSE("GPL");
 -- 
-2.17.1
+2.34.1
 

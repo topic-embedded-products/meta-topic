@@ -332,8 +332,8 @@ index 000000000000..7a1a313d15fd
 +	return i2c_smbus_write_byte_data(i2c, 0, 0);
 +}
 +
-+static int ltc3562_i2c_probe(struct i2c_client *i2c,
-+	const struct i2c_device_id *id)
++static int ltc3562_i2c_probe(struct i2c_client *i2c
++	)
 +{
 +	int i, error;
 +	unsigned long uV;
