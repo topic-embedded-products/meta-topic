@@ -16,7 +16,14 @@ TOPICBSPCONFIG:tepzu = "file://topic-miamimp-standard.cfg file://topic-miamiplus
 TOPICBSPCONFIG:ttpzu9 = "file://topic-miamimp-standard.cfg file://topic-miamiplusmp-extra.cfg file://ttpzu9-extra.cfg file://usb-wired-network-adapters.cfg"
 TOPICBSPCONFIG:xdpzu7 = "file://topic-xdpzu7-standard.cfg file://usb-wired-network-adapters.cfg"
 
+# For some reason, the configuration drops support for UNIX and IPv4 protocols, put them back
+TOPIC_NETWORK_CONFIG = "\
+	file://network-ipv4.cfg \
+	file://network-unix.cfg \
+	"
+
 SRC_URI:append = "\
 	${TOPICBSPCONFIG} \
+	${TOPIC_NETWORK_CONFIG} \
 	${@bb.utils.contains("MACHINE_FEATURES", "rtc", "file://zynqmp-rtc.cfg", "", d)} \
 	"
