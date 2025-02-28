@@ -132,18 +132,24 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		pagesize = <16>;
-		/* NVMEM entries */
-		gem0_mac: mac@30 {
-			reg = <0x30 6>;
-		};
-		gem1_mac: mac@38 {
-			reg = <0x38 6>;
-		};
-		miamiserial: serial@1f4 {
-			reg = <0x1f4 4>;
-		};
-		dyplolicense: dyplolicense@1f8 {
-			reg = <0x1f8 8>;
+
+		nvmem-layout {
+			compatible = "fixed-layout";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			gem0_mac: mac@30 {
+				reg = <0x30 6>;
+			};
+			gem1_mac: mac@38 {
+				reg = <0x38 6>;
+			};
+			miamiserial: serial@1f4 {
+				reg = <0x1f4 4>;
+			};
+			dyplolicense: dyplolicense@1f8 {
+				reg = <0x1f8 8>;
+			};
 		};
 	};
 	/* IO Voltage controller */

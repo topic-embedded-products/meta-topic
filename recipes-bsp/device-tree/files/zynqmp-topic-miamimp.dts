@@ -140,17 +140,22 @@
 		pagesize = <16>;
 		#address-cells = <1>;
 		#size-cells = <1>;
-		gem0_mac: mac@1e8 {
-			reg = <0x1e8 6>;
-		};
-		gem1_mac: mac@1ee {
-			reg = <0x1ee 6>;
-		};
-		miamiserial: serial@1f4 {
-			reg = <0x1f4 4>;
-		};
-		dyplolicense: dyplolicense@1f8 {
-			reg = <0x1f8 8>;
+		nvmem-layout {
+			compatible = "fixed-layout";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			gem0_mac: mac@1e8 {
+				reg = <0x1e8 6>;
+			};
+			gem1_mac: mac@1ee {
+				reg = <0x1ee 6>;
+			};
+			miamiserial: serial@1f4 {
+				reg = <0x1f4 4>;
+			};
+			dyplolicense: dyplolicense@1f8 {
+				reg = <0x1f8 8>;
+			};
 		};
 	};
 	/* Programmable clock (for logic) */
