@@ -32,11 +32,6 @@ SOC_VARIANT ?= "eg"
 # The SOM_FAMILY is more specific than the SOC_FAMILY (=zynqmp) in the MACHINEOVERRIDES
 MACHINEOVERRIDES =. "${SOM_FAMILY}:${MACHINE_BOARD}:${FPGA_FAMILY}:"
 
-# The zynqmp is a CortexA53, no need to be binary compatible with other CPUs
-# This is a strange place to do this. Note that you'll have to remove this when
-# attempting to build the PMU firmware.
-DEFAULTTUNE = "cortexa53"
-
 require conf/machine/zynqmp-generic.conf
 # Undo what Xilinx did, there's nothing that we want, so make it empty
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS = ""
@@ -86,8 +81,7 @@ IMAGE_OVERHEAD_FACTOR="1.1"
 # Xilinx sets WKS_FILE_DEPENDS:append which we'll undo here. We only want boot.bin there anyway...
 WKS_FILE_DEPENDS:remove = "virtual/dtb u-boot-xlnx-uenv u-boot-xlnx-scr arm-trusted-firmware"
 
-# HACK (xilins prepends file:// and appends .elf
-# FSBL_FILE = "${HOME}/projects/topic-platform-langdale/fsbl-${MACHINE}"
+XILINX_WITH_ESW = "xsct"
 
 # Do not add device-tree or bitstream to boot.bin, they're not needed
 BIF_DEVICETREE_ATTR = ""
@@ -95,11 +89,9 @@ BIF_BITSTREAM_ATTR = ""
 
 # TLD uses this revision
 TOPIC_XSA_DESIGN_VERSION ?= "179+bcff7f6"
-TOPIC_XSA_DESIGN_NAME ?= "fpga-hardware-${HDF_MACHINE}-reference-${TOPIC_XSA_DESIGN_VERSION}.xsa"
+TOPIC_XSA_DESIGN_NAME ?= "fpga-hardware-${MACHINE}-reference-${TOPIC_XSA_DESIGN_VERSION}.xsa"
 
 # Setup things for external-hdf.bb
-# Note: Update the checksums in "external-hdf.bbappend" when the reference designs change
-HDF_MACHINE = "${MACHINE}"
-HDF_BASE = "http://"
-HDF_PATH = "topic.nl/downloads/xsa/${TOPIC_XSA_DESIGN_NAME}.xz;name=${HDF_MACHINE}"
-HDF_NAME = "${S}/${TOPIC_XSA_DESIGN_NAME}"
+HDF_NAME = "${TOPIC_XSA_DESIGN_NAME}"
+HDF_URI = "http://topic.nl/downloads/xsa/${TOPIC_XSA_DESIGN_NAME}.xz"
+HDF_URI[sha256sum] = "${TOPIC_XSA_DESIGN_SHA256SUM}"

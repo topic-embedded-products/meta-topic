@@ -20,6 +20,7 @@ SRC_URI:append = "\
 # fsbl-firmware/fsbl-firmware_plat/hw/psu_init.c is taken from the XSA file
 # fsbl-firmware/fsbl-firmware/psu_init.c is what actually gets compiled
 do_configure:append:zynqmp() {
+	echo  "Patching psu_init in S=${S} B=${B}"
 	for p in fsbl-firmware/fsbl-firmware_plat/hw fsbl-firmware/fsbl-firmware
 	do
 		ln ${WORKDIR}/ps_iic_eeprom.c ${WORKDIR}/ps_iic_eeprom.h ${WORKDIR}/psu_init_ddr.inc ${WORKDIR}/psu_init_ddr_custom.inc ${S}/$p/

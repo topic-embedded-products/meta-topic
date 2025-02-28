@@ -1,5 +1,6 @@
 #include "xfsbl_hw.h"
 #include "xiicps.h"
+#include "xil_util.h"
 
 #include "ps_iic_eeprom.h"
 
@@ -8,7 +9,6 @@ int psu_read_eeprom(u16 device_id, u16 i2c_slave_addr, u16 offset, u8 offset_siz
 	XIicPs IicInstance;
 	XIicPs_Config *ConfigIic;
 	s32 Status;
-	u32 Regval;
 	u8 TxArray[2];
 
 	/* Lookup for I2C-1U device */
@@ -28,10 +28,8 @@ int psu_read_eeprom(u16 device_id, u16 i2c_slave_addr, u16 offset, u8 offset_siz
 		return Status;
 
 	/* Wait until bus is idle  */
-	Regval = 0;
-	Status = XFsbl_PollTimeout(IicInstance.Config.BaseAddress +
-			XIICPS_SR_OFFSET, Regval, (Regval &	XIICPS_SR_BA_MASK) == 0x0U,
-			100000u);
+	Status = Xil_WaitForEvent(IicInstance.Config.BaseAddress +
+			XIICPS_SR_OFFSET, XIICPS_SR_BA_MASK, 0u, 100000u);
 	if (Status != XST_SUCCESS)
 		return Status;
 
