@@ -117,6 +117,24 @@
 		#phy-cells = <0>;
 		reset-gpios = <&gpioex 4 GPIO_ACTIVE_LOW>;
 	};
+
+	/* Enable PL clocks */
+	fclk_pl0_ref: fclk-pl0 {
+		compatible = "xlnx,fclk";
+		clocks = <&zynqmp_clk PL0_REF>;
+	};
+	fclk_pl1_ref: fclk-pl1 {
+		compatible = "xlnx,fclk";
+		clocks = <&zynqmp_clk PL1_REF>;
+	};
+	fclk_pl2_ref: fclk-pl2 {
+		compatible = "xlnx,fclk";
+		clocks = <&zynqmp_clk PL2_REF>;
+	};
+	fclk_pl3_ref: fclk-pl3 {
+		compatible = "xlnx,fclk";
+		clocks = <&zynqmp_clk PL3_REF>;
+	};
 };
 
 &usb0 {

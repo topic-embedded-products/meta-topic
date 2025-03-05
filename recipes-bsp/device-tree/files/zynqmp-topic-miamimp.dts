@@ -81,6 +81,24 @@
 		io-channels = <&xilinx_ams 7>, <&xilinx_ams 8>, <&xilinx_ams 20>;
 		io-channel-names = "ps_temp", "remote_temp", "pl_temp";
 	};
+
+	/* Enable PL clocks */
+	fclk_pl0_ref: fclk-pl0 {
+		compatible = "xlnx,fclk";
+		clocks = <&zynqmp_clk PL0_REF>;
+	};
+	fclk_pl1_ref: fclk-pl1 {
+		compatible = "xlnx,fclk";
+		clocks = <&zynqmp_clk PL1_REF>;
+	};
+	fclk_pl2_ref: fclk-pl2 {
+		compatible = "xlnx,fclk";
+		clocks = <&zynqmp_clk PL2_REF>;
+	};
+	fclk_pl3_ref: fclk-pl3 {
+		compatible = "xlnx,fclk";
+		clocks = <&zynqmp_clk PL3_REF>;
+	};
 };
 
 /* USB PHY reset (Xilinx specific) */
