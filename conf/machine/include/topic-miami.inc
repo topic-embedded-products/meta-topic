@@ -73,8 +73,9 @@ MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree-static"
 
 DEVICETREE ??= "devicetree/topic-miami.dtb"
 
-# We want to use u-boot SPL
-PREFERRED_PROVIDER_virtual/boot-bin = "u-boot-xlnx"
+# We want to use u-boot proper
+PREFERRED_PROVIDER_virtual/boot-bin = "u-boot"
+PREFERRED_PROVIDER_virtual/bootloader = "u-boot"
 
 # Xilinx sets WKS_FILE_DEPENDS:append which we'll undo here. We only want boot.bin there anyway...
 WKS_FILE_DEPENDS:remove = "xilinx-bootbin virtual/dtb u-boot-xlnx-scr u-boot-xlnx-uenv arm-trusted-firmware"
