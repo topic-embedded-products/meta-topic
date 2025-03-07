@@ -1,4 +1,4 @@
-setenv bootargs $bootargs console=ttyPS0,115200 reset_reason=${reset_reason}
+setenv bootargs $bootargs console=ttyPS0,115200 reset_reason=${reset_reason} quiet
 if test "${devtype}" = "mmc"; then
 	echo "Loading kernel from SD card partition ${distro_bootpart}..."
 	if load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} /boot/system.dtb && load ${devtype} ${devnum}:${distro_bootpart} ${kernel_addr_r} /boot/uImage; then
