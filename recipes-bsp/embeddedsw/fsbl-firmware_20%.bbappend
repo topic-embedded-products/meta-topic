@@ -2,7 +2,6 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 # Apply extra patches to psu_init.c
 EXTRA_PSUINIT_PATCH = ""
-EXTRA_PSUINIT_PATCH:xdpzu7 = "xdpzu7_psu_init_sdio.patch"
 EXTRA_PSUINIT_PATCH:tdkzu6 = "tdkzu_psu_init_dual_rank_support.patch"
 EXTRA_PSUINIT_PATCH:tdkzu9 = "tdkzu_psu_init_dual_rank_support.patch"
 EXTRA_PSUINIT_PATCH:tdkzu15 = "tdkzu_psu_init_dual_rank_support.patch"

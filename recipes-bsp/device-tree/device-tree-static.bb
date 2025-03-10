@@ -29,15 +29,6 @@ RCONFLICTS:${PN} = "device-tree"
 SYSTEM_TOP_DTB ?= "${MACHINE}.dtb"
 SYSTEM_DTB ?= "${SYSTEM_TOP_DTB}"
 
-COMPATIBLE_MACHINE:xdpzu7 = ".*"
-SRC_URI:xdpzu7 = " \
-		file://zynqmp-topic-miamimp-xilinx-xdp.dts \
-		file://zynqmp-topic-miamimp-xilinx-xdp-sd.dts \
-		file://zynqmp-topic-miamimp-xilinx-xdp-usbhost.dts \
-		file://zynqmp-topic-miamimp-xilinx-xdp-sd-usbhost.dts \
-		"
-SYSTEM_TOP_DTB:xdpzu7 = "zynqmp-topic-miamimp-xilinx-xdp.dtb"
-
 COMPATIBLE_MACHINE:ttpzu9 = ".*"
 SRC_URI:ttpzu9 = "\
 	file://zynqmp-topic-miamiplusmp.dts \

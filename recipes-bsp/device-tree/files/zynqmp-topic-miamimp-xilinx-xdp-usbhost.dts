@@ -1,5 +1,0 @@
-#include "zynqmp-topic-miamimp-xilinx-xdp.dts"
-
-&dwc3_0 {
-	dr_mode = "host"; /* One of host, peripheral, otg */
-};
