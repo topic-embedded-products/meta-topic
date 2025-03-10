@@ -43,6 +43,7 @@ SRC_URI:ttpzu9 = "\
 	file://zynqmp-topic-miamiplusmp.dts \
 	file://${MACHINE}.dts \
 	"
+SYSTEM_TOP_DTB:ttpzu9 = "${MACHINE}.dtb"
 
 COMPATIBLE_MACHINE:tspzu = ".*"
 # Generic configuration for SOM
