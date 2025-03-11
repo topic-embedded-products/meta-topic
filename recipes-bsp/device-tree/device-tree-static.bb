@@ -55,12 +55,14 @@ SYSTEM_TOP_DTB:tdpzu = "tdpzu-uboot.dtb"
 SRC_URI:tepzu = "\
 	file://zynqmp-topic-miamiplusmp.dts \
 	file://tepzu.dts \
+	file://tepzu-uboot.dts \
 	"
-SYSTEM_TOP_DTB:tepzu = "tepzu.dtb"
+SYSTEM_TOP_DTB:tepzu = "tepzu-uboot.dtb"
 
 TDKZU_SOURCES = "\
 	file://zynqmp-topic-miamimp-florida-gen.dts \
 	file://zynqmp-topic-miamimp.dts \
+	file://tdkzu-uboot.dts \
 	"
 COMPATIBLE_MACHINE:tdkzu6  = ".*"
 COMPATIBLE_MACHINE:tdkzu9  = ".*"
@@ -68,9 +70,9 @@ COMPATIBLE_MACHINE:tdkzu15 = ".*"
 SRC_URI:tdkzu6  = "${TDKZU_SOURCES}"
 SRC_URI:tdkzu9  = "${TDKZU_SOURCES}"
 SRC_URI:tdkzu15 = "${TDKZU_SOURCES}"
-SYSTEM_TOP_DTB:tdkzu6 = "zynqmp-topic-miamimp-florida-gen.dtb"
-SYSTEM_TOP_DTB:tdkzu9 = "zynqmp-topic-miamimp-florida-gen.dtb"
-SYSTEM_TOP_DTB:tdkzu15 = "zynqmp-topic-miamimp-florida-gen.dtb"
+SYSTEM_TOP_DTB:tdkzu6 = "tdkzu-uboot.dtb"
+SYSTEM_TOP_DTB:tdkzu9 = "tdkzu-uboot.dtb"
+SYSTEM_TOP_DTB:tdkzu15 = "tdkzu-uboot.dtb"
 
 TDKZ_SOURCES = "\
 	file://topic-miami-florida-mio.dts \

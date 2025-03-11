@@ -1,0 +1,8 @@
+#include "zynqmp-topic-miamimp-florida-gen.dts"
+
+/* Run QSPI at 40MHz. Some bug in u-boot corrupts the data at higher speeds */
+&qspi {
+	flash@0 {
+		spi-max-frequency = <40000000>;
+	};
+};
