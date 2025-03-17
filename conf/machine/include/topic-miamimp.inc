@@ -3,6 +3,10 @@
 #
 # Machine config is expected to set MACHINE_BOARD and FPGA_FAMILY
 
+# The MPSoC has a cortexa53 core. Xilinx defaults to cortexa72-cortexa53
+# wich also works but just isn't true.
+DEFAULTTUNE = "cortexa53"
+
 # The system-on-module contains flash, CPU+FPGA, RAM and various power supply
 # and clock sources.
 SOM_FAMILY = "topic-miamimp"
