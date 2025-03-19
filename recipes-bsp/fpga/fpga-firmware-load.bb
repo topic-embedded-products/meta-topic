@@ -20,7 +20,8 @@ INITSCRIPT_PARAMS = "start 03 S ."
 SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 
 do_compile() {
-	true
+	sed -i -e 's,@LIBDIR@,${nonarch_base_libdir},g' ${WORKDIR}/${BPN}.sh
+	sed -i -e 's,@BINDIR@,${bindir},g' ${WORKDIR}/${BPN}.service
 }
 
 FILES:${PN} = "${bindir} ${sysconfdir} ${systemd_unitdir}"
@@ -32,5 +33,4 @@ do_install() {
 	install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/${BPN}.sh
 	install -d ${D}${systemd_unitdir}/system
 	install -m 0644 ${WORKDIR}/${BPN}.service ${D}${systemd_unitdir}/system/
-	sed -i -e 's,@BINDIR@,${bindir},g' ${D}${systemd_unitdir}/system/${BPN}.service
 }

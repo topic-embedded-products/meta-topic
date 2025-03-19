@@ -5,13 +5,12 @@ INHIBIT_DEFAULT_DEPS = "1"
 # Need the bitstream converter on the build machine
 DEPENDS = "fpga-bit-to-bin-native"
 # Recommend bitstream to be loaded at boot
-RRECOMMENDS:${PN} = "${@bb.utils.contains("MACHINE_FEATURES", "fpgamgr", "fpga-firmware-load", "fpga-image-load", d)}"
+RRECOMMENDS:${PN} = "fpga-firmware-load"
 # Package is machine specific
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-# By default, installs into /usr/share, but when using the fpga manager you
-# would want this to be /lib/firmware
-FPGA_STATIC_BITSTREAM_PATH ?= "${@bb.utils.contains("MACHINE_FEATURES", "fpgamgr", "/lib/firmware", "${datadir}", d)}"
+# By default, installs into /lib/firmware
+FPGA_STATIC_BITSTREAM_PATH ?= "${nonarch_base_libdir}/firmware"
 # Where you want to put the partials depends on what you want to do with them.
 # Dyplo likes them to be in /usr/share so that remains the default for all platforms
 FPGA_BITSTREAM_PATH ?= "${datadir}"
@@ -135,6 +134,7 @@ do_convert_bitstreams() {
 }
 do_convert_bitstreams[dirs] = "${B}"
 
+INSANE_SKIP:${PN} += "usrmerge"
 FILES:${PN} = "${FPGA_BITSTREAM_PATH} ${FPGA_STATIC_BITSTREAM_PATH}"
 do_install() {
 	install -d ${D}${FPGA_BITSTREAM_PATH}

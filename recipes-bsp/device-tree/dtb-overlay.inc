@@ -27,10 +27,10 @@ addtask replacevars after do_patch before do_compile
 
 # devicetree.bbclass installs into /boot/devicetree while we want to install
 # into /lib/firmware
-FILES:${PN} = "/lib/firmware"
+FILES:${PN} = "${nonarch_base_libdir}/firmware"
 do_install() {
     for DTB_FILE in `ls *.dtbo`; do
-        install -Dm 0644 ${B}/${DTB_FILE} ${D}/lib/firmware/${DTB_FILE}
+        install -Dm 0644 ${B}/${DTB_FILE} ${D}${nonarch_base_libdir}/firmware/${DTB_FILE}
     done
 }
 

@@ -1,5 +1,5 @@
 #!/bin/sh -e
-if [ -e /lib/firmware/pl.dtbo ]
+if [ -e @LIBDIR@/firmware/pl.dtbo ]
 then
     test -d /sys/kernel/config/device-tree/overlays/full || mkdir /sys/kernel/config/device-tree/overlays/full
     echo -n pl.dtbo > /sys/kernel/config/device-tree/overlays/full/path

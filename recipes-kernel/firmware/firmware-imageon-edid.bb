@@ -8,11 +8,11 @@ SRC_URI = "https://github.com/analogdevicesinc/linux/blob/c7c505283d373d0618e33e
 
 S = "${WORKDIR}"
 
-FILES:${PN} = "/lib/firmware"
+FILES:${PN} = "${nonarch_base_libdir}/firmware"
 
 do_install() {
-	install -d ${D}/lib/firmware
-	install -m 644 ${S}/imageon_edid.bin ${D}/lib/firmware/
+	install -d ${D}${nonarch_base_libdir}/firmware
+	install -m 644 ${S}/imageon_edid.bin ${D}${nonarch_base_libdir}/firmware/
 }
 
 SRC_URI[md5sum] = "136512f5377191211382664d5f0474bd"
