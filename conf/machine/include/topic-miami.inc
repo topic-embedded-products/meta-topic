@@ -53,7 +53,7 @@ HAS_PLATFORM_INIT:append = "\
 UBOOT_USER_SPECIFIED_DTS = "zynq-topic-miami"
 
 KERNEL_MODULE_AUTOLOAD ?= ""
-KERNEL_MODULE_AUTOLOAD += "g_ether spi-cadence"
+KERNEL_MODULE_AUTOLOAD += "spi-cadence"
 
 MACHINE_EXTRA_RRECOMMENDS += "\
 	topic-miami-monitor-lib \

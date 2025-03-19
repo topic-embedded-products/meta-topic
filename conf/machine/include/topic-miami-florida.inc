@@ -10,7 +10,6 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-axi-hdmi-rx \
 	kernel-module-bitblit \
 	kernel-module-dma-axi-dmac \
-	kernel-module-g-ether \
 	kernel-module-u-ether \
 	kernel-module-usb-f-ecm \
 	kernel-module-usb-f-ecm-subset \

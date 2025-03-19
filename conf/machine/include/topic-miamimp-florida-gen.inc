@@ -2,7 +2,7 @@ require conf/machine/include/topic-miamimp.inc
 
 BOARD_PL_REFERENCE = "dtb-miami-florida-gen-reference"
 
-KERNEL_MODULE_AUTOLOAD += "g_ether spi-cadence mali"
+KERNEL_MODULE_AUTOLOAD += "spi-cadence mali"
 
 # Extra packages to install for the board
 MACHINE_EXTRA_RRECOMMENDS += "\
@@ -11,8 +11,6 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-axi-hdmi-rx \
 	kernel-module-bitblit \
 	kernel-module-dma-axi-dmac \
-	kernel-module-g-ether \
-	kernel-module-g-mass-storage \
 	kernel-module-u-ether \
 	kernel-module-usb-f-ecm \
 	kernel-module-usb-f-ecm-subset \
