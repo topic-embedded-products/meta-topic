@@ -14,6 +14,10 @@ SRC_URI:append = "\
 	file://psu_init_ddr.inc file://psu_init_ddr_custom.inc \
 	"
 
+SRC_URI:append:tspzu = "\
+	file://0001-topic-Determine-ECC-range-programmatically.patch \
+	"
+
 # The configure step generates the psu_init.c anew and doesn't actually use the one from the XSA
 # To get our modifications into the FSBL, patch both psu_init.c files:
 # fsbl-firmware/fsbl-firmware_plat/hw/psu_init.c is taken from the XSA file

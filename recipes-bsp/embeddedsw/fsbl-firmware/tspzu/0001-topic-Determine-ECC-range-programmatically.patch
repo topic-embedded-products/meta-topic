@@ -1,0 +1,55 @@
+From 5e8aceab747b279a8fc487390b5eaa06bd6c7312 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Wed, 19 Mar 2025 10:44:47 +0100
+Subject: [PATCH] topic: Determine ECC range programmatically
+
+Read DDR registers to determine the DDR size for ECC clearing
+---
+ .../zynqmp_fsbl/src/xfsbl_initialization.c    | 24 +++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/lib/sw_apps/zynqmp_fsbl/src/xfsbl_initialization.c b/lib/sw_apps/zynqmp_fsbl/src/xfsbl_initialization.c
+index 6b5fc31bb6..8ca8dbbf90 100644
+--- a/lib/sw_apps/zynqmp_fsbl/src/xfsbl_initialization.c
++++ b/lib/sw_apps/zynqmp_fsbl/src/xfsbl_initialization.c
+@@ -1728,6 +1728,7 @@ END:
+ static u32 XFsbl_DdrEccInit(void)
+ {
+ 	u32 Status;
++	u32 mstr_12;
+ if (XFsbl_In32(0XFD070070) & 0x04) { /* DDRC_ECCCFG0_OFFSET, ECC_MODE bit */
+ 	u64 LengthBytes =
+ 			(XFSBL_PS_DDR_END_ADDRESS - XFSBL_PS_DDR_INIT_START_ADDRESS) + 1;
+@@ -1744,8 +1745,27 @@ if (XFsbl_In32(0XFD070070) & 0x04) { /* DDRC_ECCCFG0_OFFSET, ECC_MODE bit */
+ 
+ 	/* If there is upper PS DDR, initialize its ECC */
+ #ifdef XFSBL_PS_HI_DDR_START_ADDRESS
+-	LengthBytes =
+-		(XFSBL_PS_HI_DDR_END_ADDRESS - XFSBL_PS_HI_DDR_START_ADDRESS) + 1;
++	/* Reading these registers only works on TOPIC boards */
++	/* bit 12:13 bus width, 00=Full 01=Half 10=Quarter */
++	mstr_12 = (XFsbl_In32(0xFD070000) >> 12) & 0x3;
++	/* bit 0:3 address bit 16 mapping */
++	switch (XFsbl_In32(0xFD07021C) & 0x0f) {
++	case 0xf:
++		/* density 8, max size 4GB */
++		LengthBytes = 0x100000000ull >> mstr_12;
++		LengthBytes -= 0x80000000; /* 2GB in lower range */
++		break;
++	case 0x7:
++		/* density 16, max size 8GB */
++		LengthBytes = 0x200000000ull >> mstr_12;
++		LengthBytes -= 0x80000000; /* 2GB in lower range */
++		break;
++	default:
++		LengthBytes =
++			(XFSBL_PS_HI_DDR_END_ADDRESS - XFSBL_PS_HI_DDR_START_ADDRESS) + 1;
++		break;
++	}
++
+ 	DestAddr = XFSBL_PS_HI_DDR_START_ADDRESS;
+ 
+ 	Status = XFsbl_EccInit(DestAddr, LengthBytes);
+-- 
+2.34.1
+
