@@ -8,8 +8,6 @@ PACKAGES = "${PN}"
 
 SRC_URI = "file://init file://${BPN}.service file://${BPN}.sh"
 
-S = "${WORKDIR}"
-
 inherit update-rc.d systemd
 
 # Set to start at 03, which is before modutils
@@ -20,17 +18,19 @@ INITSCRIPT_PARAMS = "start 03 S ."
 SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 
 do_compile() {
-	sed -i -e 's,@LIBDIR@,${nonarch_base_libdir},g' ${WORKDIR}/${BPN}.sh
-	sed -i -e 's,@BINDIR@,${bindir},g' ${WORKDIR}/${BPN}.service
+	for f in ${BPN}.sh ${BPN}.service init
+	do
+		sed -e 's,@LIBDIR@,${nonarch_base_libdir},g' -e 's,@BINDIR@,${sbindir},g' ${WORKDIR}/$f > ${B}/$f
+	done
 }
 
-FILES:${PN} = "${bindir} ${sysconfdir} ${systemd_unitdir}"
+FILES:${PN} = "${sbindir} ${sysconfdir} ${systemd_unitdir}"
 
 do_install() {
-	install -d ${D}${bindir}
-	install -m 755 ${WORKDIR}/${BPN}.sh ${D}${bindir}/${PN}.sh
+	install -d ${D}${sbindir}
+	install -m 755 ${B}/${BPN}.sh ${D}${sbindir}/${PN}.sh
 	install -d ${D}${sysconfdir}/init.d
 	install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/${BPN}.sh
 	install -d ${D}${systemd_unitdir}/system
-	install -m 0644 ${WORKDIR}/${BPN}.service ${D}${systemd_unitdir}/system/
+	install -m 0644 ${B}/${BPN}.service ${D}${systemd_unitdir}/system/
 }
