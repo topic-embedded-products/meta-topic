@@ -9,24 +9,14 @@ inherit uboot_bootscript
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 SRC_URI = "file://boot.scr"
-SRC_URI:append:tdkz10 = " file://autorun.scr"
-
-S = "${WORKDIR}"
 
 do_compile () {
-	oe_mkimage_script -n "autorun" -d ${WORKDIR}/boot.scr ${S}/autorun.uimage.scr
+	oe_mkimage_script -n "boot" -d ${WORKDIR}/boot.scr ${B}/boot.uimage.scr
 }
 
 do_install () {
 	install -d ${D}/boot
-	install ${S}/autorun.uimage.scr ${D}/boot/boot.scr
-}
-
-do_compile:append:tdkz10 () {
-	oe_mkimage_script -n "autorun" -d ${WORKDIR}/autorun.scr ${S}/autorun-compat.uimage.scr
-}
-do_install:append:tdkz10 () {
-	install ${S}/autorun-compat.uimage.scr ${D}/boot/autorun.scr
+	install ${B}/boot.uimage.scr ${D}/boot/boot.scr
 }
 
 FILES:${PN} = "/boot"
