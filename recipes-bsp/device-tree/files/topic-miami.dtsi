@@ -201,21 +201,24 @@
 	num-cs = <1>;
 	primary_flash: flash@0 {
 		u-boot,dm-pre-reloc;
+		reg = <0>;
 		compatible = "jedec,spi-nor";
 		/* Max frequency for quad read is 108MHz according to data sheet */
 		spi-max-frequency = <108000000>;
 		spi-tx-bus-width = <1>;
 		spi-rx-bus-width = <4>;
-		#address-cells = <1>;
-		#size-cells = <1>;
-		reg = <0x0>;
-		partition@qspi-boot-bin {
-			label = "qspi-boot-bin";
-			reg = <0x00000 0x100000>;
-		};
-		partition@qspi-rootfs {
-			label = "qspi-rootfs";
-			reg = <0x100000 0>;
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			partition@qspi-boot-bin {
+				label = "qspi-boot-bin";
+				reg = <0x00000 0x100000>;
+			};
+			partition@qspi-rootfs {
+				label = "qspi-rootfs";
+				reg = <0x100000 0>;
+			};
 		};
 	};
 };
