@@ -30,7 +30,7 @@ do_install() {
 	install -d ${D}${sbindir}
 	install -m 755 ${B}/${BPN}.sh ${D}${sbindir}/${PN}.sh
 	install -d ${D}${sysconfdir}/init.d
-	install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/${BPN}.sh
+	install -m 755 ${B}/init ${D}${sysconfdir}/init.d/${BPN}.sh
 	install -d ${D}${systemd_unitdir}/system
 	install -m 0644 ${B}/${BPN}.service ${D}${systemd_unitdir}/system/
 }
