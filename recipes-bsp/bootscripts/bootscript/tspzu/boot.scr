@@ -21,6 +21,7 @@ elif test "${devtype}" = "ubi"; then
 	echo "Loading kernel from UBIFS..."
 	if ubifsload ${fdt_addr_r} /boot/system.dtb && ubifsload ${kernel_addr_r} /boot/Image; then
 		echo "Load from UBIFS succeeded"
+		ubifsumount ; ubi detach
 		if i2c probe 38; then
 			echo "Board v1r0"
 			fdt addr ${fdt_addr_r}
