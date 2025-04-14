@@ -1,19 +1,22 @@
-From 1058f11e4e39f3cd392c9010b290a7faa26643c9 Mon Sep 17 00:00:00 2001
-From: Lars-Peter Clausen <lars@metafoo.de>
-Date: Mon, 11 Feb 2013 18:43:56 +0100
-Subject: [PATCH 1/8] axi-hdmi-driver: add driver
+From 837d9d7c43d1b8556ecf4e5853ae3fe91007ab20 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 14 Apr 2025 14:59:28 +0200
+Subject: [PATCH] axi-hdmi-driver: add driver
 
-Signed-off-by: Lars-Peter Clausen <lars@metafoo.de>
+Copy driver from
+https://github.com/analogdevicesinc/linux.git branch "main"
+
+Upstream-status: Backport
 ---
  drivers/gpu/drm/Kconfig                       |   2 +
  drivers/gpu/drm/Makefile                      |   1 +
  drivers/gpu/drm/adi_axi_hdmi/Kconfig          |   8 +
  drivers/gpu/drm/adi_axi_hdmi/Makefile         |   7 +
- drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_crtc.c  | 248 +++++++++
- drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c   | 231 ++++++++
- drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.h   |  44 ++
- .../gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c   | 522 ++++++++++++++++++
- 8 files changed, 1063 insertions(+)
+ drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_crtc.c  | 251 +++++++++++++
+ drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c   | 231 ++++++++++++
+ drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.h   |  44 +++
+ .../gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c   | 355 ++++++++++++++++++
+ 8 files changed, 899 insertions(+)
  create mode 100644 drivers/gpu/drm/adi_axi_hdmi/Kconfig
  create mode 100644 drivers/gpu/drm/adi_axi_hdmi/Makefile
  create mode 100644 drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_crtc.c
@@ -22,33 +25,33 @@ Signed-off-by: Lars-Peter Clausen <lars@metafoo.de>
  create mode 100644 drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
 
 diff --git a/drivers/gpu/drm/Kconfig b/drivers/gpu/drm/Kconfig
-index 147d61b9674e..147deefc7c2e 100644
+index ec4abf9ff47b..6e5b7e942052 100644
 --- a/drivers/gpu/drm/Kconfig
 +++ b/drivers/gpu/drm/Kconfig
-@@ -275,6 +275,8 @@ source "drivers/gpu/drm/nouveau/Kconfig"
+@@ -271,6 +271,8 @@ source "drivers/gpu/drm/i915/Kconfig"
  
- source "drivers/gpu/drm/i915/Kconfig"
+ source "drivers/gpu/drm/kmb/Kconfig"
  
 +source "drivers/gpu/drm/adi_axi_hdmi/Kconfig"
 +
  config DRM_VGEM
  	tristate "Virtual GEM provider"
- 	depends on DRM
+ 	depends on DRM && MMU
 diff --git a/drivers/gpu/drm/Makefile b/drivers/gpu/drm/Makefile
-index 81569009f884..655bbb11fa77 100644
+index 215e78e79125..06ec385afbf6 100644
 --- a/drivers/gpu/drm/Makefile
 +++ b/drivers/gpu/drm/Makefile
-@@ -90,6 +90,7 @@ obj-$(CONFIG_DRM_ARMADA) += armada/
+@@ -160,6 +160,7 @@ obj-$(CONFIG_DRM_UDL) += udl/
+ obj-$(CONFIG_DRM_AST) += ast/
+ obj-$(CONFIG_DRM_ARMADA) += armada/
  obj-$(CONFIG_DRM_ATMEL_HLCDC)	+= atmel-hlcdc/
- obj-y			+= rcar-du/
- obj-$(CONFIG_DRM_SHMOBILE) +=shmobile/
 +obj-$(CONFIG_DRM_ADI_AXI_HDMI) += adi_axi_hdmi/
+ obj-y			+= renesas/
  obj-y			+= omapdrm/
  obj-$(CONFIG_DRM_SUN4I) += sun4i/
- obj-y			+= tilcdc/
 diff --git a/drivers/gpu/drm/adi_axi_hdmi/Kconfig b/drivers/gpu/drm/adi_axi_hdmi/Kconfig
 new file mode 100644
-index 000000000000..4f2d9713046c
+index 000000000000..0b10f6f0759d
 --- /dev/null
 +++ b/drivers/gpu/drm/adi_axi_hdmi/Kconfig
 @@ -0,0 +1,8 @@
@@ -56,8 +59,8 @@ index 000000000000..4f2d9713046c
 +	tristate "DRM Support for Analog Devices HDMI FPGA platforms"
 +	depends on DRM
 +	default	n
++	select DRM_GEM_DMA_HELPER
 +	select DRM_KMS_HELPER
-+	select DRM_KMS_CMA_HELPER
 +	select XILINX_VDMA
 +	select VT_HW_CONSOLE_BINDING if FRAMEBUFFER_CONSOLE
 diff --git a/drivers/gpu/drm/adi_axi_hdmi/Makefile b/drivers/gpu/drm/adi_axi_hdmi/Makefile
@@ -75,10 +78,10 @@ index 000000000000..5a889bde3974
 +obj-$(CONFIG_DRM_ADI_AXI_HDMI) += adi_axi_hdmi.o
 diff --git a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_crtc.c b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_crtc.c
 new file mode 100644
-index 000000000000..313f054a6f9d
+index 000000000000..2a21f4cac6f6
 --- /dev/null
 +++ b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_crtc.c
-@@ -0,0 +1,248 @@
+@@ -0,0 +1,251 @@
 +/*
 + * Analog Devices AXI HDMI DRM driver.
 + *
@@ -94,9 +97,13 @@ index 000000000000..313f054a6f9d
 +
 +#include <drm/drm_atomic_helper.h>
 +#include <drm/drm_crtc_helper.h>
-+#include <drm/drm_gem_cma_helper.h>
-+#include <drm/drm_plane_helper.h>
++#include <drm/drm_fourcc.h>
++#include <drm/drm_framebuffer.h>
++#include <drm/drm_gem_dma_helper.h>
 +#include <drm/drm_gem_framebuffer_helper.h>
++#include <drm/drm_plane_helper.h>
++#include <drm/drm_print.h>
++#include <drm/drm_vblank.h>
 +
 +#include "axi_hdmi_drv.h"
 +
@@ -124,7 +131,7 @@ index 000000000000..313f054a6f9d
 +	struct axi_hdmi_crtc *axi_hdmi_crtc = plane_to_axi_hdmi_crtc(plane);
 +	struct drm_framebuffer *fb = plane->state->fb;
 +	size_t offset, hw_row_size;
-+	struct drm_gem_cma_object *obj;
++	struct drm_gem_dma_object *obj;
 +
 +#if IS_ENABLED(CONFIG_XILINX_DMA)
 +	struct xilinx_vdma_config vdma_config;
@@ -137,7 +144,7 @@ index 000000000000..313f054a6f9d
 +	}
 +#endif
 +
-+	obj = drm_fb_cma_get_gem_obj(plane->state->fb, 0);
++	obj = drm_fb_dma_get_gem_obj(plane->state->fb, 0);
 +
 +	offset = plane->state->crtc_x * fb->format->cpp[0] +
 +		plane->state->crtc_y * fb->pitches[0];
@@ -150,7 +157,7 @@ index 000000000000..313f054a6f9d
 +	 * is fb->piches[0], but the actual size for the hw is somewhat less
 +	 */
 +	axi_hdmi_crtc->dma_template->dir = DMA_MEM_TO_DEV;
-+	axi_hdmi_crtc->dma_template->src_start = obj->paddr + offset;
++	axi_hdmi_crtc->dma_template->src_start = obj->dma_addr + offset;
 +	/* sgl list have just one entry (each interleaved frame have 1 chunk) */
 +	axi_hdmi_crtc->dma_template->frame_size = 1;
 +	/* the number of interleaved frame, each has the size specified in sgl */
@@ -176,7 +183,7 @@ index 000000000000..313f054a6f9d
 +}
 +
 +static void axi_hdmi_plane_atomic_update(struct drm_plane *plane,
-+	struct drm_plane_state *old_state)
++	struct drm_atomic_state *old_state)
 +{
 +	struct axi_hdmi_crtc *axi_hdmi_crtc = plane_to_axi_hdmi_crtc(plane);
 +	struct dma_async_tx_descriptor *desc;
@@ -197,12 +204,12 @@ index 000000000000..313f054a6f9d
 +}
 +
 +static void axi_hdmi_crtc_enable(struct drm_crtc *crtc,
-+				 struct drm_crtc_state *old_state)
++				 struct drm_atomic_state *old_state)
 +{
 +}
 +
 +static void axi_hdmi_crtc_disable(struct drm_crtc *crtc,
-+				  struct drm_crtc_state *old_state)
++				  struct drm_atomic_state *old_state)
 +{
 +	struct axi_hdmi_crtc *axi_hdmi_crtc = to_axi_hdmi_crtc(crtc);
 +
@@ -210,7 +217,7 @@ index 000000000000..313f054a6f9d
 +}
 +
 +static void axi_hdmi_crtc_atomic_begin(struct drm_crtc *crtc,
-+	struct drm_crtc_state *state)
++	struct drm_atomic_state *state)
 +{
 +	struct drm_pending_vblank_event *event = crtc->state->event;
 +
@@ -253,7 +260,6 @@ index 000000000000..313f054a6f9d
 +
 +static void axi_hdmi_plane_destroy(struct drm_plane *plane)
 +{
-+	drm_plane_helper_disable(plane, NULL);
 +	drm_plane_cleanup(plane);
 +}
 +
@@ -329,7 +335,7 @@ index 000000000000..313f054a6f9d
 +}
 diff --git a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c
 new file mode 100644
-index 000000000000..5d90d7c0e98a
+index 000000000000..a5d9ccc06da5
 --- /dev/null
 +++ b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c
 @@ -0,0 +1,231 @@
@@ -352,13 +358,15 @@ index 000000000000..5d90d7c0e98a
 +#include <linux/of_graph.h>
 +#include <linux/clk.h>
 +
-+#include <drm/drmP.h>
 +#include <drm/drm.h>
-+#include <drm/drm_crtc_helper.h>
-+#include <drm/drm_gem_cma_helper.h>
 +#include <drm/drm_atomic_helper.h>
-+#include <drm/drm_gem_framebuffer_helper.h>
++#include <drm/drm_crtc_helper.h>
++#include <drm/drm_drv.h>
++#include <drm/drm_fbdev_generic.h>
 +#include <drm/drm_fb_helper.h>
++#include <drm/drm_gem_dma_helper.h>
++#include <drm/drm_gem_framebuffer_helper.h>
++#include <drm/drm_probe_helper.h>
 +
 +#include "axi_hdmi_drv.h"
 +
@@ -419,27 +427,24 @@ index 000000000000..5d90d7c0e98a
 +
 +	drm_mode_config_reset(ddev);
 +
-+	ret = drm_fb_cma_fbdev_init(ddev, 32, 1);
-+	if (ret) {
-+		DRM_ERROR("failed to initialize drm fbdev: %d\n", ret);
-+		goto err_crtc;
-+	}
-+
 +	/* init kms poll for handling hpd */
 +	drm_kms_helper_poll_init(ddev);
 +
-+	return drm_dev_register(ddev, 0);
++	ret = drm_dev_register(ddev, 0);
++	if (ret)
++		goto err_crtc;
 +
++	drm_fbdev_generic_setup(ddev, 32);
++
++	return 0;
 +err_crtc:
 +	drm_mode_config_cleanup(ddev);
-+	drm_dev_unref(ddev);
 +
 +	return ret;
 +}
 +
 +static void axi_hdmi_unload(struct drm_device *dev)
 +{
-+	drm_fb_cma_fbdev_fini(dev);
 +	drm_kms_helper_poll_fini(dev);
 +	drm_mode_config_cleanup(dev);
 +}
@@ -447,7 +452,7 @@ index 000000000000..5d90d7c0e98a
 +static const struct file_operations axi_hdmi_driver_fops = {
 +	.owner		= THIS_MODULE,
 +	.open		= drm_open,
-+	.mmap		= drm_gem_cma_mmap,
++	.mmap		= drm_gem_mmap,
 +	.poll		= drm_poll,
 +	.read		= drm_read,
 +	.unlocked_ioctl	= drm_ioctl,
@@ -458,10 +463,9 @@ index 000000000000..5d90d7c0e98a
 +	.driver_features	= DRIVER_MODESET | DRIVER_GEM | DRIVER_ATOMIC,
 +	.unload			= axi_hdmi_unload,
 +	.lastclose		= drm_fb_helper_lastclose,
-+	.gem_free_object	= drm_gem_cma_free_object,
-+	.gem_vm_ops		= &drm_gem_cma_vm_ops,
-+	.dumb_create		= drm_gem_cma_dumb_create,
-+	.gem_prime_vmap		= drm_gem_cma_prime_vmap,
++	.gem_prime_import	= drm_gem_prime_import,
++	.gem_prime_import_sg_table = drm_gem_dma_prime_import_sg_table,
++	.dumb_create		= drm_gem_dma_dumb_create,
 +	.fops			= &axi_hdmi_driver_fops,
 +	.name			= DRIVER_NAME,
 +	.desc			= DRIVER_DESC,
@@ -545,6 +549,8 @@ index 000000000000..5d90d7c0e98a
 +{
 +	struct axi_hdmi_private *private = platform_get_drvdata(pdev);
 +
++	drm_atomic_helper_shutdown(private->drm_dev);
++
 +	drm_put_dev(private->drm_dev);
 +	dma_release_channel(private->dma);
 +	return 0;
@@ -566,7 +572,7 @@ index 000000000000..5d90d7c0e98a
 +MODULE_DESCRIPTION("");
 diff --git a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.h b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.h
 new file mode 100644
-index 000000000000..eea98d8cdc72
+index 000000000000..6570c9e9353c
 --- /dev/null
 +++ b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.h
 @@ -0,0 +1,44 @@
@@ -583,7 +589,7 @@ index 000000000000..eea98d8cdc72
 +#define _AXI_HDMI_DRV_H_
 +
 +#include <drm/drm.h>
-+#include <drm/drm_fb_cma_helper.h>
++#include <drm/drm_fb_dma_helper.h>
 +#include <linux/of.h>
 +#include <linux/clk.h>
 +
@@ -616,10 +622,10 @@ index 000000000000..eea98d8cdc72
 +#endif
 diff --git a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
 new file mode 100644
-index 000000000000..34d9374f5c42
+index 000000000000..a08aa860727b
 --- /dev/null
 +++ b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
-@@ -0,0 +1,522 @@
+@@ -0,0 +1,355 @@
 +/*
 + * Analog Devices AXI HDMI DRM driver.
 + *
@@ -639,13 +645,14 @@ index 000000000000..34d9374f5c42
 +#include <linux/clk.h>
 +
 +#include <drm/drm_atomic_helper.h>
++#include <drm/drm_bridge.h>
 +#include <drm/drm_crtc_helper.h>
 +#include <drm/drm_encoder_slave.h>
 +#include <drm/drm_edid.h>
++#include <drm/drm_print.h>
++#include <drm/drm_probe_helper.h>
 +
 +#include "axi_hdmi_drv.h"
-+
-+#include "../i2c/adv7511.h"
 +
 +#define AXI_HDMI_STATUS_VMDA_UNDERFLOW	BIT(4)
 +#define AXI_HDMI_STATUS_VMDA_OVERFLOW	BIT(3)
@@ -722,18 +729,6 @@ index 000000000000..34d9374f5c42
 +{
 +	struct axi_hdmi_encoder *enc = container_of(connector, struct axi_hdmi_encoder, connector);
 +	return &enc->encoder.base;
-+}
-+
-+static int axi_hdmi_connector_init(struct drm_device *dev,
-+	struct drm_connector *connector, struct drm_encoder *encoder);
-+
-+static const struct drm_encoder_slave_funcs *get_slave_funcs(
-+	struct drm_encoder *enc)
-+{
-+	if (enc->bridge)
-+		return NULL;
-+
-+	return to_encoder_slave(enc)->slave_funcs;
 +}
 +
 +static void axi_hdmi_set_color_range(struct axi_hdmi_private *private,
@@ -868,86 +863,35 @@ index 000000000000..34d9374f5c42
 +
 +static void axi_hdmi_encoder_enable(struct drm_encoder *encoder)
 +{
-+	struct axi_hdmi_encoder *axi_hdmi_encoder = to_axi_hdmi_encoder(encoder);
-+	struct drm_connector *connector;
 +	struct axi_hdmi_private *private = encoder->dev->dev_private;
-+	const struct drm_encoder_slave_funcs *sfuncs = get_slave_funcs(encoder);
-+	struct adv7511_video_config config;
-+	struct edid *edid;
 +
 +	if (!private->clk_enabled) {
 +		clk_prepare_enable(private->hdmi_clock);
 +		private->clk_enabled = true;
 +	}
 +	writel(AXI_HDMI_RESET_ENABLE, private->base + AXI_HDMI_REG_RESET);
-+
-+	if (!sfuncs)
-+		return;
-+
-+	connector = &axi_hdmi_encoder->connector;
-+	edid = drm_connector_get_edid(connector);
-+
-+	if (edid)
-+		config.hdmi_mode = drm_detect_hdmi_monitor(edid);
-+	else
-+		config.hdmi_mode = false;
-+
-+	hdmi_avi_infoframe_init(&config.avi_infoframe);
-+
-+	config.avi_infoframe.scan_mode = HDMI_SCAN_MODE_UNDERSCAN;
-+
-+	if (private->is_rgb) {
-+			config.csc_enable = false;
-+			config.avi_infoframe.colorspace = HDMI_COLORSPACE_RGB;
-+	} else {
-+		config.csc_scaling_factor = ADV7511_CSC_SCALING_4;
-+		config.csc_coefficents = adv7511_csc_ycbcr_to_rgb;
-+
-+		if ((connector->display_info.color_formats & DRM_COLOR_FORMAT_YCRCB422) &&
-+			config.hdmi_mode) {
-+			config.csc_enable = false;
-+			config.avi_infoframe.colorspace = HDMI_COLORSPACE_YUV422;
-+		} else {
-+			config.csc_enable = true;
-+			config.avi_infoframe.colorspace = HDMI_COLORSPACE_RGB;
-+		}
-+	}
-+
-+	if (sfuncs->set_config)
-+		sfuncs->set_config(encoder, &config);
-+
-+	if (sfuncs->dpms)
-+		sfuncs->dpms(encoder, DRM_MODE_DPMS_ON);
 +}
 +
 +static void axi_hdmi_encoder_disable(struct drm_encoder *encoder)
 +{
 +	struct axi_hdmi_private *private = encoder->dev->dev_private;
-+	const struct drm_encoder_slave_funcs *sfuncs = get_slave_funcs(encoder);
 +
 +	writel(0, private->base + AXI_HDMI_REG_RESET);
 +	if (private->clk_enabled) {
 +		clk_disable_unprepare(private->hdmi_clock);
 +		private->clk_enabled = false;
 +	}
-+
-+	if (sfuncs && sfuncs->dpms)
-+		sfuncs->dpms(encoder, DRM_MODE_DPMS_OFF);
 +}
 +
 +static void axi_hdmi_encoder_mode_set(struct drm_encoder *encoder,
 +	struct drm_crtc_state *crtc_state,
 +	struct drm_connector_state *conn_state)
 +{
-+	const struct drm_encoder_slave_funcs *sfuncs = get_slave_funcs(encoder);
 +	struct axi_hdmi_private *private = encoder->dev->dev_private;
 +	struct drm_display_mode *mode = &crtc_state->mode;
 +	unsigned int h_de_min, h_de_max;
 +	unsigned int v_de_min, v_de_max;
 +	unsigned int val;
-+
-+	if (sfuncs && sfuncs->mode_set)
-+		sfuncs->mode_set(encoder, mode, &crtc_state->adjusted_mode);
 +
 +	h_de_min = mode->htotal - mode->hsync_start;
 +	h_de_max = h_de_min + mode->hdisplay;
@@ -979,12 +923,8 @@ index 000000000000..34d9374f5c42
 +
 +static void axi_hdmi_encoder_destroy(struct drm_encoder *encoder)
 +{
-+	const struct drm_encoder_slave_funcs *sfuncs = get_slave_funcs(encoder);
 +	struct axi_hdmi_encoder *axi_hdmi_encoder =
 +		to_axi_hdmi_encoder(encoder);
-+
-+	if (sfuncs && sfuncs->destroy)
-+		sfuncs->destroy(encoder);
 +
 +	drm_encoder_cleanup(encoder);
 +	kfree(axi_hdmi_encoder);
@@ -1016,22 +956,16 @@ index 000000000000..34d9374f5c42
 +	bridge = of_drm_find_bridge(priv->encoder_slave->dev.of_node);
 +	if (bridge) {
 +		bridge->encoder = encoder;
-+		encoder->bridge = bridge;
-+		ret = drm_bridge_attach(encoder, bridge, NULL);
++		/*
++		 * Check if we really need to create th drm_connector.
++		 * If not, DRM_BRIDGE_ATTACH_NO_CONNECTOR can be passed instead
++		 * 0
++		 */
++		ret = drm_bridge_attach(encoder, bridge, NULL, 0);
 +		if (ret) {
 +		    drm_encoder_cleanup(encoder);
 +		    return NULL;
 +		}
-+	} else {
-+		struct drm_connector *connector;
-+		struct drm_i2c_encoder_driver *encoder_drv;
-+
-+		/* For backwards compatibility, drop it eventually. */
-+		encoder_drv = to_drm_i2c_encoder_driver(to_i2c_driver(priv->encoder_slave->dev.driver));
-+		encoder_drv->encoder_init(priv->encoder_slave, dev, &axi_hdmi_encoder->encoder);
-+
-+		connector = &axi_hdmi_encoder->connector;
-+		axi_hdmi_connector_init(dev, connector, encoder);
 +	}
 +
 +
@@ -1047,101 +981,6 @@ index 000000000000..34d9374f5c42
 +
 +	return encoder;
 +}
-+
-+static int axi_hdmi_connector_get_modes(struct drm_connector *connector)
-+{
-+	struct drm_encoder *encoder = connector_to_encoder(connector);
-+	const struct drm_encoder_slave_funcs *sfuncs = get_slave_funcs(encoder);
-+	int count = 0;
-+
-+	if (sfuncs && sfuncs->get_modes)
-+		count += sfuncs->get_modes(encoder, connector);
-+
-+	return count;
-+}
-+
-+static int axi_hdmi_connector_mode_valid(struct drm_connector *connector,
-+	struct drm_display_mode *mode)
-+{
-+	if (mode->clock > 165000)
-+		return MODE_CLOCK_HIGH;
-+
-+	if (mode->flags & DRM_MODE_FLAG_INTERLACE)
-+		return MODE_NO_INTERLACE;
-+
-+	return MODE_OK;
-+}
-+
-+static struct drm_encoder *axi_hdmi_best_encoder(struct drm_connector *connector)
-+{
-+	return connector_to_encoder(connector);
-+}
-+
-+static struct drm_connector_helper_funcs axi_hdmi_connector_helper_funcs = {
-+	.get_modes	= axi_hdmi_connector_get_modes,
-+	.mode_valid	= axi_hdmi_connector_mode_valid,
-+	.best_encoder	= axi_hdmi_best_encoder,
-+};
-+
-+static enum drm_connector_status axi_hdmi_connector_detect(
-+	struct drm_connector *connector, bool force)
-+{
-+	enum drm_connector_status status = connector_status_unknown;
-+	struct drm_encoder *encoder = connector_to_encoder(connector);
-+	const struct drm_encoder_slave_funcs *sfuncs = get_slave_funcs(encoder);
-+
-+	if (sfuncs && sfuncs->detect)
-+		status = sfuncs->detect(encoder, connector);
-+
-+	return status;
-+}
-+
-+static void axi_hdmi_connector_destroy(struct drm_connector *connector)
-+{
-+	drm_connector_unregister(connector);
-+	drm_connector_cleanup(connector);
-+}
-+
-+static struct drm_connector_funcs axi_hdmi_connector_funcs = {
-+	.fill_modes = drm_helper_probe_single_connector_modes,
-+	.detect = axi_hdmi_connector_detect,
-+	.destroy = axi_hdmi_connector_destroy,
-+	.reset = drm_atomic_helper_connector_reset,
-+	.atomic_duplicate_state = drm_atomic_helper_connector_duplicate_state,
-+	.atomic_destroy_state = drm_atomic_helper_connector_destroy_state,
-+};
-+
-+static int axi_hdmi_connector_init(struct drm_device *dev,
-+	struct drm_connector *connector, struct drm_encoder *encoder)
-+{
-+	int type;
-+	int err;
-+
-+	type = DRM_MODE_CONNECTOR_HDMIA;
-+	connector->polled = DRM_CONNECTOR_POLL_CONNECT |
-+				DRM_CONNECTOR_POLL_DISCONNECT;
-+
-+	drm_connector_init(dev, connector, &axi_hdmi_connector_funcs, type);
-+	drm_connector_helper_add(connector, &axi_hdmi_connector_helper_funcs);
-+
-+	err = drm_connector_register(connector);
-+	if (err)
-+		goto err_connector;
-+
-+	err = drm_connector_attach_encoder(connector, encoder);
-+	if (err) {
-+		DRM_ERROR("failed to attach a connector to a encoder\n");
-+		goto err_sysfs;
-+	}
-+
-+	return 0;
-+
-+err_sysfs:
-+	drm_connector_unregister(connector);
-+err_connector:
-+	drm_connector_cleanup(connector);
-+	return err;
-+}
 -- 
-2.17.1
+2.43.0
 

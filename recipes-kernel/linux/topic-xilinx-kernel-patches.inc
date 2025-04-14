@@ -8,10 +8,17 @@ MDEVSUPPORT = "${@bb.utils.contains('VIRTUAL-RUNTIME_dev_manager', 'busybox-mdev
 EXFATSUPPORT = "file://enable-exfat-fs.cfg"
 KEXECSUPPORT = "file://enable-kexec-support.cfg"
 
+HDMI_OUT_PATCHES = "\
+	file://adi/0001-axi-hdmi-driver-add-driver.patch \
+	file://adi-topic/0001-drm-axi_hdmi_crtc.c-Skip-DMA_INTERLEAVE-check.patch \
+	file://adi-topic/0001-adv7511_audio-Only-register-the-SPDIF-output.patch \
+	"
+
 SRC_URI:append = "\
 	${MDEVSUPPORT} \
 	${EXFATSUPPORT} \
 	${KEXECSUPPORT} \
+	${HDMI_OUT_PATCHES} \
 	file://0001-net-phy-xilinx_phy-Reset-PHY-to-resume-from-shutdown.patch \
 	file://0001-pcie-xilinx-Support-reset-GPIO-and-wait-for-link-up-.patch \
 	file://0001-usb-hub-Ignore-OTG-negotiation-problems-during-enume.patch \
