@@ -28,6 +28,7 @@ MACHINE_BT_DRIVERS = "\
 
 # Extra packages to install for the board
 MACHINE_EXTRA_RRECOMMENDS += "\
+	kernel-module-lima \
 	kernel-module-u-ether \
 	kernel-module-usb-f-ecm \
 	kernel-module-usb-f-ecm-subset \
@@ -39,7 +40,7 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	${MACHINE_BT_DRIVERS} \
 	"
 
-MACHINE_FEATURES += "rtc usbhost usbgadget ethernet wifi bluetooth powerkey"
+MACHINE_FEATURES += "rtc usbhost usbgadget ethernet wifi bluetooth powerkey screen"
 
 DEVICETREE = "devicetree/${MACHINE_BOARD}.dtb"
 

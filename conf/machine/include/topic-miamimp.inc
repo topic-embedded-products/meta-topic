@@ -64,6 +64,10 @@ MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree-static"
 MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
 # Sanitize the MACHINE_FEATURES (otherwise we get wifi, bluetooth and more)
 MACHINE_FEATURES = "ext2 ext3 vfat usbhost fpgamgr"
+# All our MPSoC modules have an "eg" version with a MALI GPU
+MACHINE_FEATURES += "mali400"
+# Don't enforce the armsoc xfree86 driver and prefer KMS
+XSERVER_EXT:zynqmp = ""
 
 SERIAL_CONSOLE = "115200 ttyPS0"
 # We only want to run getty on the console.

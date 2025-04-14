@@ -11,6 +11,7 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-axi-hdmi-rx \
 	kernel-module-bitblit \
 	kernel-module-dma-axi-dmac \
+	kernel-module-lima \
 	kernel-module-u-ether \
 	kernel-module-usb-f-ecm \
 	kernel-module-usb-f-ecm-subset \
@@ -21,7 +22,6 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-videobuf2-memops \
 	kernel-module-videobuf2-vmalloc \
 	kernel-module-xilinx-dma \
-	kernel-module-mali \
 	firmware-imageon-edid \
 	"
 

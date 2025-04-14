@@ -15,6 +15,9 @@ TOPICBSPCONFIG:tspzu = "file://topic-miamimp-standard.cfg file://topic-miamiplus
 TOPICBSPCONFIG:tepzu = "file://topic-miamimp-standard.cfg file://topic-miamiplusmp-extra.cfg file://usb-wired-network-adapters.cfg file://tepzu.cfg file://wifi-iwl.cfg"
 TOPICBSPCONFIG:ttpzu9 = "file://topic-miamimp-standard.cfg file://topic-miamiplusmp-extra.cfg file://ttpzu9-extra.cfg file://usb-wired-network-adapters.cfg"
 
+# Machines with mali400 feature should enable the LIMA driver
+TOPIC_DRM_CONFIG = "${@bb.utils.contains('MACHINE_FEATURES', 'mali400', 'file://drm-lima.cfg', '', d)}"
+
 # For some reason, the configuration drops support for UNIX and IPv4 protocols, put them back
 TOPIC_NETWORK_CONFIG = "\
 	file://network-ipv4.cfg \
@@ -24,5 +27,6 @@ TOPIC_NETWORK_CONFIG = "\
 SRC_URI:append = "\
 	${TOPICBSPCONFIG} \
 	${TOPIC_NETWORK_CONFIG} \
+	${TOPIC_DRM_CONFIG} \
 	${@bb.utils.contains("MACHINE_FEATURES", "rtc", "file://zynqmp-rtc.cfg", "", d)} \
 	"
