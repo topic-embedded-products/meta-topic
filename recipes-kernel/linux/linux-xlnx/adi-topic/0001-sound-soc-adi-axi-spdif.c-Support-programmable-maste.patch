@@ -1,8 +1,7 @@
-From d1262b94b98b077107ef23a16d7d6d41369b813e Mon Sep 17 00:00:00 2001
+From 3a6657c25f6add58c8bdc1a2de95a60851251ed7 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 2 Dec 2014 08:33:03 +0100
-Subject: [PATCH 3/7] sound/soc/adi/axi-spdif.c: Support programmable master
- clock
+Subject: [PATCH] sound/soc/adi/axi-spdif.c: Support programmable master clock
 
 If the master clock supports programmable rates, program it to generate
 the desired frequency. Only apply constraints when the clock is fixed.
@@ -11,7 +10,7 @@ for two frequencies. If the results are equal, or if the call returns
 an error, the driver assumes the clock is fixed.
 
 The clock frequency must be set before enabling it. Enabling the clock
-was don in "startup", but that occurs before "hw_params" where the rate
+was done in "startup", but that occurs before "hw_params" where the rate
 is known. Move the clock start to the hw_params routine, and keep track
 of whether the clock has been started, because shutdown may be called
 without having called hw_params first.
@@ -25,7 +24,7 @@ Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
  1 file changed, 40 insertions(+), 22 deletions(-)
 
 diff --git a/sound/soc/adi/axi-spdif.c b/sound/soc/adi/axi-spdif.c
-index 9b3d81c41c8c..03aa4f0f3ddb 100644
+index 10545bd99704..508b7bc1352c 100644
 --- a/sound/soc/adi/axi-spdif.c
 +++ b/sound/soc/adi/axi-spdif.c
 @@ -3,7 +3,6 @@
@@ -118,7 +117,7 @@ index 9b3d81c41c8c..03aa4f0f3ddb 100644
  }
  
  static const struct snd_soc_dai_ops axi_spdif_dai_ops = {
-@@ -182,6 +195,7 @@ static int axi_spdif_probe(struct platform_device *pdev)
+@@ -183,6 +196,7 @@ static int axi_spdif_probe(struct platform_device *pdev)
  	struct resource *res;
  	void __iomem *base;
  	int ret;
@@ -154,5 +153,5 @@ index 9b3d81c41c8c..03aa4f0f3ddb 100644
  					 &axi_spdif_dai, 1);
  	if (ret)
 -- 
-2.17.1
+2.43.0
 

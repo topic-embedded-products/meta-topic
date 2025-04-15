@@ -12,6 +12,7 @@ HDMI_OUT_PATCHES = "\
 	file://adi/0001-axi-hdmi-driver-add-driver.patch \
 	file://adi-topic/0001-drm-axi_hdmi_crtc.c-Skip-DMA_INTERLEAVE-check.patch \
 	file://adi-topic/0001-adv7511_audio-Only-register-the-SPDIF-output.patch \
+	file://adi-topic/0001-sound-soc-adi-axi-spdif.c-Support-programmable-maste.patch \
 	"
 
 SRC_URI:append = "\
