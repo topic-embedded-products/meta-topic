@@ -12,3 +12,4 @@ SOM_FAMILY .= ":tspzu"
 TOPIC_XSA_DESIGN_VERSION = "194+3aaae37"
 TOPIC_XSA_DESIGN_NAME = "fpga-hardware-tdp-reference-ecc-${TOPIC_XSA_DESIGN_VERSION}.xsa"
 
+# XSERVER_EXT:tspzu = "xf86-video-armsoc"
