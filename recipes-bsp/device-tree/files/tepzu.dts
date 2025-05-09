@@ -215,11 +215,19 @@
 
 &usb1 {
 	status = "okay";
-	/*
-	 * Using Xilinx' borked implementation to add a reset for the HUB,
-	 * otherwise SuperSpeed doesn't work.
-	 */
-	reset-gpios = <&tep_gpioex10 5 GPIO_ACTIVE_LOW>;
+
+	/* Onboard USB hub (mostly to operate the reset pin) */
+	hub_3_0: usbhub3 {
+		compatible = "usb451,8440";
+		reset-gpios = <&tep_gpioex10 5 GPIO_ACTIVE_LOW>;
+		vdd-supply = <&reg_3v3_miami>;
+		peer-hub = <&hub_2_0>;
+	};
+	hub_2_0: usbhub2 {
+		compatible = "usb451,8442";
+		vdd-supply = <&reg_3v3_miami>;
+		peer-hub = <&hub_3_0>;
+	};
 };
 
 &dwc3_1 {

@@ -38,6 +38,8 @@ SRC_URI:append = "\
 	file://0012-gpio-poweroff-Implement-force-pm-power-off-flag.patch \
 	file://0013-spi-nor-Skip-4BAIT-parsing-on-Xilinx-Zynq-QSPI-contr.patch \
 	file://0014-pinctrl-mcp23s08-Reset-all-pins-to-input-at-probe.patch \
+	file://0001-usb-misc-onboard_usb_dev-Add-support-for-TI-TUSB8044.patch \
+	file://0002-dt-bindings-usb-ti-usb8041-Add-binding-for-TI-USB804.patch \
 	"
 
 
