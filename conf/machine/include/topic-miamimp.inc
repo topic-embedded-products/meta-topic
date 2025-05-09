@@ -44,7 +44,7 @@ MACHINE_ESSENTIAL_EXTRA_RDEPENDS = ""
 # get added unconditionally by zynqmp-generic.conf.
 EXTRA_IMAGEDEPENDS:remove = "u-boot-xlnx-uenv u-boot-xlnx-scr"
 # We have our own bootscript
-EXTRA_IMAGEDEPENDS += "bootscript"
+UBOOT_BOOT_SCRIPT = "bootscript"
 
 # Get rid of QEMU dependency, work around build failures
 IMAGE_CLASSES:remove = "image-types-xilinx-qemu"
