@@ -16,6 +16,7 @@ HDMI_OUT_PATCHES = "\
 	"
 
 SRC_URI:append = "\
+        file://no-localversion-auto.cfg \
 	${MDEVSUPPORT} \
 	${EXFATSUPPORT} \
 	${KEXECSUPPORT} \
