@@ -20,6 +20,7 @@ SRC_URI:append = "\
 	${MDEVSUPPORT} \
 	${EXFATSUPPORT} \
 	${KEXECSUPPORT} \
+        file://tcm.cfg \
 	${HDMI_OUT_PATCHES} \
 	file://0001-net-phy-xilinx_phy-Reset-PHY-to-resume-from-shutdown.patch \
 	file://0001-pcie-xilinx-Support-reset-GPIO-and-wait-for-link-up-.patch \
