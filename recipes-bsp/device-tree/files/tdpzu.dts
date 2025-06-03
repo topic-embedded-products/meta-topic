@@ -15,7 +15,7 @@
 	gpio-poweroff {
 		compatible = "gpio-poweroff";
 		gpios = <&tdp_gpioex24 4 GPIO_ACTIVE_LOW>;
-		force-pm-power-off; /* Replace the PSCI power-off callback */
+		priority = <192>; /* Replace the PSCI power-off callback */
 	};
 
 	gpio-key-power {

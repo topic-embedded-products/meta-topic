@@ -46,7 +46,7 @@
 		compatible = "gpio-poweroff";
 		gpios = <&gpioexf 5 1>; /* Output 5, active low */
 		input;
-		force-pm-power-off; /* Replace the PSCI power-off callback */
+		priority = <192>; /* Replace the PSCI power-off callback */
 	};
 
 	charger: battery-charger {

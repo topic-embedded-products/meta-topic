@@ -22,7 +22,7 @@
 	gpio-poweroff {
 		compatible = "gpio-poweroff";
 		gpios = <&ttp_gpioex 7 GPIO_ACTIVE_LOW>;
-		force-pm-power-off; /* Replace the PSCI power-off callback */
+		priority = <192>; /* Replace the PSCI power-off callback */
 	};
 
 	/* Regulator for the 5V USB VBUS power line. */
