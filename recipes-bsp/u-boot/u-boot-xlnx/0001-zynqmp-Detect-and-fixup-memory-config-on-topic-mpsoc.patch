@@ -1,4 +1,4 @@
-From dcc8c73e9defdfb1718acf0b456811aa930f9cc1 Mon Sep 17 00:00:00 2001
+From b935dba712fbf39ab074143d4f76365e7517d987 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 19 Apr 2023 14:45:51 +0200
 Subject: [PATCH] zynqmp: Detect and fixup memory config on topic mpsoc plus
@@ -15,10 +15,10 @@ Upstream-status: Inappropriate
  2 files changed, 47 insertions(+)
 
 diff --git a/board/xilinx/common/board.c b/board/xilinx/common/board.c
-index 8afdd1026c..0c8c824ed1 100644
+index 5a249a6e9b6..095de89b9f1 100644
 --- a/board/xilinx/common/board.c
 +++ b/board/xilinx/common/board.c
-@@ -683,6 +683,22 @@ phys_addr_t board_get_usable_ram_top(phys_size_t total_size)
+@@ -669,12 +669,30 @@ int embedded_dtb_select(void)
  
  #ifdef CONFIG_OF_BOARD_SETUP
  #define MAX_RAND_SIZE 8
@@ -40,18 +40,17 @@ index 8afdd1026c..0c8c824ed1 100644
 +
  int ft_board_setup(void *blob, struct bd_info *bd)
  {
- 	size_t n = MAX_RAND_SIZE;
-@@ -690,6 +706,8 @@ int ft_board_setup(void *blob, struct bd_info *bd)
- 	u8 buf[MAX_RAND_SIZE];
- 	int nodeoffset, ret;
+ 	static const struct node_info nodes[] = {
+ 		{ "arm,pl353-nand-r2p1", MTD_DEV_TYPE_NAND, },
+ 	};
  
 +	ft_board_setup_memory(blob, bd);
 +
- 	if (uclass_get_device(UCLASS_RNG, 0, &dev) || !dev) {
- 		debug("No RNG device\n");
- 		return 0;
+ 	if (IS_ENABLED(CONFIG_FDT_FIXUP_PARTITIONS) && IS_ENABLED(CONFIG_NAND_ZYNQ))
+ 		fdt_fixup_mtdparts(blob, nodes, ARRAY_SIZE(nodes));
+ 
 diff --git a/board/xilinx/zynqmp/zynqmp.c b/board/xilinx/zynqmp/zynqmp.c
-index 062e2e829d..5dea2d6671 100644
+index d07979f0dd3..fbaed6c3e9c 100644
 --- a/board/xilinx/zynqmp/zynqmp.c
 +++ b/board/xilinx/zynqmp/zynqmp.c
 @@ -11,6 +11,7 @@
@@ -62,7 +61,7 @@ index 062e2e829d..5dea2d6671 100644
  #include <init.h>
  #include <log.h>
  #include <net.h>
-@@ -240,14 +241,42 @@ unsigned long do_go_exec(ulong (*entry)(int, char * const []), int argc,
+@@ -236,14 +237,42 @@ unsigned long do_go_exec(ulong (*entry)(int, char * const []), int argc,
  }
  
  #if !defined(CFG_SYS_SDRAM_BASE) && !defined(CFG_SYS_SDRAM_SIZE)

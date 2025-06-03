@@ -1,8 +1,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
-# Backport LZ4 support
-SRC_URI:append = " file://0001-fs-squashfs-enable-LZ4-compression-support.patch"
-
 # Glitches on serial input interrupt the boot sequence on some boards, use
 # a particular key (space) to stop autoboot instead of any key.
 # Speed up boot by setting boot delays to zero and remove environment loading
