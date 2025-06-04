@@ -62,6 +62,19 @@
 		gpio = <&tep_gpioex10 6 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 	};
+
+	/* DisplayPort connector */
+	dpcon {
+		compatible = "dp-connector";
+		label = "USB-C";
+		type = "full-size";
+
+		port {
+			dpcon_in: endpoint {
+				remote-endpoint = <&dpsub_dp_out>;
+			};
+		};
+	};
 };
 
 /* SD1 */
@@ -258,6 +271,11 @@
 	assigned-clocks = <&si5345 0 8>;
 	assigned-clock-rates = <27000000>;
 	assigned-clock-parents = <&si5345 1 1>;
+};
+&out_dp {
+	dpsub_dp_out: endpoint {
+		remote-endpoint = <&dpcon_in>;
+	};
 };
 &zynqmp_dpdma {
 	status = "okay";

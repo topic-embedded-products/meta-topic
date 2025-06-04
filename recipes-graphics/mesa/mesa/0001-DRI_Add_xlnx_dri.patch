@@ -14,7 +14,7 @@ Index: mesa-24.0.1/src/gallium/targets/dri/meson.build
                 'stm_dri.so',
                 'sun4i-drm_dri.so',
                 'udl_dri.so',
-+               'xlnx_dri.so',
++               'zynqmp-dpsub_dri.so',
               ]],
               [with_gallium_radeonsi, 'radeonsi_dri.so'],
               [with_gallium_nouveau, 'nouveau_dri.so'],
@@ -26,7 +26,7 @@ Index: mesa-24.0.1/src/gallium/targets/dri/target.c
  DEFINE_LOADER_DRM_ENTRYPOINT(stm)
  DEFINE_LOADER_DRM_ENTRYPOINT(sun4i_drm)
  DEFINE_LOADER_DRM_ENTRYPOINT(udl)
-+DEFINE_LOADER_DRM_ENTRYPOINT(xlnx)
++DEFINE_LOADER_DRM_ENTRYPOINT(zynqmp_dpsub)
  #endif
  
  #if defined(GALLIUM_LIMA)
