@@ -265,6 +265,7 @@
 
 /* Displayport - HP and AUX signals through EMIO, enabled when PL probes */
 &zynqmp_dpsub {
+	/delete-property/ bootph-all;
 	phy-names = "dp-phy0";
 	phys = <&psgtr 1 PHY_TYPE_DP 0 3>;
 	xlnx,max-lanes = <1>;
