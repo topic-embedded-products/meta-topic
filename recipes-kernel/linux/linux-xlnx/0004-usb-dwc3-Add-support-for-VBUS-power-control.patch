@@ -144,7 +144,7 @@ index d76ae676783c..6c4586bbf0c5 100644
  
 -		if (dwc->usb2_phy)
 -			otg_set_vbus(dwc->usb2_phy->otg, false);
-+		dwc3_set_vbus(dwc, true);
++		dwc3_set_vbus(dwc, false);
  		if (dwc->usb2_generic_phy[0])
  			phy_set_mode(dwc->usb2_generic_phy[0], PHY_MODE_USB_DEVICE);
  		ret = dwc3_gadget_init(dwc);
