@@ -265,6 +265,10 @@
 	status = "okay";
 };
 
+&zynqmp_dpsub {
+	/delete-property/ bootph-all;
+};
+
 &pinctrl0 {
 	status = "okay";
 

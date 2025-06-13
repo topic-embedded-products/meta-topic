@@ -506,3 +506,7 @@
 	nvmem-cells = <&gem3_mac>;
 	nvmem-cell-names = "mac-address";
 };
+
+&zynqmp_dpsub {
+	/delete-property/ bootph-all;
+};
