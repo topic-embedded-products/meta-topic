@@ -1,0 +1,31 @@
+From 86d0a5b57157f227a5ef62a1f66b2dd271c01480 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 27 Jun 2025 08:13:51 +0200
+Subject: [PATCH] drm: xlnx: zynqmp_dp: Support DRM_FORMAT_XRGB8888
+
+XRGB8888 is the default mode that X11 will want to use. Add support
+for this to the zynqmp DP driver, so that applications can use 32-bit
+framebuffers.
+---
+ drivers/gpu/drm/xlnx/zynqmp_disp.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/gpu/drm/xlnx/zynqmp_disp.c b/drivers/gpu/drm/xlnx/zynqmp_disp.c
+index a3b536329ea6..1611b7d63a53 100644
+--- a/drivers/gpu/drm/xlnx/zynqmp_disp.c
++++ b/drivers/gpu/drm/xlnx/zynqmp_disp.c
+@@ -337,6 +337,11 @@ static const struct zynqmp_disp_format avbuf_gfx_fmts[] = {
+ 		.buf_fmt	= ZYNQMP_DISP_AV_BUF_FMT_NL_GFX_RGBA8888,
+ 		.swap		= true,
+ 		.sf		= scaling_factors_888,
++	}, {
++		.drm_fmt	= DRM_FORMAT_XRGB8888,
++		.buf_fmt	= ZYNQMP_DISP_AV_BUF_FMT_NL_GFX_RGBA8888,
++		.swap		= true,
++		.sf		= scaling_factors_888,
+ 	}, {
+ 		.drm_fmt	= DRM_FORMAT_RGBA8888,
+ 		.buf_fmt	= ZYNQMP_DISP_AV_BUF_FMT_NL_GFX_ABGR8888,
+-- 
+2.34.1
+

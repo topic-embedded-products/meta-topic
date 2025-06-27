@@ -40,6 +40,7 @@ SRC_URI:append = "\
 	file://0014-pinctrl-mcp23s08-Reset-all-pins-to-input-at-probe.patch \
 	file://0001-usb-misc-onboard_usb_dev-Add-support-for-TI-TUSB8044.patch \
 	file://0002-dt-bindings-usb-ti-usb8041-Add-binding-for-TI-USB804.patch \
+	file://0001-drm-xlnx-zynqmp_dp-Support-DRM_FORMAT_XRGB8888.patch \
 	"
 
 
