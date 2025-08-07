@@ -1,0 +1,131 @@
+From 36f5b487bf4fc4cd025f22fc73aecdb282f5b9dd Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Thu, 7 Aug 2025 15:30:34 +0200
+Subject: [PATCH] drm: adi_axi_hdmi: Adapt for kernel 6.12
+
+Fix the compiler errors and warnings and make the driver compatible
+with 6.12
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+---
+ drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c   | 26 ++++---------------
+ .../gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c   |  6 -----
+ 2 files changed, 5 insertions(+), 27 deletions(-)
+
+diff --git a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c
+index a5d9ccc06da5..352ade0c61bd 100644
+--- a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c
++++ b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c
+@@ -21,8 +21,8 @@
+ #include <drm/drm_atomic_helper.h>
+ #include <drm/drm_crtc_helper.h>
+ #include <drm/drm_drv.h>
+-#include <drm/drm_fbdev_generic.h>
+ #include <drm/drm_fb_helper.h>
++#include <drm/drm_fbdev_dma.h>
+ #include <drm/drm_gem_dma_helper.h>
+ #include <drm/drm_gem_framebuffer_helper.h>
+ #include <drm/drm_probe_helper.h>
+@@ -37,7 +37,6 @@
+ 
+ static struct drm_mode_config_funcs axi_hdmi_mode_config_funcs = {
+ 	.fb_create = drm_gem_fb_create,
+-	.output_poll_changed = drm_fb_helper_output_poll_changed,
+ 	.atomic_check = drm_atomic_helper_check,
+ 	.atomic_commit = drm_atomic_helper_commit,
+ };
+@@ -93,7 +92,7 @@ static int axi_hdmi_init(struct drm_driver *ddrv, struct device *dev)
+ 	if (ret)
+ 		goto err_crtc;
+ 
+-	drm_fbdev_generic_setup(ddev, 32);
++	drm_fbdev_dma_setup(ddev, 32);
+ 
+ 	return 0;
+ err_crtc:
+@@ -108,29 +107,18 @@ static void axi_hdmi_unload(struct drm_device *dev)
+ 	drm_mode_config_cleanup(dev);
+ }
+ 
+-static const struct file_operations axi_hdmi_driver_fops = {
+-	.owner		= THIS_MODULE,
+-	.open		= drm_open,
+-	.mmap		= drm_gem_mmap,
+-	.poll		= drm_poll,
+-	.read		= drm_read,
+-	.unlocked_ioctl	= drm_ioctl,
+-	.release	= drm_release,
+-};
++DEFINE_DRM_GEM_DMA_FOPS(axi_hdmi_driver_fops);
+ 
+ static struct drm_driver axi_hdmi_driver = {
+ 	.driver_features	= DRIVER_MODESET | DRIVER_GEM | DRIVER_ATOMIC,
+ 	.unload			= axi_hdmi_unload,
+-	.lastclose		= drm_fb_helper_lastclose,
+-	.gem_prime_import	= drm_gem_prime_import,
+-	.gem_prime_import_sg_table = drm_gem_dma_prime_import_sg_table,
+-	.dumb_create		= drm_gem_dma_dumb_create,
+ 	.fops			= &axi_hdmi_driver_fops,
+ 	.name			= DRIVER_NAME,
+ 	.desc			= DRIVER_DESC,
+ 	.date			= DRIVER_DATE,
+ 	.major			= DRIVER_MAJOR,
+ 	.minor			= DRIVER_MINOR,
++	DRM_GEM_DMA_DRIVER_OPS,
+ };
+ 
+ static const struct of_device_id adv7511_encoder_of_match[] = {
+@@ -143,7 +131,6 @@ MODULE_DEVICE_TABLE(of, adv7511_encoder_of_match);
+ 
+ static int axi_hdmi_platform_probe(struct platform_device *pdev)
+ {
+-	const struct of_device_id *id;
+ 	struct device_node *np = pdev->dev.of_node;
+ 	struct axi_hdmi_private *private;
+ 	struct device_node *slave_node, *ep_node;
+@@ -187,8 +174,6 @@ static int axi_hdmi_platform_probe(struct platform_device *pdev)
+ 
+ 	private->is_rgb = of_property_read_bool(np, "adi,is-rgb");
+ 
+-	id = of_match_node(adv7511_encoder_of_match, np);
+-
+ 	private->encoder_slave = of_find_i2c_device_by_node(slave_node);
+ 	of_node_put(slave_node);
+ 
+@@ -204,7 +189,7 @@ static int axi_hdmi_platform_probe(struct platform_device *pdev)
+ 	return axi_hdmi_init(&axi_hdmi_driver, &pdev->dev);
+ }
+ 
+-static int axi_hdmi_platform_remove(struct platform_device *pdev)
++static void axi_hdmi_platform_remove(struct platform_device *pdev)
+ {
+ 	struct axi_hdmi_private *private = platform_get_drvdata(pdev);
+ 
+@@ -212,7 +197,6 @@ static int axi_hdmi_platform_remove(struct platform_device *pdev)
+ 
+ 	drm_put_dev(private->drm_dev);
+ 	dma_release_channel(private->dma);
+-	return 0;
+ }
+ 
+ static struct platform_driver adv7511_encoder_driver = {
+diff --git a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
+index a08aa860727b..3c59df2c3fe5 100644
+--- a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
++++ b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
+@@ -77,12 +77,6 @@ static const struct debugfs_reg32 axi_hdmi_encoder_debugfs_regs[] = {
+ 	{ "VTiming3", AXI_HDMI_REG_VTIMING3 },
+ };
+ 
+-static const uint16_t adv7511_csc_ycbcr_to_rgb[] = {
+-	0x0734, 0x04ad, 0x0000, 0x1c1b,
+-	0x1ddc, 0x04ad, 0x1f24, 0x0135,
+-	0x0000, 0x04ad, 0x087c, 0x1b77,
+-};
+-
+ struct axi_hdmi_encoder {
+ 	struct drm_encoder_slave encoder;
+ 	struct drm_connector connector;
+-- 
+2.34.1
+
