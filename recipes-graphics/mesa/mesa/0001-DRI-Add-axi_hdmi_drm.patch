@@ -3,7 +3,8 @@ From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 29 Apr 2025 14:58:26 +0200
 Subject: [PATCH] DRI: Add axi_hdmi_drm
 
-Allows using the ADV7511 rendering pipeline
+Allows using the ADV7511 rendering pipeline and the FMCHDMI in
+combination with e.g. the MPSoC MALI400.
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 Upstream-Status: Pending
@@ -16,11 +17,12 @@ diff --git a/src/gallium/targets/dri/meson.build b/src/gallium/targets/dri/meson
 index e74df9b..eb095cc 100644
 --- a/src/gallium/targets/dri/meson.build
 +++ b/src/gallium/targets/dri/meson.build
-@@ -70,6 +70,7 @@ libgallium_dri = shared_library(
+@@ -70,6 +70,8 @@ libgallium_dri = shared_library(
  
  foreach d : [[with_gallium_kmsro, [
                 'armada-drm_dri.so',
 +               'axi_hdmi_drm_dri.so',
++               'fmchdmi_dri.so',
                 'exynos_dri.so',
                 'gm12u320_dri.so',
                 'hdlcd_dri.so',
@@ -28,11 +30,12 @@ diff --git a/src/gallium/targets/dri/target.c b/src/gallium/targets/dri/target.c
 index b94ea3d..feff6e3 100644
 --- a/src/gallium/targets/dri/target.c
 +++ b/src/gallium/targets/dri/target.c
-@@ -98,6 +98,7 @@ DEFINE_LOADER_DRM_ENTRYPOINT(tegra);
+@@ -98,6 +98,8 @@ DEFINE_LOADER_DRM_ENTRYPOINT(tegra);
  
  #if defined(GALLIUM_KMSRO)
  DEFINE_LOADER_DRM_ENTRYPOINT(armada_drm)
 +DEFINE_LOADER_DRM_ENTRYPOINT(axi_hdmi_drm)
++DEFINE_LOADER_DRM_ENTRYPOINT(fmchdmi)
  DEFINE_LOADER_DRM_ENTRYPOINT(exynos)
  DEFINE_LOADER_DRM_ENTRYPOINT(gm12u320)
  DEFINE_LOADER_DRM_ENTRYPOINT(hdlcd)
