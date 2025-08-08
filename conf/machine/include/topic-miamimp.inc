@@ -97,7 +97,7 @@ BIF_DEVICETREE_ATTR = ""
 BIF_BITSTREAM_ATTR = ""
 
 # TLD uses this revision
-TOPIC_XSA_DESIGN_VERSION ?= "179+bcff7f6"
+TOPIC_XSA_DESIGN_VERSION ?= "286+a99bb33"
 TOPIC_XSA_DESIGN_NAME ?= "fpga-hardware-${MACHINE}-reference-${TOPIC_XSA_DESIGN_VERSION}.xsa"
 
 # Setup things for external-hdf.bb
