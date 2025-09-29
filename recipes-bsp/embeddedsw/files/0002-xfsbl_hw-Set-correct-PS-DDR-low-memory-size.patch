@@ -1,0 +1,37 @@
+From 910d7d6c9fb009d9ae3852e9aa02a039585aa8d2 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Mon, 29 Sep 2025 16:22:58 +0200
+Subject: [PATCH 2/2] xfsbl_hw: Set correct PS DDR low memory size
+
+Sometimes the XPAR_PSU_DDR_0_S_AXI_HIGHADDR value gets defined as
+0x7FF00000 - 1 which is 1MB below 2GB. The FSBL uses this value to
+initalize the DDR memory when ECC is enabled. If this doesn't erase all
+DDR, this leads to 'Synchronous Abort' in u-boot or similar EDAC errors
+in the kernel later on, depending on how the memory happens to be used.
+
+Fix the value to be 2GB-1 always, so that the ECC memory gets initialized
+properly.
+---
+ lib/sw_apps/zynqmp_fsbl/src/xfsbl_hw.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/sw_apps/zynqmp_fsbl/src/xfsbl_hw.h b/lib/sw_apps/zynqmp_fsbl/src/xfsbl_hw.h
+index 2c005eb3a0..551c08b26e 100644
+--- a/lib/sw_apps/zynqmp_fsbl/src/xfsbl_hw.h
++++ b/lib/sw_apps/zynqmp_fsbl/src/xfsbl_hw.h
+@@ -983,10 +983,10 @@ extern "C" {
+ 		#ifdef ARMR5
+ 			#define XFSBL_PS_DDR_END_ADDRESS		(XPAR_PSU_R5_DDR_0_S_AXI_HIGHADDR)
+ 		#else
+-			#define XFSBL_PS_DDR_END_ADDRESS		(XPAR_PSU_DDR_0_S_AXI_HIGHADDR)
++			#define XFSBL_PS_DDR_END_ADDRESS		(0x80000000U - 1U)
+ 		#endif
+ 	#else
+-		#define XFSBL_PS_DDR_END_ADDRESS		(XPAR_PSU_DDR_0_HIGHADDRESS)
++		#define XFSBL_PS_DDR_END_ADDRESS		(0x80000000U - 1U)
+ 	#endif
+ #endif
+ 
+-- 
+2.43.0
+
