@@ -180,7 +180,11 @@
 			gpio-hog;
 			gpios = <5 0>;
 			input; /* Hardware pull-up or pull-down sets default */
-			line-name = "eth_clk_sw_ctrl";
+		};
+		eth-switch-ctl {
+			gpio-hog;
+			gpios = <6 GPIO_PULL_UP>;
+			input;
 		};
 	};
 
