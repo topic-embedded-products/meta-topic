@@ -7,11 +7,10 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 # Use UBI to boot from QSPI. Add support for squashfs.
 SRC_URI:append:topic-miamimp = "\
 	file://must-press-space-to-stop-autoboot.cfg \
-	file://no-bootdelay.cfg \
 	file://no-env.cfg \
-	file://no-network.cfg \
 	file://no-sata.cfg \
 	file://no-video.cfg \
+	file://enable-zynmp-phy.cfg \
 	file://support-ubi-boot.cfg \
 	file://support-squashfs.cfg \
 	file://0001-zynqmp-Boot-with-UBI-from-QSPI.patch \
