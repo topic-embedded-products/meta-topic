@@ -1,5 +1,24 @@
 #include "tepzu.dts"
 
+/ {
+	/* Provide fixed clocks for serdes initialization (missing Si534x driver) */
+	clk100: fixed_clock_100 {
+		compatible = "fixed-clock";
+		#clock-cells = <0x0>;
+		clock-frequency = <100000000>;
+	};
+	clk125: fixed_clock_125 {
+		compatible = "fixed-clock";
+		#clock-cells = <0x0>;
+		clock-frequency = <125000000>;
+	};
+	clk27: fixed_clock_27 {
+		compatible = "fixed-clock";
+		#clock-cells = <0x0>;
+		clock-frequency = <27000000>;
+	};
+};
+
 /* Run QSPI at 40MHz. Some bug in u-boot corrupts the data at higher speeds */
 &qspi {
 	flash@0 {
@@ -16,4 +35,39 @@
 };
 &dwc3_1 {
 	status = "disabled";
+};
+
+&gpioex {
+	/* U-boot doesn't recognize pcal9554b, so try using something similar */
+	compatible = "nxp,pcal9554b", "nxp,pca9554";
+};
+
+/* Remove references to Si534X clock */
+&gem2 {
+	/delete-property/ assigned-clock-rates;
+	/delete-property/ assigned-clocks;
+};
+
+/*
+ * Zynq GEM driver doesnt use DM_MDIO and hence ignores the reset there. So
+ * connect the reset to the PHY instead.
+ */
+&miamiphy {
+	reset-gpios = <&gpioex 2 1>; /* Active low, on port 2 of GPIO expander */
+	/* Datasheet: 10 ms reset pulse, wait 50 ms for register access */
+	reset-assert-us = <10000>;
+	reset-deassert-us = <50000>;
+};
+
+/* Pretend that the input clock rates are fixed */
+&psgtr {
+	/delete-property/ assigned-clocks;
+	/delete-property/ assigned-clock-rates;
+	clock-names = "ref0", "ref1", "ref3";
+	clocks = <&clk100>, <&clk125>, <&clk27>;
+};
+
+&pcie {
+	/delete-property/ assigned-clocks;
+	/delete-property/ assigned-clock-rates;
 };

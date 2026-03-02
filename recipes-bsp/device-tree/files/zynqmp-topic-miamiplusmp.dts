@@ -473,13 +473,8 @@
 	nvmem-cell-names = "mac-address";
 	phys = <&psgtr 2 PHY_TYPE_SGMII 2 1>; /* Lane 2 refclk 1 */
 	/* Need 25MHz and 125MHz clocks (Xilinx drivers lack proper clk support) */
-	assigned-clocks      = <&si5345 0 5>, <&si5345 0 2>, <&si5345 0 7>;
-	assigned-clock-rates =    <25000000>,   <125000000>,   <250000000>;
-
-	/* Change TSU clock to external input (copied from zynqmp-clk-ccf.dtsi) */
-	clocks = <&zynqmp_clk LPD_LSBUS>, <&zynqmp_clk GEM2_REF>, <&zynqmp_clk GEM2_TX>,
-		 <&zynqmp_clk GEM2_RX>, <&si5345 0 7>;
-	clock-names = "pclk", "hclk", "tx_clk", "rx_clk", "tsu_clk";
+	assigned-clocks      = <&si5345 0 5>, <&si5345 0 2>;
+	assigned-clock-rates =    <25000000>,   <125000000>;
 
 	mdio {
 		#address-cells = <1>;
