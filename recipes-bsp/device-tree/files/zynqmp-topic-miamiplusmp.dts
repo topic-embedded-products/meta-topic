@@ -442,6 +442,11 @@
 	reset-on-timeout;
 	timeout-sec = <5>;
 };
+&lpd_watchdog {
+	status = "okay";
+	reset-on-timeout;
+	timeout-sec = <5>;
+};
 
 &xilinx_ams {
 	status = "okay";
