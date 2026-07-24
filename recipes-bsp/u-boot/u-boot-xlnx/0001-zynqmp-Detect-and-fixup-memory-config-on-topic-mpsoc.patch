@@ -1,4 +1,4 @@
-From b935dba712fbf39ab074143d4f76365e7517d987 Mon Sep 17 00:00:00 2001
+From 660de0c91efad9426009ebb1788ca360216ef4d7 Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 19 Apr 2023 14:45:51 +0200
 Subject: [PATCH] zynqmp: Detect and fixup memory config on topic mpsoc plus
@@ -15,10 +15,10 @@ Upstream-status: Inappropriate
  2 files changed, 47 insertions(+)
 
 diff --git a/board/xilinx/common/board.c b/board/xilinx/common/board.c
-index 5a249a6e9b6..095de89b9f1 100644
+index aff28cdd9b6..7b3cd5cc1e5 100644
 --- a/board/xilinx/common/board.c
 +++ b/board/xilinx/common/board.c
-@@ -669,12 +669,30 @@ int embedded_dtb_select(void)
+@@ -687,12 +687,30 @@ int embedded_dtb_select(void)
  
  #ifdef CONFIG_OF_BOARD_SETUP
  #define MAX_RAND_SIZE 8
@@ -50,18 +50,18 @@ index 5a249a6e9b6..095de89b9f1 100644
  		fdt_fixup_mtdparts(blob, nodes, ARRAY_SIZE(nodes));
  
 diff --git a/board/xilinx/zynqmp/zynqmp.c b/board/xilinx/zynqmp/zynqmp.c
-index d07979f0dd3..fbaed6c3e9c 100644
+index 4a62fdd8028..472b2eb1adf 100644
 --- a/board/xilinx/zynqmp/zynqmp.c
 +++ b/board/xilinx/zynqmp/zynqmp.c
-@@ -11,6 +11,7 @@
- #include <dfu.h>
+@@ -12,6 +12,7 @@
  #include <env.h>
  #include <env_internal.h>
+ #include <efi_loader.h>
 +#include <fdt_support.h>
  #include <init.h>
  #include <log.h>
- #include <net.h>
-@@ -236,14 +237,42 @@ unsigned long do_go_exec(ulong (*entry)(int, char * const []), int argc,
+ #include <mtd.h>
+@@ -255,14 +256,42 @@ unsigned long do_go_exec(ulong (*entry)(int, char * const []), int argc,
  }
  
  #if !defined(CFG_SYS_SDRAM_BASE) && !defined(CFG_SYS_SDRAM_SIZE)
@@ -105,5 +105,5 @@ index d07979f0dd3..fbaed6c3e9c 100644
  
  	return 0;
 -- 
-2.43.0
+2.34.1
 
