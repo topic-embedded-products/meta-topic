@@ -1,0 +1,68 @@
+From e1841f9ce440cc1f59d574f32400a7aeabcb6d75 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 4 Aug 2026 09:49:58 +0200
+Subject: [PATCH] drm: adi_axi_hdmi: Update for 6.18 kernel
+
+Upstream dropped "drm_encoder_slave" which the axi_hdmi_encoder.c
+uses extensively, so the encoder part doesn't compile.
+---
+ drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c     | 6 +++---
+ drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c | 1 -
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c
+index 352ade0c61bd..85dc66545aa3 100644
+--- a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c
++++ b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_drv.c
+@@ -17,6 +17,7 @@
+ #include <linux/of_graph.h>
+ #include <linux/clk.h>
+ 
++#include <drm/clients/drm_client_setup.h>
+ #include <drm/drm.h>
+ #include <drm/drm_atomic_helper.h>
+ #include <drm/drm_crtc_helper.h>
+@@ -31,7 +32,6 @@
+ 
+ #define DRIVER_NAME	"axi_hdmi_drm"
+ #define DRIVER_DESC	"AXI HDMI DRM"
+-#define DRIVER_DATE	"20120930"
+ #define DRIVER_MAJOR	1
+ #define DRIVER_MINOR	0
+ 
+@@ -92,7 +92,7 @@ static int axi_hdmi_init(struct drm_driver *ddrv, struct device *dev)
+ 	if (ret)
+ 		goto err_crtc;
+ 
+-	drm_fbdev_dma_setup(ddev, 32);
++	drm_client_setup(drm, NULL);
+ 
+ 	return 0;
+ err_crtc:
+@@ -115,10 +115,10 @@ static struct drm_driver axi_hdmi_driver = {
+ 	.fops			= &axi_hdmi_driver_fops,
+ 	.name			= DRIVER_NAME,
+ 	.desc			= DRIVER_DESC,
+-	.date			= DRIVER_DATE,
+ 	.major			= DRIVER_MAJOR,
+ 	.minor			= DRIVER_MINOR,
+ 	DRM_GEM_DMA_DRIVER_OPS,
++	DRM_FBDEV_DMA_DRIVER_OPS,
+ };
+ 
+ static const struct of_device_id adv7511_encoder_of_match[] = {
+diff --git a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
+index 3c59df2c3fe5..1c17e1e37403 100644
+--- a/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
++++ b/drivers/gpu/drm/adi_axi_hdmi/axi_hdmi_encoder.c
+@@ -19,7 +19,6 @@
+ #include <drm/drm_atomic_helper.h>
+ #include <drm/drm_bridge.h>
+ #include <drm/drm_crtc_helper.h>
+-#include <drm/drm_encoder_slave.h>
+ #include <drm/drm_edid.h>
+ #include <drm/drm_print.h>
+ #include <drm/drm_probe_helper.h>
+-- 
+2.34.1
+
