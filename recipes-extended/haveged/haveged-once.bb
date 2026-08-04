@@ -10,6 +10,8 @@ INITSCRIPT_NAME = "${BPN}.sh"
 INITSCRIPT_PARAMS = "start 10 S ."
 SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 
+S = "${UNPACKDIR}"
+
 do_compile() {
 	true
 }
@@ -20,7 +22,7 @@ RDEPENDS:${PN} += "haveged"
 
 do_install() {
 	install -d ${D}${sysconfdir}/init.d
-	install -m 755 ${WORKDIR}/${BPN}.sh ${D}${sysconfdir}/init.d/${BPN}.sh
+	install -m 755 ${S}/${BPN}.sh ${D}${sysconfdir}/init.d/${BPN}.sh
 	install -d ${D}${systemd_unitdir}/system
-	install -m 0644 ${WORKDIR}/${BPN}.service ${D}${systemd_unitdir}/system/
+	install -m 0644 ${S}/${BPN}.service ${D}${systemd_unitdir}/system/
 }

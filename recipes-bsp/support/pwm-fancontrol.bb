@@ -1,5 +1,5 @@
 DESCRIPTION = "Temperature controlled fans"
-LICENSE = "GPLv3"
+LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://../COPYING;md5=9eef91148a9b14ec7f9df333daebc746"
 
 inherit gitpkgv update-rc.d systemd
@@ -11,7 +11,7 @@ SRC_URI = "${GITHUB_TOPIC_URI}/kernel-module-topic-pl-fanctrl${GITHUB_TOPIC_URI_
 
 PV = "0+${SRCPV}"
 PKGV = "0+${GITPKGV}"
-S = "${WORKDIR}/git/app"
+S .= "/app"
 SRCREV = "041f3745f3eff6ff89c834d3b883dc4f0df265d1"
 
 INITSCRIPT_NAME = "${BPN}.sh"

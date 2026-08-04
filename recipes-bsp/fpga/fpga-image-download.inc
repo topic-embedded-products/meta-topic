@@ -10,7 +10,7 @@ PACKAGENAME ?= "${BPN}-${MACHINE}-${PV}"
 BOARD_DESIGN_URI = "http://fpga-server.local/downloads/fpga/${PACKAGENAME}.bit.xz;name=${MACHINE}"
 
 PKGV = "${PV}"
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 B = "${S}"
 
 # Nothing to build

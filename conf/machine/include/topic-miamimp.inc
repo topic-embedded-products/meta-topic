@@ -61,7 +61,7 @@ PREFERRED_PROVIDER_virtual/dtb = "device-tree-static"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree-static"
 
 # The RTC only works if a battery is connected, which most boards do not have
-MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
+MACHINE_FEATURES_OPTED_OUT = "rtc"
 # Sanitize the MACHINE_FEATURES (otherwise we get wifi, bluetooth and more)
 MACHINE_FEATURES = "ext2 ext3 vfat usbhost fpgamgr"
 # All our MPSoC modules have an "eg" version with a MALI GPU
@@ -85,7 +85,7 @@ WKS_FILE_RO = "sdimage-squashfs.wks"
 # Xilinx sets WKS_FILES instead of WKS_FILE, so we're forced to do that here too
 WKS_FILES = "${WKS_FILE}"
 IMAGE_BOOT_FILES = "boot.bin"
-IMAGE_OVERHEAD_FACTOR="1.1"
+IMAGE_OVERHEAD_FACTOR = "1.1"
 
 # Xilinx sets WKS_FILE_DEPENDS:append which we'll undo here. We only want boot.bin there anyway...
 WKS_FILE_DEPENDS:remove = "virtual/dtb u-boot-xlnx-uenv u-boot-xlnx-scr arm-trusted-firmware"

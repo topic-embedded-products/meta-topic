@@ -12,6 +12,6 @@ BOARD_DESIGN_URI = "${TOPICDOWNLOADS_URI}/files/${TOPIC_XSA_DESIGN_NAME}.xz;name
 do_compile[depends] += "unzip-native:do_populate_sysroot"
 # Nothing to build, just unpack the XSA to get the bitstream
 do_compile() {
-   unzip ${WORKDIR}/${TOPIC_XSA_DESIGN_NAME} ${FPGA_PART}.bit
+   unzip ${S}/${TOPIC_XSA_DESIGN_NAME} ${FPGA_PART}.bit
    cp -f -l ${FPGA_PART}.bit fpga.bit
 }

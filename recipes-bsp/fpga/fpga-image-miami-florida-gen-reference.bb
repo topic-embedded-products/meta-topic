@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaa
 
 BOARD_DESIGN_URI = ""
 
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 PV = "v3r0.1"
 
 PLNAME = "topic-miami-florida-gen-${FPGA_FAMILY}"
@@ -20,7 +20,7 @@ SRC_URI = "${TOPICEMBEDDED_URIBASE}/${BITSTREAM_FILENAME};name=${PLNAME}"
 
 # Copy static bitstream to the source dir.
 do_compile() {
-	cp ${WORKDIR}/${BITSTREAM_FILENAME} ${S}/fpga.bit
+	cp -l ${S}/${BITSTREAM_FILENAME} ${S}/fpga.bit
 }
 
 SRC_URI[topic-miami-florida-gen-xc7z015.md5sum] = "54c27f024fafb513856c1721eedcb215"

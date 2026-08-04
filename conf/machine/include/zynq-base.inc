@@ -21,7 +21,7 @@ IMAGE_INSTALL_MACHINE_EXTRAS = "packagegroup-machine-base ${BOARD_PL_REFERENCE}"
 KERNEL_IMAGETYPE = "uImage"
 
 # If we have an rtc, we'll tell it
-MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
+MACHINE_FEATURES_OPTED_OUT = "rtc"
 
 # Specify machine features
 MACHINE_FEATURES = "vfat fpgamgr"
@@ -55,5 +55,5 @@ WKS_FILE_RO = "sdimage-squashfs.wks"
 # Xilinx sets WKS_FILES instead of WKS_FILE, so we're forced to do that here too
 WKS_FILES = "${WKS_FILE}"
 IMAGE_BOOT_FILES = "boot.bin u-boot.img"
-IMAGE_OVERHEAD_FACTOR="1.1"
+IMAGE_OVERHEAD_FACTOR = "1.1"
 do_image_wic[depends] += "mtools-native:do_populate_sysroot dosfstools-native:do_populate_sysroot"

@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://${META_ZYNQ_BASE}/COPYING;md5=751419260aa954499f7abaa
 
 BOARD_DESIGN_URI = ""
 
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 PV = "v3r0.4"
 SRC_URI[topic-miamimp-florida-gen-xczu9eg.sha256sum] = "6e9e72f52d2383108a50335366a8a289122a306fbc6aebbf470264e75a2713ac"
@@ -24,5 +24,5 @@ SRC_URI = "${TOPICEMBEDDED_URIBASE}/${BITSTREAM_FILENAME}.xz;name=${PLNAME}"
 
 # Copy static bitstream to the source dir.
 do_compile() {
-	cp ${WORKDIR}/${BITSTREAM_FILENAME} ${S}/fpga.bit
+	cp -l ${S}/${BITSTREAM_FILENAME} ${S}/fpga.bit
 }

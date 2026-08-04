@@ -7,7 +7,6 @@ inherit module gitpkgv
 
 PV = "3+${SRCPV}"
 PKGV = "3+${GITPKGV}"
-S = "${WORKDIR}/git"
 SRCREV = "${AUTOREV}"
 
 GITHUB_TOPIC_URI ?= "git://github.com/topic-embedded-products"

@@ -22,14 +22,14 @@ do_configure:append:zynqmp() {
 	echo  "Patching psu_init in S=${S} B=${B}"
 	for p in fsbl-firmware/fsbl-firmware_plat/hw fsbl-firmware/fsbl-firmware_plat/zynqmp_fsbl fsbl-firmware/fsbl-firmware
 	do
-		cp -l ${WORKDIR}/ps_iic_eeprom.c ${WORKDIR}/ps_iic_eeprom.h ${WORKDIR}/psu_init_ddr.inc ${WORKDIR}/psu_init_ddr_custom.inc ${S}/$p/
+		cp -l ${UNPACKDIR}/ps_iic_eeprom.c ${UNPACKDIR}/ps_iic_eeprom.h ${UNPACKDIR}/psu_init_ddr.inc ${UNPACKDIR}/psu_init_ddr_custom.inc ${S}/$p/
 		sed "s#PSU_MASK_POLL_TIME 1100000#PSU_MASK_POLL_TIME 11000#g" ${S}/$p/psu_init.c > ${S}/$p/psu_init.c.new
 		rm ${S}/$p/psu_init.c
 		mv ${S}/$p/psu_init.c.new ${S}/$p/psu_init.c
 		pushd ${S}/$p
 		for f in ${EXTRA_PSUINIT_PATCH}
 		do
-			patch -p 1 -i ${WORKDIR}/$f
+			patch -p 1 -i ${UNPACKDIR}/$f
 		done
 		popd
 	done

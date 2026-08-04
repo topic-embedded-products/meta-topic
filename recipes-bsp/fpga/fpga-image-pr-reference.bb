@@ -16,7 +16,7 @@ TOPICDOWNLOADS_URI ?= "https://topic-downloads.fra1.digitaloceanspaces.com"
 BOARD_DESIGN_URI = "${TOPICDOWNLOADS_URI}/files/${BOARD_DESIGN_PATH}-${PV}.tar.xz;name=${MACHINE}"
 
 PKGV = "${PV}"
-S = "${WORKDIR}/${BOARD_DESIGN_PATH}"
+S = "${UNPACKDIR}/${BOARD_DESIGN_PATH}"
 B = "${S}"
 
 # Nothing to build

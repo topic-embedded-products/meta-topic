@@ -10,8 +10,10 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 SRC_URI = "file://boot.scr"
 
+S = "${UNPACKDIR}"
+
 do_compile () {
-	oe_mkimage_script -n "boot" -d ${WORKDIR}/boot.scr ${B}/boot.uimage.scr
+	oe_mkimage_script -n "boot" -d ${S}/boot.scr ${B}/boot.uimage.scr
 }
 
 do_install () {

@@ -6,7 +6,7 @@ inherit allarch
 
 SRC_URI = "https://github.com/analogdevicesinc/linux/blob/c7c505283d373d0618e33e0cefe3c195133e4ad4/firmware/imageon_edid.bin?raw=true;downloadfilename=imageon_edid.bin"
 
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 FILES:${PN} = "${nonarch_base_libdir}/firmware"
 

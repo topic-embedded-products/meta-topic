@@ -8,6 +8,8 @@ PACKAGES = "${PN}"
 
 SRC_URI = "file://init file://${BPN}.service file://${BPN}.sh"
 
+S = "${UNPACKDIR}"
+
 inherit update-rc.d systemd
 
 # Set to start at 03, which is before modutils
@@ -20,7 +22,7 @@ SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 do_compile() {
 	for f in ${BPN}.sh ${BPN}.service init
 	do
-		sed -e 's,@LIBDIR@,${nonarch_base_libdir},g' -e 's,@BINDIR@,${sbindir},g' ${WORKDIR}/$f > ${B}/$f
+		sed -e 's,@LIBDIR@,${nonarch_base_libdir},g' -e 's,@BINDIR@,${sbindir},g' ${S}/$f > ${B}/$f
 	done
 }
 
