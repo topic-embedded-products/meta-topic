@@ -9,6 +9,7 @@ PACKAGES = "${PN}"
 SRC_URI = "file://init file://${BPN}.service file://${BPN}.sh"
 
 S = "${UNPACKDIR}"
+B = "${WORKDIR}/build"
 
 inherit update-rc.d systemd
 
