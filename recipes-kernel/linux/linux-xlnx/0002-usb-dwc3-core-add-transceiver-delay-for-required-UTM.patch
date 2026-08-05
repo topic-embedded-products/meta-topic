@@ -14,6 +14,7 @@ delay. This delay is required for some UTMI/ULPI PHYs.
 Adding this option we can enable/disable XCVRDLY bit for transceiver delay.
 
 Signed-off-by: Piyush Mehta <piyush.mehta@xilinx.com>
+Upstream-Status: Backport
 ---
  drivers/usb/dwc3/core.c | 12 ++++++++++++
  drivers/usb/dwc3/core.h |  4 ++++

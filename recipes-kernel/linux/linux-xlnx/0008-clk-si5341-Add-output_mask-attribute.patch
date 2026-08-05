@@ -10,7 +10,8 @@ Allows disabling clocks from userspace. Expected sequence:
   - Program clock chip by writing program_nvm_bank
   - Reboot system
 
-Upstream-status: Inappropriate
+Upstream-Status: Inappropriate [configuration]
+
 ---
  drivers/clk/clk-si5341.c | 66 ++++++++++++++++++++++++++++++++++++++++
  1 file changed, 66 insertions(+)

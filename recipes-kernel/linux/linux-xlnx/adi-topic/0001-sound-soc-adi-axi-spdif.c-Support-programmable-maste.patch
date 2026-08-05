@@ -19,6 +19,8 @@ Starting the clock and enabling the SPDIF output AFTER programming the
 dividers is a more logical order anyway.
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+
+Upstream-Status: Submitted
 ---
  sound/soc/adi/axi-spdif.c | 62 +++++++++++++++++++++++++--------------
  1 file changed, 40 insertions(+), 22 deletions(-)

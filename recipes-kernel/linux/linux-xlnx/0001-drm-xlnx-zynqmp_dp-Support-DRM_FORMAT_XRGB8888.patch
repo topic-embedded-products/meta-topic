@@ -6,6 +6,8 @@ Subject: [PATCH] drm: xlnx: zynqmp_dp: Support DRM_FORMAT_XRGB8888
 XRGB8888 is the default mode that X11 will want to use. Add support
 for this to the zynqmp DP driver, so that applications can use 32-bit
 framebuffers.
+
+Upstream-Status: Submitted
 ---
  drivers/gpu/drm/xlnx/zynqmp_disp.c | 5 +++++
  1 file changed, 5 insertions(+)

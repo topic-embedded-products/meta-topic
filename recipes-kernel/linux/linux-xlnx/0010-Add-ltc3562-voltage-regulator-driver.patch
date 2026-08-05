@@ -7,6 +7,7 @@ The ltc3562 is an I2C controlled regulator supporting 4 independent
 outputs.
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+Upstream-Status: Denied
 ---
  .../devicetree/bindings/regulator/ltc3562.txt |  57 +++
  drivers/regulator/Kconfig                     |   7 +

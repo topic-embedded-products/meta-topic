@@ -12,6 +12,7 @@ time by 300ms and allows the clock to be up and running before the
 kernel boots (e.g. for bootloader usage).
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+Upstream-Status: Denied
 ---
  drivers/clk/clk-si5341.c | 57 +++++++++++++++++++++++++++++++++++++---
  1 file changed, 54 insertions(+), 3 deletions(-)

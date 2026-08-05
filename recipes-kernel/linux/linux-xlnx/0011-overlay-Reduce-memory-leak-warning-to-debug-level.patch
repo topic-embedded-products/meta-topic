@@ -8,6 +8,8 @@ The kernel spams messages like:
 This issue was present in previous kernels but was never reported
 explicitly. There's nothing "we" can do about it at the moment, so
 reduce the log level and keep the spam out of the error level logs.
+
+Upstream-Status: Inappropriate
 ---
  drivers/of/overlay.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

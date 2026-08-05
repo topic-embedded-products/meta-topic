@@ -6,6 +6,8 @@ Subject: [PATCH 06/14] wireless: brcmfmac: Disable power-save mode
 The power save mode of the brcmfmac module causes issues on many devices, and
 increases ping response times to more than 1 second. Turn it off permanently
 to solve the connection errors and latency issues.
+
+Upstream-Status: Submitted
 ---
  .../wireless/broadcom/brcm80211/brcmfmac/cfg80211.c    | 10 +++-------
  1 file changed, 3 insertions(+), 7 deletions(-)

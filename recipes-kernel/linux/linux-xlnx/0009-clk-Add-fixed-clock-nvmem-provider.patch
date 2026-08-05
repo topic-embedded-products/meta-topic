@@ -18,6 +18,7 @@ an I2C EEPROM) it cannot be integrated into clk-fixed which uses
 CLK_OF_DECLARE to initialize.
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+Upstream-Status: Denied
 
 Series-to: linux-clk@vger.kernel.org
 Series-version: 4

@@ -15,6 +15,7 @@ restriction, check the "compatible" value of the SPI controller and skip
 parsing the 4BAIT header alltogether on that controller.
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+Upstream-Status: Inappropriate
 ---
  drivers/mtd/spi-nor/sfdp.c | 10 ++++++++++
  1 file changed, 10 insertions(+)

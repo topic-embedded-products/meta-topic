@@ -7,6 +7,7 @@ Support VBUS power control using regulator framework. Enables the regulator
 while the port is in host mode.
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+Upstream-Status: Submitted
 ---
  drivers/usb/dwc3/core.c | 37 +++++++++++++++++++++++++++++--------
  drivers/usb/dwc3/core.h |  4 ++++

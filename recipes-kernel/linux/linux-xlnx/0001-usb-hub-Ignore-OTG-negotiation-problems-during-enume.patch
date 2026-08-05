@@ -12,6 +12,8 @@ Adding a USB hub in between solves this.
 Modify the hub code to not give up immediately when the OTG negotiations
 run into trouble, but just continue as a standard hub, which lets the
 cable decide which end will be what.
+
+Upstream-Status: Backport
 ---
  drivers/usb/core/hub.c | 5 ++---
  1 file changed, 2 insertions(+), 3 deletions(-)

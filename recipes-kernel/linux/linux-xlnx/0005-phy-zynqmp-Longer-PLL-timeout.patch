@@ -8,6 +8,8 @@ The PS GTR PLL sometimes takes a bit more than 1 millisecond to lock, resulting 
   phy phy-fd400000.phy.2: phy poweron failed --> -110
   dwc3 fe200000.dwc3: failed to initialize core: -110
 Change the timeout to approximately 20ms.
+
+Upstream-Status: Submitted
 ---
  drivers/phy/xilinx/phy-zynqmp.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

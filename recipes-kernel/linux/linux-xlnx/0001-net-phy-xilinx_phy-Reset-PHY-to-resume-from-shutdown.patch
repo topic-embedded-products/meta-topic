@@ -9,6 +9,7 @@ Implement a xilinxphy specific resume function. This fixes that the PHY
 stopped working after a down-up sequence.
 
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+Upstream-Status: Submitted
 ---
  drivers/net/phy/xilinx_phy.c | 20 +++++++++++++++++---
  1 file changed, 17 insertions(+), 3 deletions(-)
