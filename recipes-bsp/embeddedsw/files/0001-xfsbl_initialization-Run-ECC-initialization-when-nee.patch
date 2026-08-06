@@ -6,6 +6,8 @@ Subject: [PATCH] xfsbl_initialization: Run ECC initialization when needed
 Always initialize ECC when register settings indicate it's enabled, regardless
 of any defined macro. This allows boards to do this dynamically based on jumper
 or EEPROM settings.
+
+Upstream-Status: Inappropriate
 ---
  lib/sw_apps/zynqmp_fsbl/src/xfsbl_initialization.c | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)

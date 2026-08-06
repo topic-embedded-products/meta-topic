@@ -8,6 +8,8 @@ option to enable watchdog.
 
 see:
 https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18842055/Cadence+WDT+Driver
+
+Upstream-Status: Inappropriate
 ---
  lib/sw_apps/zynqmp_pmufw/src/xpfw_config.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

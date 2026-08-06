@@ -11,6 +11,8 @@ in the kernel later on, depending on how the memory happens to be used.
 
 Fix the value to be 2GB-1 always, so that the ECC memory gets initialized
 properly.
+
+Upstream-Status: Inappropriate
 ---
  lib/sw_apps/zynqmp_fsbl/src/xfsbl_hw.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)

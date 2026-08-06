@@ -4,6 +4,7 @@ Date: Fri, 10 Jan 2020 11:38:53 +0100
 Subject: [PATCH 2/2] Give PCAP ctrl back to ICAP for partial programming
  (Dyplo)
 
+Upstream-Status: Inappropriate
 ---
  lib/sw_services/xilfpga/src/interface/zynqmp/xilfpga_pcap.c | 4 ++++
  1 file changed, 4 insertions(+)
