@@ -3,6 +3,7 @@ From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Thu, 27 Jul 2023 12:16:42 +0200
 Subject: [PATCH] zynqmp: Boot with UBI from QSPI
 
+Upstream-Status: Inappropriate
 ---
  include/configs/xilinx_zynqmp.h | 5 +----
  1 file changed, 1 insertion(+), 4 deletions(-)

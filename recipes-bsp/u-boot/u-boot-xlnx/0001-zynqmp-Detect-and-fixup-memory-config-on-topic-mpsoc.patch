@@ -8,7 +8,7 @@ Read DDR settings from controller and update board configuration
 Update memory settings in devicetree for OS boot
 Requires CONFIG_OF_BOARD_SETUP=y and CONFIG_ARCH_FIXUP_FDT_MEMORY=y
 
-Upstream-status: Inappropriate
+Upstream-Status: Inappropriate
 ---
  board/xilinx/common/board.c  | 18 ++++++++++++++++++
  board/xilinx/zynqmp/zynqmp.c | 29 +++++++++++++++++++++++++++++
