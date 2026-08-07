@@ -10,7 +10,11 @@ static int psu_read_eeprom(u16 device_id, u16 i2c_slave_addr, u16 offset, u8 off
 	u8 TxArray[2];
 
 	/* Lookup for I2C-1U device */
+#ifdef SDT
+	ConfigIic = XIicPs_LookupConfig(device_id ? XPAR_I2C1_BASEADDR : XPAR_I2C0_BASEADDR);
+#else
 	ConfigIic = XIicPs_LookupConfig(device_id);
+#endif
 	if (!ConfigIic)
 		return 1;
 

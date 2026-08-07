@@ -1,4 +1,4 @@
-From 660de0c91efad9426009ebb1788ca360216ef4d7 Mon Sep 17 00:00:00 2001
+From c6861fa3a7bf6ae4f60f56bb229f3d2e4a37b0ff Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Wed, 19 Apr 2023 14:45:51 +0200
 Subject: [PATCH] zynqmp: Detect and fixup memory config on topic mpsoc plus
@@ -11,8 +11,8 @@ Requires CONFIG_OF_BOARD_SETUP=y and CONFIG_ARCH_FIXUP_FDT_MEMORY=y
 Upstream-Status: Inappropriate
 ---
  board/xilinx/common/board.c  | 18 ++++++++++++++++++
- board/xilinx/zynqmp/zynqmp.c | 29 +++++++++++++++++++++++++++++
- 2 files changed, 47 insertions(+)
+ board/xilinx/zynqmp/zynqmp.c | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+)
 
 diff --git a/board/xilinx/common/board.c b/board/xilinx/common/board.c
 index aff28cdd9b6..7b3cd5cc1e5 100644
@@ -50,7 +50,7 @@ index aff28cdd9b6..7b3cd5cc1e5 100644
  		fdt_fixup_mtdparts(blob, nodes, ARRAY_SIZE(nodes));
  
 diff --git a/board/xilinx/zynqmp/zynqmp.c b/board/xilinx/zynqmp/zynqmp.c
-index 4a62fdd8028..472b2eb1adf 100644
+index 4a62fdd8028..cee7b3db783 100644
 --- a/board/xilinx/zynqmp/zynqmp.c
 +++ b/board/xilinx/zynqmp/zynqmp.c
 @@ -12,6 +12,7 @@
@@ -61,7 +61,7 @@ index 4a62fdd8028..472b2eb1adf 100644
  #include <init.h>
  #include <log.h>
  #include <mtd.h>
-@@ -255,14 +256,42 @@ unsigned long do_go_exec(ulong (*entry)(int, char * const []), int argc,
+@@ -255,14 +256,41 @@ unsigned long do_go_exec(ulong (*entry)(int, char * const []), int argc,
  }
  
  #if !defined(CFG_SYS_SDRAM_BASE) && !defined(CFG_SYS_SDRAM_SIZE)
@@ -77,7 +77,6 @@ index 4a62fdd8028..472b2eb1adf 100644
  	if (ret)
  		return ret;
  
-+	gd->bd->bi_dram[0].size = get_ram_size((long *)gd->bd->bi_dram[0].start, gd->bd->bi_dram[0].size);
 +	detected_size = gd->bd->bi_dram[1].size;
 +	if (detected_size) {
 +		/* Reading these registers only works on TOPIC boards */
