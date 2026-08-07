@@ -19,13 +19,12 @@ SRC_URI:append = "\
 # fsbl-firmware/fsbl-firmware/psu_init.c is what actually gets compiled
 # The files are links to external sources, un-link them before patching
 do_configure:append:zynqmp() {
-	echo  "Patching psu_init in S=${S} B=${B}"
-	for p in fsbl-firmware/fsbl-firmware_plat/hw fsbl-firmware/fsbl-firmware_plat/zynqmp_fsbl fsbl-firmware/fsbl-firmware
+	# Handy debugging information in case the files get moved again...
+	# echo -e "Patching psu_init in\n WORKDIR=${WORKDIR}\n UNPACKDIR=${UNPACKDIR}\n S=${S}\n B=${B}"
+	for p in lib/sw_apps/zynqmp_fsbl/src lib/sw_apps/zynqmp_fsbl/misc/som
 	do
 		cp -l ${UNPACKDIR}/ps_iic_eeprom.c ${UNPACKDIR}/ps_iic_eeprom.h ${UNPACKDIR}/psu_init_ddr.inc ${UNPACKDIR}/psu_init_ddr_custom.inc ${S}/$p/
-		sed "s#PSU_MASK_POLL_TIME 1100000#PSU_MASK_POLL_TIME 11000#g" ${S}/$p/psu_init.c > ${S}/$p/psu_init.c.new
-		rm ${S}/$p/psu_init.c
-		mv ${S}/$p/psu_init.c.new ${S}/$p/psu_init.c
+		sed -i "s#PSU_MASK_POLL_TIME 1100000#PSU_MASK_POLL_TIME 11000#g" ${S}/$p/psu_init.c
 		pushd ${S}/$p
 		for f in ${EXTRA_PSUINIT_PATCH}
 		do
