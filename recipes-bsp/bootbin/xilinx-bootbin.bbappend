@@ -5,6 +5,3 @@ BIF_COMMON_ATTR:append:zynqmp = " init"
 BIF_COMMON_ATTR[init] = "initouter.int"
 
 SRC_URI:append:zynqmp = " file://initouter.int"
-do_compile:prepend:zynqmp() {
-	cp ${UNPACKDIR}/initouter.int ${B}/
-}
