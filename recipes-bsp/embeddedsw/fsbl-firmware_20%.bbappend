@@ -9,7 +9,7 @@ EXTRA_PSUINIT_PATCH:tspzu = "0001-tspzu-ddr-routines.patch"
 
 SRC_URI:append = "\
 	${@'${EXTRA_PSUINIT_PATCH}' and 'file://${EXTRA_PSUINIT_PATCH};apply=n' or ''} \
-	file://ps_iic_eeprom.c file://ps_iic_eeprom.h \
+	file://ps_iic_eeprom.h \
 	file://psu_init_ddr.inc file://psu_init_ddr_custom.inc \
 	"
 
@@ -23,7 +23,7 @@ do_configure:append:zynqmp() {
 	# echo -e "Patching psu_init in\n WORKDIR=${WORKDIR}\n UNPACKDIR=${UNPACKDIR}\n S=${S}\n B=${B}"
 	for p in lib/sw_apps/zynqmp_fsbl/src lib/sw_apps/zynqmp_fsbl/misc/som
 	do
-		cp -l ${UNPACKDIR}/ps_iic_eeprom.c ${UNPACKDIR}/ps_iic_eeprom.h ${UNPACKDIR}/psu_init_ddr.inc ${UNPACKDIR}/psu_init_ddr_custom.inc ${S}/$p/
+		cp -l ${UNPACKDIR}/ps_iic_eeprom.h ${UNPACKDIR}/psu_init_ddr.inc ${UNPACKDIR}/psu_init_ddr_custom.inc ${S}/$p/
 		sed -i "s#PSU_MASK_POLL_TIME 1100000#PSU_MASK_POLL_TIME 11000#g" ${S}/$p/psu_init.c
 		pushd ${S}/$p
 		for f in ${EXTRA_PSUINIT_PATCH}
