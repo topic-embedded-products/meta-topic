@@ -1,4 +1,4 @@
-From 87d652caafb6e5e5be3f0953e6ef73674b43df87 Mon Sep 17 00:00:00 2001
+From bfa438690d741e264e384d017cd92a7b3be345aa Mon Sep 17 00:00:00 2001
 From: Mike Looijmans <mike.looijmans@topic.nl>
 Date: Tue, 29 Apr 2025 14:58:26 +0200
 Subject: [PATCH] DRI: Add axi_hdmi_drm
@@ -9,36 +9,34 @@ combination with e.g. the MPSoC MALI400.
 Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
 Upstream-Status: Pending
 ---
- src/gallium/targets/dri/meson.build | 1 +
- src/gallium/targets/dri/target.c    | 1 +
- 2 files changed, 2 insertions(+)
+ src/gallium/targets/dril/dril_target.c | 2 ++
+ src/gallium/targets/dril/meson.build   | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/src/gallium/targets/dri/meson.build b/src/gallium/targets/dri/meson.build
-index e74df9b..eb095cc 100644
---- a/src/gallium/targets/dri/meson.build
-+++ b/src/gallium/targets/dri/meson.build
-@@ -70,6 +70,8 @@ libgallium_dri = shared_library(
- 
- foreach d : [[with_gallium_kmsro, [
-                'armada-drm_dri.so',
-+               'axi_hdmi_drm_dri.so',
-+               'fmchdmi_dri.so',
-                'exynos_dri.so',
-                'gm12u320_dri.so',
-                'hdlcd_dri.so',
-diff --git a/src/gallium/targets/dri/target.c b/src/gallium/targets/dri/target.c
-index b94ea3d..feff6e3 100644
---- a/src/gallium/targets/dri/target.c
-+++ b/src/gallium/targets/dri/target.c
-@@ -98,6 +98,8 @@ DEFINE_LOADER_DRM_ENTRYPOINT(tegra);
- 
- #if defined(GALLIUM_KMSRO)
- DEFINE_LOADER_DRM_ENTRYPOINT(armada_drm)
+diff --git a/src/gallium/targets/dril/dril_target.c b/src/gallium/targets/dril/dril_target.c
+index 56c55ee..97c964d 100644
+--- a/src/gallium/targets/dril/dril_target.c
++++ b/src/gallium/targets/dril/dril_target.c
+@@ -681,3 +681,5 @@ DEFINE_LOADER_DRM_ENTRYPOINT(zynqmp_dpsub)
+ DEFINE_LOADER_DRM_ENTRYPOINT(lima)
+ DEFINE_LOADER_DRM_ENTRYPOINT(d3d12)
+ DEFINE_LOADER_DRM_ENTRYPOINT(zink)
 +DEFINE_LOADER_DRM_ENTRYPOINT(axi_hdmi_drm)
 +DEFINE_LOADER_DRM_ENTRYPOINT(fmchdmi)
- DEFINE_LOADER_DRM_ENTRYPOINT(exynos)
- DEFINE_LOADER_DRM_ENTRYPOINT(gm12u320)
- DEFINE_LOADER_DRM_ENTRYPOINT(hdlcd)
+diff --git a/src/gallium/targets/dril/meson.build b/src/gallium/targets/dril/meson.build
+index 62a816f..2632f81 100644
+--- a/src/gallium/targets/dril/meson.build
++++ b/src/gallium/targets/dril/meson.build
+@@ -65,7 +65,9 @@ dril_dri = shared_library(
+ foreach d : [[with_gallium_kmsro, [
+                'apple_dri.so',
+                'armada-drm_dri.so',
++               'axi_hdmi_drm_dri.so',
+                'exynos_dri.so',
++               'fmchdmi_dri.so',
+                'gm12u320_dri.so',
+                'hdlcd_dri.so',
+                'hx8357d_dri.so',
 -- 
-2.43.0
+2.34.1
 
