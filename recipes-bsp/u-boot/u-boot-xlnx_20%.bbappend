@@ -20,6 +20,7 @@ SRC_URI:append:topic-miamimp = "\
 	file://no-video.cfg \
 	${U_BOOT_NETWORK_CONFIG} \
 	file://enable-zynmp-phy.cfg \
+	file://size-reduction.cfg \
 	file://support-ubi-boot.cfg \
 	file://support-squashfs.cfg \
 	file://0001-Revert-mmc-zynq_sdhci-Enable-card-detect-workaround-.patch \
