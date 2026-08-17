@@ -1,0 +1,56 @@
+From b7d42c9d68322b793d195764b81c94fb8e30ba83 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 14 Aug 2026 15:32:20 +0200
+Subject: [PATCH 4/4] topic_miami: Boot from QSPI in memory-mapped mode
+
+Provide the configuration options to boot from QSPI using SPL. Provide
+the correct size and offset for the SPL binaries, u-boot.img was
+always located at offset 0x20000 for this platform.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+Upstream-Status: Submitted
+---
+ configs/topic_miami_defconfig | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
+index 06604097088..2f3555e1c35 100644
+--- a/configs/topic_miami_defconfig
++++ b/configs/topic_miami_defconfig
+@@ -27,22 +27,21 @@ CONFIG_SYS_MEMTEST_END=0x18000000
+ CONFIG_REMAKE_ELF=y
+ CONFIG_SYS_CUSTOM_LDSCRIPT=y
+ CONFIG_SYS_LDSCRIPT="arch/arm/mach-zynq/u-boot.lds"
++# CONFIG_EFI_LOADER is not set
+ CONFIG_DISTRO_DEFAULTS=y
+ CONFIG_BOOTDELAY=0
+ CONFIG_USE_PREBOOT=y
+ CONFIG_SYS_PBSIZE=2077
+ # CONFIG_BOARD_LATE_INIT is not set
+ CONFIG_CLOCKS=y
+-CONFIG_SPL_MAX_SIZE=0x30000
++CONFIG_SPL_MAX_SIZE=0x20000
+ # CONFIG_SPL_SHARES_INIT_SP_ADDR is not set
+ CONFIG_SPL_HAVE_INIT_STACK=y
+ CONFIG_SPL_SYS_MALLOC=y
+ CONFIG_SPL_SYS_MALLOC_SIZE=0x2000000
+-CONFIG_SPL_SPI_LOAD=y
+-CONFIG_SYS_SPI_U_BOOT_OFFS=0x20000
++# CONFIG_SPL_SYS_MMCSD_RAW_MODE is not set
+ CONFIG_SYS_PROMPT="zynq-uboot> "
+ CONFIG_SYS_MAXARGS=32
+-# CONFIG_CMD_BOOTEFI is not set
+ # CONFIG_CMD_ELF is not set
+ # CONFIG_CMD_SPL is not set
+ CONFIG_CMD_THOR_DOWNLOAD=y
+@@ -56,7 +55,6 @@ CONFIG_CMD_MTD=y
+ CONFIG_CMD_USB=y
+ # CONFIG_CMD_SETEXPR is not set
+ CONFIG_CMD_CACHE=y
+-# CONFIG_CMD_EFICONFIG is not set
+ CONFIG_CMD_SQUASHFS=y
+ CONFIG_CMD_UBI=y
+ # CONFIG_EFI_PARTITION is not set
+-- 
+2.43.0
+

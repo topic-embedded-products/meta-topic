@@ -1,0 +1,65 @@
+From 810b4ce367a84b126fd7bad496fe732d2ec00a2f Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Wed, 26 Mar 2025 07:53:56 +0100
+Subject: [PATCH 1/4] zynq-topic-miami.dts: Use fixed-partitions binding for
+ QSPI NOR
+
+The QSPI partitioning was still using the old syntax, upgrade to the
+new "fixed-partitions" compatible bindings. This makes the MTD layer
+recognize the partitions, and CONFIG_MTDPARTS_DEFAULT can be removed.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+Upstream-Status: Submitted
+---
+ arch/arm/dts/zynq-topic-miami.dts | 21 ++++++++++++---------
+ configs/topic_miami_defconfig     |  2 --
+ 2 files changed, 12 insertions(+), 11 deletions(-)
+
+diff --git a/arch/arm/dts/zynq-topic-miami.dts b/arch/arm/dts/zynq-topic-miami.dts
+index 73eea372079..066e27240ac 100644
+--- a/arch/arm/dts/zynq-topic-miami.dts
++++ b/arch/arm/dts/zynq-topic-miami.dts
+@@ -46,15 +46,18 @@
+ 		spi-tx-bus-width = <1>;
+ 		spi-rx-bus-width = <4>;
+ 		spi-max-frequency = <100000000>;
+-		#address-cells = <1>;
+-		#size-cells = <1>;
+-		partition@0 {
+-			label = "qspi-boot-bin";
+-			reg = <0x00000 0x100000>;
+-		};
+-		partition@100000 {
+-			label = "qspi-rootfs";
+-			reg = <0x100000 0>;
++		partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++			partition@0 {
++				label = "qspi-boot-bin";
++				reg = <0x00000 0x100000>;
++			};
++			partition@100000 {
++				label = "qspi-rootfs";
++				reg = <0x100000 0>;
++			};
+ 		};
+ 	};
+ };
+diff --git a/configs/topic_miami_defconfig b/configs/topic_miami_defconfig
+index 8e8ae74801e..e736a64f371 100644
+--- a/configs/topic_miami_defconfig
++++ b/configs/topic_miami_defconfig
+@@ -57,8 +57,6 @@ CONFIG_CMD_USB=y
+ CONFIG_CMD_CACHE=y
+ # CONFIG_CMD_EFICONFIG is not set
+ CONFIG_CMD_SQUASHFS=y
+-CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
+-CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:0x100000(qspi-boot-bin),-(qspi-rootfs)"
+ CONFIG_CMD_UBI=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-- 
+2.43.0
+

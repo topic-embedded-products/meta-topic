@@ -1,0 +1,108 @@
+From 3de3d9235a9e75f184a307887b0a11745a769fe2 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Fri, 14 Aug 2026 15:05:33 +0200
+Subject: [PATCH 3/4] mach-zynq: SPL Boot from QSPI in memory-mapped mode
+
+Ever since this commit:
+  Commit 9bb02f7f4533 ("mtd: spi-nor: Fix the spi_nor_read() when config SPI_STACKED_PARALLEL is enabled")
+booting a 7-series Zynq using the SPL flow is broken, the board is unable
+to read u-boot.img from QSPI flash using the updated routines in SPL. In
+U-boot proper, reading QSPI flash works fine though.
+
+When the Zynq boots from QSPI NOR flash, the ROM will have set up the
+QSPI NOR chip in XIP mode, and the contents are now memory mapped (the
+first 16MB at least). All that needs to be done at this stage is to just
+memcpy the u-boot code into DDR RAM. This is not only extremely simple,
+it's also the fastest method to read QSPI flash on this platform.
+This corresponds to a standard NOR boot.
+
+To accomplish this, first make the SPI support optional instead of
+mandatory for the ZYNQ platform. In the bootmode detection, select the
+NOR bootmode instead of SPI when this config has been enabled. And
+enable this by default for the ZYNQ.
+
+To boot from QSPI NOR, the u-boot.img part must be placed after the
+boot.bin (i.e. SPL). Set the CONFIG_SPL_PAD_TO configuration option to
+the offset in QSPI flash. Usually this will be 0x20000 as the SPL code
+easily fits in 128k.
+
+With these changes, I was able to boot a Zynq from QSPI once more.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+Upstream-Status: Submitted
+---
+ arch/arm/Kconfig              | 3 +--
+ arch/arm/mach-zynq/Kconfig    | 6 ------
+ arch/arm/mach-zynq/spl.c      | 8 +++++++-
+ include/configs/zynq-common.h | 2 ++
+ 4 files changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index 514bf2000b4..06c03dec552 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -1346,8 +1346,7 @@ config ARCH_ZYNQ
+ 	select SPL_SOC_INIT if SPL
+ 	select SPL_CLK if SPL
+ 	select SPL_DM if SPL
+-	select SPL_DM_SPI if SPL
+-	select SPL_DM_SPI_FLASH if SPL
++	select SPL_NOR_SUPPORT if SPL
+ 	select SPL_OF_CONTROL if SPL
+ 	select SPL_SEPARATE_BSS if SPL
+ 	select SPL_TIMER if SPL
+diff --git a/arch/arm/mach-zynq/Kconfig b/arch/arm/mach-zynq/Kconfig
+index c3f505fa15c..a067a59d09b 100644
+--- a/arch/arm/mach-zynq/Kconfig
++++ b/arch/arm/mach-zynq/Kconfig
+@@ -18,12 +18,6 @@ config SPL_MMC
+ config SPL_SERIAL
+ 	default y
+ 
+-config SPL_SPI_FLASH_SUPPORT
+-	default y if ZYNQ_QSPI
+-
+-config SPL_SPI
+-	default y if ZYNQ_QSPI
+-
+ config ZYNQ_DDRC_INIT
+ 	bool "Zynq DDRC initialization"
+ 	default y
+diff --git a/arch/arm/mach-zynq/spl.c b/arch/arm/mach-zynq/spl.c
+index dc964dc2f9f..0332dcee402 100644
+--- a/arch/arm/mach-zynq/spl.c
++++ b/arch/arm/mach-zynq/spl.c
+@@ -47,10 +47,16 @@ u32 spl_boot_device(void)
+ 	u32 mode;
+ 
+ 	switch ((zynq_slcr_get_boot_mode()) & ZYNQ_BM_MASK) {
+-#ifdef CONFIG_SPL_SPI
++#ifdef CONFIG_SPL_NOR_SUPPORT
++	case ZYNQ_BM_QSPI:
++		mode = BOOT_DEVICE_NOR;
++		break;
++#else
++# ifdef CONFIG_SPL_SPI
+ 	case ZYNQ_BM_QSPI:
+ 		mode = BOOT_DEVICE_SPI;
+ 		break;
++# endif
+ #endif
+ 	case ZYNQ_BM_NAND:
+ 		mode = BOOT_DEVICE_NAND;
+diff --git a/include/configs/zynq-common.h b/include/configs/zynq-common.h
+index 94273d0deb9..902827f6f0a 100644
+--- a/include/configs/zynq-common.h
++++ b/include/configs/zynq-common.h
+@@ -35,6 +35,8 @@
+ /* Ethernet driver */
+ 
+ /* NOR */
++/* Load address is mmap address of QSPI flash, plus the offset */
++#define CFG_SYS_UBOOT_BASE (0xfc000000 + CONFIG_SPL_PAD_TO)
+ 
+ #ifdef CONFIG_USB_EHCI_ZYNQ
+ # define DFU_DEFAULT_POLL_TIMEOUT	300
+-- 
+2.43.0
+
