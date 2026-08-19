@@ -11,6 +11,8 @@
 
 #include "zynqmp-topic-miamiplusmp.dts"
 
+/delete-node/ &optee;
+
 / {
 	gpio-poweroff {
 		compatible = "gpio-poweroff";

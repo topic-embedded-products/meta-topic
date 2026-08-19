@@ -71,3 +71,7 @@
 	/delete-property/ assigned-clocks;
 	/delete-property/ assigned-clock-rates;
 };
+
+&sdhci1 {
+	/delete-property/ cd-gpios; /* Pinmux not set up in u-boot */
+};

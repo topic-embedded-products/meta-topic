@@ -52,6 +52,12 @@
 		reg = <0x0 0x0 0x0 0x80000000>, <0x8 0x00000000 0x1 0x80000000>; /* 2GB + 6GB maximum size */
 	};
 
+	/* The kernel defaults to "arm,psci-1.0" which is not supported by the firmware */
+	psci {
+		compatible = "arm,psci-0.2";
+		method = "smc";
+	};
+
 	/* Represents the 3v3 supply on the SOM. */
 	reg_3v3_miami: regulator_3v3_miami {
 		compatible = "regulator-fixed";

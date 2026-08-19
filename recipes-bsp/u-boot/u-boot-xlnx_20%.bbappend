@@ -31,3 +31,15 @@ SRC_URI:append:tspzu = "\
 	file://enable-of-board-setup.cfg \
 	file://0001-zynqmp-Detect-and-fixup-memory-config-on-topic-mpsoc.patch \
 	"
+
+# Based on u-boot-xlnx.inc, machine config can set UBOOT_MACHINE_DTB and UBOOT_MACHINE_DTB_PROVIDER
+# Machines can override the DTB that gets linked into u-boot
+python __anonymous () {
+    dts = d.getVar("UBOOT_MACHINE_DTB")
+    if dts:
+        d.setVar('DTB_FILE_NAME', d.getVar('UBOOT_MACHINE_DTB'))
+        prov = d.getVar("UBOOT_MACHINE_DTB_PROVIDER")
+        if prov:
+            # Replace the 'depends' to remove the dependency on device-tree
+            d.setVarFlag('do_configure', 'depends', '%s:do_populate_sysroot' % prov)
+}
