@@ -1,0 +1,33 @@
+From d8d3a0eb71362fda1bff8f3d38a15b957a5c4ce2 Mon Sep 17 00:00:00 2001
+From: Mike Looijmans <mike.looijmans@topic.nl>
+Date: Tue, 18 Aug 2026 15:43:30 +0200
+Subject: [PATCH] Revert "mmc: zynq_sdhci: Enable card detect workaround for
+ ZynqMP"
+
+The breaks things when not using the built-in card detect. Proper solution
+is probably to only do this if the card detect is actually being used.
+
+This reverts commit 980e55518fd9962ee4768a0f2c2f9382a2e11f8e.
+
+Signed-off-by: Mike Looijmans <mike.looijmans@topic.nl>
+Upstream-Status: Pending
+---
+ drivers/mmc/zynq_sdhci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/mmc/zynq_sdhci.c b/drivers/mmc/zynq_sdhci.c
+index eda95b72f49..fa082c2d16e 100644
+--- a/drivers/mmc/zynq_sdhci.c
++++ b/drivers/mmc/zynq_sdhci.c
+@@ -1210,7 +1210,7 @@ static int arasan_sdhci_probe(struct udevice *dev)
+ 	 * causing sd card timeout error. Workaround this by adding a wait for
+ 	 * 1000msec till the card detect state gets stable.
+ 	 */
+-	if (IS_ENABLED(CONFIG_ARCH_ZYNQMP) || IS_ENABLED(CONFIG_ARCH_VERSAL)) {
++	if (IS_ENABLED(CONFIG_ARCH_VERSAL)) {
+ 		u32 timeout = 1000000;
+ 
+ 		while (((sdhci_readl(host, SDHCI_PRESENT_STATE) &
+-- 
+2.43.0
+
