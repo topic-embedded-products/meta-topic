@@ -40,6 +40,8 @@ require conf/machine/zynqmp-generic.conf
 # Undo what Xilinx did, there's nothing that we want, so make it empty
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS = ""
 
+require reduce-buildcfg.inc 
+
 # Remove the unneeded boot config/script, not needed for topic boards, but they
 # get added unconditionally by zynqmp-generic.conf.
 EXTRA_IMAGEDEPENDS:remove = "u-boot-xlnx-uenv u-boot-xlnx-scr"

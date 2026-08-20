@@ -1,0 +1,2 @@
+# Remove the uninteresting stuff that Xilinx put into BUILDCFG_VARS
+BUILDCFG_VARS:remove = "XILINX_RELEASE_VERSION HW_BOOT_MODE HW_BOOT_MODE_TYPE SOC_ON_DISK_BOOT_BIN"

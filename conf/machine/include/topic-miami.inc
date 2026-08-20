@@ -13,6 +13,7 @@ KMACHINE = "${MACHINE_BOARD}"
 include conf/machine/include/zynq-base.inc
 require conf/machine/include/soc-zynq.inc
 require conf/machine/include/machine-xilinx-default.inc
+require reduce-buildcfg.inc 
 
 # Prefer to use Yocto's QEMU over Xilinx'
 PREFERRED_PROVIDER_qemu-helper-native = "qemu-helper-native"
