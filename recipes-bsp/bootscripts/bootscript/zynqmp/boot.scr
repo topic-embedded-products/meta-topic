@@ -1,12 +1,12 @@
 setenv bootargs $bootargs coherent_pool=512k reset_reason=${reset_reason} quiet
 if test "${devtype}" = "mmc"; then
-	echo "Loading kernel from mmc ${devnum}:${devplist}..."
-	if load ${devtype} ${devnum}:${devplist} $fdt_addr_r /boot/system.dtb && load ${devtype} ${devnum}:${devplist} $kernel_addr_r /boot/Image; then
-		setenv bootargs $bootargs root=/dev/mmcblk${devnum}p${devplist} rw rootwait
+	echo "Loading kernel from mmc ${devnum}:${distro_bootpart}..."
+	if load ${devtype} ${devnum}:${distro_bootpart} $fdt_addr_r /boot/system.dtb && load ${devtype} ${devnum}:${distro_bootpart} $kernel_addr_r /boot/Image; then
+		setenv bootargs $bootargs root=/dev/mmcblk${devnum}p${distro_bootpart} rw rootwait
 		echo "Booting..."
 		booti $kernel_addr_r - $fdt_addr_r
 	else
-		echo "Load from mmc ${devnum}:${devplist} failed, aborting mmc boot..."
+		echo "Load from mmc ${devnum}:${distro_bootpart} failed, aborting mmc boot..."
 	fi;
 elif test "${devtype}" = "ubi"; then
 	echo "Loading kernel from UBIFS..."
