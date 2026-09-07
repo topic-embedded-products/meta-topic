@@ -4,6 +4,9 @@ MACHINE_BOARD = "ttpzu"
 
 require conf/machine/include/tspzu.inc
 
+DEVICETREE = "devicetree/${MACHINE}.dtb"
+UBOOT_MACHINE_DTB = "${MACHINE}-uboot.dtb"
+
 BOARD_PL_REFERENCE = "dtb-ttpzu9-reference"
 
 # Extra packages to install for the board
@@ -13,11 +16,6 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-usb-f-ecm-subset \
 	kernel-module-usb-f-mass-storage \
 	kernel-module-usb-f-rndis \
-	kernel-module-topic-pl-fanctrl \
-	pwm-fancontrol \
 	"
 
 MACHINE_FEATURES += "usbhost usbgadget ethernet"
-
-DEVICETREE = "devicetree/${MACHINE}.dtb"
-

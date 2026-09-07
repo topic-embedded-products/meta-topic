@@ -1,16 +1,112 @@
-# machine: Topic System-on-Module Plus w/ Zynq Ultrascale
+# Generic machine configuration for Topic Miami MPSoC Plus SOM (tspzu)
 
-FPGA_FAMILY_SHORT ?= "xczu"
-DEVICETREE ?= "devicetree/zynqmp-topic-miamiplusmp.dtb"
+# May settings still have "tepzu9" in their names, but actually apply to all
+# the modules.
 
-require conf/machine/include/topic-miamimp.inc
+MACHINE_BBMULTICONFIG ?= "tepzu9-cortexa53-fsbl tepzu9-microblaze-pmu"
+BBMULTICONFIG += "${MACHINE_BBMULTICONFIG}"
 
-# Add SOM to overrides, takes precedence over topic-miamimp
-SOM_FAMILY .= ":tspzu"
+TUNEFILE[microblaze-pmu] = "conf/machine/include/tepzu9/microblaze.inc"
 
-# Default XSA to create PMUFW and FSBL
-TOPIC_XSA_DESIGN_VERSION = "275+c09563c"
-TOPIC_XSA_DESIGN_NAME = "fpga-hardware-tdp-reference-ecc-${TOPIC_XSA_DESIGN_VERSION}.xsa"
-TOPIC_XSA_DESIGN_SHA256SUM = "739768df14f3bc379739f287dcd980e8db2a9eeab116eebc0a527cbb93709935"
+# Xilinx defaults to 'cortexa72-cortexa53' but the MPSoC isn't a little.big
+# combined CPU, so correct that here.
+DEFAULTTUNE ?= "cortexa53"
 
-# XSERVER_EXT:tspzu = "xf86-video-armsoc"
+# First Stage Boot Loader
+FSBL_DEPENDS = ""
+FSBL_MCDEPENDS = "mc::tepzu9-cortexa53-fsbl:fsbl-firmware:do_deploy"
+FSBL_DEPLOY_DIR = "${TMPDIR}-tepzu9-cortexa53-fsbl/deploy/images/${MACHINE}"
+
+# PMU Firmware
+PMU_DEPENDS = ""
+PMU_MCDEPENDS = "mc::tepzu9-microblaze-pmu:pmu-firmware:do_deploy"
+PMU_FIRMWARE_DEPLOY_DIR = "${TMPDIR}-tepzu9-microblaze-pmu/deploy/images/${MACHINE}"
+
+# Set the default (linux) domain device tree
+CONFIG_DTFILE_DIR := "${@bb.utils.which(d.getVar('BBPATH'), 'conf/dts/tepzu9')}"
+CONFIG_DTFILE ?= "${CONFIG_DTFILE_DIR}/cortexa53-linux.dts"
+CONFIG_DTFILE[vardepsexclude] += "CONFIG_DTFILE_DIR"
+
+DTB_FILE_PATH ?= "${RECIPE_SYSROOT}/boot/devicetree/${@os.path.basename(d.getVar('CONFIG_DTFILE').replace('.dts', '.dtb'))}"
+
+# Serial Console Settings
+SERIAL_CONSOLES ?= "115200;ttyPS0"
+
+# Yocto arm-trusted-firmware(TF-A) variables
+TFA_CONSOLE ?= "cadence"
+TFA_BL33_LOAD ?= "0x8000000"
+
+# Yocto u-boot-xlnx variables
+
+# Set DDR Base address for u-boot-xlnx-scr variables
+DDR_BASEADDR ?= "0x0"
+SKIP_APPEND_BASEADDR ?= "0"
+
+# Yocto KERNEL Variables
+UBOOT_ENTRYPOINT ?= "0x200000"
+UBOOT_LOADADDRESS ?= "0x200000"
+
+# Yocto MACHINE_FEATURES Variable
+MACHINE_FEATURES += "mali400 fpga-overlay"
+
+MACHINE_BOARD = "tepzu"
+# [T] Add SOM to overrides, takes precedence over 'generic-zynqmp'
+MACHINEOVERRIDES =. "topic-miamimp:tspzu:${MACHINE_BOARD}:"
+
+# [T] Don't use Xilinx' scripts for booting
+UBOOT_BOOT_SCRIPT = "bootscript"
+# [T] Don't deploy unused u-boot ELF binaries
+UBOOTELF_NODTB_IMAGE = ""
+UBOOTELF_NODTB_BINARY = ""
+
+# Required generic machine inclusion
+require conf/machine/zynqmp-generic.conf
+require conf/machine/include/reduce-buildcfg.inc 
+
+# This is an 'SDT' based BSP
+XILINX_WITH_ESW = "sdt"
+
+# Original SDT artifacts URL
+SDT_URI = "http://fpga-server.local/downloads/fpga/sdt-tepzu9-280+38e5dd1.tar.xz"
+SDT_URI[sha256sum] = "188748f2b2c383a2fd6211493538873357aae57fe1e4aee57a652355e809c2be"
+
+# Set the system device trees
+SYSTEM_DTFILE_DEPENDS = "sdt-artifacts"
+SYSTEM_DTFILE_DIR = "${RECIPE_SYSROOT}${datadir}/sdt/${MACHINE}"
+SYSTEM_DTFILE = "${SYSTEM_DTFILE_DIR}/system-top.dts"
+
+# Load the dynamic machine features
+include conf/machine/include/tepzu9/${BB_CURRENT_MC}-features.conf
+LIBXIL_CONFIG = "conf/machine/include/tepzu9/${BB_CURRENT_MC}-libxil.conf"
+
+# Primary Bootmode value
+DEFAULT_HW_BOOT_MODE = "3"
+
+# Update bootbin to use proper device tree
+BIF_PARTITION_IMAGE[device-tree] = "${DTB_FILE_PATH}"
+# And don't put the DT into boot.bin
+BIF_DEVICETREE_ATTR = ""
+
+# WIC image support.
+WKS_FILE = "sdimage-swu.wks"
+WKS_FILE_RO = "sdimage-squashfs.wks"
+# Xilinx sets WKS_FILES instead of WKS_FILE, so we're forced to do that here too
+WKS_FILES = "${WKS_FILE}"
+# The only thing we want in the boot partition
+IMAGE_BOOT_FILES = "boot.bin"
+# Make this empty so the xilinx script don't put boot.bin into /boot/
+IMAGE_BOOT_FILES_INSTALLED = ""
+WKS_FILE_DEPENDS += "${PREFERRED_PROVIDER_virtual/boot-bin}"
+
+# Devicetree stuff
+# This is broken with SDT, there are hard dependencies on "device-tree"
+# PREFERRED_PROVIDER_virtual/dtb = "device-tree-static"
+DEVICETREE ?= "devicetree/${MACHINE_BOARD}.dtb"
+# For U-boot, this is the dtb that gets compiled in. Should be in /boot/devicetree
+UBOOT_MACHINE_DTB ?= "${MACHINE_BOARD}-uboot.dtb"
+UBOOT_MACHINE_DTB_PROVIDER = "device-tree-plain"
+# For Linux, this is what is put into /boot and /lib/firmware
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree-plain"
+BOARD_PL_REFERENCE ??= ""
+# BOARD_PL_REFERENCE can also be overridden in the image recipe
+IMAGE_INSTALL_MACHINE_EXTRAS = "packagegroup-machine-base ${BOARD_PL_REFERENCE}"
