@@ -46,9 +46,6 @@ SKIP_APPEND_BASEADDR ?= "0"
 UBOOT_ENTRYPOINT ?= "0x200000"
 UBOOT_LOADADDRESS ?= "0x200000"
 
-# Yocto MACHINE_FEATURES Variable
-MACHINE_FEATURES += "mali400 fpga-overlay"
-
 MACHINE_BOARD = "tepzu"
 # [T] Add SOM to overrides, takes precedence over 'generic-zynqmp'
 MACHINEOVERRIDES =. "topic-miamimp:tspzu:${MACHINE_BOARD}:"
@@ -63,6 +60,12 @@ UBOOTELF_NODTB_BINARY = ""
 require conf/machine/zynqmp-generic.conf
 require conf/machine/include/reduce-buildcfg.inc 
 
+# Remove the nonsense items like "wifi" that zynqmp-generic.conf adds. Extra
+# features must be appended to MACHINE_FEATURES_EXTRA, otherwise it will clash
+# with Xilinx' abuse of MACHINE_FEATURES in bare-metal mode.
+MACHINE_FEATURES = "mali400 fpga-overlay ${MACHINE_FEATURES_EXTRA}"
+MACHINE_FEATURES_EXTRA ?= ""
+
 # This is an 'SDT' based BSP
 XILINX_WITH_ESW = "sdt"
 
@@ -76,6 +79,8 @@ SYSTEM_DTFILE_DIR = "${RECIPE_SYSROOT}${datadir}/sdt/${MACHINE}"
 SYSTEM_DTFILE = "${SYSTEM_DTFILE_DIR}/system-top.dts"
 
 # Load the dynamic machine features
+# This will replace MACHINE_FEATURES for the bare-metal parts, any modification
+# of MACHINE_FEATURES will have to take place before this line.
 include conf/machine/include/tepzu9/${BB_CURRENT_MC}-features.conf
 LIBXIL_CONFIG = "conf/machine/include/tepzu9/${BB_CURRENT_MC}-libxil.conf"
 

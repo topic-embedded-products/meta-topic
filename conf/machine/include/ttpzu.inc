@@ -18,4 +18,4 @@ MACHINE_EXTRA_RRECOMMENDS += "\
 	kernel-module-usb-f-rndis \
 	"
 
-MACHINE_FEATURES += "usbhost usbgadget ethernet"
+MACHINE_FEATURES_EXTRA += "usbhost usbgadget ethernet powerkey"
