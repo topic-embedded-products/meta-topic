@@ -5,7 +5,7 @@ MACHINE_BOARD = "ttpzu"
 require conf/machine/include/tspzu.inc
 
 DEVICETREE = "devicetree/${MACHINE}.dtb"
-UBOOT_MACHINE_DTB = "${MACHINE}-uboot.dtb"
+UBOOT_MACHINE_DTB = "${MACHINE}.dtb"
 
 BOARD_PL_REFERENCE = "dtb-ttpzu9-reference"
 
