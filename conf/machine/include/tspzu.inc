@@ -69,9 +69,9 @@ MACHINE_FEATURES_EXTRA ?= ""
 # This is an 'SDT' based BSP
 XILINX_WITH_ESW = "sdt"
 
-# Original SDT artifacts URL
-SDT_URI = "http://fpga-server.local/downloads/fpga/sdt-tepzu9-280+38e5dd1.tar.xz"
-SDT_URI[sha256sum] = "188748f2b2c383a2fd6211493538873357aae57fe1e4aee57a652355e809c2be"
+# Original SDT artifacts URL (reference design)
+SDT_URI = "http://fpga-server.local/downloads/fpga/fpga-board-utils/fpga-hardware-tdp-reference-ecc-275+c09563c-sdt.tar.xz"
+SDT_URI[sha256sum] = "9a39af137abad70c393266aa9605be1086f33ae80b5882b7e751cffc605c587a"
 
 # Set the system device trees
 SYSTEM_DTFILE_DEPENDS = "sdt-artifacts"
