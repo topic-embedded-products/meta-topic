@@ -2204,9 +2204,9 @@
                         xlnx,mio-bank = <0x1>;
                         xlnx,ip-name = "psu_sd";
                         xlnx,bus-width = <0x4>;
-                        xlnx,card-detect = <0x1>;
+                        xlnx,card-detect = <0x0>;
                         xlnx,has-wp = <0x0>;
-                        xlnx,has-cd = <0x1>;
+                        xlnx,has-cd = <0x0>;
                         xlnx,slot-type = <0x2>;
                         xlnx,clk-50-sdr-otap-dly = <0x5>;
                         xlnx,clk-50-ddr-itap-dly = <0x0>;
