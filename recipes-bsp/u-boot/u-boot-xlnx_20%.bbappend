@@ -23,7 +23,6 @@ SRC_URI:append:topic-miamimp = "\
 	file://size-reduction.cfg \
 	file://support-ubi-boot.cfg \
 	file://support-squashfs.cfg \
-	file://0001-Revert-mmc-zynq_sdhci-Enable-card-detect-workaround-.patch \
 	file://0001-zynqmp-Boot-with-UBI-from-QSPI.patch \
 	"
 
