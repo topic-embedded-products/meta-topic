@@ -3,7 +3,7 @@
 # May settings still have "tepzu9" in their names, but actually apply to all
 # the modules.
 
-MACHINE_BBMULTICONFIG ?= "tepzu9-cortexa53-fsbl tepzu9-microblaze-pmu"
+MACHINE_BBMULTICONFIG ?= "tepzu9-microblaze-pmu"
 BBMULTICONFIG += "${MACHINE_BBMULTICONFIG}"
 
 TUNEFILE[microblaze-pmu] = "conf/machine/include/tepzu9/microblaze.inc"
@@ -66,6 +66,12 @@ require conf/machine/include/reduce-buildcfg.inc
 MACHINE_FEATURES = "mali400 fpga-overlay ${MACHINE_FEATURES_EXTRA}"
 MACHINE_FEATURES_EXTRA ?= ""
 
+# Prefer u-boot SPL over FSBL
+PREFERRED_PROVIDER_virtual/bootloader = "u-boot"
+PREFERRED_PROVIDER_virtual/boot-bin = "u-boot"
+SPL_BINARY = "spl/boot.bin"
+UBOOT_SUFFIX = "itb"
+
 # This is an 'SDT' based BSP
 XILINX_WITH_ESW = "sdt"
 
@@ -98,7 +104,7 @@ WKS_FILE_RO = "sdimage-squashfs.wks"
 # Xilinx sets WKS_FILES instead of WKS_FILE, so we're forced to do that here too
 WKS_FILES = "${WKS_FILE}"
 # The only thing we want in the boot partition
-IMAGE_BOOT_FILES = "boot.bin"
+IMAGE_BOOT_FILES = "boot.bin u-boot.${UBOOT_SUFFIX}"
 # Make this empty so the xilinx script don't put boot.bin into /boot/
 IMAGE_BOOT_FILES_INSTALLED = ""
 WKS_FILE_DEPENDS += "${PREFERRED_PROVIDER_virtual/boot-bin}"
