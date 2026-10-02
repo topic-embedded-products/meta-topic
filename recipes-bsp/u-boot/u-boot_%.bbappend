@@ -6,3 +6,5 @@ SRC_URI += "\
     file://0003-mach-zynq-SPL-Boot-from-QSPI-in-memory-mapped-mode.patch \
     file://0004-topic_miami-Boot-from-QSPI-in-memory-mapped-mode.patch \
 "
+
+require u-boot-topic-common.inc
