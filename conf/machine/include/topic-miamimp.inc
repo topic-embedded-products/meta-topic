@@ -102,5 +102,5 @@ TOPIC_XSA_DESIGN_NAME ?= "fpga-hardware-${MACHINE}-reference-${TOPIC_XSA_DESIGN_
 
 # Setup things for external-hdf.bb
 HDF_NAME = "${TOPIC_XSA_DESIGN_NAME}"
-HDF_URI = "http://topic.nl/downloads/xsa/${TOPIC_XSA_DESIGN_NAME}.xz"
+HDF_URI = "http://topic-downloads.fra1.digitaloceanspaces.com/files/${TOPIC_XSA_DESIGN_NAME}.xz"
 HDF_URI[sha256sum] = "${TOPIC_XSA_DESIGN_SHA256SUM}"
