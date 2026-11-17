@@ -31,7 +31,6 @@ SRC_URI:append = "\
 	file://0001-net-phy-xilinx_phy-Reset-PHY-to-resume-from-shutdown.patch \
 	file://0001-pcie-xilinx-Support-reset-GPIO-and-wait-for-link-up-.patch \
 	file://0001-usb-hub-Ignore-OTG-negotiation-problems-during-enume.patch \
-	file://0002-usb-dwc3-core-add-transceiver-delay-for-required-UTM.patch \
 	file://0004-usb-dwc3-Add-support-for-VBUS-power-control.patch \
 	file://0005-phy-zynqmp-Longer-PLL-timeout.patch \
 	file://0006-wireless-brcmfmac-Disable-power-save-mode.patch \
